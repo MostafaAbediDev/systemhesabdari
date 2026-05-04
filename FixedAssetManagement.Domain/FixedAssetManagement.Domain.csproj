@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AccountManagement.Domain\AccountManagement.Domain.csproj" />
+    <ProjectReference Include="..\GeneralInfoManagement.Domain\GeneralInfoManagement.Domain.csproj" />
+    <ProjectReference Include="..\InvoiceSystemManagement.Domain\InvoiceSystemManagement.Domain.csproj" />
+    <ProjectReference Include="..\PersonManagement.Domain\PersonManagement.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
