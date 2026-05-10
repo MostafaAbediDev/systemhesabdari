@@ -119,7 +119,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersonManagement.Applicatio
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersonManagement.Application", "PersonManagement.Application\PersonManagement.Application.csproj", "{34FC1EFC-634B-4439-9059-1D56FCE99B79}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taadol", "..\..\..\source\repos\Taadol\Taadol\Taadol.csproj", "{27B5F042-4EA7-58E8-F5EB-25134C47970E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taadol", "Taadol\Taadol\Taadol.csproj", "{5A89053A-45D1-003A-ECE7-8B06686FEA52}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -247,10 +247,10 @@ Global
 		{34FC1EFC-634B-4439-9059-1D56FCE99B79}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{34FC1EFC-634B-4439-9059-1D56FCE99B79}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{34FC1EFC-634B-4439-9059-1D56FCE99B79}.Release|Any CPU.Build.0 = Release|Any CPU
-		{27B5F042-4EA7-58E8-F5EB-25134C47970E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{27B5F042-4EA7-58E8-F5EB-25134C47970E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{27B5F042-4EA7-58E8-F5EB-25134C47970E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{27B5F042-4EA7-58E8-F5EB-25134C47970E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A89053A-45D1-003A-ECE7-8B06686FEA52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A89053A-45D1-003A-ECE7-8B06686FEA52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A89053A-45D1-003A-ECE7-8B06686FEA52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A89053A-45D1-003A-ECE7-8B06686FEA52}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

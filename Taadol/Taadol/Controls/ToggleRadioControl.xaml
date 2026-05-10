@@ -1,0 +1,84 @@
+﻿<UserControl x:Class="Taadol.Controls.ToggleRadioControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="30"
+             d:DesignWidth="150">
+
+    <StackPanel Orientation="Horizontal"
+                VerticalAlignment="Center"
+                Cursor="Hand"
+                MouseLeftButtonUp="Container_Click"
+                MouseEnter="Container_MouseEnter"
+                MouseLeave="Container_MouseLeave">
+
+        <!-- متن لیبل -->
+        <TextBlock x:Name="LabelText"
+                   Text="انتخاب نشده"
+                   FontSize="14"
+                   FontFamily="{StaticResource IRANSans}"
+                   FontWeight="DemiBold"
+                   Foreground="#2B3F6C"
+                   VerticalAlignment="Center"
+                   Margin="0,0,4,0">
+            <TextBlock.RenderTransform>
+                <TranslateTransform x:Name="LabelTranslate"
+                                    X="0" />
+            </TextBlock.RenderTransform>
+        </TextBlock>
+
+        <!-- دایره رادیو -->
+        <Grid Width="26"
+              Height="26"
+              VerticalAlignment="Center">
+
+            <!-- هاله Glow -->
+            <Ellipse x:Name="HoverGlow"
+                     Width="21"
+                     Height="21"
+                     Fill="#27AE60"
+                     Opacity="0">
+                <Ellipse.Effect>
+                    <BlurEffect Radius="2" />
+                </Ellipse.Effect>
+            </Ellipse>
+
+            <!-- دایره اصلی -->
+            <Ellipse x:Name="OuterCircle"
+                     Width="20"
+                     Height="20"
+                     StrokeThickness="1.5"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Center">
+                <Ellipse.Stroke>
+                    <SolidColorBrush x:Name="OuterStrokeBrush"
+                                     Color="#CBD5E1" />
+                </Ellipse.Stroke>
+                <Ellipse.Fill>
+                    <SolidColorBrush x:Name="OuterFillBrush"
+                                     Color="#FFFFFF" />
+                </Ellipse.Fill>
+                <Ellipse.RenderTransform>
+                    <ScaleTransform x:Name="CircleScale"
+                                    ScaleX="1"
+                                    ScaleY="1"
+                                    CenterX="10"
+                                    CenterY="10" />
+                </Ellipse.RenderTransform>
+            </Ellipse>
+
+            <!-- نقطه داخلی -->
+            <Ellipse x:Name="InnerDot"
+                     Width="10"
+                     Height="10"
+                     Fill="#27AE60"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Center"
+                     Visibility="Collapsed" />
+
+        </Grid>
+
+    </StackPanel>
+</UserControl>
