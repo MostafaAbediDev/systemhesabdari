@@ -4,8 +4,8 @@ using PersonManagement.Domain.Person.PersonAddressAgg;
 using PersonManagement.Domain.Person.PersonAgg;
 using PersonManagement.Domain.Person.PersonBankAgg;
 using PersonManagement.Domain.Person.PersonContactAgg;
+using PersonManagement.Domain.Person.PersonTypeAgg;
 using PersonManagement.Infrastructure.EFCore.Mapping;
-using System.Collections.Generic;
 
 namespace PersonManagement.Infrastructure.EFCore
 {
@@ -16,6 +16,7 @@ namespace PersonManagement.Infrastructure.EFCore
         public DbSet<PersonAddresses> PersonAddresses { get; set; }
         public DbSet<PersonBanks> PersonBanks { get; set; }
         public DbSet<PersonContacts> PersonContacts { get; set; }
+        public DbSet<PersonType> PersonTypes { get; set; }
 
 
         public PersonSystemContext(DbContextOptions<PersonSystemContext> options) : base(options)

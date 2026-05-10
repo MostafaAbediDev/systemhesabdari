@@ -20,6 +20,7 @@ namespace PersonManagement.Infrastructure.EFCore.Mapping
             builder.Property(x => x.RegistrationNumber).HasMaxLength(50).IsRequired();
 
             builder.HasOne(x => x.Branches).WithMany().HasForeignKey(x => x.BranchId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(x => x.PersonType).WithMany(x => x.Persons).HasForeignKey(x => x.PersonTypeId);
 
             builder.HasMany(s => s.PersonBanks).WithOne(s => s.Persons).HasForeignKey(s => s.PersonId);
             builder.HasMany(s => s.PersonAddresses).WithOne(s => s.Persons).HasForeignKey(s => s.PersonId);

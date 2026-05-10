@@ -52,7 +52,7 @@
                                         Margin="10,0,10,0" />
 
                         <Grid>
-                            <controls:SimpleTest />
+                            <!--<controls:SimpleTest />-->
                             <TextBlock Text="جستجو"
                                        FontSize="13"
                                        Foreground="#737791"
@@ -199,12 +199,13 @@
         </Border>
 
         <!-- سایدبار -->
-        <controls:SidebarControl x:Name="Sidebar"
-                                 Grid.Row="0"
-                                 Grid.RowSpan="2"
-                                 Grid.Column="0"
-                                 Panel.ZIndex="10"
-                                 Loaded="Sidebar_Loaded" />
+        <!-- <controls:SidebarControl x:Name="Sidebar"
+                         Grid.Row="0"
+                         Grid.RowSpan="2"
+                         Grid.Column="0"
+                         Panel.ZIndex="10"
+                         Loaded="Sidebar_Loaded" /> -->
+        
 
         <!-- محتوا -->
         <Border x:Name="MainContentBorder"

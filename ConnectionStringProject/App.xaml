@@ -1,7 +1,7 @@
-﻿<Application x:Class="wpfprojects.App"
+﻿<Application x:Class="ConnectionStringProject.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:wpfprojects"
+             xmlns:local="clr-namespace:ConnectionStringProject"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
          

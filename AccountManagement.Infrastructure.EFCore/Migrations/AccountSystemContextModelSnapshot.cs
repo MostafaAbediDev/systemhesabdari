@@ -47,10 +47,10 @@ namespace AccountManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
@@ -129,10 +129,10 @@ namespace AccountManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsActive")
@@ -179,10 +179,10 @@ namespace AccountManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
@@ -256,10 +256,10 @@ namespace AccountManagement.Infrastructure.EFCore.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
@@ -306,10 +306,10 @@ namespace AccountManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
@@ -359,10 +359,10 @@ namespace AccountManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<int>("EconomicCode")
@@ -421,10 +421,10 @@ namespace AccountManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("EstablishedDate")
@@ -467,10 +467,10 @@ namespace AccountManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("EndDate")
@@ -507,10 +507,10 @@ namespace AccountManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
@@ -551,10 +551,10 @@ namespace AccountManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Desscription")
@@ -587,10 +587,10 @@ namespace AccountManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsActive")
@@ -629,10 +629,10 @@ namespace AccountManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsActive")
@@ -692,10 +692,10 @@ namespace AccountManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<string>("EconomicCode")
@@ -718,9 +718,6 @@ namespace AccountManagement.Infrastructure.EFCore.Migrations
                     b.Property<string>("NationalCode")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PersonType")
-                        .HasColumnType("int");
 
                     b.Property<string>("RegistrationNumber")
                         .IsRequired()
@@ -756,10 +753,10 @@ namespace AccountManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsActive")
@@ -805,10 +802,10 @@ namespace AccountManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")

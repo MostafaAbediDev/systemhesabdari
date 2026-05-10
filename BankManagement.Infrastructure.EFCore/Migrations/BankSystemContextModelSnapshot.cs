@@ -46,10 +46,10 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
@@ -125,10 +125,10 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsActive")
@@ -175,10 +175,10 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
@@ -249,10 +249,10 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
                     b.Property<decimal>("Debit")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
@@ -290,9 +290,6 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<int>("BankType")
-                        .HasColumnType("int");
-
                     b.Property<long>("BankTypeId")
                         .HasColumnType("bigint");
 
@@ -304,10 +301,10 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
@@ -331,9 +328,76 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("BankTypeId");
+
                     b.HasIndex("PictureId");
 
                     b.ToTable("Banks", (string)null);
+                });
+
+            modelBuilder.Entity("BankManagement.Domain.Bank.BankTypeAgg.BankTypes", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("Code")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BankTypes", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            Code = 1,
+                            CreationDate = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsActive = true,
+                            IsDeleted = false,
+                            Title = "دولتی"
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            Code = 2,
+                            CreationDate = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsActive = true,
+                            IsDeleted = false,
+                            Title = "خصوصی"
+                        },
+                        new
+                        {
+                            Id = 3L,
+                            Code = 3,
+                            CreationDate = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsActive = true,
+                            IsDeleted = false,
+                            Title = "قرض‌الحسنه"
+                        });
                 });
 
             modelBuilder.Entity("BankManagement.Domain.Bank.ChequeAgg.Cheques", b =>
@@ -365,10 +429,10 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("DueDate")
@@ -415,10 +479,10 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<int>("FirstChequeCode")
@@ -485,10 +549,10 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsActive")
@@ -540,10 +604,10 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsActive")
@@ -587,10 +651,10 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
@@ -667,10 +731,10 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
@@ -732,10 +796,10 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
@@ -785,10 +849,10 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<int>("EconomicCode")
@@ -847,10 +911,10 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("EstablishedDate")
@@ -893,10 +957,10 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("EndDate")
@@ -933,10 +997,10 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<long>("EntityId")
@@ -975,10 +1039,10 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
@@ -1019,10 +1083,10 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Desscription")
@@ -1055,10 +1119,10 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsActive")
@@ -1097,10 +1161,10 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsActive")
@@ -1160,10 +1224,10 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<string>("EconomicCode")
@@ -1187,8 +1251,8 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PersonType")
-                        .HasColumnType("int");
+                    b.Property<long>("PersonTypeId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("RegistrationNumber")
                         .IsRequired()
@@ -1197,6 +1261,8 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BranchesId");
+
+                    b.HasIndex("PersonTypeId");
 
                     b.ToTable("Persons");
                 });
@@ -1224,10 +1290,10 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsActive")
@@ -1273,10 +1339,10 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DeletedBy")
+                    b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
@@ -1309,6 +1375,41 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
                     b.HasIndex("PersonsId");
 
                     b.ToTable("PersonContacts");
+                });
+
+            modelBuilder.Entity("PersonManagement.Domain.Person.PersonTypeAgg.PersonType", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("Code")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PersonType");
                 });
 
             modelBuilder.Entity("AccountManagement.Domain.Account.AccountAgg.Accounts", b =>
@@ -1401,11 +1502,19 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
 
             modelBuilder.Entity("BankManagement.Domain.Bank.BankAgg.Banks", b =>
                 {
+                    b.HasOne("BankManagement.Domain.Bank.BankTypeAgg.BankTypes", "BankTypes")
+                        .WithMany("Banks")
+                        .HasForeignKey("BankTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("GeneralInfoManagement.Domain.BaseInfo.PictureAgg.Pictures", "Pictures")
                         .WithMany()
                         .HasForeignKey("PictureId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.Navigation("BankTypes");
 
                     b.Navigation("Pictures");
                 });
@@ -1651,7 +1760,15 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("PersonManagement.Domain.Person.PersonTypeAgg.PersonType", "PersonType")
+                        .WithMany("Persons")
+                        .HasForeignKey("PersonTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Branches");
+
+                    b.Navigation("PersonType");
                 });
 
             modelBuilder.Entity("PersonManagement.Domain.Person.PersonBankAgg.PersonBanks", b =>
@@ -1705,6 +1822,11 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
                     b.Navigation("CompanyBankAccounts");
                 });
 
+            modelBuilder.Entity("BankManagement.Domain.Bank.BankTypeAgg.BankTypes", b =>
+                {
+                    b.Navigation("Banks");
+                });
+
             modelBuilder.Entity("BankManagement.Domain.Bank.ChequeAgg.Cheques", b =>
                 {
                     b.Navigation("ReceiptsPayments");
@@ -1754,6 +1876,11 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
                     b.Navigation("PersonBanks");
 
                     b.Navigation("PersonContacts");
+                });
+
+            modelBuilder.Entity("PersonManagement.Domain.Person.PersonTypeAgg.PersonType", b =>
+                {
+                    b.Navigation("Persons");
                 });
 #pragma warning restore 612, 618
         }
