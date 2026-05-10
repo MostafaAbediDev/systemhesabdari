@@ -7,23 +7,23 @@ namespace Taadol_Cal
         public MainWindow()
         {
             InitializeComponent();
-            Sidebar.SidebarWidthChanged += (width) =>
-            {
-                SidebarColumn.Width = new GridLength(width);
-                SidebarColumn.MinWidth = 0;
-                SidebarColumn.MaxWidth = double.PositiveInfinity;
-            };
+            //Sidebar.SidebarWidthChanged += (width) =>
+            //{
+            //    SidebarColumn.Width = new GridLength(width);
+            //    SidebarColumn.MinWidth = 0;
+            //    SidebarColumn.MaxWidth = double.PositiveInfinity;
+            //};
 
             // گوش دادن به کلیک زیرمنو
-            Sidebar.SubMenuClicked += (tag) =>
-            {
-                // TODO: Navigate based on tag
-            };
+            //Sidebar.SubMenuClicked += (tag) =>
+            //{
+            //    // TODO: Navigate based on tag
+            //};
             // پنهان کردن محتوای پیش‌فرض
             MainContentBorder.Visibility = Visibility.Collapsed;
 
             // Subscribe به event کلیک منو
-            Sidebar.SubMenuClicked += OnSubMenuClicked;
+            //Sidebar.SubMenuClicked += OnSubMenuClicked;
         }
 
         private void OnSubMenuClicked(string tag)
@@ -68,10 +68,10 @@ namespace Taadol_Cal
 
         private void Sidebar_Loaded(object sender, RoutedEventArgs e)
         {
-            Sidebar.SidebarWidthChanged += width =>
-            {
-                SidebarColumn.Width = new GridLength(width);
-            };
+            //Sidebar.SidebarWidthChanged += width =>
+            //{
+            //    SidebarColumn.Width = new GridLength(width);
+            //};
         }
 
         private void NewProductView_Loaded(object sender, RoutedEventArgs e)

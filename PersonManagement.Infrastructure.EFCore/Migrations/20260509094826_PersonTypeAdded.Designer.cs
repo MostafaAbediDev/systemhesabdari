@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PersonManagement.Infrastructure.EFCore;
 
@@ -11,9 +12,11 @@ using PersonManagement.Infrastructure.EFCore;
 namespace PersonManagement.Infrastructure.EFCore.Migrations
 {
     [DbContext(typeof(PersonSystemContext))]
-    partial class PersonSystemContextModelSnapshot : ModelSnapshot
+    [Migration("20260509094826_PersonTypeAdded")]
+    partial class PersonTypeAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

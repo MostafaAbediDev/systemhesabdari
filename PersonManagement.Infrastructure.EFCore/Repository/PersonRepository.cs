@@ -46,7 +46,6 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
                      NationalCode = x.NationalCode,
                      EconomicCode = x.EconomicCode,
                      RegistrationNumber = x.RegistrationNumber,
-                     PersonType = x.PersonType,
                      BranchId = x.BranchId,
                      IsLegal = x.IsLegal
                  })
@@ -79,7 +78,6 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
                     NationalCode = person.NationalCode,
                     EconomicCode = person.EconomicCode,
                     RegistrationNumber = person.RegistrationNumber,
-                    PersonType = person.PersonType,
                     BranchName = person.Branches.Title,
                     IsActive = person.IsActive,
                     IsLegal = person.IsLegal
@@ -145,7 +143,6 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
                     EconomicCode = x.EconomicCode,
                     RegistrationNumber = x.RegistrationNumber,
                     BranchName = x.Branches.Title,
-                    PersonType = x.PersonType,
                     IsActive = x.IsActive,
                     IsLegal = x.IsLegal
                 })

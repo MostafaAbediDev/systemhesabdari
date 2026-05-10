@@ -21,38 +21,38 @@ namespace Taadol_Cal
     /// </summary>
     public partial class App : Application
     {
-        public static IServiceProvider ServiceProvider { get; private set; }
+        //public static IServiceProvider ServiceProvider { get; private set; }
 
-        protected override void OnStartup(StartupEventArgs e)
-        {
-            var services = new ServiceCollection();
+        //protected override void OnStartup(StartupEventArgs e)
+        //{
+        //    var services = new ServiceCollection();
 
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
-                .Build();
+        //    var configuration = new ConfigurationBuilder()
+        //        .SetBasePath(Directory.GetCurrentDirectory())
+        //        .AddJsonFile("appsettings.json")
+        //        .Build();
 
-            ConfigureServices(services, configuration);
+        //    ConfigureServices(services, configuration);
 
-            ServiceProvider = services.BuildServiceProvider();
+        //    ServiceProvider = services.BuildServiceProvider();
 
-            base.OnStartup(e);
-        }
+        //    base.OnStartup(e);
+        //}
 
-        private void ConfigureServices(IServiceCollection services, IConfiguration configuration)
-        {
-            var connectionString = configuration.GetConnectionString("TaadolDb");
+        //private void ConfigureServices(IServiceCollection services, IConfiguration configuration)
+        //{
+        //    var connectionString = configuration.GetConnectionString("TaadolDb");
 
-            AccountManagementBoostrapper.Configure(services, connectionString);
-            BankManagementBoostrapper.Configure(services, connectionString);
-            FixedAssetManagementBoostrapper.Configure(services, connectionString);
-            GeneralInfoManagementBoostrapper.Configure(services, connectionString);
-            InventoryManagementBoostrapper.Configure(services, connectionString);
-            InvoiceManagementBoostrapper.Configure(services, connectionString);
-            LogManagementBoostrapper.Configure(services, connectionString);
-            PayrollSystemManagementBoostrapper.Configure(services, connectionString);
-            PersonManagementBoostrapper.Configure(services, connectionString);
-        }
+        //    AccountManagementBoostrapper.Configure(services, connectionString);
+        //    BankManagementBoostrapper.Configure(services, connectionString);
+        //    FixedAssetManagementBoostrapper.Configure(services, connectionString);
+        //    GeneralInfoManagementBoostrapper.Configure(services, connectionString);
+        //    InventoryManagementBoostrapper.Configure(services, connectionString);
+        //    InvoiceManagementBoostrapper.Configure(services, connectionString);
+        //    LogManagementBoostrapper.Configure(services, connectionString);
+        //    PayrollSystemManagementBoostrapper.Configure(services, connectionString);
+        //    PersonManagementBoostrapper.Configure(services, connectionString);
+        //}
     }
 
 }

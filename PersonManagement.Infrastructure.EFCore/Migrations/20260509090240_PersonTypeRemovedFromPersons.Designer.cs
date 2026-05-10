@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PersonManagement.Infrastructure.EFCore;
 
@@ -11,9 +12,11 @@ using PersonManagement.Infrastructure.EFCore;
 namespace PersonManagement.Infrastructure.EFCore.Migrations
 {
     [DbContext(typeof(PersonSystemContext))]
-    partial class PersonSystemContextModelSnapshot : ModelSnapshot
+    [Migration("20260509090240_PersonTypeRemovedFromPersons")]
+    partial class PersonTypeRemovedFromPersons
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -444,9 +447,6 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<long>("PersonTypeId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("RegistrationNumber")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -455,8 +455,6 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BranchId");
-
-                    b.HasIndex("PersonTypeId");
 
                     b.ToTable("Persons", (string)null);
                 });
@@ -568,71 +566,6 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                     b.ToTable("PersonContacts", (string)null);
                 });
 
-            modelBuilder.Entity("PersonManagement.Domain.Person.PersonTypeAgg.PersonType", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<int>("Code")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long?>("DeletedBy")
-                        .HasColumnType("bigint");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("PersonTypes", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1L,
-                            Code = 1,
-                            CreationDate = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc),
-                            IsActive = true,
-                            IsDeleted = false,
-                            Title = "مشتری"
-                        },
-                        new
-                        {
-                            Id = 2L,
-                            Code = 2,
-                            CreationDate = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc),
-                            IsActive = true,
-                            IsDeleted = false,
-                            Title = "پرسنل"
-                        },
-                        new
-                        {
-                            Id = 3L,
-                            Code = 3,
-                            CreationDate = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc),
-                            IsActive = true,
-                            IsDeleted = false,
-                            Title = "تامین کننده"
-                        });
-                });
-
             modelBuilder.Entity("GeneralInfoManagement.Domain.BaseInfo.BranchArchiveAgg.BranchArchive", b =>
                 {
                     b.HasOne("GeneralInfoManagement.Domain.BaseInfo.BranchesAgg.Branches", "Branch")
@@ -712,15 +645,7 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("PersonManagement.Domain.Person.PersonTypeAgg.PersonType", "PersonType")
-                        .WithMany("Persons")
-                        .HasForeignKey("PersonTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("Branches");
-
-                    b.Navigation("PersonType");
                 });
 
             modelBuilder.Entity("PersonManagement.Domain.Person.PersonBankAgg.PersonBanks", b =>
@@ -782,11 +707,6 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                     b.Navigation("PersonBanks");
 
                     b.Navigation("PersonContacts");
-                });
-
-            modelBuilder.Entity("PersonManagement.Domain.Person.PersonTypeAgg.PersonType", b =>
-                {
-                    b.Navigation("Persons");
                 });
 #pragma warning restore 612, 618
         }

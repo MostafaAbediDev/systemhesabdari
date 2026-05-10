@@ -3,6 +3,7 @@ using GeneralInfoManagement.Domain.BaseInfo.BranchesAgg;
 using PersonManagement.Domain.Person.PersonAddressAgg;
 using PersonManagement.Domain.Person.PersonBankAgg;
 using PersonManagement.Domain.Person.PersonContactAgg;
+using PersonManagement.Domain.Person.PersonTypeAgg;
 
 namespace PersonManagement.Domain.Person.PersonAgg
 {
@@ -13,10 +14,11 @@ namespace PersonManagement.Domain.Person.PersonAgg
         public string NationalCode { get; private set; }
         public string EconomicCode { get; private set; }
         public string RegistrationNumber { get; private set; }
-        public int PersonType { get; private set; }
+        public long PersonTypeId { get; private set; }
         public bool IsLegal { get; private set; }
         public long BranchId { get; private set; }
         public Branches Branches { get; private set; }
+        public PersonType PersonType { get; private set; }
         public List<PersonBanks> PersonBanks { get; private set; }
         public List<PersonAddresses> PersonAddresses { get; private set; }
         public List<PersonContacts> PersonContacts { get; private set; }
@@ -36,7 +38,6 @@ namespace PersonManagement.Domain.Person.PersonAgg
             NationalCode = nationalCode;
             EconomicCode = economicCode;
             RegistrationNumber = registrationNumber;
-            PersonType = personType;
         }
 
         public void Edit(string code, string fullName, string nationalCode,
@@ -47,7 +48,6 @@ namespace PersonManagement.Domain.Person.PersonAgg
             NationalCode = nationalCode;
             EconomicCode = economicCode;
             RegistrationNumber = registrationNumber;
-            PersonType = personType;
         }
 
         public void SetBranch(long branchId)
