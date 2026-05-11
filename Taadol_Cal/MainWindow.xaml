@@ -37,6 +37,7 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
+<<<<<<< HEAD
                 <Border Grid.Column="0"
                         Background="#ffffff"
                         CornerRadius="12"
@@ -121,6 +122,8 @@
                         </Grid>
                     </StackPanel>
                 </Border>
+=======
+>>>>>>> master
 
                 <Border Grid.Column="1"
                         CornerRadius="12"
@@ -213,6 +216,7 @@
                 Background="#FFF8ED"
                 HorizontalAlignment="Left"
                 Visibility="Collapsed">
+<<<<<<< HEAD
             <ScrollViewer HorizontalScrollBarVisibility="Disabled"
                           Background="#FFF8ED"
                           VerticalScrollBarVisibility="Auto">
@@ -221,6 +225,13 @@
                                 MaxWidth="1200"
                                 Margin="0,16,0,16" />
             </ScrollViewer>
+=======
+
+            <ContentControl x:Name="MainContent"
+                            HorizontalAlignment="Center"
+                            Margin="0,16,0,16" />
+
+>>>>>>> master
         </Border>
 
     </Grid>

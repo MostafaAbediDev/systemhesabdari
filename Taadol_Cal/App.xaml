@@ -7,8 +7,12 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+<<<<<<< HEAD
                 <ResourceDictionary Source="pack://application:,,,/SharpVectors.Runtime;component/Themes/Generic.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/SharpVectors.Controls;component/Themes/Default.xaml" />
+=======
+              
+>>>>>>> master
                 <materialDesign:BundledTheme BaseTheme="Light"
                                              PrimaryColor="Blue"
                                              SecondaryColor="Green" />
