@@ -1,0 +1,239 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Assets\Fonts\IRANSansXFaNum-Black.ttf" />
+    <None Remove="Assets\Fonts\IRANSansXFaNum-Bold.ttf" />
+    <None Remove="Assets\Fonts\IRANSansXFaNum-DemiBold.ttf" />
+    <None Remove="Assets\Fonts\IRANSansXFaNum-ExtraBlack.ttf" />
+    <None Remove="Assets\Fonts\IRANSansXFaNum-ExtraBold.ttf" />
+    <None Remove="Assets\Fonts\IRANSansXFaNum-Heavy.ttf" />
+    <None Remove="Assets\Fonts\IRANSansXFaNum-Light.ttf" />
+    <None Remove="Assets\Fonts\IRANSansXFaNum-Medium.ttf" />
+    <None Remove="Assets\Fonts\IRANSansXFaNum-Regular.ttf" />
+    <None Remove="Assets\Fonts\IRANSansXFaNum-Thin.ttf" />
+    <None Remove="Assets\Fonts\IRANSansXFaNum-UltraLight.ttf" />
+    <None Remove="Assets\Icons\add-square.svg" />
+    <None Remove="Assets\Icons\arrow-right.svg" />
+    <None Remove="Assets\Icons\Arrow.svg" />
+    <None Remove="Assets\Icons\arrowDowN.svg" />
+    <None Remove="Assets\Icons\ArrowLeft.svg" />
+    <None Remove="Assets\Icons\ArrowUP.svg" />
+    <None Remove="Assets\Icons\box-add.svg" />
+    <None Remove="Assets\Icons\briefcase.svg" />
+    <None Remove="Assets\Icons\briefcase_u.svg" />
+    <None Remove="Assets\Icons\buildings.svg" />
+    <None Remove="Assets\Icons\buildings_u.svg" />
+    <None Remove="Assets\Icons\calendar-tick.svg" />
+    <None Remove="Assets\Icons\calendar.svg" />
+    <None Remove="Assets\Icons\chart.svg" />
+    <None Remove="Assets\Icons\chart_u.svg" />
+    <None Remove="Assets\Icons\close.svg" />
+    <None Remove="Assets\Icons\direct-send.svg" />
+    <None Remove="Assets\Icons\dollar-circle.svg" />
+    <None Remove="Assets\Icons\dollar-circle_u.svg" />
+    <None Remove="Assets\Icons\edit.svg" />
+    <None Remove="Assets\Icons\Leftsquare.svg" />
+    <None Remove="Assets\Icons\Line.svg" />
+    <None Remove="Assets\Icons\LOGO.svg" />
+    <None Remove="Assets\Icons\more.svg" />
+    <None Remove="Assets\Icons\newdoc.svg" />
+    <None Remove="Assets\Icons\newrepo.svg" />
+    <None Remove="Assets\Icons\profile-circle.svg" />
+    <None Remove="Assets\Icons\profile.svg" />
+    <None Remove="Assets\Icons\profile_u.svg" />
+    <None Remove="Assets\Icons\rep.svg" />
+    <None Remove="Assets\Icons\rep_u.svg" />
+    <None Remove="Assets\Icons\Rightsquare.svg" />
+    <None Remove="Assets\Icons\save.svg" />
+    <None Remove="Assets\Icons\search.svg" />
+    <None Remove="Assets\Icons\share.svg" />
+    <None Remove="Assets\Icons\share_u.svg" />
+    <None Remove="Assets\Icons\tempsave.svg" />
+    <None Remove="Assets\Icons\trash.svg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MaterialDesignColors" Version="2.1.4" />
+    <PackageReference Include="MaterialDesignThemes" Version="4.9.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.9">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.6" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.6" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.5-beta1" />
+    <PackageReference Include="SharpVectors" Version="1.8.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\01_FrameWork\01_FrameWork.csproj" />
+    <ProjectReference Include="..\AccountManagement.Configuration\AccountManagement.Configuration.csproj" />
+    <ProjectReference Include="..\BankManagement.Configuration\BankManagement.Configuration.csproj" />
+    <ProjectReference Include="..\FixedAssetManagement.Configuration\FixedAssetManagement.Configuration.csproj" />
+    <ProjectReference Include="..\GeneralInfoManagement.Configuration\GeneralInfoManagement.Configuration.csproj" />
+    <ProjectReference Include="..\InventoryManagement.Configuration\InventoryManagement.Configuration.csproj" />
+    <ProjectReference Include="..\InvoiceManagement.Configuration\InvoiceManagement.Configuration.csproj" />
+    <ProjectReference Include="..\LogManagement.Configuration\LogManagement.Configuration.csproj" />
+    <ProjectReference Include="..\PayrollSystemManagement.Configuration\PayrollSystemManagement.Configuration.csproj" />
+    <ProjectReference Include="..\PersonManagement.Configuration\PersonManagement.Configuration.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\Fonts\IRANSansXFaNum-Black.ttf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Fonts\IRANSansXFaNum-Bold.ttf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Fonts\IRANSansXFaNum-DemiBold.ttf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Fonts\IRANSansXFaNum-ExtraBlack.ttf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Fonts\IRANSansXFaNum-ExtraBold.ttf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Fonts\IRANSansXFaNum-Heavy.ttf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Fonts\IRANSansXFaNum-Light.ttf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Fonts\IRANSansXFaNum-Medium.ttf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Fonts\IRANSansXFaNum-Regular.ttf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Fonts\IRANSansXFaNum-Thin.ttf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Fonts\IRANSansXFaNum-UltraLight.ttf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Content Include="Assets\Icons\add-square.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\arrow-right.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\Arrow.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\arrowDowN.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\ArrowLeft.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\ArrowUP.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\box-add.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\briefcase.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\briefcase_u.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\buildings.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\buildings_u.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\calendar-tick.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\calendar.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\chart.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\chart_u.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\close.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\direct-send.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\dollar-circle.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\dollar-circle_u.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\edit.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\Leftsquare.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\Line.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\LOGO.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\more.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\newdoc.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\newrepo.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\profile-circle.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\profile.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\profile_u.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\rep.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\rep_u.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\Rightsquare.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\save.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\search.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\share.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\share_u.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\tempsave.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\trash.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

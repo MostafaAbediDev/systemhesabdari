@@ -1,0 +1,15 @@
+# Visual Studio Cache & User-specific files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build outputs
+bin/
+obj/
+
+# Others
+*.cache
+*.db
+*.pdb
