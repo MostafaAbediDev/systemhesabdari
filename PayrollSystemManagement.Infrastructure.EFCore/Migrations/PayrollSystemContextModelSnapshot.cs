@@ -46,10 +46,17 @@ namespace PayrollSystemManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
@@ -125,10 +132,17 @@ namespace PayrollSystemManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsActive")
@@ -175,10 +189,17 @@ namespace PayrollSystemManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
@@ -249,10 +270,17 @@ namespace PayrollSystemManagement.Infrastructure.EFCore.Migrations
                     b.Property<decimal>("Debit")
                         .HasColumnType("decimal(18,2)");
 
+<<<<<<< HEAD
                     b.Property<DateTime>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
@@ -296,10 +324,17 @@ namespace PayrollSystemManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
@@ -349,10 +384,17 @@ namespace PayrollSystemManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
                         .HasColumnType("bigint");
 
                     b.Property<int>("EconomicCode")
@@ -411,10 +453,17 @@ namespace PayrollSystemManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("EstablishedDate")
@@ -457,10 +506,17 @@ namespace PayrollSystemManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("EndDate")
@@ -497,10 +553,17 @@ namespace PayrollSystemManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
@@ -541,10 +604,17 @@ namespace PayrollSystemManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
                         .HasColumnType("bigint");
 
                     b.Property<string>("Desscription")
@@ -594,10 +664,17 @@ namespace PayrollSystemManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
                         .HasColumnType("bigint");
 
                     b.Property<string>("Department")
@@ -676,10 +753,17 @@ namespace PayrollSystemManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
                         .HasColumnType("bigint");
 
                     b.Property<long>("EmployeeId")
@@ -743,10 +827,17 @@ namespace PayrollSystemManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
@@ -811,10 +902,17 @@ namespace PayrollSystemManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsActive")
@@ -852,10 +950,17 @@ namespace PayrollSystemManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsActive")
@@ -894,10 +999,17 @@ namespace PayrollSystemManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsActive")
@@ -957,10 +1069,17 @@ namespace PayrollSystemManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
                         .HasColumnType("bigint");
 
                     b.Property<string>("EconomicCode")
@@ -984,9 +1103,12 @@ namespace PayrollSystemManagement.Infrastructure.EFCore.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+<<<<<<< HEAD
                     b.Property<int>("PersonType")
                         .HasColumnType("int");
 
+=======
+>>>>>>> master
                     b.Property<string>("RegistrationNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -1021,10 +1143,17 @@ namespace PayrollSystemManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsActive")
@@ -1070,10 +1199,17 @@ namespace PayrollSystemManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")

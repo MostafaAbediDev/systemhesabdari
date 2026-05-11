@@ -22,6 +22,54 @@ namespace LogManagement.Infrastructure.EFCore.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+<<<<<<< HEAD
+=======
+            modelBuilder.Entity("GeneralInfoManagement.Domain.BaseInfo.BranchArchiveAgg.BranchArchive", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("BranchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("File")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId");
+
+                    b.ToTable("BranchArchive");
+                });
+
+>>>>>>> master
             modelBuilder.Entity("GeneralInfoManagement.Domain.BaseInfo.BranchesAgg.Branches", b =>
                 {
                     b.Property<long>("Id")
@@ -38,6 +86,7 @@ namespace LogManagement.Infrastructure.EFCore.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+<<<<<<< HEAD
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
@@ -45,6 +94,18 @@ namespace LogManagement.Infrastructure.EFCore.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<long>("DeletedBy")
+=======
+                    b.Property<long>("CompanyId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
                         .HasColumnType("bigint");
 
                     b.Property<int>("EconomicCode")
@@ -87,9 +148,103 @@ namespace LogManagement.Infrastructure.EFCore.Migrations
 
                     b.HasKey("Id");
 
+<<<<<<< HEAD
                     b.ToTable("Branches");
                 });
 
+=======
+                    b.HasIndex("CompanyId");
+
+                    b.ToTable("Branches");
+                });
+
+            modelBuilder.Entity("GeneralInfoManagement.Domain.BaseInfo.CompaniesAgg.Companies", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("EstablishedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LegalName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Logo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Companies");
+                });
+
+            modelBuilder.Entity("GeneralInfoManagement.Domain.BaseInfo.FinancialPeriodsAgg.FinancialPeriods", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("BranchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId");
+
+                    b.ToTable("FinancialPeriods");
+                });
+
+>>>>>>> master
             modelBuilder.Entity("GeneralInfoManagement.Domain.General.CityAgg.Cities", b =>
                 {
                     b.Property<long>("Id")
@@ -101,10 +256,17 @@ namespace LogManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
@@ -117,12 +279,26 @@ namespace LogManagement.Infrastructure.EFCore.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+<<<<<<< HEAD
+=======
+                    b.Property<long>("ProvinceId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ProvincesId")
+                        .HasColumnType("bigint");
+
+>>>>>>> master
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
+<<<<<<< HEAD
+=======
+                    b.HasIndex("ProvincesId");
+
+>>>>>>> master
                     b.ToTable("Cities");
                 });
 
@@ -137,10 +313,17 @@ namespace LogManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
                         .HasColumnType("bigint");
 
                     b.Property<string>("Desscription")
@@ -189,10 +372,17 @@ namespace LogManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
                         .HasColumnType("bigint");
 
                     b.Property<long>("EntityId")
@@ -280,10 +470,17 @@ namespace LogManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsActive")
@@ -322,10 +519,17 @@ namespace LogManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsActive")
@@ -385,10 +589,17 @@ namespace LogManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
                         .HasColumnType("bigint");
 
                     b.Property<string>("EconomicCode")
@@ -412,9 +623,12 @@ namespace LogManagement.Infrastructure.EFCore.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+<<<<<<< HEAD
                     b.Property<int>("PersonType")
                         .HasColumnType("int");
 
+=======
+>>>>>>> master
                     b.Property<string>("RegistrationNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -449,10 +663,17 @@ namespace LogManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsActive")
@@ -498,10 +719,17 @@ namespace LogManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
@@ -536,6 +764,53 @@ namespace LogManagement.Infrastructure.EFCore.Migrations
                     b.ToTable("PersonContacts");
                 });
 
+<<<<<<< HEAD
+=======
+            modelBuilder.Entity("GeneralInfoManagement.Domain.BaseInfo.BranchArchiveAgg.BranchArchive", b =>
+                {
+                    b.HasOne("GeneralInfoManagement.Domain.BaseInfo.BranchesAgg.Branches", "Branch")
+                        .WithMany("BranchArchive")
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Branch");
+                });
+
+            modelBuilder.Entity("GeneralInfoManagement.Domain.BaseInfo.BranchesAgg.Branches", b =>
+                {
+                    b.HasOne("GeneralInfoManagement.Domain.BaseInfo.CompaniesAgg.Companies", "Company")
+                        .WithMany("Branch")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+                });
+
+            modelBuilder.Entity("GeneralInfoManagement.Domain.BaseInfo.FinancialPeriodsAgg.FinancialPeriods", b =>
+                {
+                    b.HasOne("GeneralInfoManagement.Domain.BaseInfo.BranchesAgg.Branches", "Branch")
+                        .WithMany("FinancialPeriod")
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Branch");
+                });
+
+            modelBuilder.Entity("GeneralInfoManagement.Domain.General.CityAgg.Cities", b =>
+                {
+                    b.HasOne("GeneralInfoManagement.Domain.General.ProvinceAgg.Provinces", "Provinces")
+                        .WithMany("Cities")
+                        .HasForeignKey("ProvincesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Provinces");
+                });
+
+>>>>>>> master
             modelBuilder.Entity("LogManagement.Domain.LogAgg.Logs", b =>
                 {
                     b.HasOne("GeneralInfoManagement.Domain.BaseInfo.BranchesAgg.Branches", "Branches")
@@ -623,6 +898,26 @@ namespace LogManagement.Infrastructure.EFCore.Migrations
                     b.Navigation("Persons");
                 });
 
+<<<<<<< HEAD
+=======
+            modelBuilder.Entity("GeneralInfoManagement.Domain.BaseInfo.BranchesAgg.Branches", b =>
+                {
+                    b.Navigation("BranchArchive");
+
+                    b.Navigation("FinancialPeriod");
+                });
+
+            modelBuilder.Entity("GeneralInfoManagement.Domain.BaseInfo.CompaniesAgg.Companies", b =>
+                {
+                    b.Navigation("Branch");
+                });
+
+            modelBuilder.Entity("GeneralInfoManagement.Domain.General.ProvinceAgg.Provinces", b =>
+                {
+                    b.Navigation("Cities");
+                });
+
+>>>>>>> master
             modelBuilder.Entity("PersonManagement.Domain.Person.ContactTypeAgg.ContactTypes", b =>
                 {
                     b.Navigation("PersonContacts");

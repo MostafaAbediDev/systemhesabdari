@@ -45,6 +45,7 @@
                     <StackPanel Grid.Column="1"
                                 Orientation="Horizontal">
                         <!-- دکمه ثبت موقت -->
+<<<<<<< HEAD
                         <Button Command="{Binding SaveAndContinueCommand}"
                                 Margin="0,0,8,0"
                                 Style="{StaticResource OutlinedButtonLarge}"
@@ -103,6 +104,21 @@
                                            VerticalAlignment="Center" />
                             </StackPanel>
                         </Button>
+=======
+                        <controls:CustomOutlinedButton Margin="0,0,12,0"
+                                                       Text="ثبت موقت">
+                            <controls:CustomOutlinedButton.Icon>
+                                <svg:SvgViewbox  Source="/Assets/Icons/tempsave.svg"
+                                                 Width="16"
+                                                 Height="16" />
+                            </controls:CustomOutlinedButton.Icon>
+                        </controls:CustomOutlinedButton>
+                        <!-- دکمه ثبت -->
+                        <controls:IconButton ButtonText="ثبت"
+                                             IconSource="/Assets/Icons/save.svg"
+                                             ButtonCommand="{Binding EditCommand}"
+                                             ButtonBackground="#2667FF" />
+>>>>>>> master
 
                     </StackPanel>
                 </Grid>
@@ -146,7 +162,11 @@
 
                                 <TextBlock Text="کد حسابداری"
                                            Style="{StaticResource FormLabel}" />
+<<<<<<< HEAD
                                 <ToggleButton Content="غیرفعال"
+=======
+                                <ToggleButton Content="آیا این شخص غیر فعال است؟"
+>>>>>>> master
                                               FlowDirection="LeftToRight"
                                               Style="{StaticResource StatusToggleButton}"
                                               IsChecked="False"
@@ -159,7 +179,12 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <controls:ModernPersianTextBox Grid.Column="0"
+<<<<<<< HEAD
                                                               />
+=======
+                                                               Text="{Binding Username}"
+                                                               Placeholder="1234" />
+>>>>>>> master
 
                                 <!--<TextBox Grid.Column="0"
                                          Text="{Binding CurrentProduct.AccountCode, UpdateSourceTrigger=PropertyChanged}"

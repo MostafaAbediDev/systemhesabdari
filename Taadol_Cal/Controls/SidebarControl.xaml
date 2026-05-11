@@ -114,7 +114,11 @@
                             Background="Transparent">
                         <svg:SvgViewbox Width="45"
                                         Height="45"
+<<<<<<< HEAD
                                         Source="pack://application:,,,/Assets/Icons/LOGO.svg"
+=======
+                                        Source="/Assets/Icons/LOGO.svg"
+>>>>>>> master
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Center" />
 
@@ -137,13 +141,22 @@
                         Margin="12,0,12,8"
                         BorderBrush="#2667FF"
                         BorderThickness="0,1,0,1"
+<<<<<<< HEAD
                         Cursor="Hand">
+=======
+                        Cursor="Hand"
+                        MouseLeftButtonUp="YearSelector_Click">
+>>>>>>> master
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
                         <svg:SvgViewbox Grid.Column="0"
                                         Margin="10,0,10,0"
                                         Width="17"
@@ -151,6 +164,10 @@
                                         Stretch="Uniform"
                                         Source="/Assets/Icons/calendar-tick.svg"
                                         VerticalAlignment="Center" />
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
                         <TextBlock x:Name="YearText"
                                    Grid.Column="1"
                                    Text="سال مالی ۱۴۰۴"
@@ -159,17 +176,65 @@
                                    Foreground="#737791"
                                    FontFamily="{StaticResource IRANSans}"
                                    VerticalAlignment="Center" />
+<<<<<<< HEAD
                         <svg:SvgViewbox Grid.Column="2"
                                         x:Name="YearChevron"
                                         Margin="0,0,10,0"
+=======
+
+                        <svg:SvgViewbox Grid.Column="2"
+                                        x:Name="YearChevron"
+                                        Margin="0,0,10,0"
+                                        MouseLeftButtonUp="YearSelector_Click"
+>>>>>>> master
                                         Width="10"
                                         Height="4"
                                         Stretch="Uniform"
                                         Source="/Assets/Icons/Arrow.svg"
+<<<<<<< HEAD
                                         VerticalAlignment="Center" />
                     </Grid>
                 </Border>
 
+=======
+                                        VerticalAlignment="Center"
+                                        RenderTransformOrigin="0.5,0.5">
+                            <svg:SvgViewbox.RenderTransform>
+                                <RotateTransform x:Name="YearChevronRotation"
+                                                 Angle="0" />
+                            </svg:SvgViewbox.RenderTransform>
+                        </svg:SvgViewbox>
+                    </Grid>
+
+                    <!-- ✅ Popup دقیقاً زیر Border -->
+                    <Border.Resources>
+
+                    </Border.Resources>
+                </Border>
+                <Popup FlowDirection="LeftToRight"
+                       x:Name="YearPopup"
+                       PlacementTarget="{Binding ElementName=YearSelector}"
+                       Placement="Bottom"
+                       StaysOpen="False"
+                       AllowsTransparency="True"
+                       PopupAnimation="Fade">
+                    <Border Background="White"
+                            BorderBrush="#D4E1FF"
+                            BorderThickness="1"
+                            CornerRadius="0,0,8,8"
+                            MinWidth="{Binding ActualWidth, ElementName=YearSelector}"
+                            Padding="4,4,4,4">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="12"
+                                              ShadowDepth="2"
+                                              Opacity="0.12"
+                                              Color="#001242"
+                                              Direction="270" />
+                        </Border.Effect>
+                        <StackPanel x:Name="YearList" />
+                    </Border>
+                </Popup>
+>>>>>>> master
                 <!-- خط جدا -->
                 <Border Height="1"
                         Background="#E9F0FF"

@@ -4,6 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+<<<<<<< HEAD
+=======
+using System.Windows.Input;
+>>>>>>> master
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
@@ -15,7 +19,10 @@ namespace Taadol_Cal.Controls
     {
         private string _activeSubMenuTag = null;
 
+<<<<<<< HEAD
         // اضافه کردن این متغیر در بالای کلاس
+=======
+>>>>>>> master
         private Button _activeSubMenuButton = null;
         private bool _isSubMenuAnimating = false;
         private bool _isSidebarOpen = true;
@@ -31,6 +38,15 @@ namespace Taadol_Cal.Controls
         public SidebarControl()
         {
             InitializeComponent();
+<<<<<<< HEAD
+=======
+            BuildYearList();
+            YearPopup.Closed += (s, e) =>
+            {
+                _isYearPopupOpen = false;
+                RotateYearChevron(0);
+            };
+>>>>>>> master
             YearChevron.Visibility = Visibility.Visible;
 
             var rotation = FindArrowRotation(BtnToggleSidebar);
@@ -119,6 +135,10 @@ namespace Taadol_Cal.Controls
             if (border != null)
             {
                 border.ClearValue(Border.BackgroundProperty);
+<<<<<<< HEAD
+=======
+                border.ClearValue(Border.BackgroundProperty);
+>>>>>>> master
                 border.CornerRadius = new CornerRadius(8);
             }
 
@@ -665,7 +685,13 @@ namespace Taadol_Cal.Controls
             return t * t * (3 - 2 * t);
         }
 
+<<<<<<< HEAD
 
+=======
+        private bool _isYearPopupOpen = false;
+        private int _selectedYear = 1404;
+        private readonly int[] _years = { 1404, 1403, 1402 };
+>>>>>>> master
 
         private void AnimateCornerRadius(Border border, CornerRadius targetRadius, int durationMs = 90, Action onComplete = null)
         {
@@ -798,6 +824,7 @@ namespace Taadol_Cal.Controls
 
             if (textBlock != null)
             {
+<<<<<<< HEAD
                 // ✅ ساخت Brush جدید
                 var currentColor = (textBlock.Foreground as SolidColorBrush)?.Color
                                    ?? (Color)ColorConverter.ConvertFromString("#0D2159");
@@ -811,6 +838,27 @@ namespace Taadol_Cal.Controls
                         Duration = TimeSpan.FromMilliseconds(200),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                     });
+=======
+                var currentColor = (textBlock.Foreground as SolidColorBrush)?.Color
+                                   ?? (Color)ColorConverter.ConvertFromString("#737791");
+                var newBrush = new SolidColorBrush(currentColor);
+                textBlock.Foreground = newBrush;
+
+                var anim = new ColorAnimation
+                {
+                    To = (Color)ColorConverter.ConvertFromString("#737791"),
+                    Duration = TimeSpan.FromMilliseconds(200),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+
+                // ✅ بعد از اتمام انیمیشن، local value رو پاک کن
+                anim.Completed += (s, e) =>
+                {
+                    textBlock.ClearValue(TextBlock.ForegroundProperty);
+                };
+
+                newBrush.BeginAnimation(SolidColorBrush.ColorProperty, anim);
+>>>>>>> master
 
                 AnimateFontSize(textBlock, 14, 13, 200);
                 textBlock.FontWeight = FontWeights.Medium;
@@ -818,6 +866,7 @@ namespace Taadol_Cal.Controls
 
             if (ellipse != null)
             {
+<<<<<<< HEAD
                 // ✅ ساخت Brush جدید
                 var currentColor = (ellipse.Fill as SolidColorBrush)?.Color
                                    ?? (Color)ColorConverter.ConvertFromString("#2667FF");
@@ -835,6 +884,121 @@ namespace Taadol_Cal.Controls
                 AnimateSize(ellipse, 8, 5, 200);
             }
         }
+=======
+                var currentColor = (ellipse.Fill as SolidColorBrush)?.Color
+                                   ?? (Color)ColorConverter.ConvertFromString("#737791");
+                var newFill = new SolidColorBrush(currentColor);
+                ellipse.Fill = newFill;
+
+                var anim = new ColorAnimation
+                {
+                    To = (Color)ColorConverter.ConvertFromString("#737791"),
+                    Duration = TimeSpan.FromMilliseconds(200),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+
+                // ✅ بعد از اتمام انیمیشن، local value رو پاک کن
+                anim.Completed += (s, e) =>
+                {
+                    ellipse.ClearValue(Shape.FillProperty);
+                };
+
+                newFill.BeginAnimation(SolidColorBrush.ColorProperty, anim);
+                AnimateSize(ellipse, 8, 5, 200);
+            }
+        }
+
+
+        private void YearSelector_Click(object sender, MouseButtonEventArgs e)
+        {
+            if (_isYearPopupOpen)
+                CloseYearPopup();
+            else
+                OpenYearPopup();
+        }
+        private void OpenYearPopup()
+        {
+            BuildYearList();
+            _isYearPopupOpen = true;
+            YearPopup.IsOpen = true;
+            RotateYearChevron(180);
+        }
+        private void CloseYearPopup()
+        {
+            _isYearPopupOpen = false;
+            YearPopup.IsOpen = false;
+            RotateYearChevron(0);
+        }
+        private void RotateYearChevron(double angle)
+        {
+            YearChevronRotation.BeginAnimation(RotateTransform.AngleProperty,
+                new DoubleAnimation(angle, TimeSpan.FromMilliseconds(180))
+                { EasingFunction = new CircleEase() });
+        }
+        private void BuildYearList()
+        {
+            YearList.Children.Clear();
+
+            foreach (var year in _years)
+            {
+                bool isSelected = year == _selectedYear;
+
+                var btn = new Button
+                {
+                    Content = $"سال مالی {ToPersianDigits(year)}",
+                    Height = 36,
+                    Cursor = Cursors.Hand,
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    HorizontalContentAlignment = HorizontalAlignment.Right,
+                    Background = isSelected
+                        ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E9F0FF"))
+                        : Brushes.Transparent,
+                    BorderThickness = new Thickness(0),
+                    FontFamily = (FontFamily)FindResource("IRANSans"),
+                    FontSize = 13,
+                    FontWeight = isSelected ? FontWeights.Bold : FontWeights.Medium,
+                    Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString(
+                        isSelected ? "#0D2159" : "#737791")),
+                    Padding = new Thickness(10, 0, 10, 0),
+                    Tag = year
+                };
+
+                btn.MouseEnter += (s, e) =>
+                {
+                    var b = (Button)s;
+                    if ((int)b.Tag != _selectedYear)
+                        b.Background = new SolidColorBrush(
+                            (Color)ColorConverter.ConvertFromString("#F0F5FF"));
+                };
+
+                btn.MouseLeave += (s, e) =>
+                {
+                    var b = (Button)s;
+                    b.Background = (int)b.Tag == _selectedYear
+                        ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E9F0FF"))
+                        : Brushes.Transparent;
+                };
+
+                btn.Click += (s, e) =>
+                {
+                    _selectedYear = (int)((Button)s).Tag;
+                    YearText.Text = $"سال مالی {ToPersianDigits(_selectedYear)}";
+                    CloseYearPopup();
+                };
+
+                YearList.Children.Add(btn);
+            }
+        }
+
+        private string ToPersianDigits(int number)
+        {
+            return number.ToString()
+                .Replace("0", "۰").Replace("1", "۱").Replace("2", "۲")
+                .Replace("3", "۳").Replace("4", "۴").Replace("5", "۵")
+                .Replace("6", "۶").Replace("7", "۷").Replace("8", "۸")
+                .Replace("9", "۹");
+        }
+>>>>>>> master
         private void SetSubMenuActive(Button btn)
         {
             btn.ApplyTemplate();

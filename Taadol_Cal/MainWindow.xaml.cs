@@ -1,4 +1,8 @@
 ﻿using System.Windows;
+<<<<<<< HEAD
+=======
+using Taadol_Cal.Views;
+>>>>>>> master
 
 namespace Taadol_Cal
 {
@@ -39,6 +43,7 @@ namespace Taadol_Cal
                     MainContentBorder.Visibility = Visibility.Visible;
                     break;
 
+<<<<<<< HEAD
                 //case "product_new":
                 //    MainContent.Content = new NewProductView();
                 //    break;
@@ -55,6 +60,24 @@ namespace Taadol_Cal
                 //case "person_list":
                 //    MainContent.Content = new PersonListView();
                 //    break;
+=======
+                case "product_new":
+                    MainContent.Content = new NewProductView();
+                    break;
+
+                case "product_list":
+                    MainContent.Content = new ProductListView();
+                    break;
+                case "service_new":
+                    MainContent.Content = new NewServiceView();
+                    break;
+                case "person_new":
+                    MainContent.Content = new NewPersonView();
+                    break;
+                case "person_list":
+                    MainContent.Content = new PersonListView();
+                    break;
+>>>>>>> master
 
                 // سایر موارد...
                 default:

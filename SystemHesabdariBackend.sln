@@ -119,7 +119,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersonManagement.Applicatio
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersonManagement.Application", "PersonManagement.Application\PersonManagement.Application.csproj", "{34FC1EFC-634B-4439-9059-1D56FCE99B79}"
 EndProject
+<<<<<<< HEAD
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taadol", "Taadol\Taadol\Taadol.csproj", "{5A89053A-45D1-003A-ECE7-8B06686FEA52}"
+=======
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taadol_Cal", "Taadol_Cal\Taadol_Cal.csproj", "{E932F0AF-27CF-A36B-A9A7-4DF5AB494D6D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConnectionStringProject", "ConnectionStringProject\ConnectionStringProject.csproj", "{553C7DF3-277A-44D0-80BD-7B13A8A0D557}"
+>>>>>>> master
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -247,10 +253,21 @@ Global
 		{34FC1EFC-634B-4439-9059-1D56FCE99B79}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{34FC1EFC-634B-4439-9059-1D56FCE99B79}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{34FC1EFC-634B-4439-9059-1D56FCE99B79}.Release|Any CPU.Build.0 = Release|Any CPU
+<<<<<<< HEAD
 		{5A89053A-45D1-003A-ECE7-8B06686FEA52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5A89053A-45D1-003A-ECE7-8B06686FEA52}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A89053A-45D1-003A-ECE7-8B06686FEA52}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5A89053A-45D1-003A-ECE7-8B06686FEA52}.Release|Any CPU.Build.0 = Release|Any CPU
+=======
+		{E932F0AF-27CF-A36B-A9A7-4DF5AB494D6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E932F0AF-27CF-A36B-A9A7-4DF5AB494D6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E932F0AF-27CF-A36B-A9A7-4DF5AB494D6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E932F0AF-27CF-A36B-A9A7-4DF5AB494D6D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{553C7DF3-277A-44D0-80BD-7B13A8A0D557}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{553C7DF3-277A-44D0-80BD-7B13A8A0D557}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{553C7DF3-277A-44D0-80BD-7B13A8A0D557}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{553C7DF3-277A-44D0-80BD-7B13A8A0D557}.Release|Any CPU.Build.0 = Release|Any CPU
+>>>>>>> master
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

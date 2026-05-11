@@ -914,6 +914,7 @@
                                               RecognizesAccessKey="True"
                                               SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
 
+<<<<<<< HEAD
                             <Button x:Name="AddButton"
                                     Grid.Column="1"
                                     Width="24"
@@ -932,6 +933,9 @@
                                       Width="12"
                                       Height="12" />
                             </Button>
+=======
+
+>>>>>>> master
                         </Grid>
                     </Border>
 
@@ -941,18 +945,26 @@
                             <Setter TargetName="Border"
                                     Property="Background"
                                     Value="#F5F5F5" />
+<<<<<<< HEAD
                             <Setter TargetName="AddButton"
                                     Property="Visibility"
                                     Value="Visible" />
+=======
+
+>>>>>>> master
                         </Trigger>
                         <Trigger Property="IsSelected"
                                  Value="True">
                             <Setter TargetName="Border"
                                     Property="Background"
                                     Value="#E3F2FD" />
+<<<<<<< HEAD
                             <Setter TargetName="AddButton"
                                     Property="Visibility"
                                     Value="Visible" />
+=======
+
+>>>>>>> master
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

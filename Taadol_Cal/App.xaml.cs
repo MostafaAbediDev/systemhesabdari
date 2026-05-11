@@ -21,6 +21,7 @@ namespace Taadol_Cal
     /// </summary>
     public partial class App : Application
     {
+<<<<<<< HEAD
         public static IServiceProvider ServiceProvider { get; private set; }
 
         protected override void OnStartup(StartupEventArgs e)
@@ -53,6 +54,40 @@ namespace Taadol_Cal
             PayrollSystemManagementBoostrapper.Configure(services, connectionString);
             PersonManagementBoostrapper.Configure(services, connectionString);
         }
+=======
+        //public static IServiceProvider ServiceProvider { get; private set; }
+
+        //protected override void OnStartup(StartupEventArgs e)
+        //{
+        //    var services = new ServiceCollection();
+
+        //    var configuration = new ConfigurationBuilder()
+        //        .SetBasePath(Directory.GetCurrentDirectory())
+        //        .AddJsonFile("appsettings.json")
+        //        .Build();
+
+        //    ConfigureServices(services, configuration);
+
+        //    ServiceProvider = services.BuildServiceProvider();
+
+        //    base.OnStartup(e);
+        //}
+
+        //private void ConfigureServices(IServiceCollection services, IConfiguration configuration)
+        //{
+        //    var connectionString = configuration.GetConnectionString("TaadolDb");
+
+        //    AccountManagementBoostrapper.Configure(services, connectionString);
+        //    BankManagementBoostrapper.Configure(services, connectionString);
+        //    FixedAssetManagementBoostrapper.Configure(services, connectionString);
+        //    GeneralInfoManagementBoostrapper.Configure(services, connectionString);
+        //    InventoryManagementBoostrapper.Configure(services, connectionString);
+        //    InvoiceManagementBoostrapper.Configure(services, connectionString);
+        //    LogManagementBoostrapper.Configure(services, connectionString);
+        //    PayrollSystemManagementBoostrapper.Configure(services, connectionString);
+        //    PersonManagementBoostrapper.Configure(services, connectionString);
+        //}
+>>>>>>> master
     }
 
 }

@@ -138,6 +138,7 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver"
                                  Value="True">
+<<<<<<< HEAD
                             <Setter TargetName="bd"
                                     Property="Background"
                                     Value="#D6E7FF" />
@@ -148,6 +149,20 @@
                                     Property="Background"
                                     Value="#C4DBFF" />
                         </Trigger>
+=======
+                            <Setter TargetName="PART_Text"
+                                    Property="Foreground"
+                                    Value="#2A3547" />
+                            <Setter TargetName="PART_Text"
+                                    Property="FontWeight"
+                                    Value="SemiBold" />
+                            <Setter TargetName="PART_Dot"
+                                    Property="Fill"
+                                    Value="#2A3547" />
+                        </Trigger>
+
+
+>>>>>>> master
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
