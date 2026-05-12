@@ -31,23 +31,27 @@ namespace PersonManagement.Domain.Person.PersonAgg
         }
 
         public Persons(string code, string fullName, string nationalCode,
-            string economicCode, string registrationNumber, int personType)
+            string economicCode, string registrationNumber, long personTypeId, long branchId)
         {
             Code = code;
             FullName = fullName;
             NationalCode = nationalCode;
             EconomicCode = economicCode;
             RegistrationNumber = registrationNumber;
+            PersonTypeId = personTypeId;
+            BranchId = branchId;
         }
 
         public void Edit(string code, string fullName, string nationalCode,
-            string economicCode, string registrationNumber, int personType)
+            string economicCode, string registrationNumber, long personTypeId, long branchId)
         {
             Code = code;
             FullName = fullName;
             NationalCode = nationalCode;
             EconomicCode = economicCode;
             RegistrationNumber = registrationNumber;
+            PersonTypeId = personTypeId;
+            BranchId = branchId;
         }
 
         public void SetBranch(long branchId)

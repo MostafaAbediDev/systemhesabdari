@@ -8,6 +8,7 @@ public class PersonManagementBoostrapper
     public static void Configure(IServiceCollection services, string connectionString)
     {
         services.AddDbContext<PersonSystemContext>(x => x.UseSqlServer(connectionString));
+        services.AddDbContext<PersonFakeDataContext>(x => x.UseSqlServer(connectionString));
     }
 }
 

@@ -14,17 +14,21 @@ namespace PersonManagement.Domain.Person.PersonContactAgg
         public Persons Persons { get; private set; }
         public ContactTypes ContactTypes { get; private set; }
 
-        public PersonContacts(string value, string description)
+        public PersonContacts(string value, string description, long personId, long contactTypeId)
         {
             Value = value;
             Description = description;
+            PersonId = personId;
+            ContactTypeId = contactTypeId;
             IsDefault = false;
         }
 
-        public void Edit(string value, string description)
+        public void Edit(string value, string description, long personId, long contactTypeId)
         {
             Value = value;
             Description = description;
+            PersonId = personId;
+            ContactTypeId = contactTypeId;
             IsDefault = false;
         }
 
