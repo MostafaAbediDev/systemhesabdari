@@ -12,6 +12,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PayrollSystemManagement.Configuration;
 using PersonManagement.Configuration;
+using PersonManagement.Infrastructure.EFCore;
+using PersonManagement.Infrastructure.EFCore.Seed;
 using System.IO;
 using System.Windows;
 
@@ -34,18 +36,40 @@ namespace ConnectionStringProject
 
             ServiceProvider = services.BuildServiceProvider();
 
-            using (var scope = ServiceProvider.CreateScope())
-            {
-                var context = scope.ServiceProvider.GetRequiredService<GeneralInfoFakeDataContext>();
+            using var scope = ServiceProvider.CreateScope();
+            var sp = scope.ServiceProvider;
 
-                await context.Database.MigrateAsync();
+            // =========================
+            // 1. Migrate Databases
+            // =========================
 
-                // ✅ اجرای Seed بعد از Migration
-                await GeneralSeeders.SeedAsync(context);
-            }
+            var generalContext =
+                sp.GetRequiredService<GeneralInfoFakeDataContext>();
+
+            var personContext =
+                sp.GetRequiredService<PersonFakeDataContext>();
+
+            await generalContext.Database.MigrateAsync();
+            await personContext.Database.MigrateAsync();
+
+            // =========================
+            // 2. Seed General Info
+            // =========================
+
+            await GeneralSeeders.SeedAsync(generalContext);
+
+            // =========================
+            // 3. Seed Person (Fake Data)
+            // =========================
+
+            var personSeeder =
+                sp.GetRequiredService<PersonFakeSeeder>();
+
+            await personSeeder.SeedAsync();
 
             base.OnStartup(e);
         }
+
 
         private void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
@@ -60,6 +84,9 @@ namespace ConnectionStringProject
             LogManagementBoostrapper.Configure(services, fakeConnectionString);
             PayrollSystemManagementBoostrapper.Configure(services, fakeConnectionString);
             PersonManagementBoostrapper.Configure(services, fakeConnectionString);
+
+            services.AddScoped<PersonFakeSeeder>();
+
         }
     }
 }

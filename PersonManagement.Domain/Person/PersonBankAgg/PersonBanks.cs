@@ -13,21 +13,23 @@ namespace PersonManagement.Domain.Person.PersonBankAgg
         public long PersonId { get; private set; }
         public Persons Persons { get; private set; }
 
-        public PersonBanks(string bankName, string accountNumber, string cardNumber, string shaba)
+        public PersonBanks(string bankName, string accountNumber, string cardNumber, string shaba, long personId)
         {
             BankName = bankName;
             AccountNumber = accountNumber;
             CardNumber = cardNumber;
             Shaba = shaba;
+            PersonId = personId;
             IsDefault = false;
         }
 
-        public void Edit(string bankName, string accountNumber, string cardNumber, string shaba)
+        public void Edit(string bankName, string accountNumber, string cardNumber, string shaba, long personId)
         {
             BankName = bankName;
             AccountNumber = accountNumber;
             CardNumber = cardNumber;
             Shaba = shaba;
+            PersonId = personId;
             IsDefault = false;
         }
 

@@ -17,15 +17,23 @@ namespace PersonManagement.Domain.Person.PersonAddressAgg
         public Provinces Provinces { get; private set; }
         public Cities Cities { get; private set; }
 
-        public PersonAddresses(string address, string postalCode)
+        public PersonAddresses(long personId, long provinceId, long cityId,
+        string address, string postalCode)
         {
+            PersonId = personId;
+            ProvinceId = provinceId;
+            CityId = cityId;
             Address = address;
             PostalCode = postalCode;
             IsDefault = false;
         }
 
-        public void Edit(string address, string postalCode)
+        public void Edit(long personId, long provinceId, long cityId,
+        string address, string postalCode)
         {
+            PersonId = personId;
+            ProvinceId = provinceId;
+            CityId = cityId;
             Address = address;
             PostalCode = postalCode;
             IsDefault = false;
