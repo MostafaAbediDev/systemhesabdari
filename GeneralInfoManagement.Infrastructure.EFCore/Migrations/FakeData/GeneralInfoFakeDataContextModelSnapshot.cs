@@ -8,10 +8,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace GeneralInfoManagement.Infrastructure.EFCore.Migrations
+namespace GeneralInfoManagement.Infrastructure.EFCore.Migrations.FakeData
 {
-    [DbContext(typeof(GeneralInfoSystemContext))]
-    partial class GeneralInfoSystemContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(GeneralInfoFakeDataContext))]
+    partial class GeneralInfoFakeDataContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {

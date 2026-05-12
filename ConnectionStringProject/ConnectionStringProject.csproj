@@ -30,4 +30,10 @@
     <ProjectReference Include="..\PersonManagement.Configuration\PersonManagement.Configuration.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

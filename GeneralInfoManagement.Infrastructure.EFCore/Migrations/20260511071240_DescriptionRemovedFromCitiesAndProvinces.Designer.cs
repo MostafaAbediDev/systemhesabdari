@@ -4,6 +4,7 @@ using GeneralInfoManagement.Infrastructure.EFCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GeneralInfoManagement.Infrastructure.EFCore.Migrations
 {
     [DbContext(typeof(GeneralInfoSystemContext))]
-    partial class GeneralInfoSystemContextModelSnapshot : ModelSnapshot
+    [Migration("20260511071240_DescriptionRemovedFromCitiesAndProvinces")]
+    partial class DescriptionRemovedFromCitiesAndProvinces
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -287,7 +290,10 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Migrations
             modelBuilder.Entity("GeneralInfoManagement.Domain.General.CityAgg.Cities", b =>
                 {
                     b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
@@ -322,7 +328,10 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Migrations
             modelBuilder.Entity("GeneralInfoManagement.Domain.General.ProvinceAgg.Provinces", b =>
                 {
                     b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");

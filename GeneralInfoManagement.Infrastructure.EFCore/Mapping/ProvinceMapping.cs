@@ -11,8 +11,10 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Mapping
             builder.ToTable("Provinces");
             builder.HasKey(x => x.Id);
 
+            builder.Property(x => x.Id).ValueGeneratedNever();
+
+
             builder.Property(x => x.Title).HasMaxLength(100).IsRequired();
-            builder.Property(x => x.Desscription).HasMaxLength(200).IsRequired();
 
             builder.HasMany(s => s.Cities).WithOne(s => s.Provinces).HasForeignKey(s => s.ProvinceId);
 
