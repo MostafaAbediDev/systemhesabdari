@@ -8,7 +8,7 @@
         public string NationalCode { get; set; }
         public string EconomicCode { get; set; }
         public string RegistrationNumber { get; set; }
-        public int PersonType { get; set; }
+        public string PersonTypeTitle { get; set; }
         public string BranchName { get; set; }
         public bool IsLegal { get; set; }
         public bool IsActive { get; set; }
