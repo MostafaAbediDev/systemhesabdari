@@ -4,16 +4,19 @@ using GeneralInfoManagement.Infrastructure.EFCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace GeneralInfoManagement.Infrastructure.EFCore.Migrations
+namespace GeneralInfoManagement.Infrastructure.EFCore.Migrations.FakeData
 {
-    [DbContext(typeof(GeneralInfoSystemContext))]
-    partial class GeneralInfoSystemContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(GeneralInfoFakeDataContext))]
+    [Migration("20260511105022_SeedFakeData500Records")]
+    partial class SeedFakeData500Records
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -6,20 +6,25 @@ namespace GeneralInfoManagement.Domain.General.CityAgg
     public class Cities : EntityBase
     {
         public string Title { get; private set; }
-        public string Description { get; private set; }
         public long ProvinceId { get; private set; }
         public Provinces Provinces { get; private set; }
 
-        public Cities(string title, string description)
+        protected Cities()
         {
-            Title = title;
-            Description = description;
         }
 
-        public void Edit(string title, string description)
+        public Cities(string title, long provinceId)
         {
             Title = title;
-            Description = description;
+            ProvinceId = provinceId;
+            IsActive = true;
+            IsDeleted = false;
+        }
+
+        public void Edit(string title, long provinceId)
+        {
+            Title = title;
+            ProvinceId = provinceId;
         }
 
         public void Remove()

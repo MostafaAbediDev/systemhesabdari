@@ -9,6 +9,7 @@ namespace GeneralInfoManagement.Configuration
         public static void Configure(IServiceCollection services, string connectionString)
         {
             services.AddDbContext<GeneralInfoSystemContext>(x => x.UseSqlServer(connectionString));
+            services.AddDbContext<GeneralInfoFakeDataContext>(x => x.UseSqlServer(connectionString));
         }
     }
 }

@@ -6,7 +6,6 @@ namespace GeneralInfoManagement.Domain.General.ProvinceAgg
     public class Provinces : EntityBase
     {
         public string Title { get; private set; }
-        public string Desscription { get; private set; }
         public List<Cities> Cities { get; private set; }
 
         protected Provinces()
@@ -14,16 +13,16 @@ namespace GeneralInfoManagement.Domain.General.ProvinceAgg
             Cities = new List<Cities>();
         }
 
-        public Provinces(string title, string desscription)
+        public Provinces(string title)
         {
             Title = title;
-            Desscription = desscription;
+            IsActive = true;
+            IsDeleted = false;
         }
 
-        public void Edit(string title, string desscription)
+        public void Edit(string title)
         {
             Title = title;
-            Desscription = desscription;
         }
 
         public void Remove()
