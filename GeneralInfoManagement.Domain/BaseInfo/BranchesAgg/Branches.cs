@@ -11,9 +11,9 @@ namespace GeneralInfoManagement.Domain.BaseInfo.BranchesAgg
         public string NationalId { get; private set; }
         public string EconomicCode { get; private set; }
         public string RegisterNumber { get; private set; }
-        public string Code { get; private set; }
         public string Email { get; private set; }
         public string Phone { get; private set; }
+        public string Code { get; private set; }
         public string Address { get; private set; }
         public string PostCode { get; private set; }
         public bool IsMain { get; private set; }
@@ -34,14 +34,13 @@ namespace GeneralInfoManagement.Domain.BaseInfo.BranchesAgg
         }
 
         public Branches(string title, string nationalId, string economicCode,
-            string registerNumber, string code, string email, string phone,
+            string registerNumber, string email, string phone,
             string address, string postCode, Location location, long companyId)
         {
             Title = title;
             NationalId = nationalId;
             EconomicCode = economicCode;
             RegisterNumber = registerNumber;
-            Code = code;
             Email = email;
             Phone = phone;
             Address = address;
@@ -51,19 +50,26 @@ namespace GeneralInfoManagement.Domain.BaseInfo.BranchesAgg
         }
 
         public void Edit(string title, string nationalId, string economicCode,
-            string registerNumber, string code, string email, string phone,
+            string registerNumber, string email, string phone,
             string address, string postCode, Location location)
         {
             Title = title;
             NationalId = nationalId;
             EconomicCode = economicCode;
             RegisterNumber = registerNumber;
-            Code = code;
             Email = email;
             Phone = phone;
             Address = address;
             PostCode = postCode;
             Location = location;
+        }
+
+        public void SetCode(string code)
+        {
+            if (string.IsNullOrWhiteSpace(code))
+                throw new ArgumentException("Code is required");
+
+            Code = code;
         }
 
         public void SetAsMain()
