@@ -8,18 +8,22 @@ namespace GeneralInfoManagement.Domain.BaseInfo.BranchesAgg
     public class Branches : EntityBase
     {
         public string Title { get; private set; }
-        public int NationalId { get; private set; }
-        public int EconomicCode { get; private set; }
-        public int RegisterNumber { get; private set; }
+        public string NationalId { get; private set; }
+        public string EconomicCode { get; private set; }
+        public string RegisterNumber { get; private set; }
         public string Code { get; private set; }
         public string Email { get; private set; }
         public string Phone { get; private set; }
-        public string Lat_Log { get; private set; }
         public string Address { get; private set; }
         public string PostCode { get; private set; }
         public bool IsMain { get; private set; }
+
         public long CompanyId { get; private set; }
+
+        public Location Location { get; private set; }
+
         public Companies Company { get; private set; }
+
         public List<BranchArchive> BranchArchive { get; private set; }
         public List<FinancialPeriods> FinancialPeriod { get; private set; }
 
@@ -28,9 +32,10 @@ namespace GeneralInfoManagement.Domain.BaseInfo.BranchesAgg
             BranchArchive = new List<BranchArchive>();
             FinancialPeriod = new List<FinancialPeriods>();
         }
-        public Branches(string title, int nationalId, int economicCode,
-            int registerNumber, string code, string email, string phone,
-            string lat_Log, string address, string postCode)
+
+        public Branches(string title, string nationalId, string economicCode,
+            string registerNumber, string code, string email, string phone,
+            string address, string postCode, Location location, long companyId)
         {
             Title = title;
             NationalId = nationalId;
@@ -39,14 +44,15 @@ namespace GeneralInfoManagement.Domain.BaseInfo.BranchesAgg
             Code = code;
             Email = email;
             Phone = phone;
-            Lat_Log = lat_Log;
             Address = address;
             PostCode = postCode;
+            Location = location;
+            CompanyId = companyId;
         }
 
-        public void Edit(string title, int nationalId, int economicCode,
-            int registerNumber, string code, string email, string phone,
-            string lat_Log, string address, string postCode)
+        public void Edit(string title, string nationalId, string economicCode,
+            string registerNumber, string code, string email, string phone,
+            string address, string postCode, Location location)
         {
             Title = title;
             NationalId = nationalId;
@@ -55,17 +61,17 @@ namespace GeneralInfoManagement.Domain.BaseInfo.BranchesAgg
             Code = code;
             Email = email;
             Phone = phone;
-            Lat_Log = lat_Log;
             Address = address;
             PostCode = postCode;
+            Location = location;
         }
 
-        public void Real()
+        public void SetAsMain()
         {
             IsMain = true;
         }
 
-        public void NotReal()
+        public void UnsetMain()
         {
             IsMain = false;
         }
@@ -80,12 +86,12 @@ namespace GeneralInfoManagement.Domain.BaseInfo.BranchesAgg
             IsDeleted = false;
         }
 
-        public void Active()
+        public void Activate()
         {
             IsActive = true;
         }
 
-        public void NotActive()
+        public void Deactivate()
         {
             IsActive = false;
         }

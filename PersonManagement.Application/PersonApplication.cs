@@ -26,7 +26,8 @@ namespace PersonManagement.Application
                 command.NationalCode,
                 command.EconomicCode,
                 command.RegistrationNumber,
-                command.PersonType
+                command.PersonTypeId,
+                command.BranchId
             );
 
             // تنظیمات تکمیلی دامنه
@@ -60,7 +61,8 @@ namespace PersonManagement.Application
                 command.NationalCode,
                 command.EconomicCode,
                 command.RegistrationNumber,
-                command.PersonType
+                command.PersonTypeId,
+                command.BranchId
             );
 
             person.SetBranch(command.BranchId);

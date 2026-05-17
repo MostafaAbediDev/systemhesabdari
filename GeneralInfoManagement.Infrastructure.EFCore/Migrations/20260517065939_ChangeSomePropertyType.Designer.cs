@@ -4,6 +4,7 @@ using GeneralInfoManagement.Infrastructure.EFCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GeneralInfoManagement.Infrastructure.EFCore.Migrations
 {
     [DbContext(typeof(GeneralInfoSystemContext))]
-    partial class GeneralInfoSystemContextModelSnapshot : ModelSnapshot
+    [Migration("20260517065939_ChangeSomePropertyType")]
+    partial class ChangeSomePropertyType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -102,8 +105,7 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Migrations
 
                     b.Property<string>("EconomicCode")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -119,10 +121,14 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Migrations
                     b.Property<bool>("IsMain")
                         .HasColumnType("bit");
 
+                    b.Property<string>("Lat_Log")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<string>("NationalId")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Phone")
                         .IsRequired()
@@ -136,8 +142,7 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Migrations
 
                     b.Property<string>("RegisterNumber")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -369,31 +374,7 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("GeneralInfoManagement.Domain.BaseInfo.BranchesAgg.Location", "Location", b1 =>
-                        {
-                            b1.Property<long>("BranchesId")
-                                .HasColumnType("bigint");
-
-                            b1.Property<decimal>("Latitude")
-                                .HasColumnType("decimal(9,6)")
-                                .HasColumnName("Latitude");
-
-                            b1.Property<decimal>("Longitude")
-                                .HasColumnType("decimal(9,6)")
-                                .HasColumnName("Longitude");
-
-                            b1.HasKey("BranchesId");
-
-                            b1.ToTable("Branches");
-
-                            b1.WithOwner()
-                                .HasForeignKey("BranchesId");
-                        });
-
                     b.Navigation("Company");
-
-                    b.Navigation("Location")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("GeneralInfoManagement.Domain.BaseInfo.FinancialPeriodsAgg.FinancialPeriods", b =>

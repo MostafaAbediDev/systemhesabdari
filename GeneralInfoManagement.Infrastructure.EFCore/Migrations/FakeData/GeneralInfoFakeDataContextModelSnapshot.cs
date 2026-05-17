@@ -100,8 +100,10 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Migrations.FakeData
                     b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
-                    b.Property<int>("EconomicCode")
-                        .HasColumnType("int");
+                    b.Property<string>("EconomicCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -117,13 +119,10 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Migrations.FakeData
                     b.Property<bool>("IsMain")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Lat_Log")
+                    b.Property<string>("NationalId")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("NationalId")
-                        .HasColumnType("int");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Phone")
                         .IsRequired()
@@ -135,8 +134,10 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Migrations.FakeData
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
-                    b.Property<int>("RegisterNumber")
-                        .HasColumnType("int");
+                    b.Property<string>("RegisterNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -368,7 +369,31 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Migrations.FakeData
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.OwnsOne("GeneralInfoManagement.Domain.BaseInfo.BranchesAgg.Location", "Location", b1 =>
+                        {
+                            b1.Property<long>("BranchesId")
+                                .HasColumnType("bigint");
+
+                            b1.Property<decimal>("Latitude")
+                                .HasColumnType("decimal(9,6)")
+                                .HasColumnName("Latitude");
+
+                            b1.Property<decimal>("Longitude")
+                                .HasColumnType("decimal(9,6)")
+                                .HasColumnName("Longitude");
+
+                            b1.HasKey("BranchesId");
+
+                            b1.ToTable("Branches");
+
+                            b1.WithOwner()
+                                .HasForeignKey("BranchesId");
+                        });
+
                     b.Navigation("Company");
+
+                    b.Navigation("Location")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("GeneralInfoManagement.Domain.BaseInfo.FinancialPeriodsAgg.FinancialPeriods", b =>
