@@ -258,19 +258,6 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Migrations.FakeData
                     b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("EntityId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("EntityType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -280,7 +267,20 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Migrations.FakeData
                     b.Property<bool>("IsMain")
                         .HasColumnType("bit");
 
+                    b.Property<long>("OwnerId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("OwnerType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("OwnerId", "OwnerType");
 
                     b.ToTable("Pictures", (string)null);
                 });
