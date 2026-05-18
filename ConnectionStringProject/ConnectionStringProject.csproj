@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AccountManagement.Configuration\AccountManagement.Configuration.csproj" />
     <ProjectReference Include="..\BankManagement.Configuration\BankManagement.Configuration.csproj" />
+    <ProjectReference Include="..\CodeManagement.Configuration\CodeManagement.Configuration.csproj" />
     <ProjectReference Include="..\FixedAssetManagement.Configuration\FixedAssetManagement.Configuration.csproj" />
     <ProjectReference Include="..\GeneralInfoManagement.Configuration\GeneralInfoManagement.Configuration.csproj" />
     <ProjectReference Include="..\InventoryManagement.Configuration\InventoryManagement.Configuration.csproj" />

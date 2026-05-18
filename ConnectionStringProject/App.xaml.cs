@@ -1,5 +1,6 @@
 ﻿using AccountManagement.Configuration;
 using BankManagement.Configuration;
+using CodeManagement.Configuration;
 using FixedAssetManagement.Configuration;
 using GeneralInfoManagement.Configuration;
 using GeneralInfoManagement.Infrastructure.EFCore;
@@ -74,6 +75,9 @@ namespace ConnectionStringProject
         private void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
             var fakeConnectionString = configuration.GetConnectionString("TaadolFakeDb");
+            var ConnectionString = configuration.GetConnectionString("TaadolDb");
+
+            CodeManagementBoostrapper.Configure(services, ConnectionString);
 
             AccountManagementBoostrapper.Configure(services, fakeConnectionString);
             BankManagementBoostrapper.Configure(services, fakeConnectionString);
