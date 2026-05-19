@@ -74,7 +74,7 @@ namespace ConnectionStringProject
 
         private void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
-            var fakeConnectionString = configuration.GetConnectionString("TaadolFakeDb");
+            var fakeConnectionString = configuration.GetConnectionString("TaadolFakeDb");   
             var ConnectionString = configuration.GetConnectionString("TaadolDb");
 
             CodeManagementBoostrapper.Configure(services, ConnectionString);
