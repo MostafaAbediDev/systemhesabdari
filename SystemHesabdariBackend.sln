@@ -139,6 +139,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GIM.Application", "GIM.Appl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneralInfoManagement.Application.Contract", "GeneralInfoManagement.Application.Contract\GeneralInfoManagement.Application.Contract.csproj", "{E127C5AB-0DB6-4CAF-B860-D792142837A8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneralInfoManagement.Application", "GeneralInfoManagement.Application\GeneralInfoManagement.Application.csproj", "{3AF7C7A9-7315-4D16-B06D-0D3811E52C29}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -289,6 +291,10 @@ Global
 		{E127C5AB-0DB6-4CAF-B860-D792142837A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E127C5AB-0DB6-4CAF-B860-D792142837A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E127C5AB-0DB6-4CAF-B860-D792142837A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3AF7C7A9-7315-4D16-B06D-0D3811E52C29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AF7C7A9-7315-4D16-B06D-0D3811E52C29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3AF7C7A9-7315-4D16-B06D-0D3811E52C29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3AF7C7A9-7315-4D16-B06D-0D3811E52C29}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -349,6 +355,7 @@ Global
 		{348F6E57-82F4-43A1-ACB7-715502A81395} = {78338D67-162F-47E4-BCED-C0CCDD80A70A}
 		{EE5689C7-B887-4D12-97C7-2F6DBB75E677} = {3CA45053-DD68-4BD9-9278-5CDAF6FAE340}
 		{E127C5AB-0DB6-4CAF-B860-D792142837A8} = {EE5689C7-B887-4D12-97C7-2F6DBB75E677}
+		{3AF7C7A9-7315-4D16-B06D-0D3811E52C29} = {EE5689C7-B887-4D12-97C7-2F6DBB75E677}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {755146A5-DE3D-4433-86D5-CFC10BD5F267}
