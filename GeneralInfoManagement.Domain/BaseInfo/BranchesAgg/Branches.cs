@@ -13,7 +13,6 @@ namespace GeneralInfoManagement.Domain.BaseInfo.BranchesAgg
         public string RegisterNumber { get; private set; }
         public string Email { get; private set; }
         public string Phone { get; private set; }
-        public string Code { get; private set; }
         public string Address { get; private set; }
         public string PostCode { get; private set; }
         public bool IsMain { get; private set; }
@@ -62,14 +61,6 @@ namespace GeneralInfoManagement.Domain.BaseInfo.BranchesAgg
             Address = address;
             PostCode = postCode;
             Location = location;
-        }
-
-        public void SetCode(string code)
-        {
-            if (string.IsNullOrWhiteSpace(code))
-                throw new ArgumentException("Code is required");
-
-            Code = code;
         }
 
         public void SetAsMain()

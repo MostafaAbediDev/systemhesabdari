@@ -18,11 +18,6 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
             _context = personFakeDataContext;
         }
 
-        public bool Exists(Expression<Func<Persons, bool>> predicate)
-        {
-            return _context.Persons.Any(predicate);
-        }
-
         public List<PersonViewModel> GetAllPersons()
         {
             return _context.Persons
@@ -41,7 +36,6 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
                 .ToList();
         }
 
-        // ✅ گرفتن جزئیات برای ادیت
         public EditPerson GetDetails(long id)
         {
             return _context.Persons
