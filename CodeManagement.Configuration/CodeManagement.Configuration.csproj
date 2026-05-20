@@ -11,6 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CodeManagement.Application.Contracts\CodeManagement.Application.Contracts.csproj" />
+    <ProjectReference Include="..\CodeManagement.Application\CodeManagement.Application.csproj" />
     <ProjectReference Include="..\CodeManagement.Infrastructure.EFCore\CodeManagement.Infrastructure.EFCore.csproj" />
   </ItemGroup>
 

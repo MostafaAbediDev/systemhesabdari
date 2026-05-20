@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CodeManagement.Infrastructure.EFCore
 {
-    public class CodeFakeDataContex : DbContext
+    public class CodeFakeDataContext : DbContext
     {
         public DbSet<Codes> Codes { get; set; }
 
-        public CodeFakeDataContex(DbContextOptions<CodeFakeDataContex> options) : base(options)
+        public CodeFakeDataContext(DbContextOptions<CodeFakeDataContext> options) : base(options)
         {
         }
 
