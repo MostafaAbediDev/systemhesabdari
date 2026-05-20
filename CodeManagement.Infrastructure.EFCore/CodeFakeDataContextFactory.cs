@@ -4,20 +4,20 @@ using Microsoft.Extensions.Configuration;
 
 namespace CodeManagement.Infrastructure.EFCore
 {
-    public class CodeFakeDataContextFactory : IDesignTimeDbContextFactory<CodeFakeDataContex>
+    public class CodeFakeDataContextFactory : IDesignTimeDbContextFactory<CodeFakeDataContext>
     {
-        public CodeFakeDataContex CreateDbContext(string[] args)
+        public CodeFakeDataContext CreateDbContext(string[] args)
         {
             var config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json")
                 .Build();
 
-            var options = new DbContextOptionsBuilder<CodeFakeDataContex>()
+            var options = new DbContextOptionsBuilder<CodeFakeDataContext>()
                 .UseSqlServer(config.GetConnectionString("TaadolFakeDb"))
                 .Options;
 
-            return new CodeFakeDataContex(options);
+            return new CodeFakeDataContext(options);
         }
     }
 }

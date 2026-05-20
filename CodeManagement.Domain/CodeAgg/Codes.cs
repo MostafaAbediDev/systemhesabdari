@@ -29,6 +29,13 @@ namespace CodeManagement.Domain.CodeAgg
 
             Value = value;
         }
+
+        public void Edit(string value, long ownerId, CodeOwnerType ownerType)
+        {
+            Value = value;
+            OwnerId = ownerId;
+            OwnerType = ownerType;
+        }
     }
 
 }
