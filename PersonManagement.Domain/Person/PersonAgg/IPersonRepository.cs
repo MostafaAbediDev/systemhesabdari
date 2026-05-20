@@ -6,7 +6,6 @@ namespace PersonManagement.Domain.Person.PersonAgg
 {
     public interface IPersonRepository : IRepository<long, Persons>
     {
-        bool Exists(Expression<Func<Persons, bool>> predicate);
         EditPerson GetDetails(long id);
         PersonFullViewModel GetFullDetails(long id);
         List<PersonViewModel> Search(PersonSearchModel searchModel);

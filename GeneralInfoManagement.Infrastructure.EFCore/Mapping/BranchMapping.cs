@@ -25,10 +25,6 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Mapping
             builder.Property(x => x.RegisterNumber)
                 .HasMaxLength(20);
 
-            builder.Property(x => x.Code)
-                .HasMaxLength(50)
-                .IsRequired();
-
             builder.Property(x => x.Email)
                 .HasMaxLength(100);
 

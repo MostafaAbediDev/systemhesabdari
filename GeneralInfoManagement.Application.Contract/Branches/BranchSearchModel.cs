@@ -6,6 +6,5 @@
         public string NationalId { get; set; }
         public string EconomicCode { get; set; }
         public string RegisterNumber { get; set; }
-        public string Code { get; set; }
     }
 }
