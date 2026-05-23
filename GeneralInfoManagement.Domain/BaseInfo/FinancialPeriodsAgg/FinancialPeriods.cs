@@ -11,18 +11,20 @@ namespace GeneralInfoManagement.Domain.BaseInfo.FinancialPeriodsAgg
         public long BranchId { get; private set; }
         public Branches Branch { get; private set; }
 
-        public FinancialPeriods(string title, DateTime startDate, DateTime endDate)
+        public FinancialPeriods(string title, DateTime startDate, DateTime endDate, long branchId)
         {
             Title = title;
             StartDate = startDate;
             EndDate = endDate;
+            BranchId = branchId;
         }
 
-        public void Edit(string title, DateTime startDate, DateTime endDate)
+        public void Edit(string title, DateTime startDate, DateTime endDate, long branchId)
         {
             Title = title;
             StartDate = startDate;
             EndDate = endDate;
+            BranchId= branchId;
         }
 
         public void Remove()
