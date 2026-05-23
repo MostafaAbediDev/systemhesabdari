@@ -7,6 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CodeManagement.Infrastructure.EFCore\CodeManagement.Infrastructure.EFCore.csproj" />
+    <ProjectReference Include="..\GeneralInfoManagement.Application\GeneralInfoManagement.Application.csproj" />
     <ProjectReference Include="..\GeneralInfoManagement.Infrastructure.EFCore\GeneralInfoManagement.Infrastructure.EFCore.csproj" />
   </ItemGroup>
 

@@ -16,7 +16,6 @@ namespace CodeManagement.Configuration
             services.AddTransient<ICodeRepository, CodeRepository>();
             services.AddTransient<ICodeApplication, CodeApplication>();
 
-
             services.AddDbContext<CodeSystemContext>(x => x.UseSqlServer(connectionString));
             services.AddDbContext<CodeFakeDataContext>(x => x.UseSqlServer(connectionString));
         }
