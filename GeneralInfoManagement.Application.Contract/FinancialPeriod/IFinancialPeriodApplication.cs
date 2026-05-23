@@ -1,5 +1,4 @@
 ﻿using _0_Framework.Application;
-using GeneralInfoManagement.Application.Contract.Company;
 
 namespace GeneralInfoManagement.Application.Contract.FinancialPeriod
 {
