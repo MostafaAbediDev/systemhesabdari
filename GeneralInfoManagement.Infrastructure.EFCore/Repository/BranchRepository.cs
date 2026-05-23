@@ -103,5 +103,12 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
                 .OrderByDescending(x => x.Id)
                 .ToList();
         }
+
+        public void ResetAllMainBranches()
+        {
+            _context.Branches
+                .Where(x => x.IsMain)
+                .ExecuteUpdate(x => x.SetProperty(b => b.IsMain, false));
+        }
     }
 }

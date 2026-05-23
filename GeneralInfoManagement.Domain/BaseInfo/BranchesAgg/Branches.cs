@@ -2,6 +2,7 @@
 using GeneralInfoManagement.Domain.BaseInfo.BranchArchiveAgg;
 using GeneralInfoManagement.Domain.BaseInfo.CompaniesAgg;
 using GeneralInfoManagement.Domain.BaseInfo.FinancialPeriodsAgg;
+using System.ComponentModel.Design;
 
 namespace GeneralInfoManagement.Domain.BaseInfo.BranchesAgg
 {
@@ -50,7 +51,7 @@ namespace GeneralInfoManagement.Domain.BaseInfo.BranchesAgg
 
         public void Edit(string title, string nationalId, string economicCode,
             string registerNumber, string email, string phone,
-            string address, string postCode, Location location)
+            string address, string postCode, Location location, long companyId)
         {
             Title = title;
             NationalId = nationalId;
@@ -61,6 +62,7 @@ namespace GeneralInfoManagement.Domain.BaseInfo.BranchesAgg
             Address = address;
             PostCode = postCode;
             Location = location;
+            CompanyId = companyId;
         }
 
         public void SetAsMain()

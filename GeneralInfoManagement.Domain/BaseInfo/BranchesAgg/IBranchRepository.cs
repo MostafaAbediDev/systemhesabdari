@@ -8,5 +8,6 @@ namespace GeneralInfoManagement.Domain.BaseInfo.BranchesAgg
         EditBranch GetDetails(long id);
         List<BranchViewModel> Search(BranchSearchModel searchModel);
         List<BranchViewModel> GetAllBranches();
+        void ResetAllMainBranches();
     }
 }
