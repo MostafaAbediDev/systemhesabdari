@@ -19,6 +19,13 @@ namespace GeneralInfoManagement.Domain.BaseInfo.PictureAgg
             IsMain = false;
         }
 
+        public void Edit(long ownerId, PictureOwnerType ownerType, string url)
+        {
+            OwnerId = ownerId;
+            OwnerType = ownerType;
+            Url = url;
+        }
+
         public void SetAsMain()
         {
             IsMain = true;
