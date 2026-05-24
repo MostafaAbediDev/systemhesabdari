@@ -19,7 +19,6 @@ namespace CodeManagement.Application
         {
             var operation = new OperationResult();
 
-            // تعیین نهایی مقدار کد
             var finalValue = command.IsAutomatic
                 ? _codegenService.Generate(command.OwnerType)
                 : command.Value;
@@ -70,6 +69,19 @@ namespace CodeManagement.Application
             };
         }
 
+        public List<CodeViewModel> GetListByOwners(List<long> ownerIds, CodeOwnerTypeDTO ownerType)
+        {
+            var codes = _codeRepository.GetByOwners(ownerIds, (CodeOwnerType)ownerType);
+
+            return codes.Select(code => new CodeViewModel
+            {
+                Id = code.Id,
+                OwnerId = code.OwnerId,
+                Value = code.Value,
+                CreationDate = code.CreationDate.ToString("yyyy/MM/dd")
+            }).ToList();
+        }
+
         public List<CodeViewModel> Search(CodeSearchModel searchModel)
         {
             return _codeRepository.Search(searchModel);
@@ -79,7 +91,6 @@ namespace CodeManagement.Application
         {
             var operation = new OperationResult();
 
-            // تشخیص مقدار نهایی (اتوماتیک یا دستی)
             var finalValue = command.IsAutomatic
                 ? _codegenService.Generate(command.OwnerType)
                 : command.Value;
@@ -91,7 +102,6 @@ namespace CodeManagement.Application
 
             if (existingCode == null)
             {
-                // اگر وجود نداشت، ثبت کن
                 if (_codeRepository.Exists(x => x.Value == finalValue))
                     return operation.Failed("کد تولید شده یا وارد شده تکراری است.");
 
@@ -100,7 +110,6 @@ namespace CodeManagement.Application
             }
             else
             {
-                // اگر وجود داشت، ویرایش کن
                 if (_codeRepository.Exists(x => x.Value == finalValue && x.Id != existingCode.Id))
                     return operation.Failed("کد جدید با رکورد دیگری تکراری است.");
 

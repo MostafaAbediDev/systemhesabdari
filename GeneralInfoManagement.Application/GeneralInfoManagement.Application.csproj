@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\01_FrameWork\01_FrameWork.csproj" />
+    <ProjectReference Include="..\CodeManagement.Application.Contracts\CodeManagement.Application.Contracts.csproj" />
     <ProjectReference Include="..\GeneralInfoManagement.Application.Contract\GeneralInfoManagement.Application.Contract.csproj" />
     <ProjectReference Include="..\GeneralInfoManagement.Domain\GeneralInfoManagement.Domain.csproj" />
   </ItemGroup>

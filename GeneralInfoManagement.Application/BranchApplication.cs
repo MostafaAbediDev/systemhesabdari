@@ -1,4 +1,5 @@
 ﻿using _0_Framework.Application;
+using CodeManagement.Application.Contracts.Code;
 using GeneralInfoManagement.Application.Contract.Branches;
 using GeneralInfoManagement.Domain.BaseInfo.BranchesAgg;
 
@@ -7,10 +8,12 @@ namespace GeneralInfoManagement.Application
     public class BranchApplication : IBranchApplication
     {
         private readonly IBranchRepository _branchRepository;
+        private readonly ICodeApplication  _codeApplication;
 
-        public BranchApplication(IBranchRepository branchRepository)
+        public BranchApplication(IBranchRepository branchRepository, ICodeApplication codeApplication)
         {
             _branchRepository = branchRepository;
+            _codeApplication = codeApplication;
         }
 
         public OperationResult Create(CreateBranches command)
@@ -138,7 +141,21 @@ namespace GeneralInfoManagement.Application
 
         public List<BranchViewModel> GetBranches()
         {
-            return _branchRepository.GetAllBranches();
+            var branches = _branchRepository.GetAllBranches();
+            var branchIds = branches.Select(b => b.Id).ToList();
+
+            var codes = _codeApplication.GetListByOwners(branchIds, CodeOwnerTypeDTO.Branch);
+
+            var codeDictionary = codes.ToDictionary(c => c.OwnerId, c => c.Value);
+
+            foreach (var branch in branches)
+            {
+                branch.Code = codeDictionary.TryGetValue(branch.Id, out var codeValue)
+                    ? codeValue
+                    : "بدون کد";
+            }
+
+            return branches;
         }
 
         public EditBranch GetDetails(long id)

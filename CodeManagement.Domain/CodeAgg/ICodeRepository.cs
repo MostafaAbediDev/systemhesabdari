@@ -8,5 +8,7 @@ namespace CodeManagement.Domain.CodeAgg
         Codes GetByOwner(long ownerId, CodeOwnerType ownerType);
         EditCode GetDetails(long id);
         List<CodeViewModel> Search(CodeSearchModel searchModel);
+        List<Codes> GetByOwners(List<long> ownerIds, CodeOwnerType ownerType);
+
     }
 }

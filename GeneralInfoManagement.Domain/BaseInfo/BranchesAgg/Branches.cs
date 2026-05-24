@@ -17,13 +17,9 @@ namespace GeneralInfoManagement.Domain.BaseInfo.BranchesAgg
         public string Address { get; private set; }
         public string PostCode { get; private set; }
         public bool IsMain { get; private set; }
-
         public long CompanyId { get; private set; }
-
         public Location Location { get; private set; }
-
         public Companies Company { get; private set; }
-
         public List<BranchArchive> BranchArchive { get; private set; }
         public List<FinancialPeriods> FinancialPeriod { get; private set; }
 
