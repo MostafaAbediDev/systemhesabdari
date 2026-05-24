@@ -19,6 +19,11 @@ namespace CodeManagement.Infrastructure.EFCore.Repository
             return _context.Codes.FirstOrDefault(x => x.OwnerId == ownerId && x.OwnerType == ownerType);
         }
 
+        public List<Codes> GetByOwners(List<long> ownerIds, CodeOwnerType ownerType)
+        {
+            return _context.Codes.Where(x => ownerIds.Contains(x.OwnerId) && x.OwnerType == ownerType).ToList();
+        }
+
         public EditCode GetDetails(long id)
         {
             return _context.Codes
