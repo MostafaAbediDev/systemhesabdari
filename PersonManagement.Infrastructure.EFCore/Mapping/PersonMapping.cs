@@ -1,8 +1,6 @@
-﻿using GeneralInfoManagement.Domain.BaseInfo.BranchesAgg;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PersonManagement.Domain.Person.PersonAgg;
-using System.Reflection.Emit;
 
 namespace PersonManagement.Infrastructure.EFCore.Mapping
 {
@@ -14,10 +12,13 @@ namespace PersonManagement.Infrastructure.EFCore.Mapping
             builder.HasKey(x => x.Id);
 
             builder.Property(x => x.FullName).HasMaxLength(200).IsRequired();
-            builder.Property(x => x.Code).HasMaxLength(50).IsRequired();
-            builder.Property(x => x.NationalCode).HasMaxLength(20).IsRequired();
-            builder.Property(x => x.EconomicCode).HasMaxLength(50).IsRequired();
-            builder.Property(x => x.RegistrationNumber).HasMaxLength(50).IsRequired();
+
+            builder.Property(x => x.NationalCode).HasMaxLength(20).IsRequired(false);
+            builder.Property(x => x.EconomicCode).HasMaxLength(50).IsRequired(false);
+            builder.Property(x => x.RegistrationNumber).HasMaxLength(50).IsRequired(false);
+
+            builder.Property(x => x.CreditLimit).HasPrecision(18, 2);
+            builder.Property(x => x.AvailableCredit).HasPrecision(18, 2);
 
             builder.HasOne(x => x.Branches).WithMany().HasForeignKey(x => x.BranchId).OnDelete(DeleteBehavior.Restrict);
             builder.HasOne(x => x.PersonType).WithMany(x => x.Persons).HasForeignKey(x => x.PersonTypeId);

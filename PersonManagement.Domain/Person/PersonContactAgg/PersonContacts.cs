@@ -20,16 +20,13 @@ namespace PersonManagement.Domain.Person.PersonContactAgg
             Description = description;
             PersonId = personId;
             ContactTypeId = contactTypeId;
-            IsDefault = false;
         }
 
-        public void Edit(string value, string description, long personId, long contactTypeId)
+        public void Edit(string value, string description, long contactTypeId)
         {
             Value = value;
             Description = description;
-            PersonId = personId;
             ContactTypeId = contactTypeId;
-            IsDefault = false;
         }
 
         public void Remove()
@@ -50,6 +47,15 @@ namespace PersonManagement.Domain.Person.PersonContactAgg
         public void NotActive()
         {
             IsActive = false;
+        }
+        public void SetDefault()
+        {
+            IsDefault = true;
+        }
+
+        public void UnsetDefault()
+        {
+            IsDefault = false;
         }
     }
 }

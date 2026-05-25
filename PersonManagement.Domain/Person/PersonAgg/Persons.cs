@@ -9,13 +9,14 @@ namespace PersonManagement.Domain.Person.PersonAgg
 {
     public class Persons : EntityBase
     {
-        public string Code { get; private set; }
         public string FullName { get; private set; }
-        public string NationalCode { get; private set; }
-        public string EconomicCode { get; private set; }
-        public string RegistrationNumber { get; private set; }
+        public string? NationalCode { get; private set; }
+        public string? EconomicCode { get; private set; }
+        public string? RegistrationNumber { get; private set; }
         public long PersonTypeId { get; private set; }
         public bool IsLegal { get; private set; }
+        public decimal CreditLimit { get; private set; }
+        public decimal AvailableCredit { get; private set; }
         public long BranchId { get; private set; }
         public Branches Branches { get; private set; }
         public PersonType PersonType { get; private set; }
@@ -30,43 +31,68 @@ namespace PersonManagement.Domain.Person.PersonAgg
             PersonContacts = new List<PersonContacts>();
         }
 
-        public Persons(string code, string fullName, string nationalCode,
-            string economicCode, string registrationNumber, long personTypeId, long branchId)
+        public Persons(string fullName,bool isLegal,string? nationalCode,string? economicCode,
+            string? registrationNumber,long personTypeId,long branchId, decimal creditLimit)
         {
-            Code = code;
             FullName = fullName;
-            NationalCode = nationalCode;
-            EconomicCode = economicCode;
-            RegistrationNumber = registrationNumber;
+            IsLegal = isLegal;
+
+            if (isLegal)
+            {
+                EconomicCode = economicCode;
+                RegistrationNumber = registrationNumber;
+            }
+            else
+            {
+                NationalCode = nationalCode;
+            }
+
             PersonTypeId = personTypeId;
             BranchId = branchId;
+
+            CreditLimit = creditLimit;
+            AvailableCredit = creditLimit;
         }
 
-        public void Edit(string code, string fullName, string nationalCode,
-            string economicCode, string registrationNumber, long personTypeId, long branchId)
+        public void Edit(string fullName, string? nationalCode,
+            string? economicCode, string? registrationNumber, long personTypeId, long branchId, bool isLegal)
         {
-            Code = code;
             FullName = fullName;
-            NationalCode = nationalCode;
-            EconomicCode = economicCode;
-            RegistrationNumber = registrationNumber;
             PersonTypeId = personTypeId;
             BranchId = branchId;
+
+            IsLegal = isLegal;
+
+            if (IsLegal)
+            {
+                EconomicCode = economicCode;
+                RegistrationNumber = registrationNumber;
+
+                NationalCode = null;
+            }
+            else
+            {
+                NationalCode = nationalCode;
+
+                EconomicCode = null;
+                RegistrationNumber = null;
+            }
+        }
+
+        public void UpdateFinancialInfo(decimal creditLimit)
+        {
+
+            if (creditLimit < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(creditLimit), "سقف اعتبار نمی‌تواند منفی باشد.");
+            }
+
+            CreditLimit = creditLimit;
         }
 
         public void SetBranch(long branchId)
         {
             BranchId = branchId;
-        }
-
-        public void Legal()
-        {
-            IsLegal = true;
-        }
-
-        public void IlLegal()
-        {
-            IsLegal = false;
         }
 
         public void Remove()

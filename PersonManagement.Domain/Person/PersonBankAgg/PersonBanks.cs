@@ -20,17 +20,14 @@ namespace PersonManagement.Domain.Person.PersonBankAgg
             CardNumber = cardNumber;
             Shaba = shaba;
             PersonId = personId;
-            IsDefault = false;
         }
 
-        public void Edit(string bankName, string accountNumber, string cardNumber, string shaba, long personId)
+        public void Edit(string bankName, string accountNumber, string cardNumber, string shaba)
         {
             BankName = bankName;
             AccountNumber = accountNumber;
             CardNumber = cardNumber;
             Shaba = shaba;
-            PersonId = personId;
-            IsDefault = false;
         }
 
         public void Remove()
@@ -51,6 +48,15 @@ namespace PersonManagement.Domain.Person.PersonBankAgg
         public void NotActive()
         {
             IsActive = false;
+        }
+        public void SetDefault()
+        {
+            IsDefault = true;
+        }
+
+        public void UnsetDefault()
+        {
+            IsDefault = false;
         }
     }
 }

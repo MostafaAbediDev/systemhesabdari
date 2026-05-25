@@ -7,6 +7,7 @@ namespace PersonManagement.Domain.Person.PersonAddressAgg
 {
     public class PersonAddresses : EntityBase
     {
+        public string Title { get; private set; }
         public string Address { get; private set; }
         public string PostalCode { get; private set; }
         public bool IsDefault { get; private set; }
@@ -17,26 +18,25 @@ namespace PersonManagement.Domain.Person.PersonAddressAgg
         public Provinces Provinces { get; private set; }
         public Cities Cities { get; private set; }
 
-        public PersonAddresses(long personId, long provinceId, long cityId,
+        public PersonAddresses(string title, long personId, long provinceId, long cityId,
         string address, string postalCode)
         {
+            Title = title;
             PersonId = personId;
             ProvinceId = provinceId;
             CityId = cityId;
             Address = address;
             PostalCode = postalCode;
-            IsDefault = false;
         }
 
-        public void Edit(long personId, long provinceId, long cityId,
+        public void Edit(string title, long provinceId, long cityId,
         string address, string postalCode)
         {
-            PersonId = personId;
+            Title = title;
             ProvinceId = provinceId;
             CityId = cityId;
             Address = address;
             PostalCode = postalCode;
-            IsDefault = false;
         }
 
         public void Remove()
@@ -57,6 +57,15 @@ namespace PersonManagement.Domain.Person.PersonAddressAgg
         public void NotActive()
         {
             IsActive = false;
+        }
+        public void SetDefault()
+        {
+            IsDefault = true;
+        }
+
+        public void UnsetDefault()
+        {
+            IsDefault = false;
         }
     }
 }

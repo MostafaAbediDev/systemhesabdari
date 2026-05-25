@@ -2,7 +2,6 @@
 using GeneralInfoManagement.Domain.BaseInfo.BranchArchiveAgg;
 using GeneralInfoManagement.Domain.BaseInfo.CompaniesAgg;
 using GeneralInfoManagement.Domain.BaseInfo.FinancialPeriodsAgg;
-using System.ComponentModel.Design;
 
 namespace GeneralInfoManagement.Domain.BaseInfo.BranchesAgg
 {
