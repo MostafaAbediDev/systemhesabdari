@@ -371,6 +371,11 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations.FakeData
                     b.Property<long>("ProvinceId")
                         .HasColumnType("bigint");
 
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CityId");
@@ -390,16 +395,19 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations.FakeData
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
+                    b.Property<decimal>("AvailableCredit")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<long>("BranchId")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<decimal>("CreditLimit")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
@@ -408,7 +416,6 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations.FakeData
                         .HasColumnType("bigint");
 
                     b.Property<string>("EconomicCode")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -427,7 +434,6 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations.FakeData
                         .HasColumnType("bit");
 
                     b.Property<string>("NationalCode")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
@@ -435,7 +441,6 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations.FakeData
                         .HasColumnType("bigint");
 
                     b.Property<string>("RegistrationNumber")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 

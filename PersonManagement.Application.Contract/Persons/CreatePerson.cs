@@ -11,6 +11,6 @@
         public bool IsLegal { get; set; }
         public long PersonTypeId { get; set; }
         public bool IsActive { get; set; }
-
+        public decimal CreditLimit { get; set; }
     }
 }

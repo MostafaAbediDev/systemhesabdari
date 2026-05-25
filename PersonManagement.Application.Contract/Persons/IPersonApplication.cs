@@ -10,8 +10,8 @@ namespace PersonManagement.Application.Contract.Persons
         OperationResult Restore(long id);
         OperationResult Activate(long id);
         OperationResult Deactivate(long id);
-        OperationResult MakeLegal(long id);
-        OperationResult MakeIllegal(long id);
+        //OperationResult MakeLegal(long id);
+        //OperationResult MakeIllegal(long id);
         EditPerson GetDetails(long id);
         List<PersonViewModel> Search(PersonSearchModel searchModel);
         List<PersonViewModel> GetPersons();

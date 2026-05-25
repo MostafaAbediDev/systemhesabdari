@@ -26,7 +26,6 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
                 .Select(x => new PersonViewModel
                 {
                     Id = x.Id,
-                    Code = x.Code,
                     FullName = x.FullName,
                     BranchName = x.Branches != null ? x.Branches.Title : string.Empty,
                     IsActive = x.IsActive,
@@ -44,7 +43,6 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
                 .Select(x => new EditPerson
                 {
                     Id = x.Id,
-                    Code = x.Code,
                     FullName = x.FullName,
                     NationalCode = x.NationalCode,
                     EconomicCode = x.EconomicCode,
@@ -80,7 +78,6 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
                 Person = new PersonViewModel
                 {
                     Id = person.Id,
-                    Code = person.Code,
                     FullName = person.FullName,
                     NationalCode = person.NationalCode,
                     EconomicCode = person.EconomicCode,
@@ -145,7 +142,6 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
                 .Select(x => new PersonViewModel
                 {
                     Id = x.Id,
-                    Code = x.Code,
                     FullName = x.FullName,
                     NationalCode = x.NationalCode,
                     EconomicCode = x.EconomicCode,

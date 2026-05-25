@@ -21,20 +21,15 @@ namespace PersonManagement.Application
                 return operation.Failed("کد ملی تکراری است");
 
             var person = new Persons(
-                command.Code,
                 command.FullName,
+                command.IsLegal,
                 command.NationalCode,
                 command.EconomicCode,
                 command.RegistrationNumber,
                 command.PersonTypeId,
-                command.BranchId
+                command.BranchId,
+                command.CreditLimit
             );
-
-            // تنظیمات تکمیلی دامنه
-            if (command.IsLegal)
-                person.Legal();
-            else
-                person.IlLegal();
 
             person.SetBranch(command.BranchId);
 
@@ -56,19 +51,16 @@ namespace PersonManagement.Application
                 return operation.Failed("کد ملی تکراری است");
 
             person.Edit(
-                command.Code,
                 command.FullName,
                 command.NationalCode,
                 command.EconomicCode,
                 command.RegistrationNumber,
                 command.PersonTypeId,
-                command.BranchId
+                command.BranchId,
+                command.IsLegal
             );
 
             person.SetBranch(command.BranchId);
-
-            if (command.IsLegal) person.Legal();
-            else person.IlLegal();
 
             _personRepository.SaveChanges();
             return operation.Succedded();
@@ -124,31 +116,31 @@ namespace PersonManagement.Application
             return operation.Succedded();
         }
 
-        public OperationResult MakeLegal(long id)
-        {
-            var operation = new OperationResult();
-            var person = _personRepository.Get(id);
+        //public OperationResult MakeLegal(long id)
+        //{
+        //    var operation = new OperationResult();
+        //    var person = _personRepository.Get(id);
 
-            if (person == null)
-                return operation.Failed("رکورد یافت نشد");
+        //    if (person == null)
+        //        return operation.Failed("رکورد یافت نشد");
 
-            person.Legal();
-            _personRepository.SaveChanges();
-            return operation.Succedded();
-        }
+        //    person.Legal();
+        //    _personRepository.SaveChanges();
+        //    return operation.Succedded();
+        //}
 
-        public OperationResult MakeIllegal(long id)
-        {
-            var operation = new OperationResult();
-            var person = _personRepository.Get(id);
+        //public OperationResult MakeIllegal(long id)
+        //{
+        //    var operation = new OperationResult();
+        //    var person = _personRepository.Get(id);
 
-            if (person == null)
-                return operation.Failed("رکورد یافت نشد");
+        //    if (person == null)
+        //        return operation.Failed("رکورد یافت نشد");
 
-            person.IlLegal();
-            _personRepository.SaveChanges();
-            return operation.Succedded();
-        }
+        //    person.IlLegal();
+        //    _personRepository.SaveChanges();
+        //    return operation.Succedded();
+        //}
 
         public EditPerson GetDetails(long id)
         {

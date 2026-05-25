@@ -11,6 +11,7 @@ namespace PersonManagement.Infrastructure.EFCore.Mapping
             builder.ToTable("PersonAddresses");
             builder.HasKey(x => x.Id);
 
+            builder.Property(x => x.Title).HasMaxLength(250).IsRequired();
             builder.Property(x => x.Address).HasMaxLength(500).IsRequired();
             builder.Property(x => x.PostalCode).HasMaxLength(20).IsRequired();
 

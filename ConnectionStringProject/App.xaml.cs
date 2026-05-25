@@ -14,7 +14,6 @@ using Microsoft.Extensions.DependencyInjection;
 using PayrollSystemManagement.Configuration;
 using PersonManagement.Configuration;
 using PersonManagement.Infrastructure.EFCore;
-using PersonManagement.Infrastructure.EFCore.Seed;
 using System.IO;
 using System.Windows;
 
@@ -59,15 +58,6 @@ namespace ConnectionStringProject
 
             await GeneralSeeders.SeedAsync(generalContext);
 
-            // =========================
-            // 3. Seed Person (Fake Data)
-            // =========================
-
-            var personSeeder =
-                sp.GetRequiredService<PersonFakeSeeder>();
-
-            await personSeeder.SeedAsync();
-
             base.OnStartup(e);
         }
 
@@ -86,8 +76,6 @@ namespace ConnectionStringProject
             LogManagementBoostrapper.Configure(services, fakeConnectionString);
             PayrollSystemManagementBoostrapper.Configure(services, fakeConnectionString);
             PersonManagementBoostrapper.Configure(services, fakeConnectionString);
-
-            services.AddScoped<PersonFakeSeeder>();
 
         }
     }
