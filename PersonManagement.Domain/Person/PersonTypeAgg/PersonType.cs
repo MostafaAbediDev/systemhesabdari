@@ -5,7 +5,7 @@ namespace PersonManagement.Domain.Person.PersonTypeAgg
 {
     public class PersonType : EntityBase
     {
-        public int Code { get; private set; }
+        public int TitleId { get; private set; }
         public string Title { get; private set; }
         public List<Persons> Persons { get; private set; }
 
@@ -14,15 +14,15 @@ namespace PersonManagement.Domain.Person.PersonTypeAgg
             Persons = new List<Persons>();
         }
 
-        public PersonType(int code, string title)
+        public PersonType(int titleId, string title)
         {
-            Code = code;
+            TitleId = titleId;
             Title = title;
         }
 
-        public void Edit(int code, string title)
+        public void Edit(int titleId, string title)
         {
-            Code = code;
+            TitleId = titleId;
             Title = title;
         }
 

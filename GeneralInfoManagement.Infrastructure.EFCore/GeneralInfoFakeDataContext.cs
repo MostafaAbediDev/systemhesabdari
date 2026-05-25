@@ -20,6 +20,7 @@ namespace GeneralInfoManagement.Infrastructure.EFCore
         public DbSet<Pictures> Pictures { get; set; }
         public DbSet<Cities> Cities { get; set; }
         public DbSet<Provinces> Provinces { get; set; }
+
         public GeneralInfoFakeDataContext(DbContextOptions<GeneralInfoFakeDataContext> options) : base(options) 
         {
         }
