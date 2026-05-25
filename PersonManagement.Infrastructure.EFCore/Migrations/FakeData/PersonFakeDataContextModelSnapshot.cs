@@ -79,10 +79,6 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations.FakeData
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<long>("CompanyId")
                         .HasColumnType("bigint");
 
@@ -95,8 +91,9 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations.FakeData
                     b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
-                    b.Property<int>("EconomicCode")
-                        .HasColumnType("int");
+                    b.Property<string>("EconomicCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -111,12 +108,9 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations.FakeData
                     b.Property<bool>("IsMain")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Lat_Log")
+                    b.Property<string>("NationalId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("NationalId")
-                        .HasColumnType("int");
 
                     b.Property<string>("Phone")
                         .IsRequired()
@@ -126,8 +120,9 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations.FakeData
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RegisterNumber")
-                        .HasColumnType("int");
+                    b.Property<string>("RegisterNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -568,9 +563,6 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations.FakeData
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<int>("Code")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
@@ -591,6 +583,9 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations.FakeData
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<int>("TitleId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.ToTable("PersonTypes", (string)null);
@@ -599,29 +594,29 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations.FakeData
                         new
                         {
                             Id = 1L,
-                            Code = 1,
                             CreationDate = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
                             IsDeleted = false,
-                            Title = "مشتری"
+                            Title = "مشتری",
+                            TitleId = 1
                         },
                         new
                         {
                             Id = 2L,
-                            Code = 2,
                             CreationDate = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
                             IsDeleted = false,
-                            Title = "پرسنل"
+                            Title = "پرسنل",
+                            TitleId = 2
                         },
                         new
                         {
                             Id = 3L,
-                            Code = 3,
                             CreationDate = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
                             IsDeleted = false,
-                            Title = "تامین کننده"
+                            Title = "تامین کننده",
+                            TitleId = 3
                         });
                 });
 
