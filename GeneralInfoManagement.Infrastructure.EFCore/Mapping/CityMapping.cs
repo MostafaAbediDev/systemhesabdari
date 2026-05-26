@@ -19,6 +19,9 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Mapping
 
             builder.HasOne(x => x.Provinces).WithMany(x => x.Cities).HasForeignKey(x => x.ProvinceId);
 
+            builder.HasMany(s => s.Branches).WithOne(s => s.Cities).HasForeignKey(s => s.CityId);
+
+
         }
     }
 }

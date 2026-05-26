@@ -4,16 +4,19 @@ using GeneralInfoManagement.Infrastructure.EFCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace GeneralInfoManagement.Infrastructure.EFCore.Migrations.FakeData
+namespace GeneralInfoManagement.Infrastructure.EFCore.Migrations
 {
-    [DbContext(typeof(GeneralInfoFakeDataContext))]
-    partial class GeneralInfoFakeDataContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(GeneralInfoSystemContext))]
+    [Migration("20260526084140_CitiesAndProvincesAddToBranches")]
+    partial class CitiesAndProvincesAddToBranches
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

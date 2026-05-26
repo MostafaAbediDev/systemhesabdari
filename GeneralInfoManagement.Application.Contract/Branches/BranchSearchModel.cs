@@ -6,5 +6,7 @@
         public string NationalId { get; set; }
         public string EconomicCode { get; set; }
         public string RegisterNumber { get; set; }
+        public long ProvinceId { get; set; }
+        public long CityId { get; set; }
     }
 }

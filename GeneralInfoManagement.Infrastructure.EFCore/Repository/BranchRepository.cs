@@ -27,12 +27,17 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
                     EconomicCode = x.EconomicCode,
                     RegisterNumber = x.RegisterNumber,
                     Email = x.Email,
-                    Phone = x.Phone,
+                    MobilePhone = x.MobilePhone,
+                    TelePhone = x.TelePhone,
                     Address = x.Address,
                     PostCode = x.PostCode,
                     Latitude = x.Location.Latitude,
                     Longitude = x.Location.Longitude,
                     CompanyId = x.CompanyId,
+                    CityId = x.CityId,
+                    CityName = x.Cities.Title,
+                    ProvinceName = x.Provinces.Title,
+                    ProvinceId = x.ProvinceId,
                     IsActive = x.IsActive,
                     CreatedAt = x.CreationDate
                 })
@@ -53,12 +58,15 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
                     EconomicCode = x.EconomicCode,
                     RegisterNumber = x.RegisterNumber,
                     Email = x.Email,
-                    Phone = x.Phone,
+                    MobilePhone = x.MobilePhone,
+                    TelePhone = x.TelePhone,
                     Address = x.Address,
                     PostCode = x.PostCode,
                     Latitude = x.Location.Latitude,
                     Longitude = x.Location.Longitude,
-                    CompanyId = x.CompanyId
+                    CompanyId = x.CompanyId,
+                    CityId = x.CityId,
+                    ProvinceId = x.ProvinceId
                 })
                 .FirstOrDefault();
         }
@@ -81,6 +89,12 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
             if (!string.IsNullOrWhiteSpace(searchModel.RegisterNumber))
                 query = query.Where(x => x.RegisterNumber.Contains(searchModel.RegisterNumber));
 
+            if (searchModel.ProvinceId > 0)
+                query = query.Where(x => x.ProvinceId == searchModel.ProvinceId);
+
+            if (searchModel.CityId > 0)
+                query = query.Where(x => x.CityId == searchModel.CityId);
+
 
             return query
                 .Select(x => new BranchViewModel
@@ -91,12 +105,17 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
                     EconomicCode = x.EconomicCode,
                     RegisterNumber = x.RegisterNumber,
                     Email = x.Email,
-                    Phone = x.Phone,
+                    MobilePhone = x.MobilePhone,
+                    TelePhone = x.TelePhone,
                     Address = x.Address,
                     PostCode = x.PostCode,
                     Latitude = x.Location.Latitude,
                     Longitude = x.Location.Longitude,
                     CompanyId = x.CompanyId,
+                    CityId = x.CityId,
+                    ProvinceId = x.ProvinceId,
+                    CityName = x.Cities.Title,
+                    ProvinceName = x.Provinces.Title,
                     IsActive = x.IsActive,
                     CreatedAt = x.CreationDate
                 })

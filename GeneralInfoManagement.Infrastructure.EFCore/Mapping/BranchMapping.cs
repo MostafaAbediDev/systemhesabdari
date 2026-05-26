@@ -28,7 +28,7 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Mapping
             builder.Property(x => x.Email)
                 .HasMaxLength(100);
 
-            builder.Property(x => x.Phone)
+            builder.Property(x => x.MobilePhone)
                 .HasMaxLength(50);
 
             builder.Property(x => x.Address)
@@ -54,6 +54,14 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Mapping
             builder.HasOne(x => x.Company)
                 .WithMany(x => x.Branch)
                 .HasForeignKey(x => x.CompanyId);
+
+            builder.HasOne(x => x.Provinces)
+                .WithMany(x => x.Branches)
+                .HasForeignKey(x => x.ProvinceId).OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(x => x.Cities)
+                .WithMany(x => x.Branches)
+                .HasForeignKey(x => x.CityId);
 
             builder.HasMany(x => x.BranchArchive)
                 .WithOne(x => x.Branch)

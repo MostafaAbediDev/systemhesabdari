@@ -26,8 +26,8 @@ namespace GeneralInfoManagement.Application
             var location = new Location(command.Latitude, command.Longitude);
 
             var branch = new Branches(command.Title, command.NationalId, command.EconomicCode,
-                                      command.RegisterNumber, command.Email, command.Phone,
-                                      command.Address, command.PostCode, location, command.CompanyId);
+                                      command.RegisterNumber, command.Email, command.MobilePhone,
+                                      command.Address, command.PostCode, location, command.CompanyId, command.TelePhone, command.CityId, command.ProvinceId);
 
             _branchRepository.Create(branch);
 
@@ -49,8 +49,8 @@ namespace GeneralInfoManagement.Application
             var location = new Location(command.Latitude, command.Longitude);
 
             branch.Edit(command.Title, command.NationalId, command.EconomicCode,
-                        command.RegisterNumber, command.Email, command.Phone,
-                        command.Address, command.PostCode, location, command.CompanyId);
+                        command.RegisterNumber, command.Email, command.MobilePhone,
+                        command.Address, command.PostCode, location, command.CompanyId, command.TelePhone, command.CityId, command.ProvinceId);
 
             _branchRepository.SaveChanges();
             return operation.Succedded();

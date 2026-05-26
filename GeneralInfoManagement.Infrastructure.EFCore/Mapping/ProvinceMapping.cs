@@ -17,6 +17,7 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Mapping
             builder.Property(x => x.Title).HasMaxLength(100).IsRequired();
 
             builder.HasMany(s => s.Cities).WithOne(s => s.Provinces).HasForeignKey(s => s.ProvinceId);
+            builder.HasMany(s => s.Branches).WithOne(s => s.Provinces).HasForeignKey(s => s.ProvinceId);
 
         }
     }
