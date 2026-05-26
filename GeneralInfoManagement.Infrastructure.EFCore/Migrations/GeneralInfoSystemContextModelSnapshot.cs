@@ -83,6 +83,9 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<long>("CityId")
+                        .HasColumnType("bigint");
+
                     b.Property<long>("CompanyId")
                         .HasColumnType("bigint");
 
@@ -114,25 +117,32 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Migrations
                     b.Property<bool>("IsMain")
                         .HasColumnType("bit");
 
+                    b.Property<string>("MobilePhone")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<string>("NationalId")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("PostCode")
                         .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
+                    b.Property<long>("ProvinceId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("RegisterNumber")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("TelePhone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -141,7 +151,11 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CityId");
+
                     b.HasIndex("CompanyId");
+
+                    b.HasIndex("ProvinceId");
 
                     b.ToTable("Branches", (string)null);
                 });
@@ -358,10 +372,22 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Migrations
 
             modelBuilder.Entity("GeneralInfoManagement.Domain.BaseInfo.BranchesAgg.Branches", b =>
                 {
+                    b.HasOne("GeneralInfoManagement.Domain.General.CityAgg.Cities", "Cities")
+                        .WithMany("Branches")
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("GeneralInfoManagement.Domain.BaseInfo.CompaniesAgg.Companies", "Company")
                         .WithMany("Branch")
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GeneralInfoManagement.Domain.General.ProvinceAgg.Provinces", "Provinces")
+                        .WithMany("Branches")
+                        .HasForeignKey("ProvinceId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.OwnsOne("GeneralInfoManagement.Domain.BaseInfo.BranchesAgg.Location", "Location", b1 =>
@@ -385,10 +411,14 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Migrations
                                 .HasForeignKey("BranchesId");
                         });
 
+                    b.Navigation("Cities");
+
                     b.Navigation("Company");
 
                     b.Navigation("Location")
                         .IsRequired();
+
+                    b.Navigation("Provinces");
                 });
 
             modelBuilder.Entity("GeneralInfoManagement.Domain.BaseInfo.FinancialPeriodsAgg.FinancialPeriods", b =>
@@ -425,8 +455,15 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Migrations
                     b.Navigation("Branch");
                 });
 
+            modelBuilder.Entity("GeneralInfoManagement.Domain.General.CityAgg.Cities", b =>
+                {
+                    b.Navigation("Branches");
+                });
+
             modelBuilder.Entity("GeneralInfoManagement.Domain.General.ProvinceAgg.Provinces", b =>
                 {
+                    b.Navigation("Branches");
+
                     b.Navigation("Cities");
                 });
 #pragma warning restore 612, 618

@@ -1,4 +1,5 @@
 ﻿using _0_FrameWork.Domain;
+using GeneralInfoManagement.Domain.BaseInfo.BranchesAgg;
 using GeneralInfoManagement.Domain.General.ProvinceAgg;
 
 namespace GeneralInfoManagement.Domain.General.CityAgg
@@ -8,9 +9,11 @@ namespace GeneralInfoManagement.Domain.General.CityAgg
         public string Title { get; private set; }
         public long ProvinceId { get; private set; }
         public Provinces Provinces { get; private set; }
+        public List<Branches> Branches { get; private set; }
 
         protected Cities()
         {
+            Branches = new List<Branches>();
         }
 
         public Cities(string title, long provinceId)
