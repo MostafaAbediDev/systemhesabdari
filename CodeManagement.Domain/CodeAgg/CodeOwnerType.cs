@@ -2,7 +2,8 @@
 {
     public enum CodeOwnerType
     {
-        Branch = 1
+        Branch = 1,
+        Person = 2
     }
 
 }
