@@ -17,7 +17,7 @@ namespace AccountManagement.Infrastructure.EFCore.Mapping
 
             builder.Property(x => x.Description).HasMaxLength(500).IsRequired();
 
-            builder.HasOne(x => x.Person).WithMany().HasForeignKey(x => x.PersonId).OnDelete(DeleteBehavior.NoAction);
+            //builder.HasOne(x => x.Person).WithMany().HasForeignKey(x => x.PersonId).OnDelete(DeleteBehavior.NoAction);
             builder.HasOne(x => x.AccountingDocument).WithMany().HasForeignKey(x => x.AccountingDocumentId);
             builder.HasOne(x => x.Account).WithMany(x => x.AccountingEntrie).HasForeignKey(x => x.AccountId);
 

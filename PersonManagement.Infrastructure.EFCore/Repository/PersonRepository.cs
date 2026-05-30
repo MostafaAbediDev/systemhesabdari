@@ -122,7 +122,6 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
                     .Select(b => new PersonBankViewModel
                     {
                         Id = b.Id,
-                        BankName = b.BankName,
                         AccountNumber = b.AccountNumber,
                         CardNumber = b.CardNumber,
                         Shaba = b.Shaba,
