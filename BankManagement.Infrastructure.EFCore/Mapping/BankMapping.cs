@@ -15,12 +15,13 @@ namespace BankManagement.Infrastructure.EFCore.Mapping
             builder.Property(x => x.Country).HasMaxLength(200).IsRequired();
             builder.Property(x => x.Description).HasMaxLength(300).IsRequired();
 
-            builder.HasOne(x => x.Pictures).WithMany().HasForeignKey(x => x.PictureId).OnDelete(DeleteBehavior.NoAction);
             builder.HasOne(x => x.BankTypes).WithMany(x => x.Banks).HasForeignKey(x => x.BankTypeId);
 
             builder.HasMany(s => s.CompanyBankAccounts).WithOne(s => s.Banks).HasForeignKey(s => s.BankId);
 
             builder.HasMany(s => s.ChequeBooks).WithOne(s => s.Banks).HasForeignKey(s => s.BankId);
+
+            builder.HasMany(s => s.BankBranches).WithOne(s => s.Banks).HasForeignKey(s => s.BankId);
 
         }
     }

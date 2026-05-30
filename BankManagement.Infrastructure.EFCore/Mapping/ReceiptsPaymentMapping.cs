@@ -16,7 +16,7 @@ namespace BankManagement.Infrastructure.EFCore.Mapping
 
             builder.HasOne(x => x.Branches).WithMany().HasForeignKey(x => x.BranchId).OnDelete(DeleteBehavior.NoAction);
             builder.HasOne(x => x.FinancialPeriods).WithMany().HasForeignKey(x => x.FinancialPeriodId).OnDelete(DeleteBehavior.NoAction);
-            builder.HasOne(x => x.Persons).WithMany().HasForeignKey(x => x.PersonId).OnDelete(DeleteBehavior.NoAction);
+            //builder.HasOne(x => x.Persons).WithMany().HasForeignKey(x => x.PersonId).OnDelete(DeleteBehavior.NoAction);
             builder.HasOne(x => x.AccountingDocuments).WithMany().HasForeignKey(x => x.AccountingDocumentId).OnDelete(DeleteBehavior.NoAction);
 
             builder.HasOne(x => x.CompanyBankAccounts).WithMany(x => x.ReceiptsPayments).HasForeignKey(x => x.CompanyBankAccountId);

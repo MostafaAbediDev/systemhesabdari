@@ -1,8 +1,8 @@
 ﻿using _0_FrameWork.Domain;
+using BankManagement.Domain.Bank.BankBrancheAgg;
 using BankManagement.Domain.Bank.BankTypeAgg;
 using BankManagement.Domain.Bank.ChequeBookAgg;
 using BankManagement.Domain.Bank.CompanyBankAccountAgg;
-using GeneralInfoManagement.Domain.BaseInfo.PictureAgg;
 
 namespace BankManagement.Domain.Bank.BankAgg
 {
@@ -12,11 +12,11 @@ namespace BankManagement.Domain.Bank.BankAgg
         public long BankTypeId { get; private set; }
         public string Country { get; private set; }
         public string Description { get; private set; }
-        public long PictureId { get; private set; }
+        public string Logo { get; private set; }
         public BankTypes BankTypes { get; private set; }
-        public Pictures Pictures { get; private set; }
         public List<CompanyBankAccounts> CompanyBankAccounts { get; private set; }
         public List<ChequeBooks> ChequeBooks { get; private set; }
+        public List<BankBranches> BankBranches { get; private set; }
 
         protected Banks()
         {

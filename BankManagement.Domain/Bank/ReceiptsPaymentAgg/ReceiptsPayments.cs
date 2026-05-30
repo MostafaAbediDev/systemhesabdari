@@ -5,7 +5,6 @@ using BankManagement.Domain.Bank.CompanyBankAccountAgg;
 using BankManagement.Domain.Bank.FundAgg;
 using GeneralInfoManagement.Domain.BaseInfo.BranchesAgg;
 using GeneralInfoManagement.Domain.BaseInfo.FinancialPeriodsAgg;
-using PersonManagement.Domain.Person.PersonAgg;
 
 namespace BankManagement.Domain.Bank.ReceiptsPaymentAgg
 {
@@ -24,7 +23,7 @@ namespace BankManagement.Domain.Bank.ReceiptsPaymentAgg
         public long AccountingDocumentId { get; private set; }
         public Branches Branches { get; private set; }
         public FinancialPeriods FinancialPeriods { get; private set; }
-        public Persons Persons { get; private set; }
+        //public Persons Persons { get; private set; }
         public Funds Funds { get; private set; }
         public CompanyBankAccounts CompanyBankAccounts { get; private set; }
         public Cheques Cheques { get; private set; }

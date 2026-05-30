@@ -2,7 +2,6 @@
 using AccountManagement.Domain.Account.AccountingEntrieAgg;
 using GeneralInfoManagement.Domain.BaseInfo.BranchesAgg;
 using GeneralInfoManagement.Domain.BaseInfo.FinancialPeriodsAgg;
-using PersonManagement.Domain.Person.PersonAgg;
 
 namespace AccountManagement.Domain.Account.AccountingDocumentAgg
 {
@@ -22,7 +21,7 @@ namespace AccountManagement.Domain.Account.AccountingDocumentAgg
         public long FinancialPeriodId { get; private set; }
         public Branches Branch { get; private set; }
         public FinancialPeriods FinancialPeriod { get; private set; }
-        public Persons Person { get; private set; }
+        //public Persons Person { get; private set; }
         public List<AccountingEntries> AccountingEntrie { get; private set; }
 
         protected AccountingDocuments()

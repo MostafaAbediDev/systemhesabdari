@@ -1,7 +1,6 @@
 ﻿using _0_FrameWork.Domain;
 using AccountManagement.Domain.Account.AccountAgg;
 using GeneralInfoManagement.Domain.BaseInfo.BranchesAgg;
-using PersonManagement.Domain.Person.PersonAgg;
 
 namespace BankManagement.Domain.Bank.PettyCashAgg
 {
@@ -19,7 +18,7 @@ namespace BankManagement.Domain.Bank.PettyCashAgg
         public long AccountId { get; private set; }
         public long SettlementAccountId { get; private set; }
         public Branches Branches { get; private set; }
-        public Persons Persons { get; private set; }
+        //public Persons Persons { get; private set; }
         public Accounts Accounts { get; private set; }
 
         public PettyCashes(string title, string description, decimal initialAmount, decimal currentBalance, decimal maxLimit, DateTime lastSettlementDate)

@@ -9,6 +9,7 @@ namespace BankManagement.Configuration
         public static void Configure(IServiceCollection services, string connectionString)
         {
             services.AddDbContext<BankSystemContext>(x => x.UseSqlServer(connectionString));
+            services.AddDbContext<BankFakeDataContext>(x => x.UseSqlServer(connectionString));
         }
     }
 }
