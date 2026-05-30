@@ -2,6 +2,7 @@
 {
     public enum CodeOwnerTypeDTO
     {
-        Branch = 1
+        Branch = 1,
+        Person = 2
     }
 }

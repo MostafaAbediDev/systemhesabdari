@@ -9,14 +9,13 @@ namespace CodeManagement.Application
             var prefix = ownerType switch
             {
                 CodeOwnerTypeDTO.Branch => "BR-",
-                _ => "GEN-"
+                CodeOwnerTypeDTO.Person => "PE-",
+                _ => throw new ArgumentOutOfRangeException(nameof(ownerType), ownerType, null)
             };
 
-            // تولید مقدار تصادفی به شکل ۵ رقمی
-            var random = new Random();
-            var number = random.Next(10000, 99999);
-
+            var number = Random.Shared.Next(10000, 99999);
             return $"{prefix}{number}";
         }
+
     }
 }
