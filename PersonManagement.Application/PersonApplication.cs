@@ -1,4 +1,5 @@
 ﻿using _0_Framework.Application;
+using CodeManagement.Application.Contracts.Code;
 using PersonManagement.Application.Contract.Persons;
 using PersonManagement.Domain.Person.PersonAgg;
 
@@ -7,18 +8,23 @@ namespace PersonManagement.Application
     public class PersonApplication : IPersonApplication
     {
         private readonly IPersonRepository _personRepository;
+        private readonly ICodeApplication _codeApplication;
 
-        public PersonApplication(IPersonRepository personRepository)
+        public PersonApplication(IPersonRepository personRepository, ICodeApplication codeApplication)
         {
             _personRepository = personRepository;
+            _codeApplication = codeApplication;
         }
 
         public OperationResult Create(CreatePerson command)
         {
-            var operation = new OperationResult();
+            var result = new OperationResult();
 
-            if (_personRepository.Exists(x => x.NationalCode == command.NationalCode))
-                return operation.Failed("کد ملی تکراری است");
+            if (!command.IsLegal && _personRepository.ExistsNationalCode(command.NationalCode))
+                return result.Failed("کد ملی تکراری است.");
+
+            if (command.IsLegal && _personRepository.ExistsEconomicCode(command.EconomicCode))
+                return result.Failed("کد اقتصادی تکراری است.");
 
             var person = new Persons(
                 command.FullName,
@@ -28,42 +34,52 @@ namespace PersonManagement.Application
                 command.RegistrationNumber,
                 command.PersonTypeId,
                 command.BranchId,
-                command.CreditLimit
-            );
-
-            person.SetBranch(command.BranchId);
+                command.CreditLimit);
 
             _personRepository.Create(person);
             _personRepository.SaveChanges();
 
-            return operation.Succedded();
+            var codeResult = _codeApplication.SetCode(new CreateCode
+            {
+                OwnerId = person.Id,
+                OwnerType = CodeOwnerTypeDTO.Person,
+                IsAutomatic = command.IsCodeAutomatic,
+                Value = command.ManualCode
+            });
+
+            if (!codeResult.IsSucceeded)
+                return result.Failed(codeResult.Message);
+
+            return result.Succedded();
         }
 
         public OperationResult Edit(EditPerson command)
         {
-            var operation = new OperationResult();
-
+            var result = new OperationResult();
             var person = _personRepository.Get(command.Id);
-            if (person == null)
-                return operation.Failed("رکورد یافت نشد");
+            if (person == null) return result.Failed(ApplicationMessages.RecordNotFound);
 
-            if (_personRepository.Exists(x => x.NationalCode == command.NationalCode && x.Id != command.Id))
-                return operation.Failed("کد ملی تکراری است");
+            if (!command.IsLegal && _personRepository.ExistsNationalCode(command.NationalCode, command.Id))
+                return result.Failed("کد ملی وارد شده برای شخص دیگری ثبت شده است.");
 
-            person.Edit(
-                command.FullName,
-                command.NationalCode,
-                command.EconomicCode,
-                command.RegistrationNumber,
-                command.PersonTypeId,
-                command.BranchId,
-                command.IsLegal
-            );
+            person.Edit(command.FullName, command.NationalCode, command.EconomicCode,
+                        command.RegistrationNumber, command.PersonTypeId, command.BranchId, command.IsLegal);
 
-            person.SetBranch(command.BranchId);
+            person.UpdateFinancialInfo(command.CreditLimit);
+
+            var codeResult = _codeApplication.SetCode(new CreateCode
+            {
+                OwnerId = person.Id,
+                OwnerType = CodeOwnerTypeDTO.Person,
+                IsAutomatic = command.IsCodeAutomatic,
+                Value = command.ManualCode
+            });
+
+            if (!codeResult.IsSucceeded)
+                return result.Failed(codeResult.Message);
 
             _personRepository.SaveChanges();
-            return operation.Succedded();
+            return result.Succedded();
         }
 
         public OperationResult Remove(long id)
@@ -116,50 +132,53 @@ namespace PersonManagement.Application
             return operation.Succedded();
         }
 
-        //public OperationResult MakeLegal(long id)
-        //{
-        //    var operation = new OperationResult();
-        //    var person = _personRepository.Get(id);
-
-        //    if (person == null)
-        //        return operation.Failed("رکورد یافت نشد");
-
-        //    person.Legal();
-        //    _personRepository.SaveChanges();
-        //    return operation.Succedded();
-        //}
-
-        //public OperationResult MakeIllegal(long id)
-        //{
-        //    var operation = new OperationResult();
-        //    var person = _personRepository.Get(id);
-
-        //    if (person == null)
-        //        return operation.Failed("رکورد یافت نشد");
-
-        //    person.IlLegal();
-        //    _personRepository.SaveChanges();
-        //    return operation.Succedded();
-        //}
-
+        
         public EditPerson GetDetails(long id)
         {
-            return _personRepository.GetDetails(id);
-        }
+            var details = _personRepository.GetDetails(id);
+            if (details == null) return null;
 
-        public PersonFullViewModel GetFullDetails(long id)
-        {
-            return _personRepository.GetFullDetails(id);
+            var code = _codeApplication.GetByOwner(id, CodeOwnerTypeDTO.Person);
+            details.CurrentCode = code?.Value;
+            details.ManualCode = code?.Value;
+
+            return details;
         }
 
         public List<PersonViewModel> GetPersons()
         {
-            return _personRepository.GetAllPersons();
+            var persons = _personRepository.GetAllPersons();
+            if (persons == null || persons.Count == 0) return persons;
+
+            var ids = persons.Select(x => x.Id).ToList();
+            var codes = _codeApplication.GetListByOwners(ids, CodeOwnerTypeDTO.Person);
+
+            var dict = codes
+                .GroupBy(x => x.OwnerId)
+                .ToDictionary(g => g.Key, g => g.First().Value);
+
+            foreach (var p in persons)
+                p.Code = dict.TryGetValue(p.Id, out var v) ? v : null;
+
+            return persons;
         }
 
         public List<PersonViewModel> Search(PersonSearchModel searchModel)
         {
-            return _personRepository.Search(searchModel);
+            var persons = _personRepository.Search(searchModel);
+            if (persons == null || persons.Count == 0) return persons;
+
+            var ids = persons.Select(x => x.Id).ToList();
+            var codes = _codeApplication.GetListByOwners(ids, CodeOwnerTypeDTO.Person);
+
+            var dict = codes
+                .GroupBy(x => x.OwnerId)
+                .ToDictionary(g => g.Key, g => g.First().Value);
+
+            foreach (var p in persons)
+                p.Code = dict.TryGetValue(p.Id, out var v) ? v : null;
+
+            return persons;
         }
     }
 }
