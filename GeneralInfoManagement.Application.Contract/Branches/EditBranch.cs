@@ -3,5 +3,7 @@
     public class EditBranch : CreateBranches
     {
         public long Id { get; set; }
+        public string? CurrentCode { get; set; }
+
     }
 }

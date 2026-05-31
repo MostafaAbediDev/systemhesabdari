@@ -59,7 +59,8 @@ namespace PersonManagement.Domain.Person.PersonAgg
         {
             FullName = fullName;
             PersonTypeId = personTypeId;
-            BranchId = branchId;
+
+            SetBranch(branchId);
 
             IsLegal = isLegal;
 

@@ -13,7 +13,5 @@ namespace PersonManagement.Application.Contract.Persons
         EditPerson GetDetails(long id);
         List<PersonViewModel> Search(PersonSearchModel searchModel);
         List<PersonViewModel> GetPersons();
-        PersonFullViewModel GetFullDetails(long id);
-
     }
 }

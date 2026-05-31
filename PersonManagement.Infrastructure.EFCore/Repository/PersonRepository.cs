@@ -1,11 +1,7 @@
 ﻿using _0_FrameWork.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using PersonManagement.Application.Contract.PersonAddress;
-using PersonManagement.Application.Contract.PersonBank;
-using PersonManagement.Application.Contract.PersonContact;
 using PersonManagement.Application.Contract.Persons;
 using PersonManagement.Domain.Person.PersonAgg;
-using System.Linq.Expressions;
 
 namespace PersonManagement.Infrastructure.EFCore.Repository
 {
@@ -18,152 +14,118 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
             _context = personFakeDataContext;
         }
 
-        public List<PersonViewModel> GetAllPersons()
-        {
-            return _context.Persons
-                .AsNoTracking()
-                .Include(x => x.Branches)
-                .Select(x => new PersonViewModel
-                {
-                    Id = x.Id,
-                    FullName = x.FullName,
-                    BranchName = x.Branches != null ? x.Branches.Title : string.Empty,
-                    IsActive = x.IsActive,
-                    IsLegal = x.IsLegal
-                })
-                .OrderByDescending(x => x.Id)
-                .ToList();
-        }
-
         public EditPerson GetDetails(long id)
         {
             return _context.Persons
                 .AsNoTracking()
-                .Where(x => x.Id == id)
                 .Select(x => new EditPerson
                 {
                     Id = x.Id,
                     FullName = x.FullName,
+                    IsLegal = x.IsLegal,
                     NationalCode = x.NationalCode,
                     EconomicCode = x.EconomicCode,
                     RegistrationNumber = x.RegistrationNumber,
                     PersonTypeId = x.PersonTypeId,
                     BranchId = x.BranchId,
-                    IsLegal = x.IsLegal,
-                    IsActive = x.IsActive
+                    CreditLimit = x.CreditLimit,
                 })
-                .FirstOrDefault();
-        }
-
-        // ✅ گرفتن جزئیات کامل با Include دقیق
-        public PersonFullViewModel GetFullDetails(long id)
-        {
-            var person = _context.Persons
-                .AsNoTracking()
-                .Include(x => x.Branches)
-                .Include(x => x.PersonContacts)
-                    .ThenInclude(x => x.ContactTypes)
-                .Include(x => x.PersonAddresses)
-                    .ThenInclude(x => x.Provinces)
-                .Include(x => x.PersonAddresses)
-                    .ThenInclude(x => x.Cities)
-                .Include(x => x.PersonBanks)
                 .FirstOrDefault(x => x.Id == id);
-
-            if (person == null)
-                return null;
-
-            return new PersonFullViewModel
-            {
-                Person = new PersonViewModel
-                {
-                    Id = person.Id,
-                    FullName = person.FullName,
-                    NationalCode = person.NationalCode,
-                    EconomicCode = person.EconomicCode,
-                    RegistrationNumber = person.RegistrationNumber,
-                    BranchName = person.Branches?.Title ?? string.Empty,
-                    IsActive = person.IsActive,
-                    IsLegal = person.IsLegal
-                },
-
-                Contacts = person.PersonContacts?
-                    .Where(x => !x.IsDeleted)
-                    .Select(c => new PersonContactViewModel
-                    {
-                        Id = c.Id,
-                        Value = c.Value,
-                        Description = c.Description,
-                        IsDefault = c.IsDefault,
-                        ContactTypeId = c.ContactTypeId,
-                        ContactTypeTitle = c.ContactTypes != null ? c.ContactTypes.Title : string.Empty,
-                        IsActive = c.IsActive,
-                        IsDeleted = c.IsDeleted
-                    }).ToList() ?? new List<PersonContactViewModel>(),
-
-                Addresses = person.PersonAddresses?
-                    .Where(x => !x.IsDeleted)
-                    .Select(a => new PersonAddressViewModel
-                    {
-                        Id = a.Id,
-                        Address = a.Address,
-                        PostalCode = a.PostalCode,
-                        IsDefault = a.IsDefault,
-                        ProvinceId = a.ProvinceId,
-                        CityId = a.CityId,
-                        ProvinceName = a.Provinces != null ? a.Provinces.Title : string.Empty,
-                        CityName = a.Cities != null ? a.Cities.Title : string.Empty,
-                        IsActive = a.IsActive,
-                        IsDeleted = a.IsDeleted
-                    }).ToList() ?? new List<PersonAddressViewModel>(),
-
-                Banks = person.PersonBanks?
-                    .Where(x => !x.IsDeleted)
-                    .Select(b => new PersonBankViewModel
-                    {
-                        Id = b.Id,
-                        AccountNumber = b.AccountNumber,
-                        CardNumber = b.CardNumber,
-                        Shaba = b.Shaba,
-                        IsDefault = b.IsDefault,
-                        IsActive = b.IsActive,
-                        IsDeleted = b.IsDeleted
-                    }).ToList() ?? new List<PersonBankViewModel>()
-            };
         }
 
-        // ✅ Search با فیلتر پویا و AsNoTracking
         public List<PersonViewModel> Search(PersonSearchModel searchModel)
         {
             var query = _context.Persons
-                .AsNoTracking()
+                .Include(x => x.PersonType)
                 .Include(x => x.Branches)
+                .AsNoTracking();
+
+            // اگر SoftDelete دارید
+            query = query.Where(x => !x.IsDeleted);
+
+            if (!string.IsNullOrWhiteSpace(searchModel.FullName))
+            {
+                var fullName = searchModel.FullName.Trim();
+                query = query.Where(x => x.FullName.Contains(fullName));
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchModel.NationalCode))
+            {
+                var code = searchModel.NationalCode.Trim();
+                query = query.Where(x =>
+                    (x.NationalCode != null && x.NationalCode.Contains(code)) ||
+                    (x.EconomicCode != null && x.EconomicCode.Contains(code)));
+            }
+
+            var result = query
+                .OrderByDescending(x => x.Id)
                 .Select(x => new PersonViewModel
                 {
                     Id = x.Id,
                     FullName = x.FullName,
+                    IsLegal = x.IsLegal,
                     NationalCode = x.NationalCode,
                     EconomicCode = x.EconomicCode,
-                    RegistrationNumber = x.RegistrationNumber,
-                    BranchName = x.Branches != null ? x.Branches.Title : string.Empty,
+                    PersonType = x.PersonType.Title,
+                    BranchName = x.Branches.Title,
+                    CreditLimit = x.CreditLimit,
+                    AvailableCredit = x.AvailableCredit,
                     IsActive = x.IsActive,
-                    IsLegal = x.IsLegal
                 })
-                .AsQueryable();
+                .ToList();
 
-            if (!string.IsNullOrWhiteSpace(searchModel.FullName))
-                query = query.Where(x => x.FullName.Contains(searchModel.FullName));
+            return result;
+        }
 
-            if (!string.IsNullOrWhiteSpace(searchModel.NationalCode))
-                query = query.Where(x => x.NationalCode == searchModel.NationalCode);
+        public List<PersonViewModel> GetAllPersons()
+        {
+            return _context.Persons
+                .AsNoTracking()
+                .Where(x => !x.IsDeleted)
+                .OrderByDescending(x => x.Id)
+                .Select(x => new PersonViewModel
+                {
+                    Id = x.Id,
+                    FullName = x.FullName,
+                    IsLegal = x.IsLegal,
+                    NationalCode = x.NationalCode,
+                    EconomicCode = x.EconomicCode,
+                    CreditLimit = x.CreditLimit,
+                    AvailableCredit = x.AvailableCredit,
+                    IsActive = x.IsActive,
 
-            if (!string.IsNullOrWhiteSpace(searchModel.EconomicCode))
-                query = query.Where(x => x.EconomicCode == searchModel.EconomicCode);
+                    PersonType = x.PersonType.Title,
+                    BranchName = x.Branches.Title
+                })
+                .ToList();
+        }
 
-            if (!string.IsNullOrWhiteSpace(searchModel.RegistrationNumber))
-                query = query.Where(x => x.RegistrationNumber == searchModel.RegistrationNumber);
+        public bool ExistsNationalCode(string code, long id = 0)
+        {
+            if (string.IsNullOrWhiteSpace(code))
+                return false;
 
-            return query.OrderByDescending(x => x.Id).ToList();
+            code = code.Trim();
+
+            return _context.Persons.Any(x =>
+                !x.IsDeleted &&
+                x.Id != id &&
+                x.NationalCode != null &&
+                x.NationalCode == code);
+        }
+
+        public bool ExistsEconomicCode(string code, long id = 0)
+        {
+            if (string.IsNullOrWhiteSpace(code))
+                return false;
+
+            code = code.Trim();
+
+            return _context.Persons.Any(x =>
+                !x.IsDeleted &&
+                x.Id != id &&
+                x.EconomicCode != null &&
+                x.EconomicCode == code);
         }
     }
 }
