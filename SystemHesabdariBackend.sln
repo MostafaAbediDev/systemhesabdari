@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36109.1 d17.14
+VisualStudioVersion = 17.14.36109.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BankManagement", "BankManagement", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
@@ -119,17 +119,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PersonManagement.Applicatio
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PersonManagement.Application", "PersonManagement.Application\PersonManagement.Application.csproj", "{34FC1EFC-634B-4439-9059-1D56FCE99B79}"
 EndProject
-<<<<<<< HEAD
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConnectionStringProject", "ConnectionStringProject\ConnectionStringProject.csproj", "{553C7DF3-277A-44D0-80BD-7B13A8A0D557}"
-=======
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConnectionStringProject", "ConnectionStringProject\ConnectionStringProject.csproj", "{553C7DF3-277A-44D0-80BD-7B13A8A0D557}"
->>>>>>> front
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CodeManagement", "CodeManagement", "{81AE92A9-DEEC-46F3-99A0-FE89FAFCE3E5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CM.Domain", "CM.Domain", "{B16CA56D-12F1-486F-94E2-974B0B93B778}"
 EndProject
-<<<<<<< HEAD
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeManagement.Domain", "CodeManagement.Domain\CodeManagement.Domain.csproj", "{2DB1D7F1-8ACA-471F-A891-FC91653CAE02}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CM.Infrastructure", "CM.Infrastructure", "{78338D67-162F-47E4-BCED-C0CCDD80A70A}"
@@ -149,31 +144,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeManagement.Application", "CodeManagement.Application\CodeManagement.Application.csproj", "{28058BA6-066D-4DCE-B86F-9CA8B92F1D69}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeManagement.Application.Contracts", "CodeManagement.Application.Contracts\CodeManagement.Application.Contracts.csproj", "{965BB633-333D-4E8A-8A6A-173101EC61DD}"
-=======
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeManagement.Domain", "CodeManagement.Domain\CodeManagement.Domain.csproj", "{2DB1D7F1-8ACA-471F-A891-FC91653CAE02}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CM.Infrastructure", "CM.Infrastructure", "{78338D67-162F-47E4-BCED-C0CCDD80A70A}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeManagement.Infrastructure.EFCore", "CodeManagement.Infrastructure.EFCore\CodeManagement.Infrastructure.EFCore.csproj", "{43937407-60F4-4AB9-A8AC-FA1384CE2B1B}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeManagement.Configuration", "CodeManagement.Configuration\CodeManagement.Configuration.csproj", "{348F6E57-82F4-43A1-ACB7-715502A81395}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GIM.Application", "GIM.Application", "{EE5689C7-B887-4D12-97C7-2F6DBB75E677}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeneralInfoManagement.Application.Contract", "GeneralInfoManagement.Application.Contract\GeneralInfoManagement.Application.Contract.csproj", "{E127C5AB-0DB6-4CAF-B860-D792142837A8}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeneralInfoManagement.Application", "GeneralInfoManagement.Application\GeneralInfoManagement.Application.csproj", "{3AF7C7A9-7315-4D16-B06D-0D3811E52C29}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CM.Application", "CM.Application", "{C6E00E10-0509-4068-AFC6-8B17196B1EF6}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeManagement.Application", "CodeManagement.Application\CodeManagement.Application.csproj", "{28058BA6-066D-4DCE-B86F-9CA8B92F1D69}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeManagement.Application.Contracts", "CodeManagement.Application.Contracts\CodeManagement.Application.Contracts.csproj", "{965BB633-333D-4E8A-8A6A-173101EC61DD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Taadol", "..\..\..\NOIA\taadol_hesab\taadol\Taadol\Taadol\Taadol.csproj", "{F50A5A1E-64AD-440F-B1BF-D18E85D83974}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taadol", "src\FrontEndWPF\Taadol\Taadol\Taadol.csproj", "{81F55448-070C-582F-60F7-564B5AD36B4A}"
->>>>>>> front
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -333,8 +307,6 @@ Global
 		{965BB633-333D-4E8A-8A6A-173101EC61DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{965BB633-333D-4E8A-8A6A-173101EC61DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{965BB633-333D-4E8A-8A6A-173101EC61DD}.Release|Any CPU.Build.0 = Release|Any CPU
-<<<<<<< HEAD
-=======
 		{F50A5A1E-64AD-440F-B1BF-D18E85D83974}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F50A5A1E-64AD-440F-B1BF-D18E85D83974}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F50A5A1E-64AD-440F-B1BF-D18E85D83974}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -343,7 +315,6 @@ Global
 		{81F55448-070C-582F-60F7-564B5AD36B4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{81F55448-070C-582F-60F7-564B5AD36B4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{81F55448-070C-582F-60F7-564B5AD36B4A}.Release|Any CPU.Build.0 = Release|Any CPU
->>>>>>> front
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -408,10 +379,7 @@ Global
 		{C6E00E10-0509-4068-AFC6-8B17196B1EF6} = {81AE92A9-DEEC-46F3-99A0-FE89FAFCE3E5}
 		{28058BA6-066D-4DCE-B86F-9CA8B92F1D69} = {C6E00E10-0509-4068-AFC6-8B17196B1EF6}
 		{965BB633-333D-4E8A-8A6A-173101EC61DD} = {C6E00E10-0509-4068-AFC6-8B17196B1EF6}
-<<<<<<< HEAD
-=======
 		{F50A5A1E-64AD-440F-B1BF-D18E85D83974} = {A7B0587D-0EF7-4B03-A5E2-1B59D48BF62D}
->>>>>>> front
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {755146A5-DE3D-4433-86D5-CFC10BD5F267}

@@ -3,21 +3,14 @@ using GeneralInfoManagement.Domain.BaseInfo.BranchesAgg;
 using PersonManagement.Domain.Person.PersonAddressAgg;
 using PersonManagement.Domain.Person.PersonBankAgg;
 using PersonManagement.Domain.Person.PersonContactAgg;
-<<<<<<< HEAD
 using PersonManagement.Domain.Person.PersonTypeAgg;
-=======
-<<<<<<< HEAD
-=======
-using PersonManagement.Domain.Person.PersonTypeAgg;
->>>>>>> master
->>>>>>> front
+
 
 namespace PersonManagement.Domain.Person.PersonAgg
 {
     public class Persons : EntityBase
     {
         public string FullName { get; private set; }
-<<<<<<< HEAD
         public string? NationalCode { get; private set; }
         public string? EconomicCode { get; private set; }
         public string? RegistrationNumber { get; private set; }
