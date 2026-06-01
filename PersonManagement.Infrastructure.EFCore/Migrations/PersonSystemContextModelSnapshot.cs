@@ -22,6 +22,7 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+<<<<<<< HEAD
             modelBuilder.Entity("AccountManagement.Domain.Account.AccountAgg.Accounts", b =>
                 {
                     b.Property<long>("Id")
@@ -765,6 +766,10 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                     b.ToTable("ReceiptsPayments");
                 });
 
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> front
             modelBuilder.Entity("GeneralInfoManagement.Domain.BaseInfo.BranchArchiveAgg.BranchArchive", b =>
                 {
                     b.Property<long>("Id")
@@ -810,6 +815,10 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                     b.ToTable("BranchArchive");
                 });
 
+<<<<<<< HEAD
+=======
+>>>>>>> master
+>>>>>>> front
             modelBuilder.Entity("GeneralInfoManagement.Domain.BaseInfo.BranchesAgg.Branches", b =>
                 {
                     b.Property<long>("Id")
@@ -831,6 +840,21 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                     b.Property<long>("CompanyId")
                         .HasColumnType("bigint");
 
+<<<<<<< HEAD
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+<<<<<<< HEAD
+                    b.Property<long?>("DeletedBy")
+=======
+                    b.Property<long>("DeletedBy")
+=======
+                    b.Property<long>("CompanyId")
+                        .HasColumnType("bigint");
+
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
@@ -838,6 +862,8 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<long?>("DeletedBy")
+>>>>>>> master
+>>>>>>> front
                         .HasColumnType("bigint");
 
                     b.Property<string>("EconomicCode")
@@ -889,6 +915,7 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
 
                     b.HasKey("Id");
 
+<<<<<<< HEAD
                     b.HasIndex("CitiesId");
 
                     b.HasIndex("CompanyId");
@@ -898,6 +925,18 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                     b.ToTable("Branches");
                 });
 
+=======
+<<<<<<< HEAD
+                    b.ToTable("Branches");
+                });
+
+=======
+                    b.HasIndex("CompanyId");
+
+                    b.ToTable("Branches");
+                });
+
+>>>>>>> front
             modelBuilder.Entity("GeneralInfoManagement.Domain.BaseInfo.CompaniesAgg.Companies", b =>
                 {
                     b.Property<long>("Id")
@@ -984,6 +1023,10 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                     b.ToTable("FinancialPeriods");
                 });
 
+<<<<<<< HEAD
+=======
+>>>>>>> master
+>>>>>>> front
             modelBuilder.Entity("GeneralInfoManagement.Domain.General.CityAgg.Cities", b =>
                 {
                     b.Property<long>("Id")
@@ -995,10 +1038,24 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long?>("DeletedBy")
+=======
+<<<<<<< HEAD
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
+>>>>>>> front
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsActive")
@@ -1007,20 +1064,37 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> front
                     b.Property<long>("ProvinceId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("ProvincesId")
                         .HasColumnType("bigint");
 
+<<<<<<< HEAD
+=======
+>>>>>>> master
+>>>>>>> front
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
+<<<<<<< HEAD
                     b.HasIndex("ProvincesId");
 
+=======
+<<<<<<< HEAD
+=======
+                    b.HasIndex("ProvincesId");
+
+>>>>>>> master
+>>>>>>> front
                     b.ToTable("Cities");
                 });
 
@@ -1035,10 +1109,24 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long?>("DeletedBy")
+=======
+<<<<<<< HEAD
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
+>>>>>>> front
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsActive")
@@ -1067,10 +1155,24 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long?>("DeletedBy")
+=======
+<<<<<<< HEAD
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
+>>>>>>> front
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsActive")
@@ -1108,10 +1210,24 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long?>("DeletedBy")
+=======
+<<<<<<< HEAD
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
+>>>>>>> front
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsActive")
@@ -1168,6 +1284,7 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<decimal>("CreditLimit")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
@@ -1176,6 +1293,19 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<long?>("DeletedBy")
+=======
+<<<<<<< HEAD
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
+>>>>>>> front
                         .HasColumnType("bigint");
 
                     b.Property<string>("EconomicCode")
@@ -1200,8 +1330,18 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+<<<<<<< HEAD
                     b.Property<long>("PersonTypeId")
                         .HasColumnType("bigint");
+=======
+<<<<<<< HEAD
+                    b.Property<int>("PersonType")
+                        .HasColumnType("int");
+=======
+                    b.Property<long>("PersonTypeId")
+                        .HasColumnType("bigint");
+>>>>>>> master
+>>>>>>> front
 
                     b.Property<string>("RegistrationNumber")
                         .HasMaxLength(50)
@@ -1211,8 +1351,16 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
 
                     b.HasIndex("BranchId");
 
+<<<<<<< HEAD
                     b.HasIndex("PersonTypeId");
 
+=======
+<<<<<<< HEAD
+=======
+                    b.HasIndex("PersonTypeId");
+
+>>>>>>> master
+>>>>>>> front
                     b.ToTable("Persons", (string)null);
                 });
 
@@ -1245,10 +1393,24 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long?>("DeletedBy")
+=======
+<<<<<<< HEAD
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
+>>>>>>> front
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsActive")
@@ -1291,10 +1453,24 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long?>("DeletedBy")
+=======
+<<<<<<< HEAD
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
+>>>>>>> front
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
@@ -1328,6 +1504,11 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                     b.ToTable("PersonContacts", (string)null);
                 });
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> front
             modelBuilder.Entity("PersonManagement.Domain.Person.PersonTypeAgg.PersonType", b =>
                 {
                     b.Property<long>("Id")
@@ -1336,6 +1517,12 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
+<<<<<<< HEAD
+=======
+                    b.Property<int>("Code")
+                        .HasColumnType("int");
+
+>>>>>>> front
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
@@ -1356,9 +1543,12 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+<<<<<<< HEAD
                     b.Property<int>("TitleId")
                         .HasColumnType("int");
 
+=======
+>>>>>>> front
                     b.HasKey("Id");
 
                     b.ToTable("PersonTypes", (string)null);
@@ -1367,24 +1557,41 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                         new
                         {
                             Id = 1L,
+<<<<<<< HEAD
                             CreationDate = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
                             IsDeleted = false,
                             Title = "مشتری",
                             TitleId = 1
+=======
+                            Code = 1,
+                            CreationDate = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsActive = true,
+                            IsDeleted = false,
+                            Title = "مشتری"
+>>>>>>> front
                         },
                         new
                         {
                             Id = 2L,
+<<<<<<< HEAD
                             CreationDate = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
                             IsDeleted = false,
                             Title = "پرسنل",
                             TitleId = 2
+=======
+                            Code = 2,
+                            CreationDate = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsActive = true,
+                            IsDeleted = false,
+                            Title = "پرسنل"
+>>>>>>> front
                         },
                         new
                         {
                             Id = 3L,
+<<<<<<< HEAD
                             CreationDate = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
                             IsDeleted = false,
@@ -1632,6 +1839,16 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                     b.Navigation("Funds");
                 });
 
+=======
+                            Code = 3,
+                            CreationDate = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsActive = true,
+                            IsDeleted = false,
+                            Title = "تامین کننده"
+                        });
+                });
+
+>>>>>>> front
             modelBuilder.Entity("GeneralInfoManagement.Domain.BaseInfo.BranchArchiveAgg.BranchArchive", b =>
                 {
                     b.HasOne("GeneralInfoManagement.Domain.BaseInfo.BranchesAgg.Branches", "Branch")
@@ -1645,18 +1862,22 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
 
             modelBuilder.Entity("GeneralInfoManagement.Domain.BaseInfo.BranchesAgg.Branches", b =>
                 {
+<<<<<<< HEAD
                     b.HasOne("GeneralInfoManagement.Domain.General.CityAgg.Cities", "Cities")
                         .WithMany("Branches")
                         .HasForeignKey("CitiesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+=======
+>>>>>>> front
                     b.HasOne("GeneralInfoManagement.Domain.BaseInfo.CompaniesAgg.Companies", "Company")
                         .WithMany("Branch")
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+<<<<<<< HEAD
                     b.HasOne("GeneralInfoManagement.Domain.General.ProvinceAgg.Provinces", "Provinces")
                         .WithMany("Branches")
                         .HasForeignKey("ProvincesId")
@@ -1668,6 +1889,9 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                     b.Navigation("Company");
 
                     b.Navigation("Provinces");
+=======
+                    b.Navigation("Company");
+>>>>>>> front
                 });
 
             modelBuilder.Entity("GeneralInfoManagement.Domain.BaseInfo.FinancialPeriodsAgg.FinancialPeriods", b =>
@@ -1692,6 +1916,10 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                     b.Navigation("Provinces");
                 });
 
+<<<<<<< HEAD
+=======
+>>>>>>> master
+>>>>>>> front
             modelBuilder.Entity("PersonManagement.Domain.Person.PersonAddressAgg.PersonAddresses", b =>
                 {
                     b.HasOne("GeneralInfoManagement.Domain.General.CityAgg.Cities", "Cities")
@@ -1727,6 +1955,7 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+<<<<<<< HEAD
                     b.HasOne("PersonManagement.Domain.Person.PersonTypeAgg.PersonType", "PersonType")
                         .WithMany("Persons")
                         .HasForeignKey("PersonTypeId")
@@ -1736,6 +1965,21 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                     b.Navigation("Branches");
 
                     b.Navigation("PersonType");
+=======
+<<<<<<< HEAD
+                    b.Navigation("Branches");
+=======
+                    b.HasOne("PersonManagement.Domain.Person.PersonTypeAgg.PersonType", "PersonType")
+                        .WithMany("Persons")
+                        .HasForeignKey("PersonTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Branches");
+
+                    b.Navigation("PersonType");
+>>>>>>> master
+>>>>>>> front
                 });
 
             modelBuilder.Entity("PersonManagement.Domain.Person.PersonBankAgg.PersonBanks", b =>
@@ -1776,6 +2020,7 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                     b.Navigation("Persons");
                 });
 
+<<<<<<< HEAD
             modelBuilder.Entity("AccountManagement.Domain.Account.AccountAgg.Accounts", b =>
                 {
                     b.Navigation("AccountLink");
@@ -1824,6 +2069,10 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                     b.Navigation("ReceiptsPayments");
                 });
 
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> front
             modelBuilder.Entity("GeneralInfoManagement.Domain.BaseInfo.BranchesAgg.Branches", b =>
                 {
                     b.Navigation("BranchArchive");
@@ -1836,6 +2085,7 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                     b.Navigation("Branch");
                 });
 
+<<<<<<< HEAD
             modelBuilder.Entity("GeneralInfoManagement.Domain.General.CityAgg.Cities", b =>
                 {
                     b.Navigation("Branches");
@@ -1848,6 +2098,14 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                     b.Navigation("Cities");
                 });
 
+=======
+            modelBuilder.Entity("GeneralInfoManagement.Domain.General.ProvinceAgg.Provinces", b =>
+                {
+                    b.Navigation("Cities");
+                });
+
+>>>>>>> master
+>>>>>>> front
             modelBuilder.Entity("PersonManagement.Domain.Person.ContactTypeAgg.ContactTypes", b =>
                 {
                     b.Navigation("PersonContacts");
@@ -1861,11 +2119,20 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
 
                     b.Navigation("PersonContacts");
                 });
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> front
 
             modelBuilder.Entity("PersonManagement.Domain.Person.PersonTypeAgg.PersonType", b =>
                 {
                     b.Navigation("Persons");
                 });
+<<<<<<< HEAD
+=======
+>>>>>>> master
+>>>>>>> front
 #pragma warning restore 612, 618
         }
     }

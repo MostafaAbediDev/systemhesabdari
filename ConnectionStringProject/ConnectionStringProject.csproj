@@ -21,7 +21,10 @@
   <ItemGroup>
     <ProjectReference Include="..\AccountManagement.Configuration\AccountManagement.Configuration.csproj" />
     <ProjectReference Include="..\BankManagement.Configuration\BankManagement.Configuration.csproj" />
+<<<<<<< HEAD
     <ProjectReference Include="..\CodeManagement.Configuration\CodeManagement.Configuration.csproj" />
+=======
+>>>>>>> front
     <ProjectReference Include="..\FixedAssetManagement.Configuration\FixedAssetManagement.Configuration.csproj" />
     <ProjectReference Include="..\GeneralInfoManagement.Configuration\GeneralInfoManagement.Configuration.csproj" />
     <ProjectReference Include="..\InventoryManagement.Configuration\InventoryManagement.Configuration.csproj" />
@@ -31,10 +34,13 @@
     <ProjectReference Include="..\PersonManagement.Configuration\PersonManagement.Configuration.csproj" />
   </ItemGroup>
 
+<<<<<<< HEAD
   <ItemGroup>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
+=======
+>>>>>>> front
 </Project>
