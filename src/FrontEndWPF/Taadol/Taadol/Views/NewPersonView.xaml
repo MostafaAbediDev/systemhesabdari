@@ -1,0 +1,1022 @@
+﻿<UserControl x:Class="Taadol.Views.NewPersonView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:vm="clr-namespace:Taadol.ViewModels"
+             xmlns:controls="clr-namespace:Taadol.Controls"
+             xmlns:svg="http://sharpvectors.codeplex.com/svgc/"
+             FlowDirection="RightToLeft"
+             Background="Transparent">
+
+    <UserControl.Resources>
+        <DataTemplate x:Key="BankAccountTemplate">
+            <Border BorderBrush="#E0E0E0"
+                    BorderThickness="0,1,0,0"
+                    Padding="0,15,0,15"
+                    Margin="0,5,0,5">
+
+                
+                <StackPanel>
+
+                    
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="8" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="8" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="نام بانک"
+                                       Style="{StaticResource FormLabel}" />
+                            <controls:ModernPersianTextBox Width="230"
+                                                           Placeholder="ملت" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="نام شعبه"
+                                       Style="{StaticResource FormLabel}" />
+                            <controls:ModernPersianTextBox Width="230"
+                                                           Placeholder="مرکزی" />
+                        </StackPanel>
+
+
+                        <StackPanel Grid.Column="6"
+                                    Orientation="Horizontal"
+                                    VerticalAlignment="Center"
+                                    Margin="15,0,0,0">
+                            <ToggleButton Content="حساب پیش فرض"
+                                          FlowDirection="LeftToRight"
+                                          Style="{StaticResource StatusToggleButton}"
+                                          Margin="0,0,10,0" />
+
+                            <Button x:Name="RemoveButton"
+                                    Click="RemoveBankAccount_Click"
+                                    Tag="{Binding}"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Cursor="Hand"
+                                    Margin="5,0,0,0">
+                                <svg:SvgViewbox Width="16"
+                                                Height="16"
+                                                Source="/Assets/Icons/delete.svg" />
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+
+                    
+                    <Grid Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="8" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="8" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="شماره کارت"
+                                       Style="{StaticResource FormLabel}" />
+                            <controls:ModernPersianTextBox Width="230"
+                                                           FlowDirection="LeftToRight"
+                                                           Placeholder="**** **** **** ****" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="شماره شبا"
+                                       Style="{StaticResource FormLabel}" />
+                            <controls:ModernPersianTextBox Width="230"
+                                                           FlowDirection="LeftToRight"
+                                                           Placeholder="IR" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="4">
+                            <TextBlock Text="شماره حساب"
+                                       Style="{StaticResource FormLabel}" />
+                            <controls:ModernPersianTextBox Width="230"
+                                                           FlowDirection="LeftToRight"
+                                                           Placeholder="456" />
+                        </StackPanel>
+                    </Grid>
+
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+    </UserControl.Resources>
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled">
+
+        <Border  CornerRadius="12"
+                 ClipToBounds="True"
+                 Background="#ffffff"
+                 Margin="24,0">
+            <StackPanel>
+
+
+                <Grid Margin="10,15,10,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center">
+                        <svg:SvgViewbox FlowDirection="LeftToRight"
+                                        Width="14"
+                                        Height="14"
+                                        Source="/Assets/Icons/arrow-right.svg"
+                                        Margin="10,0,10,0" />
+                        <TextBlock Text="مشخصات شخص جدید"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   FontFamily="{StaticResource IRANSans}"
+                                   Foreground="{StaticResource PrimaryBrush}"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal">
+
+                        <controls:CustomOutlinedButton Margin="0,0,12,0"
+                                                       Text="ثبت موقت">
+                            <controls:CustomOutlinedButton.Icon>
+                                <svg:SvgViewbox  Source="/Assets/Icons/tempsave.svg"
+                                                 Width="16"
+                                                 Height="16" />
+                            </controls:CustomOutlinedButton.Icon>
+                        </controls:CustomOutlinedButton>
+
+                        <controls:IconButton ButtonText="ثبت"
+                                             IconSource="/Assets/Icons/save.svg"
+                                             ButtonCommand="{Binding EditCommand}"
+                                             ButtonBackground="#2667FF" />
+
+                    </StackPanel>
+                </Grid>
+                <Border Height="1"
+                        Margin="7,0,7,2">
+                    <Border.Background>
+                        <VisualBrush TileMode="Tile"
+                                     Viewport="0,0,10,1"
+                                     ViewportUnits="Absolute"
+                                     Viewbox="0,0,10,1"
+                                     ViewboxUnits="Absolute">
+                            <VisualBrush.Visual>
+                                <Grid Width="10"
+                                      Height="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="5" />
+                                        <ColumnDefinition Width="5" />
+                                    </Grid.ColumnDefinitions>
+                                    <Rectangle Grid.Column="0"
+                                               Fill="#D4E0FF" />
+                                    <Rectangle Grid.Column="1"
+                                               Fill="#D4E0FF" />
+                                </Grid>
+                            </VisualBrush.Visual>
+                        </VisualBrush>
+                    </Border.Background>
+                </Border>
+
+                <Border  Style="{StaticResource CardPanel}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0"
+                                    Margin="0,0,24,0">
+
+
+                            <StackPanel Orientation="Horizontal">
+
+                                <TextBlock Text="شناسه یکتا"
+                                           Style="{StaticResource FormLabel}" />
+
+                            </StackPanel>
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="200" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <controls:ModernPersianTextBox Grid.Column="0"
+                                                               Text="{Binding Username}"
+                                                               Placeholder="1234" />
+
+                                <!--<TextBox Grid.Column="0"
+                                         Text="{Binding CurrentProduct.AccountCode, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource ModernPersianTextBox}"
+                                         FontFamily="{StaticResource IRANSans}"
+                                  
+                                       />-->
+
+                                <controls:ToggleSwitchControl Margin="12,0,0,0"
+                                                              FirstLabel="اتوماتیک"
+                                                              SecondLabel="دستی"
+                                                              IsFirstSelected="True"
+                                                              Grid.Column="1"
+                                                              SelectionChanged="Toggle_SelectionChanged" />
+
+                                <!--<controls:ToggleRadioControl CheckedLabel="فعال"
+                                                             UncheckedLabel="غیرفعال"
+                                                             FlowDirection="LeftToRight"
+                                                             Grid.Column="2"
+                                                             Margin="12,0,0,0"
+                                                             IsChecked="False"
+                                                             Checked="Radio_Checked" />-->
+
+                            </Grid>
+
+                            <TextBlock Text="انتخاب شعبه"
+                                       Style="{StaticResource FormLabel}" />
+                            <StackPanel Orientation="Horizontal"
+                                        Margin="0,0,0,8">
+                                <ComboBox Style="{StaticResource SearchableComboBox}"
+                                          Tag="جستجو..."
+                                          Margin="0,0,0,0"
+                                          Width="315"
+                                          ItemContainerStyle="{StaticResource SearchableComboBoxItem}"
+                                          SelectionChanged="ComboBox_SelectionChanged">
+                                    <ComboBoxItem Content="گزینه ۱" />
+                                    <ComboBoxItem Content="گزینه ۲" />
+                                    <ComboBoxItem Content="گزینه ۳" />
+                                </ComboBox>
+
+
+                            </StackPanel>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition MaxWidth="625" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Visibility="Collapsed">
+                                    <TextBlock Text="نام شرکت"
+                                               Style="{StaticResource FormLabel}" />
+                                    <controls:ModernPersianTextBox Grid.Column="0"
+                                                                   Width="620"
+                                                                   Text="{Binding Username}"
+                                                                   Placeholder="بنویسید" />
+                                </StackPanel>
+                            </Grid>
+
+                            <Grid>
+
+                                <Grid.RowDefinitions>
+                                    <RowDefinition MaxHeight="625" />
+                                </Grid.RowDefinitions>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="نوع شخص"
+                                               Style="{StaticResource FormLabel}" />
+                                    <controls:ToggleSwitchControl FirstLabel="حقیقی"
+                                                                  SecondLabel="حقوقی"
+                                                                  IsFirstSelected="True"
+                                                                  Grid.Column="1"
+                                                                  Margin="9,0,0,0"
+                                                                  SelectionChanged="Toggle_SelectionChanged" />
+
+                                    <ToggleButton Content=".شخص فعال است"
+                                                  FlowDirection="LeftToRight"
+                                                  Style="{StaticResource StatusToggleButton}"
+                                                  IsChecked="True"
+                                                  Margin="10,0,18,0" />
+                                </StackPanel>
+                            </Grid>
+
+
+                            <Grid Margin="0,5,0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2*" />
+                                    
+                                    <ColumnDefinition Width="8" />
+                                    <ColumnDefinition Width="1.5*" />
+                                    
+                                    <ColumnDefinition Width="8" />
+                                    <ColumnDefinition Width="1.5*" />
+                                    
+                                </Grid.ColumnDefinitions>
+
+                                
+                                <StackPanel Grid.Column="0"
+                                            x:Name="FirstNamePanel">
+                                    <TextBlock Text="نام"
+                                               Style="{StaticResource FormLabel}" />
+                                    <controls:ModernPersianTextBox Text="{Binding Username}"
+                                                                   Placeholder="علی" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2"
+                                            x:Name="LastNamePanel">
+                                    <TextBlock Text="نام خانوادگی"
+                                               Style="{StaticResource FormLabel}" />
+                                    <controls:ModernPersianTextBox Text="{Binding Username}"
+                                                                   Placeholder="علوی" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="4"
+                                            x:Name="NationalCodePanel">
+                                    <TextBlock Text="کد ملی"
+                                               Style="{StaticResource FormLabel}" />
+                                    <controls:ModernPersianTextBox FlowDirection="LeftToRight"
+                                                                   Text="{Binding Username}"
+                                                                   Placeholder="2470545256" />
+                                </StackPanel>
+
+                                
+                                <StackPanel Grid.Column="0"
+                                            x:Name="CompanyNamePanel"
+                                            Visibility="Collapsed">
+                                    <TextBlock Text="نام شرکت"
+                                               Style="{StaticResource FormLabel}" />
+                                    <controls:ModernPersianTextBox Text="{Binding CompanyName}"
+                                                                   Placeholder="شرکت نمونه" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2"
+                                            x:Name="EconomicCodePanel"
+                                            Visibility="Collapsed">
+                                    <TextBlock Text="کد اقتصادی"
+                                               Style="{StaticResource FormLabel}" />
+                                    <controls:ModernPersianTextBox FlowDirection="LeftToRight"
+                                                                   Text="{Binding EconomicCode}"
+                                                                   Placeholder="123456789" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="4"
+                                            x:Name="RegistrationNumberPanel"
+                                            Visibility="Collapsed">
+                                    <TextBlock Text="شماره ثبت"
+                                               Style="{StaticResource FormLabel}" />
+                                    <controls:ModernPersianTextBox FlowDirection="LeftToRight"
+                                                                   Text="{Binding RegistrationNumber}"
+                                                                   Placeholder="12345" />
+                                </StackPanel>
+                            </Grid>
+
+                            <!--<TextBlock HorizontalAlignment="Center"
+                                       Text="بارکدهای مختلف را با ; از هم جدا کنید."
+                                       FontSize="12"
+                                       Foreground="#001242"
+                                       Margin="0,0,180,5" />-->
+
+
+                            <Grid HorizontalAlignment="Left">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto" />
+                                    <ColumnDefinition Width="16" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+
+
+                                <StackPanel Grid.Column="0"
+                                            Orientation="Horizontal">
+
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="55" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Row="0"
+                                                   Margin="0,0,0,5"
+                                                   Text="دسته کلی "
+                                                   Style="{StaticResource FormLabel}"
+                                                   VerticalAlignment="Center" />
+                                        <StackPanel Orientation="Horizontal"
+                                                    Grid.Row="1">
+
+                                            <ToggleButton Content="مشتری"
+                                                          FlowDirection="LeftToRight"
+                                                          Style="{StaticResource StatusToggleButton}"
+                                                          IsChecked="False"
+                                                          Margin="0,0,8,0" />
+                                            <ToggleButton Content="تامین کننده"
+                                                          FlowDirection="LeftToRight"
+                                                          Style="{StaticResource StatusToggleButton}"
+                                                          IsChecked="False"
+                                                          Margin="0,0,8,0" />
+                                            <ToggleButton Grid.Column="2"
+                                                          Content="هردو"
+                                                          FlowDirection="LeftToRight"
+                                                          Style="{StaticResource StatusToggleButton}"
+                                                          IsChecked="False"
+                                                          Margin="0,0,8,0" />
+                                            <ToggleButton Content="پرسنل"
+                                                          FlowDirection="LeftToRight"
+                                                          Style="{StaticResource StatusToggleButton}"
+                                                          IsChecked="False" />
+                                        </StackPanel>
+                                    </Grid>
+
+
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <Grid Margin="0,5,0,5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+
+                                            <ColumnDefinition Width="*" />
+
+                                            <ColumnDefinition Width="Auto" />
+
+
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0"
+                                                   Text="دسته بندی اشخاص"
+                                                   Style="{StaticResource FormLabel}"
+                                                   VerticalAlignment="Center" />
+                                        <Button Grid.Column="2"
+                                                HorizontalAlignment="Left"
+                                                Style="{StaticResource LightAddButton}"
+                                                Width="35"
+                                                Height="35"
+                                                Background="#E9F0FF"
+                                                BorderBrush="Transparent">
+
+                                            <StackPanel Orientation="Horizontal">
+                                                <svg:SvgViewbox Width="13"
+                                                                Height="13"
+                                                                Source="/Assets/Icons/add-square.svg"
+                                                                VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Button>
+                                    </Grid>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <controls:TreeComboBox x:Name="cmbCategory"
+                                                               Width="260"
+                                                               Height="32"
+                                                               Placeholder="یک دسته انتخاب کنید..."
+                                                               ItemsSource="{Binding CategoryItems}"
+                                                               SelectedItem="{Binding SelectedCategory}"
+                                                               AddRootCommand="{Binding AddRootCmd}"
+                                                               AddChildCommand="{Binding AddChildCmd}"
+                                                               EditCommand="{Binding EditCmd}"
+                                                               DeleteCommand="{Binding DeleteCmd}"
+                                                               SelectionChanged="cmbCategory_SelectionChanged" />
+                                        <!--<Button Grid.Column="1"
+                   Style="{StaticResource LightAddButton}"
+                   Width="115"
+                   Margin="10,0,0,0"
+                   Background="#E9F0FF"
+                   BorderBrush="Transparent"
+                   Height="42">
+
+
+               <StackPanel Orientation="Horizontal">
+                   <svg:SvgViewbox Width="13"
+                                   Height="13"
+                                   Source="/Assets/Icons/add-square.svg"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,5,0" />
+                   <TextBlock Text="دسته جدید"
+                              FontWeight="Medium"
+                              FontSize="14"
+                              Foreground="#5185FF"
+                              FontFamily="{StaticResource IRANSans}"
+                              VerticalAlignment="Center" />
+               </StackPanel>
+           </Button>-->
+                                    </Grid>
+                                </StackPanel>
+                            </Grid>
+
+
+
+                        </StackPanel>
+
+
+                        <StackPanel Grid.Column="1"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Top">
+                            <StackPanel>
+                                <controls:ImagePickerControl ImageSelected="OnImageSelected"
+                                                             ImageRemoved="OnImageRemoved"
+                                                             Loaded="ImagePickerControl_Loaded" />
+
+
+                            </StackPanel>
+                            <!--<Border Width="195"
+                                    Height="185"
+                                    CornerRadius="12"
+                                    BorderThickness="1"
+                                    Margin="0,0,0,8"
+                                    BorderBrush="#BED1FF">
+                                <StackPanel    VerticalAlignment="Center"
+                                               HorizontalAlignment="Center">
+                                    <svg:SvgViewbox Width="63"
+                                                    Height="63"
+                                                    Source="/Assets/Icons/box-add.svg"
+                                                    Margin="0,0,10,0" />
+
+                                </StackPanel>
+                            </Border>-->
+
+                            <!--<StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Center">
+                                <Button Command="{Binding SaveAndContinueCommand}"
+                                        Margin="0,0,5,0"
+                                        Style="{StaticResource OutlinedButtonLarge}"
+                                        Height="42"
+                                        BorderBrush="#2667FF"
+                                        BorderThickness="1"
+                                        Background="Transparent">
+
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                                    CornerRadius="6"
+                                                    UseLayoutRounding="False">
+                                                <ContentPresenter HorizontalAlignment="Center"
+                                                                  VerticalAlignment="Center" />
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver"
+                                                         Value="True">
+                                                    <Setter Property="Background"
+                                                            Value="#EEF3FF" />
+                                                </Trigger>
+                                                <Trigger Property="IsPressed"
+                                                         Value="True">
+                                                    <Setter Property="Background"
+                                                            Value="#D6E4FF" />
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Button.Template>
+
+                                    <StackPanel Orientation="Horizontal"
+                                                Margin="12,0">
+                                        <TextBlock Text="انتخاب تصویر"
+                                                   FontWeight="Medium"
+                                                   FontSize="14"
+                                                   Foreground="#2667FF"
+                                                   FontFamily="{StaticResource IRANSans}"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+                                <Button Command="{Binding SaveAndContinueCommand}"
+                                        Margin="0,0,0,0"
+                                        Style="{StaticResource OutlinedButtonLarge}"
+                                        BorderBrush="#2667FF"
+                                        Foreground="{StaticResource AccentDeepBrush}"
+                                        Height="42">
+
+
+                                    <StackPanel Orientation="Horizontal">
+                                        <svg:SvgViewbox Width="8"
+                                                        Height="8"
+                                                        Source="/Assets/Icons/close.svg"
+                                                        VerticalAlignment="Center"
+                                                        Margin="0,0,5,0" />
+                                        <TextBlock Text="حذف"
+                                                   FontWeight="Medium"
+                                                   FontSize="14"
+                                                   Foreground="#0D2159"
+                                                   FontFamily="{StaticResource IRANSans}"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+
+                            </StackPanel>-->
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+
+                <Grid Margin="0,0,0,2">
+                    <Border Height="3">
+                        <Border.Background>
+                            <VisualBrush TileMode="Tile"
+                                         Viewport="0,0,10,1"
+                                         ViewportUnits="Absolute"
+                                         Viewbox="0,0,10,1"
+                                         ViewboxUnits="Absolute">
+                                <VisualBrush.Visual>
+                                    <Grid Width="10"
+                                          Height="1">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="5" />
+                                            <ColumnDefinition Width="5" />
+                                        </Grid.ColumnDefinitions>
+                                        <Rectangle Grid.Column="0"
+                                                   Fill="#BED1FF" />
+                                        <Rectangle Grid.Column="1"
+                                                   Fill="Transparent" />
+                                    </Grid>
+                                </VisualBrush.Visual>
+                            </VisualBrush>
+                        </Border.Background>
+                    </Border>
+
+
+                    <Ellipse Width="17"
+                             Margin="-9,0,0,0"
+                             Height="25"
+                             Fill="#FFF8ED"
+                             HorizontalAlignment="Left"
+                             VerticalAlignment="Center"
+                             Panel.ZIndex="2" />
+
+
+                    <Ellipse Width="17"
+                             Height="25"
+                             Margin="0,0,-9,0"
+                             Fill="#FFF8ED"
+                             HorizontalAlignment="Right"
+                             VerticalAlignment="Center"
+                             Panel.ZIndex="2" />
+                </Grid>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+                    <StackPanel Margin="20,0,0,0"
+                                HorizontalAlignment="Left"
+                                Grid.Row="0">
+
+
+                        <Border CornerRadius="12"
+                                BorderThickness="1.5"
+                                BorderBrush="#BED1FF"
+                                Background="#F8FAFF"
+                                Padding="4"
+                                Margin="0,0,0,10"
+                                HorizontalAlignment="Center">
+                            <StackPanel Orientation="Horizontal">
+                                <ToggleButton Content="تماس و آدرس"
+                                              Style="{StaticResource ModernTabButton}"
+                                              Margin="10,0,6,0"
+                                              IsChecked="True"
+                                              x:Name="TabPricing"
+                                              Checked="TabPricing_Checked" />
+                                <ToggleButton Content="حساب های بانکی"
+                                              Style="{StaticResource ModernTabButton}"
+                                              Margin="10,0,6,0"
+                                              x:Name="TabInventory"
+                                              Checked="TabInventory_Checked" />
+                                <ToggleButton Content="مالیات"
+                                              Visibility="Collapsed"
+                                              Style="{StaticResource ModernTabButton}"
+                                              x:Name="TabTax"
+                                              Margin="10,0,6,0"
+                                              Checked="TabTax_Checked" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                    <Border  Style="{StaticResource CardPanel}"
+                             Grid.Row="1">
+                        <StackPanel>
+
+
+
+
+                            <StackPanel  Grid.Column="1">
+
+                                <StackPanel x:Name="PricingContent"
+                                            Visibility="Collapsed">
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            
+                                            <ColumnDefinition Width="16" />
+                                            
+                                            <ColumnDefinition Width="Auto" />
+                                            
+                                        </Grid.ColumnDefinitions>
+
+                                        
+                                        <StackPanel Grid.Column="0">
+                                            
+                                            <Grid Margin="0,0,0,16">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="8" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="8" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <StackPanel Grid.Column="0">
+                                                    <TextBlock Text="شماره تلفن"
+                                                               Style="{StaticResource FormLabel}" />
+                                                    <controls:ModernPersianTextBox Width="200"
+                                                                                   FlowDirection="LeftToRight"
+                                                                                   Text="{Binding Username}"
+                                                                                   Placeholder="071" />
+                                                </StackPanel>
+
+                                                <StackPanel Grid.Column="2">
+                                                    <TextBlock Text="استان"
+                                                               Style="{StaticResource FormLabel}" />
+                                                    <ComboBox Style="{StaticResource SearchableComboBox}"
+                                                              Tag="جستجو"
+                                                              Width="200"
+                                                              HorizontalAlignment="Left"
+                                                              ItemContainerStyle="{StaticResource SearchableComboBoxItem}">
+                                                        <ComboBoxItem Content="تهران" />
+                                                        <ComboBoxItem Content="شیراز" />
+                                                        <ComboBoxItem Content="مشهد" />
+                                                    </ComboBox>
+                                                </StackPanel>
+
+                                                <StackPanel Grid.Column="4">
+                                                    <TextBlock Text="کد پستی"
+                                                               Style="{StaticResource FormLabel}" />
+                                                    <controls:ModernPersianTextBox Width="200"
+                                                                                   Text="{Binding Username}"
+                                                                                   Placeholder="" />
+                                                </StackPanel>
+                                            </Grid>
+
+                                            
+                                            <Grid Margin="0,0,0,16">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="8" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="8" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <StackPanel Grid.Column="0">
+                                                    <TextBlock Text="موبایل"
+                                                               Style="{StaticResource FormLabel}" />
+                                                    <controls:ModernPersianTextBox Width="200"
+                                                                                   FlowDirection="LeftToRight"
+                                                                                   Text="{Binding Username}"
+                                                                                   Placeholder="091" />
+                                                </StackPanel>
+
+                                                <StackPanel Grid.Column="2">
+                                                    <TextBlock Text="شهرستان"
+                                                               Style="{StaticResource FormLabel}" />
+                                                    <ComboBox Style="{StaticResource SearchableComboBox}"
+                                                              Tag="جستجو..."
+                                                              Width="200"
+                                                              HorizontalAlignment="Left"
+                                                              ItemContainerStyle="{StaticResource SearchableComboBoxItem}">
+                                                        <ComboBoxItem Content="تهران" />
+                                                        <ComboBoxItem Content="شیراز" />
+                                                        <ComboBoxItem Content="مشهد" />
+                                                    </ComboBox>
+                                                </StackPanel>
+
+                                                <StackPanel Grid.Column="4">
+                                                    <TextBlock Text="ایمیل"
+                                                               Style="{StaticResource FormLabel}" />
+                                                    <controls:ModernPersianTextBox Width="200"
+                                                                                   Text="{Binding Username}"
+                                                                                   FlowDirection="LeftToRight"
+                                                                                   Placeholder="example@mail.com" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </StackPanel>
+
+                                        
+                                        <Border Grid.Column="2"
+                                                Width="208"
+                                                Height="Auto"
+                                                BorderBrush="{StaticResource PrimaryBrush}"
+                                                BorderThickness="0"
+                                                CornerRadius="6"
+                                                Padding="0"
+                                                VerticalAlignment="Stretch">
+                                            <StackPanel>
+                                                <TextBlock Text="آدرس"
+                                                           Style="{StaticResource FormLabel}"
+                                                           Margin="0,0,0,8" />
+                                                <TextBox Text="{Binding Address}"
+                                                         Style="{StaticResource ModernPersianTextBox}"
+                                                         TextWrapping="Wrap"
+                                                         AcceptsReturn="True"
+                                                         Height="120"
+                                                         VerticalAlignment="Top"
+                                                         materialDesign:HintAssist.Hint="آدرس را وارد کنید..." />
+                                            </StackPanel>
+                                        </Border>
+
+                                    </Grid>
+
+                                </StackPanel>
+
+                                <StackPanel x:Name="InventoryContent"
+                                            Visibility="Visible">
+
+                                    <Grid Margin="0,0,0,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="8" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="8" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="نام بانک"
+                                                       Style="{StaticResource FormLabel}" />
+                                            <controls:ModernPersianTextBox Grid.Column="0"
+                                                                           Width="230"
+                                                                           Text="{Binding Username}"
+                                                                           Placeholder="ملت" />
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="2">
+                                            <TextBlock Text="نام شعبه"
+                                                       Width="230"
+                                                       HorizontalAlignment="Left"
+                                                       Style="{StaticResource FormLabel}" />
+                                            <controls:ModernPersianTextBox Grid.Column="0"
+                                                                           Text="{Binding Username}"
+                                                                           Placeholder="مرکزی" />
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="4"
+                                                    Orientation="Horizontal"
+                                                    Margin="0,30,0,0">
+                                            <ToggleButton Content="حساب پیش فرض"
+                                                          FlowDirection="LeftToRight"
+                                                          Style="{StaticResource StatusToggleButton}"
+                                                          IsChecked="True"
+                                                          Margin="10,0,60,0" />
+
+                                            
+                                            <Button x:Name="AddBankAccountButton"
+                                                    Click="AddBankAccountButton_Click"
+                                                    Background="Transparent"
+                                                    BorderThickness="0"
+                                                    Cursor="Hand">
+                                                <svg:SvgViewbox Width="18"
+                                                                Height="18"
+                                                                Source="/Assets/Icons/addAc.svg" />
+                                            </Button>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <Grid Margin="0,0,0,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="8" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="8" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="شماره کارت"
+                                                       Style="{StaticResource FormLabel}" />
+                                            <controls:ModernPersianTextBox Grid.Column="0"
+                                                                           Width="230"
+                                                                           FlowDirection="LeftToRight"
+                                                                           Text="{Binding Username}"
+                                                                           Placeholder="**** **** **** ****" />
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="2">
+                                            <TextBlock Text="شماره شبا"
+                                                       Style="{StaticResource FormLabel}" />
+                                            <controls:ModernPersianTextBox Grid.Column="0"
+                                                                           Width="230"
+                                                                           FlowDirection="LeftToRight"
+                                                                           Text="{Binding Username}"
+                                                                           Placeholder="IR" />
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="4">
+                                            <TextBlock Text="شماره حساب"
+                                                       Style="{StaticResource FormLabel}" />
+                                            <controls:ModernPersianTextBox Grid.Column="0"
+                                                                           Width="230"
+                                                                           FlowDirection="LeftToRight"
+                                                                           Text="{Binding Username}"
+                                                                           Placeholder="456" />
+                                        </StackPanel>
+                                    </Grid>
+
+                                    
+                                    <ItemsControl x:Name="AdditionalBankAccountsPanel"
+                                                  Margin="0,10,0,0">
+                                        <ItemsControl.ItemTemplate>
+                                            <StaticResource ResourceKey="BankAccountTemplate" />
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+
+                                <StackPanel x:Name="TaxContent"
+                                            Visibility="Collapsed">
+
+
+
+                                    <Grid Margin="0,0,0,10"
+                                          HorizontalAlignment="Left"
+                                          MaxWidth="700">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="16" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="16" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="اعتبار مالی"
+                                                       Width="200"
+                                                       Style="{StaticResource FormLabel}" />
+                                            <controls:ModernPersianTextBox Grid.Column="0"
+                                                                           Text="{Binding Username}"
+                                                                           Placeholder="0" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2">
+                                            <TextBlock Text="شناسه/کدملی"
+                                                       Width="200"
+                                                       Style="{StaticResource FormLabel}" />
+                                            <controls:ModernPersianTextBox Grid.Column="0"
+                                                                           Text="{Binding Username}"
+                                                                           Placeholder="1234" />
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="4">
+                                            <TextBlock Text="کد اقتصادی"
+                                                       Width="200"
+                                                       Style="{StaticResource FormLabel}" />
+                                            <controls:ModernPersianTextBox Grid.Column="0"
+                                                                           Text="{Binding Username}"
+                                                                           Placeholder="1234" />
+                                        </StackPanel>
+                                    </Grid>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="16" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="16" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="شماره ثبت شرکت"
+                                                       Style="{StaticResource FormLabel}" />
+                                            <controls:ModernPersianTextBox Grid.Column="0"
+                                                                           Width="230"
+                                                                           Text="{Binding Username}"
+                                                                           Placeholder="1234" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2">
+                                            <TextBlock Text="تاریخ تولد"
+                                                       Style="{StaticResource FormLabel}" />
+                                            <controls:PersianDatePickerControl x:Name="MyDatePicker2"
+                                                                               Width="235"
+                                                                               SelectedDate="{Binding BirthDate}"
+                                                                               DateChanged="MyDatePicker_DateChanged" />
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="4">
+                                            <TextBlock Text="تاریخ عضویت"
+                                                       Style="{StaticResource FormLabel}" />
+                                            <controls:PersianDatePickerControl x:Name="MyDatePicker"
+                                                                               Width="280"
+                                                                               SelectedDate="{Binding BirthDate}"
+                                                                               DateChanged="MyDatePicker_DateChanged" />
+
+
+                                        </StackPanel>
+
+                                    </Grid>
+                                    <TextBlock Text="توضیحات"
+                                               Style="{StaticResource FormLabel}" />
+                                    <TextBox Text="{Binding CurrentProduct.ProductName, UpdateSourceTrigger=PropertyChanged}"
+                                             materialDesign:HintAssist.Hint="نام کالا را وارد کنید"
+                                             Style="{StaticResource ModernPersianTextBox}"
+                                             Width="720"
+                                             HorizontalAlignment="Left"
+                                             FontFamily="{StaticResource IRANSans}"
+                                             Margin="0,0,0,8" />
+
+                                </StackPanel>
+
+                            </StackPanel>
+
+                        </StackPanel>
+                    </Border>
+
+                </Grid>
+
+
+            </StackPanel>
+        </Border>
+    </ScrollViewer>
+</UserControl>

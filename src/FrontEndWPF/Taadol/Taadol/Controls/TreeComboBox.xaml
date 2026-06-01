@@ -1,0 +1,562 @@
+﻿<UserControl x:Class="Taadol.Controls.TreeComboBox"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Taadol.Controls"
+             FlowDirection="RightToLeft"
+             x:Name="Root">
+
+    <UserControl.Resources>
+
+        
+        
+
+        
+        <Style x:Key="IconBtnBase"
+               TargetType="Button">
+            <Setter Property="Width"
+                    Value="18" />
+            <Setter Property="Height"
+                    Value="18" />
+            <Setter Property="Padding"
+                    Value="0" />
+            <Setter Property="Cursor"
+                    Value="Hand" />
+            <Setter Property="BorderThickness"
+                    Value="0" />
+            <Setter Property="Background"
+                    Value="Transparent" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="3"
+                                Padding="2">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+                                <Setter Property="Background"
+                                        Value="#1A000000" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="BtnDelete"
+               TargetType="Button"
+               BasedOn="{StaticResource IconBtnBase}" />
+        <Style x:Key="BtnEdit"
+               TargetType="Button"
+               BasedOn="{StaticResource IconBtnBase}" />
+        <Style x:Key="BtnAdd"
+               TargetType="Button"
+               BasedOn="{StaticResource IconBtnBase}" />
+
+        
+        <Style x:Key="TreeComboItemStyle"
+               TargetType="TreeViewItem">
+            <Setter Property="IsExpanded"
+                    Value="{Binding IsExpanded, Mode=TwoWay}" />
+            <Setter Property="IsSelected"
+                    Value="{Binding IsSelected, Mode=TwoWay}" />
+            <Setter Property="HorizontalContentAlignment"
+                    Value="Stretch" />
+            <Setter Property="Padding"
+                    Value="0" />
+            <Setter Property="Background"
+                    Value="Transparent" />
+            <Setter Property="BorderThickness"
+                    Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TreeViewItem">
+                        <StackPanel>
+
+                            
+                            <Border x:Name="Bd"
+                                    Background="Transparent"
+                                    BorderThickness="0,0,0,1"
+                                    BorderBrush="#F0F0F0"
+                                    MinHeight="34"
+                                    Padding="6,4">
+                                <Grid VerticalAlignment="Center">
+                                    <Grid.ColumnDefinitions>
+                                        
+                                        <ColumnDefinition Width="18" />
+                                        
+                                        <ColumnDefinition Width="Auto" />
+                                        
+                                        <ColumnDefinition Width="Auto" />
+                                        
+                                        <ColumnDefinition Width="*" />
+                                        
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    
+                                    <ToggleButton x:Name="Expander"
+                                                  Grid.Column="0"
+                                                  IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
+                                                  Width="16"
+                                                  Height="16"
+                                                  Focusable="False"
+                                                  VerticalAlignment="Center"
+                                                  Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}">
+                                        <Path x:Name="Arrow"
+                                              Data="M 0 0 L 4 4 L 8 0 Z"
+                                              Fill="#888"
+                                              Width="8"
+                                              Height="5"
+                                              RenderTransformOrigin="0.5,0.5"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Center">
+                                            <Path.RenderTransform>
+                                                <RotateTransform Angle="-90" />
+                                            </Path.RenderTransform>
+                                        </Path>
+                                    </ToggleButton>
+
+                                    
+                                    <Border Grid.Column="1"
+                                            x:Name="PersonIconBorder"
+                                            Width="20"
+                                            Height="20"
+                                            Margin="0,0,4,0"
+                                            VerticalAlignment="Center"
+                                            Visibility="Collapsed">
+                                        <Path Data="M 8 0 C 5.79 0 4 1.79 4 4 C 4 6.21 5.79 8 8 8 C 10.21 8 12 6.21 12 4 C 12 1.79 10.21 0 8 0 Z M 8 10 C 5.33 10 0 11.34 0 14 L 0 16 L 16 16 L 16 14 C 16 11.34 10.67 10 8 10 Z"
+                                              Fill="#5B9BD5"
+                                              Stretch="Uniform" />
+                                    </Border>
+
+                                    
+                                    <Ellipse Grid.Column="2"
+                                             x:Name="BulletDot"
+                                             Width="5"
+                                             Height="5"
+                                             Fill="#555"
+                                             Margin="2,0,6,0"
+                                             VerticalAlignment="Center"
+                                             Visibility="Collapsed" />
+
+                                    
+                                    <ContentPresenter Grid.Column="3"
+                                                      x:Name="PART_Header"
+                                                      Content="{TemplateBinding Header}"
+                                                      ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                                      VerticalAlignment="Center" />
+
+                                    
+                                    <StackPanel Grid.Column="4"
+                                                x:Name="CrudPanel"
+                                                Orientation="Horizontal"
+                                                Margin="4,0,0,0"
+                                                VerticalAlignment="Center"
+                                                Visibility="Hidden">
+
+                                        
+                                        <Button Style="{StaticResource BtnDelete}"
+                                                Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"
+                                                ToolTip="حذف"
+                                                Margin="0,0,2,0">
+                                            <Path Data="M 2 0 L 2 1 L 0 1 L 0 2 L 1 2 L 1 9 C 1 9.55 1.45 10 2 10 L 8 10 C 8.55 10 9 9.55 9 9 L 9 2 L 10 2 L 10 1 L 8 1 L 8 0 Z M 3 0 L 7 0 L 7 1 L 3 1 Z M 2 2 L 8 2 L 8 9 L 2 9 Z"
+                                                  Fill="#E53935"
+                                                  Stretch="Uniform"
+                                                  Width="11"
+                                                  Height="12" />
+                                        </Button>
+
+                                        
+                                        <Button Style="{StaticResource BtnEdit}"
+                                                Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"
+                                                ToolTip="ویرایش"
+                                                Margin="0,0,2,0">
+                                            <Path Data="M 0 8 L 0 10 L 2 10 L 8 4 L 6 2 Z M 9.71 2.29 C 9.9 2.1 9.9 1.8 9.71 1.61 L 8.39 0.29 C 8.2 0.1 7.9 0.1 7.71 0.29 L 6.71 1.29 L 8.71 3.29 Z"
+                                                  Fill="#00ACC1"
+                                                  Stretch="Uniform"
+                                                  Width="11"
+                                                  Height="11" />
+                                        </Button>
+
+                                        
+                                        <Button Style="{StaticResource BtnAdd}"
+                                                Command="{Binding DataContext.AddChildCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"
+                                                ToolTip="افزودن زیرمجموعه"
+                                                x:Name="BtnAddChild">
+                                            <Grid Width="11"
+                                                  Height="11">
+                                                <Rectangle Fill="#43A047"
+                                                           Width="2"
+                                                           HorizontalAlignment="Center" />
+                                                <Rectangle Fill="#43A047"
+                                                           Height="2"
+                                                           VerticalAlignment="Center" />
+                                            </Grid>
+                                        </Button>
+
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            
+                            <ItemsPresenter x:Name="ItemsHost"
+                                            Margin="12,0,0,0"
+                                            Visibility="Collapsed" />
+                        </StackPanel>
+
+                        <ControlTemplate.Triggers>
+
+                            
+                            <DataTrigger Binding="{Binding HasItems, RelativeSource={RelativeSource Self}}"
+                                         Value="False">
+                                <Setter TargetName="Expander"
+                                        Property="Visibility"
+                                        Value="Hidden" />
+                                <Setter TargetName="BulletDot"
+                                        Property="Visibility"
+                                        Value="Visible" />
+                                
+                                <Setter TargetName="BtnAddChild"
+                                        Property="Visibility"
+                                        Value="Collapsed" />
+                            </DataTrigger>
+
+                            
+                            <DataTrigger Binding="{Binding IsRoot}"
+                                         Value="True">
+                                <Setter TargetName="PersonIconBorder"
+                                        Property="Visibility"
+                                        Value="Visible" />
+                            </DataTrigger>
+
+                            
+                            <Trigger Property="IsExpanded"
+                                     Value="True">
+                                <Setter TargetName="ItemsHost"
+                                        Property="Visibility"
+                                        Value="Visible" />
+                                <Setter TargetName="Arrow"
+                                        Property="RenderTransform">
+                                    <Setter.Value>
+                                        <RotateTransform Angle="0" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+
+                            
+                            <Trigger Property="IsSelected"
+                                     Value="True">
+                                <Setter TargetName="Bd"
+                                        Property="Background"
+                                        Value="#E3F0FF" />
+                            </Trigger>
+
+                            
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="Bd"
+                                        Property="Background"
+                                        Value="#F5F9FF" />
+                                <Setter TargetName="CrudPanel"
+                                        Property="Visibility"
+                                        Value="Visible" />
+                            </Trigger>
+
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </UserControl.Resources>
+
+    <Grid>
+        
+        <ToggleButton x:Name="PART_ToggleButton"
+                      IsChecked="{Binding IsDropDownOpen, ElementName=Root, Mode=TwoWay}"
+                      HorizontalContentAlignment="Stretch"
+                      Height="32"
+                      Padding="8,0"
+                      Background="White"
+                      BorderBrush="#CCCCCC"
+                      BorderThickness="1">
+            <ToggleButton.Template>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="4"
+                            Padding="{TemplateBinding Padding}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0"
+                                       Text="{Binding SelectedText, ElementName=Root}"
+                                       VerticalAlignment="Center"
+                                       Foreground="#333"
+                                       TextTrimming="CharacterEllipsis" />
+
+                            
+                            <TextBlock Grid.Column="0"
+                                       Text="{Binding Placeholder, ElementName=Root}"
+                                       VerticalAlignment="Center"
+                                       Foreground="#AAAAAA">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility"
+                                                Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SelectedText, ElementName=Root}"
+                                                         Value="">
+                                                <Setter Property="Visibility"
+                                                        Value="Visible" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding SelectedText, ElementName=Root}"
+                                                         Value="{x:Null}">
+                                                <Setter Property="Visibility"
+                                                        Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+
+                            
+                            <Path Grid.Column="1"
+                                  Data="M 0 0 L 5 5 L 10 0 Z"
+                                  Fill="#666"
+                                  Width="10"
+                                  Height="5"
+                                  Margin="8,0,0,0"
+                                  VerticalAlignment="Center"
+                                  RenderTransformOrigin="0.5,0.5">
+                                <Path.Style>
+                                    <Style TargetType="Path">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=ToggleButton}}"
+                                                         Value="True">
+                                                <Setter Property="RenderTransform">
+                                                    <Setter.Value>
+                                                        <RotateTransform Angle="180"
+                                                                         CenterX="5"
+                                                                         CenterY="2.5" />
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Path.Style>
+                            </Path>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver"
+                                 Value="True">
+                            <Setter Property="BorderBrush"
+                                    Value="#5B9BD5" />
+                        </Trigger>
+                        <Trigger Property="IsChecked"
+                                 Value="True">
+                            <Setter Property="BorderBrush"
+                                    Value="#5B9BD5" />
+                            <Setter Property="Background"
+                                    Value="#FAFEFF" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </ToggleButton.Template>
+        </ToggleButton>
+
+        
+        <Popup x:Name="PART_Popup"
+               PlacementTarget="{Binding ElementName=PART_ToggleButton}"
+               Placement="Bottom"
+               IsOpen="{Binding IsDropDownOpen, ElementName=Root, Mode=TwoWay}"
+               StaysOpen="False"
+               AllowsTransparency="True"
+               PopupAnimation="Slide"
+               MinWidth="{Binding ActualWidth, ElementName=PART_ToggleButton}">
+
+            <Border Background="White"
+                    BorderBrush="#CCCCCC"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    Margin="0,2,0,0">
+                <Border.Effect>
+                    <DropShadowEffect Color="#000"
+                                      Opacity="0.12"
+                                      BlurRadius="10"
+                                      ShadowDepth="4"
+                                      Direction="270" />
+                </Border.Effect>
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        
+                        <RowDefinition Height="Auto" />
+                        
+                        <RowDefinition Height="Auto" />
+                        
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    
+                    <Border Grid.Row="0"
+                            BorderBrush="#EEEEEE"
+                            BorderThickness="0,0,0,1"
+                            Padding="10,8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0"
+                                       Text="دسته بندی اشخاص"
+                                       FontWeight="Bold"
+                                       FontSize="13"
+                                       Foreground="#222"
+                                       VerticalAlignment="Center" />
+
+                            
+                            <Button Grid.Column="1"
+                                    Command="{Binding AddRootCommand, ElementName=Root}"
+                                    ToolTip="افزودن دسته جدید"
+                                    Width="22"
+                                    Height="22"
+                                    Cursor="Hand"
+                                    BorderThickness="1"
+                                    BorderBrush="#5B9BD5"
+                                    Background="White">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                CornerRadius="3">
+                                            <Grid Width="12"
+                                                  Height="12"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center">
+                                                <Rectangle Fill="#5B9BD5"
+                                                           Width="2"
+                                                           HorizontalAlignment="Center" />
+                                                <Rectangle Fill="#5B9BD5"
+                                                           Height="2"
+                                                           VerticalAlignment="Center" />
+                                            </Grid>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver"
+                                                     Value="True">
+                                                <Setter Property="Background"
+                                                        Value="#EEF5FF" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                        </Grid>
+                    </Border>
+
+                    
+                    <Border Grid.Row="1"
+                            BorderBrush="#EEEEEE"
+                            BorderThickness="0,0,0,1"
+                            Padding="8,6">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            
+                            <Path Grid.Column="0"
+                                  Data="M 5 0 C 2.24 0 0 2.24 0 5 C 0 7.76 2.24 10 5 10 C 6.1 10 7.12 9.64 7.93 9.03 L 11 12.1 L 12.1 11 L 9.03 7.93 C 9.64 7.12 10 6.1 10 5 C 10 2.24 7.76 0 5 0 Z M 5 8.5 C 3.07 8.5 1.5 6.93 1.5 5 C 1.5 3.07 3.07 1.5 5 1.5 C 6.93 1.5 8.5 3.07 8.5 5 C 8.5 6.93 6.93 8.5 5 8.5 Z"
+                                  Fill="#AAAAAA"
+                                  Width="13"
+                                  Height="13"
+                                  Margin="0,0,6,0"
+                                  VerticalAlignment="Center"
+                                  Stretch="Uniform" />
+
+                            <TextBox Grid.Column="1"
+                                     x:Name="PART_SearchBox"
+                                     Text="{Binding SearchText, ElementName=Root, UpdateSourceTrigger=PropertyChanged}"
+                                     BorderThickness="0"
+                                     Background="Transparent"
+                                     VerticalAlignment="Center"
+                                     FontSize="12">
+                                <TextBox.Style>
+                                    <Style TargetType="TextBox">
+                                        <Style.Triggers>
+                                            <Trigger Property="Text"
+                                                     Value="">
+                                                <Setter Property="Background">
+                                                    <Setter.Value>
+                                                        <VisualBrush Stretch="None"
+                                                                     AlignmentX="Left">
+                                                            <VisualBrush.Visual>
+                                                                <TextBlock Text="یک دسته جستجو کنید..."
+                                                                           Foreground="#BBBBBB"
+                                                                           FontSize="12"
+                                                                           Margin="2,0" />
+                                                            </VisualBrush.Visual>
+                                                        </VisualBrush>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBox.Style>
+                            </TextBox>
+                        </Grid>
+                    </Border>
+
+                    
+                    <TreeView Grid.Row="2"
+                              x:Name="PART_TreeView"
+                              ItemsSource="{Binding FilteredItems, ElementName=Root}"
+                              ItemContainerStyle="{StaticResource TreeComboItemStyle}"
+                              BorderThickness="0"
+                              Background="Transparent"
+                              MaxHeight="320"
+                              Padding="2,2">
+
+                        <TreeView.ItemTemplate>
+                            <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                                <TextBlock Text="{Binding DisplayName}"
+                                           FontSize="13"
+                                           Padding="2,1">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Style.Triggers>
+                                                
+                                                <DataTrigger Binding="{Binding HasChildren}"
+                                                             Value="True">
+                                                    <Setter Property="FontWeight"
+                                                            Value="Bold" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </HierarchicalDataTemplate>
+                        </TreeView.ItemTemplate>
+
+                    </TreeView>
+                </Grid>
+            </Border>
+        </Popup>
+    </Grid>
+</UserControl>
