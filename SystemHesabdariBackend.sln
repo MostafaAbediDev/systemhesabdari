@@ -1,130 +1,135 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36603.0
+VisualStudioVersion = 17.14.36109.1 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BankManagement", "BankManagement", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BM.Domain", "BM.Domain", "{4A1EB669-0751-4E48-81B0-21FA26C607E6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BankManagement.Domain", "BankManagement.Domain\BankManagement.Domain.csproj", "{C5B341DA-E3DC-42A1-B9B3-202112588FF0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BankManagement.Domain", "BankManagement.Domain\BankManagement.Domain.csproj", "{C5B341DA-E3DC-42A1-B9B3-202112588FF0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "01_FrameWork", "01_FrameWork\01_FrameWork.csproj", "{65AB6357-959C-4B10-93F7-883E7FEAA89E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "01_FrameWork", "01_FrameWork\01_FrameWork.csproj", "{65AB6357-959C-4B10-93F7-883E7FEAA89E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GeneralInfoManagement", "GeneralInfoManagement", "{3CA45053-DD68-4BD9-9278-5CDAF6FAE340}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GIM.Domain", "GIM.Domain", "{0FA894EF-B245-4726-B05D-254347803F5F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneralInfoManagement.Domain", "GeneralInfoManagement.Domain\GeneralInfoManagement.Domain.csproj", "{1518C540-23EC-4443-A81F-4E99B55C83BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeneralInfoManagement.Domain", "GeneralInfoManagement.Domain\GeneralInfoManagement.Domain.csproj", "{1518C540-23EC-4443-A81F-4E99B55C83BF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FixedAssetManagement", "FixedAssetManagement", "{3631DCDB-30F9-4FD5-AAF7-2275A62A448E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FAM.Domain", "FAM.Domain", "{B7BF48BD-70BE-42B1-A8D0-14AD09402B60}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FixedAssetManagement.Domain", "FixedAssetManagement.Domain\FixedAssetManagement.Domain.csproj", "{2F94F399-F14B-4EFB-9818-55EE6A8D13E1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FixedAssetManagement.Domain", "FixedAssetManagement.Domain\FixedAssetManagement.Domain.csproj", "{2F94F399-F14B-4EFB-9818-55EE6A8D13E1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "InvoiceSystemManagement", "InvoiceSystemManagement", "{CD268D7B-854B-40F2-B1B1-5FEA0C279761}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ISM.Domain", "ISM.Domain", "{9CC57C02-218F-4081-83E1-D9EEA2EA59CB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InvoiceSystemManagement.Domain", "InvoiceSystemManagement.Domain\InvoiceSystemManagement.Domain.csproj", "{FDA22D3B-A89E-4F72-A8B7-2DFE7F1BCB72}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvoiceSystemManagement.Domain", "InvoiceSystemManagement.Domain\InvoiceSystemManagement.Domain.csproj", "{FDA22D3B-A89E-4F72-A8B7-2DFE7F1BCB72}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PayrollSystemManagement", "PayrollSystemManagement", "{1AB2CE50-BF2E-4EF8-82F4-0962A6105953}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PSM.Domain", "PSM.Domain", "{8F7EAD4C-0FA7-4A23-BFA5-9C05178305E9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PayrollSystemManagement.Domain", "PayrollSystemManagement.Domain\PayrollSystemManagement.Domain.csproj", "{07E18E20-385C-497C-9526-5491F6D35621}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PayrollSystemManagement.Domain", "PayrollSystemManagement.Domain\PayrollSystemManagement.Domain.csproj", "{07E18E20-385C-497C-9526-5491F6D35621}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PersonManagement", "PersonManagement", "{A7B0587D-0EF7-4B03-A5E2-1B59D48BF62D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PM.Domain", "PM.Domain", "{57991AA3-1C0A-4421-9FE4-42B7BEDC7941}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersonManagement.Domain", "PersonManagement.Domain\PersonManagement.Domain.csproj", "{7E8C69FC-6149-4D10-AA33-8804B8DCBA79}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PersonManagement.Domain", "PersonManagement.Domain\PersonManagement.Domain.csproj", "{7E8C69FC-6149-4D10-AA33-8804B8DCBA79}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "InventoryManagement", "InventoryManagement", "{44C01820-5E56-4B22-A0FB-9F4B19AD62E9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IM.Domain", "IM.Domain", "{DD31B906-BAE5-499E-8CB2-F4A573E1BD54}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InventoryManagement.Domain", "InventoryManagement.Domain\InventoryManagement.Domain.csproj", "{0168BA89-4169-4A72-86EE-0A2C1F128EBB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InventoryManagement.Domain", "InventoryManagement.Domain\InventoryManagement.Domain.csproj", "{0168BA89-4169-4A72-86EE-0A2C1F128EBB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AccountManagement", "AccountManagement", "{FF15DB3C-4948-4659-B551-CCA8A2B0014D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AM.Domain", "AM.Domain", "{E1339215-5369-46BE-A6C6-2D88D231AF51}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccountManagement.Domain", "AccountManagement.Domain\AccountManagement.Domain.csproj", "{0B17F7D5-218E-4151-8332-454F296AFEA7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccountManagement.Domain", "AccountManagement.Domain\AccountManagement.Domain.csproj", "{0B17F7D5-218E-4151-8332-454F296AFEA7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LogManagement", "LogManagement", "{E418AE51-4A64-4152-A108-043AC283F490}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LM.Domain", "LM.Domain", "{E17149DD-1945-44E3-AC7F-29B0F292213A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogManagement.Domain", "LogManagement.Domain\LogManagement.Domain.csproj", "{094E6888-FA29-464E-84BF-6DCC0F44C1C5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogManagement.Domain", "LogManagement.Domain\LogManagement.Domain.csproj", "{094E6888-FA29-464E-84BF-6DCC0F44C1C5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BM.Infrastructure", "BM.Infrastructure", "{F9FADDEE-EE43-425F-99D1-880B2ABB52A9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BankManagement.Infrastructure.EFCore", "BankManagement.Infrastructure.EFCore\BankManagement.Infrastructure.EFCore.csproj", "{D1279532-608D-44CC-84E6-3AA6F11DF201}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BankManagement.Infrastructure.EFCore", "BankManagement.Infrastructure.EFCore\BankManagement.Infrastructure.EFCore.csproj", "{D1279532-608D-44CC-84E6-3AA6F11DF201}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BankManagement.Configuration", "BankManagement.Configuration\BankManagement.Configuration.csproj", "{6FD1A2B9-5EA8-4B1F-AB2D-40688EE95FE6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BankManagement.Configuration", "BankManagement.Configuration\BankManagement.Configuration.csproj", "{6FD1A2B9-5EA8-4B1F-AB2D-40688EE95FE6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AM.Infrastructure", "AM.Infrastructure", "{13F7B441-AE35-42E2-8F78-B43B958D2809}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccountManagement.Infrastructure.EFCore", "AccountManagement.Infrastructure.EFCore\AccountManagement.Infrastructure.EFCore.csproj", "{1185B43B-8B8D-4401-BBB1-EFB969CDE224}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccountManagement.Infrastructure.EFCore", "AccountManagement.Infrastructure.EFCore\AccountManagement.Infrastructure.EFCore.csproj", "{1185B43B-8B8D-4401-BBB1-EFB969CDE224}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FAM.Infrastructure", "FAM.Infrastructure", "{7A259F32-CB08-478F-A263-65B0458D98C4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FixedAssetManagement.Infrastructure.EFCore", "FixedAssetManagement.Infrastructure.EFCore\FixedAssetManagement.Infrastructure.EFCore.csproj", "{9325ECDE-5AB1-4993-BA9F-A503718E94D2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FixedAssetManagement.Infrastructure.EFCore", "FixedAssetManagement.Infrastructure.EFCore\FixedAssetManagement.Infrastructure.EFCore.csproj", "{9325ECDE-5AB1-4993-BA9F-A503718E94D2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GIM.Infrastructure", "GIM.Infrastructure", "{3900CC97-523A-410C-AB67-F4E6A92F3235}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneralInfoManagement.Infrastructure.EFCore", "GeneralInfoManagement.Infrastructure.EFCore\GeneralInfoManagement.Infrastructure.EFCore.csproj", "{9797B7F3-62C4-4F8A-802E-5DDC86D0F0BC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeneralInfoManagement.Infrastructure.EFCore", "GeneralInfoManagement.Infrastructure.EFCore\GeneralInfoManagement.Infrastructure.EFCore.csproj", "{9797B7F3-62C4-4F8A-802E-5DDC86D0F0BC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LM.Infrastructure", "LM.Infrastructure", "{BBFC588E-73D2-4D13-B1A9-9DBB3906CCDC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogManagement.Infrastructure.EFCore", "LogManagement.Infrastructure.EFCore\LogManagement.Infrastructure.EFCore.csproj", "{0373DDCD-C62A-4820-A0E0-7F58AA30619A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogManagement.Infrastructure.EFCore", "LogManagement.Infrastructure.EFCore\LogManagement.Infrastructure.EFCore.csproj", "{0373DDCD-C62A-4820-A0E0-7F58AA30619A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PSM.Infrastructure", "PSM.Infrastructure", "{DAD717B7-C223-4172-ACF1-DFAF40FFB2D5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PayrollSystemManagement.Configuration", "PayrollSystemManagement.Configuration\PayrollSystemManagement.Configuration.csproj", "{580408D0-06D4-420A-8930-4A95D3B0417D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PayrollSystemManagement.Configuration", "PayrollSystemManagement.Configuration\PayrollSystemManagement.Configuration.csproj", "{580408D0-06D4-420A-8930-4A95D3B0417D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IM.Infrastructure", "IM.Infrastructure", "{F43155CC-E6E3-46C1-9F15-8F4B2C94221C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InventoryManagement.Infrastructure.EFCore", "InventoryManagement.Infrastructure.EFCore\InventoryManagement.Infrastructure.EFCore.csproj", "{495F238F-EE55-48BB-9FAF-27F33A42B293}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InventoryManagement.Infrastructure.EFCore", "InventoryManagement.Infrastructure.EFCore\InventoryManagement.Infrastructure.EFCore.csproj", "{495F238F-EE55-48BB-9FAF-27F33A42B293}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ISM.Infrastructure", "ISM.Infrastructure", "{CEE900F5-2B7E-4D48-9B46-9297A73BD6EE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InvoiceSystemManagement.Infrastructure.EFCore", "InvoiceSystemManagement.Infrastructure.EFCore\InvoiceSystemManagement.Infrastructure.EFCore.csproj", "{DA3F8368-BF7E-47F8-8A36-DF9D07512F3D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvoiceSystemManagement.Infrastructure.EFCore", "InvoiceSystemManagement.Infrastructure.EFCore\InvoiceSystemManagement.Infrastructure.EFCore.csproj", "{DA3F8368-BF7E-47F8-8A36-DF9D07512F3D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PayrollSystemManagement.Infrastructure.EFCore", "PayrollSystemManagement.Infrastructure.EFCore\PayrollSystemManagement.Infrastructure.EFCore.csproj", "{5062B4C2-00D9-4CB6-B2CC-94924FBFA27E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PayrollSystemManagement.Infrastructure.EFCore", "PayrollSystemManagement.Infrastructure.EFCore\PayrollSystemManagement.Infrastructure.EFCore.csproj", "{5062B4C2-00D9-4CB6-B2CC-94924FBFA27E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PM.Infrastructure", "PM.Infrastructure", "{E5A49E57-6C91-4686-8331-793A1191930F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersonManagement.Infrastructure.EFCore", "PersonManagement.Infrastructure.EFCore\PersonManagement.Infrastructure.EFCore.csproj", "{3E02CDAB-F757-46BB-9EE4-4E5503855DBA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PersonManagement.Infrastructure.EFCore", "PersonManagement.Infrastructure.EFCore\PersonManagement.Infrastructure.EFCore.csproj", "{3E02CDAB-F757-46BB-9EE4-4E5503855DBA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccountManagement.Configuration", "AccountManagement.Configuration\AccountManagement.Configuration.csproj", "{4ABF39B2-792F-4CA5-AD05-92BCF4DB199A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccountManagement.Configuration", "AccountManagement.Configuration\AccountManagement.Configuration.csproj", "{4ABF39B2-792F-4CA5-AD05-92BCF4DB199A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FixedAssetManagement.Configuration", "FixedAssetManagement.Configuration\FixedAssetManagement.Configuration.csproj", "{18D912B6-F209-4135-9DF9-8073DD6B5E62}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FixedAssetManagement.Configuration", "FixedAssetManagement.Configuration\FixedAssetManagement.Configuration.csproj", "{18D912B6-F209-4135-9DF9-8073DD6B5E62}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneralInfoManagement.Configuration", "GeneralInfoManagement.Configuration\GeneralInfoManagement.Configuration.csproj", "{60DF6276-E48E-4C8C-9E7F-48DBB2C467F9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeneralInfoManagement.Configuration", "GeneralInfoManagement.Configuration\GeneralInfoManagement.Configuration.csproj", "{60DF6276-E48E-4C8C-9E7F-48DBB2C467F9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InventoryManagement.Configuration", "InventoryManagement.Configuration\InventoryManagement.Configuration.csproj", "{BE035038-2FD7-478D-A889-6B0906C3FDF4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InventoryManagement.Configuration", "InventoryManagement.Configuration\InventoryManagement.Configuration.csproj", "{BE035038-2FD7-478D-A889-6B0906C3FDF4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InvoiceManagement.Configuration", "InvoiceManagement.Configuration\InvoiceManagement.Configuration.csproj", "{99BCF6CF-B90A-41DD-BBA5-D8A3195D18FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvoiceManagement.Configuration", "InvoiceManagement.Configuration\InvoiceManagement.Configuration.csproj", "{99BCF6CF-B90A-41DD-BBA5-D8A3195D18FA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogManagement.Configuration", "LogManagement.Configuration\LogManagement.Configuration.csproj", "{ADAFED8D-20B5-46C4-8B75-73992557F3A8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogManagement.Configuration", "LogManagement.Configuration\LogManagement.Configuration.csproj", "{ADAFED8D-20B5-46C4-8B75-73992557F3A8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersonManagement.Configuration", "PersonManagement.Configuration\PersonManagement.Configuration.csproj", "{2188C80A-5D59-4B9E-9E3E-95EF022E9238}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PersonManagement.Configuration", "PersonManagement.Configuration\PersonManagement.Configuration.csproj", "{2188C80A-5D59-4B9E-9E3E-95EF022E9238}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PM.Application", "PM.Application", "{708288D0-91E0-4143-91BB-E00A38B15D99}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersonManagement.Application.Contract", "PersonManagement.Application.Contract\PersonManagement.Application.Contract.csproj", "{2870D015-7F32-475C-9BF0-06B399EA917C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PersonManagement.Application.Contract", "PersonManagement.Application.Contract\PersonManagement.Application.Contract.csproj", "{2870D015-7F32-475C-9BF0-06B399EA917C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersonManagement.Application", "PersonManagement.Application\PersonManagement.Application.csproj", "{34FC1EFC-634B-4439-9059-1D56FCE99B79}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PersonManagement.Application", "PersonManagement.Application\PersonManagement.Application.csproj", "{34FC1EFC-634B-4439-9059-1D56FCE99B79}"
 EndProject
+<<<<<<< HEAD
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConnectionStringProject", "ConnectionStringProject\ConnectionStringProject.csproj", "{553C7DF3-277A-44D0-80BD-7B13A8A0D557}"
+=======
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConnectionStringProject", "ConnectionStringProject\ConnectionStringProject.csproj", "{553C7DF3-277A-44D0-80BD-7B13A8A0D557}"
+>>>>>>> front
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CodeManagement", "CodeManagement", "{81AE92A9-DEEC-46F3-99A0-FE89FAFCE3E5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CM.Domain", "CM.Domain", "{B16CA56D-12F1-486F-94E2-974B0B93B778}"
 EndProject
+<<<<<<< HEAD
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeManagement.Domain", "CodeManagement.Domain\CodeManagement.Domain.csproj", "{2DB1D7F1-8ACA-471F-A891-FC91653CAE02}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CM.Infrastructure", "CM.Infrastructure", "{78338D67-162F-47E4-BCED-C0CCDD80A70A}"
@@ -144,6 +149,31 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeManagement.Application", "CodeManagement.Application\CodeManagement.Application.csproj", "{28058BA6-066D-4DCE-B86F-9CA8B92F1D69}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeManagement.Application.Contracts", "CodeManagement.Application.Contracts\CodeManagement.Application.Contracts.csproj", "{965BB633-333D-4E8A-8A6A-173101EC61DD}"
+=======
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeManagement.Domain", "CodeManagement.Domain\CodeManagement.Domain.csproj", "{2DB1D7F1-8ACA-471F-A891-FC91653CAE02}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CM.Infrastructure", "CM.Infrastructure", "{78338D67-162F-47E4-BCED-C0CCDD80A70A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeManagement.Infrastructure.EFCore", "CodeManagement.Infrastructure.EFCore\CodeManagement.Infrastructure.EFCore.csproj", "{43937407-60F4-4AB9-A8AC-FA1384CE2B1B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeManagement.Configuration", "CodeManagement.Configuration\CodeManagement.Configuration.csproj", "{348F6E57-82F4-43A1-ACB7-715502A81395}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GIM.Application", "GIM.Application", "{EE5689C7-B887-4D12-97C7-2F6DBB75E677}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeneralInfoManagement.Application.Contract", "GeneralInfoManagement.Application.Contract\GeneralInfoManagement.Application.Contract.csproj", "{E127C5AB-0DB6-4CAF-B860-D792142837A8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeneralInfoManagement.Application", "GeneralInfoManagement.Application\GeneralInfoManagement.Application.csproj", "{3AF7C7A9-7315-4D16-B06D-0D3811E52C29}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CM.Application", "CM.Application", "{C6E00E10-0509-4068-AFC6-8B17196B1EF6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeManagement.Application", "CodeManagement.Application\CodeManagement.Application.csproj", "{28058BA6-066D-4DCE-B86F-9CA8B92F1D69}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeManagement.Application.Contracts", "CodeManagement.Application.Contracts\CodeManagement.Application.Contracts.csproj", "{965BB633-333D-4E8A-8A6A-173101EC61DD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Taadol", "..\..\..\NOIA\taadol_hesab\taadol\Taadol\Taadol\Taadol.csproj", "{F50A5A1E-64AD-440F-B1BF-D18E85D83974}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taadol", "src\FrontEndWPF\Taadol\Taadol\Taadol.csproj", "{81F55448-070C-582F-60F7-564B5AD36B4A}"
+>>>>>>> front
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -303,6 +333,17 @@ Global
 		{965BB633-333D-4E8A-8A6A-173101EC61DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{965BB633-333D-4E8A-8A6A-173101EC61DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{965BB633-333D-4E8A-8A6A-173101EC61DD}.Release|Any CPU.Build.0 = Release|Any CPU
+<<<<<<< HEAD
+=======
+		{F50A5A1E-64AD-440F-B1BF-D18E85D83974}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F50A5A1E-64AD-440F-B1BF-D18E85D83974}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F50A5A1E-64AD-440F-B1BF-D18E85D83974}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F50A5A1E-64AD-440F-B1BF-D18E85D83974}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81F55448-070C-582F-60F7-564B5AD36B4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81F55448-070C-582F-60F7-564B5AD36B4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81F55448-070C-582F-60F7-564B5AD36B4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81F55448-070C-582F-60F7-564B5AD36B4A}.Release|Any CPU.Build.0 = Release|Any CPU
+>>>>>>> front
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -367,6 +408,10 @@ Global
 		{C6E00E10-0509-4068-AFC6-8B17196B1EF6} = {81AE92A9-DEEC-46F3-99A0-FE89FAFCE3E5}
 		{28058BA6-066D-4DCE-B86F-9CA8B92F1D69} = {C6E00E10-0509-4068-AFC6-8B17196B1EF6}
 		{965BB633-333D-4E8A-8A6A-173101EC61DD} = {C6E00E10-0509-4068-AFC6-8B17196B1EF6}
+<<<<<<< HEAD
+=======
+		{F50A5A1E-64AD-440F-B1BF-D18E85D83974} = {A7B0587D-0EF7-4B03-A5E2-1B59D48BF62D}
+>>>>>>> front
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {755146A5-DE3D-4433-86D5-CFC10BD5F267}

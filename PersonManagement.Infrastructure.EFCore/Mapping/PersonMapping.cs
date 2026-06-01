@@ -21,7 +21,14 @@ namespace PersonManagement.Infrastructure.EFCore.Mapping
             builder.Property(x => x.AvailableCredit).HasPrecision(18, 2);
 
             builder.HasOne(x => x.Branches).WithMany().HasForeignKey(x => x.BranchId).OnDelete(DeleteBehavior.Restrict);
+<<<<<<< HEAD
             builder.HasOne(x => x.PersonType).WithMany(x => x.Persons).HasForeignKey(x => x.PersonTypeId);
+=======
+<<<<<<< HEAD
+=======
+            builder.HasOne(x => x.PersonType).WithMany(x => x.Persons).HasForeignKey(x => x.PersonTypeId);
+>>>>>>> master
+>>>>>>> front
 
             builder.HasMany(s => s.PersonBanks).WithOne(s => s.Persons).HasForeignKey(s => s.PersonId);
             builder.HasMany(s => s.PersonAddresses).WithOne(s => s.Persons).HasForeignKey(s => s.PersonId);

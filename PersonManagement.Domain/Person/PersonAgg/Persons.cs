@@ -3,23 +3,48 @@ using GeneralInfoManagement.Domain.BaseInfo.BranchesAgg;
 using PersonManagement.Domain.Person.PersonAddressAgg;
 using PersonManagement.Domain.Person.PersonBankAgg;
 using PersonManagement.Domain.Person.PersonContactAgg;
+<<<<<<< HEAD
 using PersonManagement.Domain.Person.PersonTypeAgg;
+=======
+<<<<<<< HEAD
+=======
+using PersonManagement.Domain.Person.PersonTypeAgg;
+>>>>>>> master
+>>>>>>> front
 
 namespace PersonManagement.Domain.Person.PersonAgg
 {
     public class Persons : EntityBase
     {
         public string FullName { get; private set; }
+<<<<<<< HEAD
         public string? NationalCode { get; private set; }
         public string? EconomicCode { get; private set; }
         public string? RegistrationNumber { get; private set; }
         public long PersonTypeId { get; private set; }
+=======
+        public string NationalCode { get; private set; }
+        public string EconomicCode { get; private set; }
+        public string RegistrationNumber { get; private set; }
+<<<<<<< HEAD
+        public int PersonType { get; private set; }
+>>>>>>> front
         public bool IsLegal { get; private set; }
         public decimal CreditLimit { get; private set; }
         public decimal AvailableCredit { get; private set; }
         public long BranchId { get; private set; }
         public Branches Branches { get; private set; }
+<<<<<<< HEAD
         public PersonType PersonType { get; private set; }
+=======
+=======
+        public long PersonTypeId { get; private set; }
+        public bool IsLegal { get; private set; }
+        public long BranchId { get; private set; }
+        public Branches Branches { get; private set; }
+        public PersonType PersonType { get; private set; }
+>>>>>>> master
+>>>>>>> front
         public List<PersonBanks> PersonBanks { get; private set; }
         public List<PersonAddresses> PersonAddresses { get; private set; }
         public List<PersonContacts> PersonContacts { get; private set; }
@@ -35,6 +60,7 @@ namespace PersonManagement.Domain.Person.PersonAgg
             string? registrationNumber,long personTypeId,long branchId, decimal creditLimit)
         {
             FullName = fullName;
+<<<<<<< HEAD
             IsLegal = isLegal;
 
             if (isLegal)
@@ -52,12 +78,22 @@ namespace PersonManagement.Domain.Person.PersonAgg
 
             CreditLimit = creditLimit;
             AvailableCredit = creditLimit;
+=======
+            NationalCode = nationalCode;
+            EconomicCode = economicCode;
+            RegistrationNumber = registrationNumber;
+<<<<<<< HEAD
+            PersonType = personType;
+=======
+>>>>>>> master
+>>>>>>> front
         }
 
         public void Edit(string fullName, string? nationalCode,
             string? economicCode, string? registrationNumber, long personTypeId, long branchId, bool isLegal)
         {
             FullName = fullName;
+<<<<<<< HEAD
             PersonTypeId = personTypeId;
 
             SetBranch(branchId);
@@ -89,6 +125,15 @@ namespace PersonManagement.Domain.Person.PersonAgg
             }
 
             CreditLimit = creditLimit;
+=======
+            NationalCode = nationalCode;
+            EconomicCode = economicCode;
+            RegistrationNumber = registrationNumber;
+<<<<<<< HEAD
+            PersonType = personType;
+=======
+>>>>>>> master
+>>>>>>> front
         }
 
         public void SetBranch(long branchId)

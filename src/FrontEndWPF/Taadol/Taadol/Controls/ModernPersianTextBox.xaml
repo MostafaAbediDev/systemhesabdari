@@ -1,0 +1,61 @@
+﻿<UserControl x:Class="Taadol.Controls.ModernPersianTextBox"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid>
+        <Border x:Name="border"
+                Background="White"
+                BorderBrush="#E8E8E8"
+                BorderThickness="1"
+                CornerRadius="8"
+                Height="45">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBox x:Name="PART_TextBox"
+                         Grid.Column="0"
+                         FontFamily="pack://application:,,,/Fonts/#IRANSans"
+                         FontSize="14"
+                         Foreground="#2C3E50"
+                         Background="Transparent"
+                         BorderThickness="0"
+                         Padding="12,10"
+                         VerticalContentAlignment="Center"
+                         TextChanged="TextBox_TextChanged"
+                         GotFocus="PART_TextBox_GotFocus"
+                         LostFocus="PART_TextBox_LostFocus">
+                    <TextBox.Template>
+                        <ControlTemplate TargetType="TextBox">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          Focusable="false"
+                                          HorizontalScrollBarVisibility="Hidden"
+                                          VerticalScrollBarVisibility="Hidden" />
+                        </ControlTemplate>
+                    </TextBox.Template>
+                </TextBox>
+
+                <TextBlock x:Name="PlaceholderText"
+                           Grid.Column="0"
+                           Foreground="#BFBFBF"
+                           FontFamily="{StaticResource IRANSans}"
+                           FontSize="14"
+                           VerticalAlignment="Center"
+                           Margin="16,12"
+                           IsHitTestVisible="False"
+                           Visibility="Visible" />
+
+                <TextBlock x:Name="SuffixText"
+                           Grid.Column="1"
+                           Foreground="#7F8C8D"
+                           FontFamily="{StaticResource IRANSans}"
+                           FontSize="14"
+                           VerticalAlignment="Center"
+                           Margin="0,0,12,0"
+                           Visibility="Collapsed" />
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

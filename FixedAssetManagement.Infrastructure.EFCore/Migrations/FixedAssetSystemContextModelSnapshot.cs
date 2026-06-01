@@ -46,10 +46,24 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long?>("DeletedBy")
+=======
+<<<<<<< HEAD
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
+>>>>>>> front
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
@@ -125,10 +139,24 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long?>("DeletedBy")
+=======
+<<<<<<< HEAD
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
+>>>>>>> front
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsActive")
@@ -175,10 +203,24 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long?>("DeletedBy")
+=======
+<<<<<<< HEAD
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
+>>>>>>> front
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
@@ -249,10 +291,24 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.Property<decimal>("Debit")
                         .HasColumnType("decimal(18,2)");
 
+<<<<<<< HEAD
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long?>("DeletedBy")
+=======
+<<<<<<< HEAD
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
+>>>>>>> front
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
@@ -282,6 +338,11 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.ToTable("AccountingEntries");
                 });
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> front
             modelBuilder.Entity("BankManagement.Domain.Bank.BankAgg.Banks", b =>
                 {
                     b.Property<long>("Id")
@@ -676,6 +737,10 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.ToTable("ReceiptsPayments");
                 });
 
+<<<<<<< HEAD
+=======
+>>>>>>> master
+>>>>>>> front
             modelBuilder.Entity("FixedAssetManagement.Domain.FixedAsset.AssetDepreciationAgg.AssetDepreciations", b =>
                 {
                     b.Property<long>("Id")
@@ -698,10 +763,24 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long?>("DeletedBy")
+=======
+<<<<<<< HEAD
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
+>>>>>>> front
                         .HasColumnType("bigint");
 
                     b.Property<decimal>("DepreciationAmount")
@@ -760,10 +839,24 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long?>("DeletedBy")
+=======
+<<<<<<< HEAD
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
+>>>>>>> front
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
@@ -845,10 +938,24 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long?>("DeletedBy")
+=======
+<<<<<<< HEAD
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
+>>>>>>> front
                         .HasColumnType("bigint");
 
                     b.Property<int>("DepreciationMethod")
@@ -902,10 +1009,24 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long?>("DeletedBy")
+=======
+<<<<<<< HEAD
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
+>>>>>>> front
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
@@ -955,10 +1076,24 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long?>("DeletedBy")
+=======
+<<<<<<< HEAD
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
+>>>>>>> front
                         .HasColumnType("bigint");
 
                     b.Property<int>("EconomicCode")
@@ -1017,10 +1152,24 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long?>("DeletedBy")
+=======
+<<<<<<< HEAD
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
+>>>>>>> front
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("EstablishedDate")
@@ -1063,10 +1212,24 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long?>("DeletedBy")
+=======
+<<<<<<< HEAD
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
+>>>>>>> front
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("EndDate")
@@ -1092,6 +1255,11 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.ToTable("FinancialPeriods");
                 });
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> front
             modelBuilder.Entity("GeneralInfoManagement.Domain.BaseInfo.PictureAgg.Pictures", b =>
                 {
                     b.Property<long>("Id")
@@ -1134,6 +1302,10 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.ToTable("Pictures");
                 });
 
+<<<<<<< HEAD
+=======
+>>>>>>> master
+>>>>>>> front
             modelBuilder.Entity("GeneralInfoManagement.Domain.General.CityAgg.Cities", b =>
                 {
                     b.Property<long>("Id")
@@ -1145,10 +1317,24 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long?>("DeletedBy")
+=======
+<<<<<<< HEAD
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
+>>>>>>> front
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
@@ -1189,10 +1375,24 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long?>("DeletedBy")
+=======
+<<<<<<< HEAD
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
+>>>>>>> front
                         .HasColumnType("bigint");
 
                     b.Property<string>("Desscription")
@@ -1214,6 +1414,12 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.ToTable("Provinces");
                 });
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+            modelBuilder.Entity("InvoiceSystemManagement.Domain.Invoice.InvoiceAgg.Invoices", b =>
+=======
+>>>>>>> front
             modelBuilder.Entity("InventoryManagement.Domain.Inventory.BarcodeAgg.Barcodes", b =>
                 {
                     b.Property<long>("Id")
@@ -1255,6 +1461,10 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                 });
 
             modelBuilder.Entity("InventoryManagement.Domain.Inventory.BrandAgg.Brands", b =>
+<<<<<<< HEAD
+=======
+>>>>>>> master
+>>>>>>> front
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -1265,9 +1475,21 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
+=======
+<<<<<<< HEAD
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+>>>>>>> front
                     b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
 
@@ -2183,6 +2405,10 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<long?>("DeletedBy")
+<<<<<<< HEAD
+=======
+>>>>>>> master
+>>>>>>> front
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
@@ -2192,12 +2418,21 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("DueDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> front
                     b.Property<long>("FinancialPeriodId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("FinancialPeriodsId")
                         .HasColumnType("bigint");
 
+<<<<<<< HEAD
+=======
+>>>>>>> master
+>>>>>>> front
                     b.Property<DateTime>("InvoiceDate")
                         .HasColumnType("datetime2");
 
@@ -2214,12 +2449,21 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> front
                     b.Property<long>("PersonId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("PersonsId")
                         .HasColumnType("bigint");
 
+<<<<<<< HEAD
+=======
+>>>>>>> master
+>>>>>>> front
                     b.Property<string>("ReturnReason")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -2227,6 +2471,37 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
+<<<<<<< HEAD
+                    b.Property<long>("StorageId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("StoragesId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+=======
+<<<<<<< HEAD
+>>>>>>> front
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountingDocumentsId");
+
+                    b.HasIndex("BranchesId");
+
+                    b.HasIndex("FinancialPeriodsId");
+
+                    b.HasIndex("PersonsId");
+
+                    b.HasIndex("StoragesId");
+
+                    b.ToTable("Invoices");
+                });
+
+<<<<<<< HEAD
+=======
+=======
                     b.Property<long>("StorageId")
                         .HasColumnType("bigint");
 
@@ -2251,6 +2526,7 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.ToTable("Invoices");
                 });
 
+>>>>>>> front
             modelBuilder.Entity("InvoiceSystemManagement.Domain.Invoice.InvoiceItemAgg.InvoiceItems", b =>
                 {
                     b.Property<long>("Id")
@@ -2430,6 +2706,10 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.ToTable("ReceiptPaymentInvoices");
                 });
 
+<<<<<<< HEAD
+=======
+>>>>>>> master
+>>>>>>> front
             modelBuilder.Entity("PersonManagement.Domain.Person.ContactTypeAgg.ContactTypes", b =>
                 {
                     b.Property<long>("Id")
@@ -2441,10 +2721,24 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long?>("DeletedBy")
+=======
+<<<<<<< HEAD
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
+>>>>>>> front
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsActive")
@@ -2483,10 +2777,24 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long?>("DeletedBy")
+=======
+<<<<<<< HEAD
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
+>>>>>>> front
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsActive")
@@ -2546,10 +2854,24 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long?>("DeletedBy")
+=======
+<<<<<<< HEAD
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
+>>>>>>> front
                         .HasColumnType("bigint");
 
                     b.Property<string>("EconomicCode")
@@ -2573,6 +2895,15 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+                    b.Property<int>("PersonType")
+                        .HasColumnType("int");
+
+=======
+>>>>>>> master
+>>>>>>> front
                     b.Property<string>("RegistrationNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -2607,10 +2938,24 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long?>("DeletedBy")
+=======
+<<<<<<< HEAD
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
+>>>>>>> front
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsActive")
@@ -2656,10 +3001,24 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+<<<<<<< HEAD
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long?>("DeletedBy")
+=======
+<<<<<<< HEAD
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("DeletedBy")
+=======
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+>>>>>>> master
+>>>>>>> front
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
@@ -2782,6 +3141,11 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.Navigation("Person");
                 });
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> front
             modelBuilder.Entity("BankManagement.Domain.Bank.BankAgg.Banks", b =>
                 {
                     b.HasOne("GeneralInfoManagement.Domain.BaseInfo.PictureAgg.Pictures", "Pictures")
@@ -2928,6 +3292,10 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.Navigation("Persons");
                 });
 
+<<<<<<< HEAD
+=======
+>>>>>>> master
+>>>>>>> front
             modelBuilder.Entity("FixedAssetManagement.Domain.FixedAsset.AssetDepreciationAgg.AssetDepreciations", b =>
                 {
                     b.HasOne("AccountManagement.Domain.Account.AccountingDocumentAgg.AccountingDocuments", "AccountingDocuments")
@@ -3053,6 +3421,11 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.Navigation("Provinces");
                 });
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> front
             modelBuilder.Entity("InventoryManagement.Domain.Inventory.BarcodeAgg.Barcodes", b =>
                 {
                     b.HasOne("InventoryManagement.Domain.Inventory.Product.ProductAgg.Products", "Products")
@@ -3471,6 +3844,10 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.Navigation("ReceiptsPayments");
                 });
 
+<<<<<<< HEAD
+=======
+>>>>>>> master
+>>>>>>> front
             modelBuilder.Entity("PersonManagement.Domain.Person.PersonAddressAgg.PersonAddresses", b =>
                 {
                     b.HasOne("GeneralInfoManagement.Domain.General.CityAgg.Cities", "Cities")
@@ -3553,6 +3930,11 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.Navigation("AccountingEntrie");
                 });
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> front
             modelBuilder.Entity("BankManagement.Domain.Bank.BankAgg.Banks", b =>
                 {
                     b.Navigation("ChequeBooks");
@@ -3580,6 +3962,10 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.Navigation("ReceiptsPayments");
                 });
 
+<<<<<<< HEAD
+=======
+>>>>>>> master
+>>>>>>> front
             modelBuilder.Entity("FixedAssetManagement.Domain.FixedAsset.FixedAssetAgg.FixedAssets", b =>
                 {
                     b.Navigation("AssetDepreciations");
@@ -3604,6 +3990,11 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.Navigation("Cities");
                 });
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> front
             modelBuilder.Entity("InventoryManagement.Domain.Inventory.BrandAgg.Brands", b =>
                 {
                     b.Navigation("Products");
@@ -3684,6 +4075,10 @@ namespace FixedAssetManagement.Infrastructure.EFCore.Migrations
                     b.Navigation("ReceiptPaymentInvoices");
                 });
 
+<<<<<<< HEAD
+=======
+>>>>>>> master
+>>>>>>> front
             modelBuilder.Entity("PersonManagement.Domain.Person.ContactTypeAgg.ContactTypes", b =>
                 {
                     b.Navigation("PersonContacts");

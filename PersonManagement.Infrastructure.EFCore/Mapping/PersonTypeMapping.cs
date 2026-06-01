@@ -12,7 +12,11 @@ namespace PersonManagement.Infrastructure.EFCore.Mapping
 
             builder.HasKey(x => x.Id);
 
+<<<<<<< HEAD
             builder.Property(x => x.TitleId)
+=======
+            builder.Property(x => x.Code)
+>>>>>>> front
                    .IsRequired();
 
             builder.Property(x => x.Title)
@@ -32,7 +36,11 @@ namespace PersonManagement.Infrastructure.EFCore.Mapping
                 new
                 {
                     Id = 1L,
+<<<<<<< HEAD
                     TitleId = 1,
+=======
+                    Code = 1,
+>>>>>>> front
                     Title = "مشتری",
                     IsDeleted = false,
                     IsActive = true,
@@ -43,7 +51,11 @@ namespace PersonManagement.Infrastructure.EFCore.Mapping
                 new
                 {
                     Id = 2L,
+<<<<<<< HEAD
                     TitleId = 2,
+=======
+                    Code = 2,
+>>>>>>> front
                     Title = "پرسنل",
                     IsDeleted = false,
                     IsActive = true,
@@ -54,7 +66,11 @@ namespace PersonManagement.Infrastructure.EFCore.Mapping
                 new
                 {
                     Id = 3L,
+<<<<<<< HEAD
                     TitleId = 3,
+=======
+                    Code = 3,
+>>>>>>> front
                     Title = "تامین کننده",
                     IsDeleted = false,
                     IsActive = true,
