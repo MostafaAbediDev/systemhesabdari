@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.35130.168
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36109.1 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BankManagement", "BankManagement", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
@@ -145,9 +145,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeManagement.Application"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeManagement.Application.Contracts", "CodeManagement.Application.Contracts\CodeManagement.Application.Contracts.csproj", "{965BB633-333D-4E8A-8A6A-173101EC61DD}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "wpf", "wpf", "{8DD737EA-9D2A-414D-A613-62F9204953BD}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Taadol", "..\..\..\NOIA\taadol_hesab\taadol\Taadol\Taadol\Taadol.csproj", "{F50A5A1E-64AD-440F-B1BF-D18E85D83974}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taadol", "src\FrontEndWPF\Taadol\Taadol\Taadol.csproj", "{81F55448-070C-582F-60F7-564B5AD36B4A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -311,6 +311,10 @@ Global
 		{F50A5A1E-64AD-440F-B1BF-D18E85D83974}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F50A5A1E-64AD-440F-B1BF-D18E85D83974}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F50A5A1E-64AD-440F-B1BF-D18E85D83974}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81F55448-070C-582F-60F7-564B5AD36B4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81F55448-070C-582F-60F7-564B5AD36B4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81F55448-070C-582F-60F7-564B5AD36B4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81F55448-070C-582F-60F7-564B5AD36B4A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -375,7 +379,7 @@ Global
 		{C6E00E10-0509-4068-AFC6-8B17196B1EF6} = {81AE92A9-DEEC-46F3-99A0-FE89FAFCE3E5}
 		{28058BA6-066D-4DCE-B86F-9CA8B92F1D69} = {C6E00E10-0509-4068-AFC6-8B17196B1EF6}
 		{965BB633-333D-4E8A-8A6A-173101EC61DD} = {C6E00E10-0509-4068-AFC6-8B17196B1EF6}
-		{F50A5A1E-64AD-440F-B1BF-D18E85D83974} = {8DD737EA-9D2A-414D-A613-62F9204953BD}
+		{F50A5A1E-64AD-440F-B1BF-D18E85D83974} = {A7B0587D-0EF7-4B03-A5E2-1B59D48BF62D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {755146A5-DE3D-4433-86D5-CFC10BD5F267}

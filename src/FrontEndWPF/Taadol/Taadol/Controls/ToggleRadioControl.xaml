@@ -20,7 +20,7 @@
                    FontSize="14"
                    FontFamily="{StaticResource IRANSans}"
                    FontWeight="DemiBold"
-                   Foreground="#2B3F6C"
+                   Foreground="Red"
                    VerticalAlignment="Center"
                    Margin="0,0,4,0">
             <TextBlock.RenderTransform>
