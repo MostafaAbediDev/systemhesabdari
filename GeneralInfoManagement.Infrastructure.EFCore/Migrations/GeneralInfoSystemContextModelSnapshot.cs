@@ -23,547 +23,449 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Migrations
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("GeneralInfoManagement.Domain.BaseInfo.BranchArchiveAgg.BranchArchive", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+            {
+                b.Property<long>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<long>("BranchId")
-                        .HasColumnType("bigint");
+                b.Property<long>("BranchId")
+                    .HasColumnType("bigint");
 
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("CreationDate")
+                    .HasColumnType("datetime2");
 
-<<<<<<< HEAD
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime?>("DeletedAt")
+                    .HasColumnType("datetime2");
 
-                    b.Property<long?>("DeletedBy")
-=======
-<<<<<<< HEAD
-                    b.Property<DateTime>("DeletedAt")
-                        .HasColumnType("datetime2");
+                b.Property<long?>("DeletedBy")
+                    .HasColumnType("bigint");
 
-                    b.Property<long>("DeletedBy")
-=======
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
+                b.Property<string>("Description")
+                    .IsRequired()
+                    .HasMaxLength(500)
+                    .HasColumnType("nvarchar(500)");
 
-                    b.Property<long?>("DeletedBy")
->>>>>>> master
->>>>>>> front
-                        .HasColumnType("bigint");
+                b.Property<string>("File")
+                    .IsRequired()
+                    .HasMaxLength(1000)
+                    .HasColumnType("nvarchar(1000)");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                b.Property<bool>("IsActive")
+                    .HasColumnType("bit");
 
-                    b.Property<string>("File")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                b.Property<bool>("IsDeleted")
+                    .HasColumnType("bit");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                b.Property<string>("Title")
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnType("nvarchar(100)");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                b.HasKey("Id");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                b.HasIndex("BranchId");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("BranchId");
-
-                    b.ToTable("BranchArchive", (string)null);
-                });
+                b.ToTable("BranchArchive", (string)null);
+            });
 
             modelBuilder.Entity("GeneralInfoManagement.Domain.BaseInfo.BranchesAgg.Branches", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+            {
+                b.Property<long>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                b.Property<string>("Address")
+                    .IsRequired()
+                    .HasMaxLength(500)
+                    .HasColumnType("nvarchar(500)");
 
-                    b.Property<long>("CityId")
-                        .HasColumnType("bigint");
+                b.Property<long>("CityId")
+                    .HasColumnType("bigint");
 
-                    b.Property<long>("CompanyId")
-                        .HasColumnType("bigint");
+                b.Property<long>("CompanyId")
+                    .HasColumnType("bigint");
 
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("CreationDate")
+                    .HasColumnType("datetime2");
 
-<<<<<<< HEAD
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime?>("DeletedAt")
+                    .HasColumnType("datetime2");
 
-                    b.Property<long?>("DeletedBy")
-=======
-<<<<<<< HEAD
-                    b.Property<DateTime>("DeletedAt")
-                        .HasColumnType("datetime2");
+                b.Property<long?>("DeletedBy")
+                    .HasColumnType("bigint");
 
-                    b.Property<long>("DeletedBy")
-=======
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
+                b.Property<string>("EconomicCode")
+                    .IsRequired()
+                    .HasMaxLength(20)
+                    .HasColumnType("nvarchar(20)");
 
-                    b.Property<long?>("DeletedBy")
->>>>>>> master
->>>>>>> front
-                        .HasColumnType("bigint");
+                b.Property<string>("Email")
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("EconomicCode")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                b.Property<bool>("IsActive")
+                    .HasColumnType("bit");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                b.Property<bool>("IsDeleted")
+                    .HasColumnType("bit");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsMain")
+                    .HasColumnType("bit");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                b.Property<string>("MobilePhone")
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasColumnType("nvarchar(50)");
 
-                    b.Property<bool>("IsMain")
-                        .HasColumnType("bit");
+                b.Property<string>("NationalId")
+                    .IsRequired()
+                    .HasMaxLength(20)
+                    .HasColumnType("nvarchar(20)");
 
-                    b.Property<string>("MobilePhone")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                b.Property<string>("PostCode")
+                    .IsRequired()
+                    .HasMaxLength(10)
+                    .HasColumnType("nvarchar(10)");
 
-                    b.Property<string>("NationalId")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                b.Property<long>("ProvinceId")
+                    .HasColumnType("bigint");
 
-                    b.Property<string>("PostCode")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                b.Property<string>("RegisterNumber")
+                    .IsRequired()
+                    .HasMaxLength(20)
+                    .HasColumnType("nvarchar(20)");
 
-                    b.Property<long>("ProvinceId")
-                        .HasColumnType("bigint");
+                b.Property<string>("TelePhone")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("RegisterNumber")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                b.Property<string>("Title")
+                    .IsRequired()
+                    .HasMaxLength(200)
+                    .HasColumnType("nvarchar(200)");
 
-                    b.Property<string>("TelePhone")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.HasKey("Id");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                b.HasIndex("CityId");
 
-                    b.HasKey("Id");
+                b.HasIndex("CompanyId");
 
-                    b.HasIndex("CityId");
+                b.HasIndex("ProvinceId");
 
-                    b.HasIndex("CompanyId");
-
-                    b.HasIndex("ProvinceId");
-
-                    b.ToTable("Branches", (string)null);
-                });
+                b.ToTable("Branches", (string)null);
+            });
 
             modelBuilder.Entity("GeneralInfoManagement.Domain.BaseInfo.CompaniesAgg.Companies", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+            {
+                b.Property<long>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("CreationDate")
+                    .HasColumnType("datetime2");
 
-<<<<<<< HEAD
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime?>("DeletedAt")
+                    .HasColumnType("datetime2");
 
-                    b.Property<long?>("DeletedBy")
-=======
-<<<<<<< HEAD
-                    b.Property<DateTime>("DeletedAt")
-                        .HasColumnType("datetime2");
+                b.Property<long?>("DeletedBy")
+                    .HasColumnType("bigint");
 
-                    b.Property<long>("DeletedBy")
-=======
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("EstablishedDate")
+                    .HasColumnType("datetime2");
 
-                    b.Property<long?>("DeletedBy")
->>>>>>> master
->>>>>>> front
-                        .HasColumnType("bigint");
+                b.Property<bool>("IsActive")
+                    .HasColumnType("bit");
 
-                    b.Property<DateTime>("EstablishedDate")
-                        .HasColumnType("datetime2");
+                b.Property<bool>("IsDeleted")
+                    .HasColumnType("bit");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                b.Property<string>("LegalName")
+                    .IsRequired()
+                    .HasMaxLength(200)
+                    .HasColumnType("nvarchar(200)");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                b.Property<string>("Logo")
+                    .IsRequired()
+                    .HasMaxLength(500)
+                    .HasColumnType("nvarchar(500)");
 
-                    b.Property<string>("LegalName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                b.Property<string>("Title")
+                    .IsRequired()
+                    .HasMaxLength(200)
+                    .HasColumnType("nvarchar(200)");
 
-                    b.Property<string>("Logo")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                b.HasKey("Id");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Companies", (string)null);
-                });
+                b.ToTable("Companies", (string)null);
+            });
 
             modelBuilder.Entity("GeneralInfoManagement.Domain.BaseInfo.FinancialPeriodsAgg.FinancialPeriods", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+            {
+                b.Property<long>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<long>("BranchId")
-                        .HasColumnType("bigint");
+                b.Property<long>("BranchId")
+                    .HasColumnType("bigint");
 
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("CreationDate")
+                    .HasColumnType("datetime2");
 
-<<<<<<< HEAD
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime?>("DeletedAt")
+                    .HasColumnType("datetime2");
 
-                    b.Property<long?>("DeletedBy")
-=======
-<<<<<<< HEAD
-                    b.Property<DateTime>("DeletedAt")
-                        .HasColumnType("datetime2");
+                b.Property<long?>("DeletedBy")
+                    .HasColumnType("bigint");
 
-                    b.Property<long>("DeletedBy")
-=======
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("EndDate")
+                    .HasColumnType("datetime2");
 
-                    b.Property<long?>("DeletedBy")
->>>>>>> master
->>>>>>> front
-                        .HasColumnType("bigint");
+                b.Property<bool>("IsActive")
+                    .HasColumnType("bit");
 
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
+                b.Property<bool>("IsDeleted")
+                    .HasColumnType("bit");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                b.Property<DateTime>("StartDate")
+                    .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                b.Property<string>("Title")
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnType("nvarchar(100)");
 
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
+                b.HasKey("Id");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                b.HasIndex("BranchId");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("BranchId");
-
-                    b.ToTable("FinancialPeriods", (string)null);
-                });
+                b.ToTable("FinancialPeriods", (string)null);
+            });
 
             modelBuilder.Entity("GeneralInfoManagement.Domain.BaseInfo.PictureAgg.Pictures", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+            {
+                b.Property<long>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("CreationDate")
+                    .HasColumnType("datetime2");
 
-<<<<<<< HEAD
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime?>("DeletedAt")
+                    .HasColumnType("datetime2");
 
-                    b.Property<long?>("DeletedBy")
-=======
-<<<<<<< HEAD
-                    b.Property<DateTime>("DeletedAt")
-                        .HasColumnType("datetime2");
+                b.Property<long?>("DeletedBy")
+                    .HasColumnType("bigint");
 
-                    b.Property<long>("DeletedBy")
-=======
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
+                b.Property<bool>("IsActive")
+                    .HasColumnType("bit");
 
-                    b.Property<long?>("DeletedBy")
->>>>>>> master
->>>>>>> front
-                        .HasColumnType("bigint");
+                b.Property<bool>("IsDeleted")
+                    .HasColumnType("bit");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsMain")
+                    .HasColumnType("bit");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                b.Property<long>("OwnerId")
+                    .HasColumnType("bigint");
 
-                    b.Property<bool>("IsMain")
-                        .HasColumnType("bit");
+                b.Property<int>("OwnerType")
+                    .HasColumnType("int");
 
-                    b.Property<long>("OwnerId")
-                        .HasColumnType("bigint");
+                b.Property<string>("Url")
+                    .IsRequired()
+                    .HasMaxLength(500)
+                    .HasColumnType("nvarchar(500)");
 
-                    b.Property<int>("OwnerType")
-                        .HasColumnType("int");
+                b.HasKey("Id");
 
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                b.HasIndex("OwnerId", "OwnerType");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("OwnerId", "OwnerType");
-
-                    b.ToTable("Pictures", (string)null);
-                });
+                b.ToTable("Pictures", (string)null);
+            });
 
             modelBuilder.Entity("GeneralInfoManagement.Domain.General.CityAgg.Cities", b =>
-                {
-                    b.Property<long>("Id")
-                        .HasColumnType("bigint");
+            {
+                b.Property<long>("Id")
+                    .HasColumnType("bigint");
 
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("CreationDate")
+                    .HasColumnType("datetime2");
 
-<<<<<<< HEAD
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime?>("DeletedAt")
+                    .HasColumnType("datetime2");
 
-                    b.Property<long?>("DeletedBy")
-=======
-<<<<<<< HEAD
-                    b.Property<DateTime>("DeletedAt")
-                        .HasColumnType("datetime2");
+                b.Property<long?>("DeletedBy")
+                    .HasColumnType("bigint");
 
-                    b.Property<long>("DeletedBy")
-=======
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
+                b.Property<bool>("IsActive")
+                    .HasColumnType("bit");
 
-                    b.Property<long?>("DeletedBy")
->>>>>>> master
->>>>>>> front
-                        .HasColumnType("bigint");
+                b.Property<bool>("IsDeleted")
+                    .HasColumnType("bit");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                b.Property<long>("ProvinceId")
+                    .HasColumnType("bigint");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                b.Property<string>("Title")
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnType("nvarchar(100)");
 
-                    b.Property<long>("ProvinceId")
-                        .HasColumnType("bigint");
+                b.HasKey("Id");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                b.HasIndex("ProvinceId");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProvinceId");
-
-                    b.ToTable("Cities", (string)null);
-                });
+                b.ToTable("Cities", (string)null);
+            });
 
             modelBuilder.Entity("GeneralInfoManagement.Domain.General.ProvinceAgg.Provinces", b =>
-                {
-                    b.Property<long>("Id")
-                        .HasColumnType("bigint");
+            {
+                b.Property<long>("Id")
+                    .HasColumnType("bigint");
 
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("CreationDate")
+                    .HasColumnType("datetime2");
 
-<<<<<<< HEAD
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime?>("DeletedAt")
+                    .HasColumnType("datetime2");
 
-                    b.Property<long?>("DeletedBy")
-=======
-<<<<<<< HEAD
-                    b.Property<DateTime>("DeletedAt")
-                        .HasColumnType("datetime2");
+                b.Property<long?>("DeletedBy")
+                    .HasColumnType("bigint");
 
-                    b.Property<long>("DeletedBy")
-=======
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
+                b.Property<bool>("IsActive")
+                    .HasColumnType("bit");
 
-                    b.Property<long?>("DeletedBy")
->>>>>>> master
->>>>>>> front
-                        .HasColumnType("bigint");
+                b.Property<bool>("IsDeleted")
+                    .HasColumnType("bit");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                b.Property<string>("Title")
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnType("nvarchar(100)");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                b.HasKey("Id");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Provinces", (string)null);
-                });
+                b.ToTable("Provinces", (string)null);
+            });
 
             modelBuilder.Entity("GeneralInfoManagement.Domain.BaseInfo.BranchArchiveAgg.BranchArchive", b =>
-                {
-                    b.HasOne("GeneralInfoManagement.Domain.BaseInfo.BranchesAgg.Branches", "Branch")
-                        .WithMany("BranchArchive")
-                        .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+            {
+                b.HasOne("GeneralInfoManagement.Domain.BaseInfo.BranchesAgg.Branches", "Branch")
+                    .WithMany("BranchArchive")
+                    .HasForeignKey("BranchId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
 
-                    b.Navigation("Branch");
-                });
+                b.Navigation("Branch");
+            });
 
             modelBuilder.Entity("GeneralInfoManagement.Domain.BaseInfo.BranchesAgg.Branches", b =>
+            {
+                b.HasOne("GeneralInfoManagement.Domain.General.CityAgg.Cities", "Cities")
+                    .WithMany("Branches")
+                    .HasForeignKey("CityId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+
+                b.HasOne("GeneralInfoManagement.Domain.BaseInfo.CompaniesAgg.Companies", "Company")
+                    .WithMany("Branch")
+                    .HasForeignKey("CompanyId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+
+                b.HasOne("GeneralInfoManagement.Domain.General.ProvinceAgg.Provinces", "Provinces")
+                    .WithMany("Branches")
+                    .HasForeignKey("ProvinceId")
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .IsRequired();
+
+                b.OwnsOne("GeneralInfoManagement.Domain.BaseInfo.BranchesAgg.Location", "Location", b1 =>
                 {
-                    b.HasOne("GeneralInfoManagement.Domain.General.CityAgg.Cities", "Cities")
-                        .WithMany("Branches")
-                        .HasForeignKey("CityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b1.Property<long>("BranchesId")
+                        .HasColumnType("bigint");
 
-                    b.HasOne("GeneralInfoManagement.Domain.BaseInfo.CompaniesAgg.Companies", "Company")
-                        .WithMany("Branch")
-                        .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b1.Property<decimal>("Latitude")
+                        .HasColumnType("decimal(9,6)")
+                        .HasColumnName("Latitude");
 
-                    b.HasOne("GeneralInfoManagement.Domain.General.ProvinceAgg.Provinces", "Provinces")
-                        .WithMany("Branches")
-                        .HasForeignKey("ProvinceId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                    b1.Property<decimal>("Longitude")
+                        .HasColumnType("decimal(9,6)")
+                        .HasColumnName("Longitude");
 
-                    b.OwnsOne("GeneralInfoManagement.Domain.BaseInfo.BranchesAgg.Location", "Location", b1 =>
-                        {
-                            b1.Property<long>("BranchesId")
-                                .HasColumnType("bigint");
+                    b1.HasKey("BranchesId");
 
-                            b1.Property<decimal>("Latitude")
-                                .HasColumnType("decimal(9,6)")
-                                .HasColumnName("Latitude");
+                    b1.ToTable("Branches");
 
-                            b1.Property<decimal>("Longitude")
-                                .HasColumnType("decimal(9,6)")
-                                .HasColumnName("Longitude");
-
-                            b1.HasKey("BranchesId");
-
-                            b1.ToTable("Branches");
-
-                            b1.WithOwner()
-                                .HasForeignKey("BranchesId");
-                        });
-
-                    b.Navigation("Cities");
-
-                    b.Navigation("Company");
-
-                    b.Navigation("Location")
-                        .IsRequired();
-
-                    b.Navigation("Provinces");
+                    b1.WithOwner()
+                        .HasForeignKey("BranchesId");
                 });
+
+                b.Navigation("Cities");
+
+                b.Navigation("Company");
+
+                b.Navigation("Location")
+                    .IsRequired();
+
+                b.Navigation("Provinces");
+            });
 
             modelBuilder.Entity("GeneralInfoManagement.Domain.BaseInfo.FinancialPeriodsAgg.FinancialPeriods", b =>
-                {
-                    b.HasOne("GeneralInfoManagement.Domain.BaseInfo.BranchesAgg.Branches", "Branch")
-                        .WithMany("FinancialPeriod")
-                        .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+            {
+                b.HasOne("GeneralInfoManagement.Domain.BaseInfo.BranchesAgg.Branches", "Branch")
+                    .WithMany("FinancialPeriod")
+                    .HasForeignKey("BranchId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
 
-                    b.Navigation("Branch");
-                });
+                b.Navigation("Branch");
+            });
 
             modelBuilder.Entity("GeneralInfoManagement.Domain.General.CityAgg.Cities", b =>
-                {
-                    b.HasOne("GeneralInfoManagement.Domain.General.ProvinceAgg.Provinces", "Provinces")
-                        .WithMany("Cities")
-                        .HasForeignKey("ProvinceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+            {
+                b.HasOne("GeneralInfoManagement.Domain.General.ProvinceAgg.Provinces", "Provinces")
+                    .WithMany("Cities")
+                    .HasForeignKey("ProvinceId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
 
-                    b.Navigation("Provinces");
-                });
+                b.Navigation("Provinces");
+            });
 
             modelBuilder.Entity("GeneralInfoManagement.Domain.BaseInfo.BranchesAgg.Branches", b =>
-                {
-                    b.Navigation("BranchArchive");
+            {
+                b.Navigation("BranchArchive");
 
-                    b.Navigation("FinancialPeriod");
-                });
+                b.Navigation("FinancialPeriod");
+            });
 
             modelBuilder.Entity("GeneralInfoManagement.Domain.BaseInfo.CompaniesAgg.Companies", b =>
-                {
-                    b.Navigation("Branch");
-                });
+            {
+                b.Navigation("Branch");
+            });
 
             modelBuilder.Entity("GeneralInfoManagement.Domain.General.CityAgg.Cities", b =>
-                {
-                    b.Navigation("Branches");
-                });
+            {
+                b.Navigation("Branches");
+            });
 
             modelBuilder.Entity("GeneralInfoManagement.Domain.General.ProvinceAgg.Provinces", b =>
-                {
-                    b.Navigation("Branches");
+            {
+                b.Navigation("Branches");
 
-                    b.Navigation("Cities");
-                });
+                b.Navigation("Cities");
+            });
 #pragma warning restore 612, 618
         }
     }

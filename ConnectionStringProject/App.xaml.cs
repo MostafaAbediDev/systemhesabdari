@@ -1,6 +1,5 @@
 ﻿using AccountManagement.Configuration;
 using BankManagement.Configuration;
-<<<<<<< HEAD
 using CodeManagement.Configuration;
 using FixedAssetManagement.Configuration;
 using GeneralInfoManagement.Configuration;
@@ -10,60 +9,33 @@ using InventoryManagement.Configuration;
 using InvoiceManagement.Configuration;
 using LogManagement.Configuration;
 using Microsoft.EntityFrameworkCore;
-=======
-using FixedAssetManagement.Configuration;
-using GeneralInfoManagement.Configuration;
-using InventoryManagement.Configuration;
-using InvoiceManagement.Configuration;
-using LogManagement.Configuration;
->>>>>>> front
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PayrollSystemManagement.Configuration;
 using PersonManagement.Configuration;
-<<<<<<< HEAD
 using PersonManagement.Infrastructure.EFCore;
-=======
-using System.Configuration;
-using System.Data;
->>>>>>> front
 using System.IO;
 using System.Windows;
 
 namespace ConnectionStringProject
 {
-<<<<<<< HEAD
-=======
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
->>>>>>> front
     public partial class App : Application
     {
         public static IServiceProvider ServiceProvider { get; private set; }
 
-<<<<<<< HEAD
         protected override async void OnStartup(StartupEventArgs e)
-=======
-        protected override void OnStartup(StartupEventArgs e)
->>>>>>> front
         {
             var services = new ServiceCollection();
 
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-<<<<<<< HEAD
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-=======
-                .AddJsonFile("appsettings.json")
->>>>>>> front
                 .Build();
 
             ConfigureServices(services, configuration);
 
             ServiceProvider = services.BuildServiceProvider();
 
-<<<<<<< HEAD
             using var scope = ServiceProvider.CreateScope();
             var sp = scope.ServiceProvider;
 
@@ -107,25 +79,4 @@ namespace ConnectionStringProject
 
         }
     }
-=======
-            base.OnStartup(e);
-        }
-
-        private void ConfigureServices(IServiceCollection services, IConfiguration configuration)
-        {
-            var connectionString = configuration.GetConnectionString("TaadolDb");
-
-            AccountManagementBoostrapper.Configure(services, connectionString);
-            BankManagementBoostrapper.Configure(services, connectionString);
-            FixedAssetManagementBoostrapper.Configure(services, connectionString);
-            GeneralInfoManagementBoostrapper.Configure(services, connectionString);
-            InventoryManagementBoostrapper.Configure(services, connectionString);
-            InvoiceManagementBoostrapper.Configure(services, connectionString);
-            LogManagementBoostrapper.Configure(services, connectionString);
-            PayrollSystemManagementBoostrapper.Configure(services, connectionString);
-            PersonManagementBoostrapper.Configure(services, connectionString);
-        }
-    }
-
->>>>>>> front
 }

@@ -119,8 +119,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PersonManagement.Applicatio
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PersonManagement.Application", "PersonManagement.Application\PersonManagement.Application.csproj", "{34FC1EFC-634B-4439-9059-1D56FCE99B79}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConnectionStringProject", "ConnectionStringProject\ConnectionStringProject.csproj", "{553C7DF3-277A-44D0-80BD-7B13A8A0D557}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CodeManagement", "CodeManagement", "{81AE92A9-DEEC-46F3-99A0-FE89FAFCE3E5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CM.Domain", "CM.Domain", "{B16CA56D-12F1-486F-94E2-974B0B93B778}"
@@ -148,6 +146,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Taadol", "..\..\..\NOIA\taadol_hesab\taadol\Taadol\Taadol\Taadol.csproj", "{F50A5A1E-64AD-440F-B1BF-D18E85D83974}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taadol", "src\FrontEndWPF\Taadol\Taadol\Taadol.csproj", "{81F55448-070C-582F-60F7-564B5AD36B4A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConnectionStringProject", "ConnectionStringProject\ConnectionStringProject.csproj", "{4CF5B311-CD4C-521D-6683-506F93A7AA0A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -275,10 +275,6 @@ Global
 		{34FC1EFC-634B-4439-9059-1D56FCE99B79}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{34FC1EFC-634B-4439-9059-1D56FCE99B79}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{34FC1EFC-634B-4439-9059-1D56FCE99B79}.Release|Any CPU.Build.0 = Release|Any CPU
-		{553C7DF3-277A-44D0-80BD-7B13A8A0D557}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{553C7DF3-277A-44D0-80BD-7B13A8A0D557}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{553C7DF3-277A-44D0-80BD-7B13A8A0D557}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{553C7DF3-277A-44D0-80BD-7B13A8A0D557}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2DB1D7F1-8ACA-471F-A891-FC91653CAE02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2DB1D7F1-8ACA-471F-A891-FC91653CAE02}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2DB1D7F1-8ACA-471F-A891-FC91653CAE02}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -315,6 +311,10 @@ Global
 		{81F55448-070C-582F-60F7-564B5AD36B4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{81F55448-070C-582F-60F7-564B5AD36B4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{81F55448-070C-582F-60F7-564B5AD36B4A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CF5B311-CD4C-521D-6683-506F93A7AA0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CF5B311-CD4C-521D-6683-506F93A7AA0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CF5B311-CD4C-521D-6683-506F93A7AA0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CF5B311-CD4C-521D-6683-506F93A7AA0A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
