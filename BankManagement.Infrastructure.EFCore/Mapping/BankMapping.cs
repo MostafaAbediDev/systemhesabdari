@@ -15,15 +15,7 @@ namespace BankManagement.Infrastructure.EFCore.Mapping
             builder.Property(x => x.Country).HasMaxLength(200).IsRequired();
             builder.Property(x => x.Description).HasMaxLength(300).IsRequired();
 
-<<<<<<< HEAD
             builder.HasOne(x => x.BankTypes).WithMany(x => x.Banks).HasForeignKey(x => x.BankTypeId);
-=======
-            builder.HasOne(x => x.Pictures).WithMany().HasForeignKey(x => x.PictureId).OnDelete(DeleteBehavior.NoAction);
-<<<<<<< HEAD
-=======
-            builder.HasOne(x => x.BankTypes).WithMany(x => x.Banks).HasForeignKey(x => x.BankTypeId);
->>>>>>> master
->>>>>>> front
 
             builder.HasMany(s => s.CompanyBankAccounts).WithOne(s => s.Banks).HasForeignKey(s => s.BankId);
 

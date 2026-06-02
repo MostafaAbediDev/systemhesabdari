@@ -17,7 +17,6 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
         public EditPerson GetDetails(long id)
         {
             return _context.Persons
-<<<<<<< HEAD
                 .AsNoTracking()
                 .Select(x => new EditPerson
                 {
@@ -32,106 +31,6 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
                     CreditLimit = x.CreditLimit,
                 })
                 .FirstOrDefault(x => x.Id == id);
-=======
-                 .Where(x => x.Id == id)
-                 .Select(x => new EditPerson
-                 {
-                     Id = x.Id,
-                     Code = x.Code,
-                     FullName = x.FullName,
-                     NationalCode = x.NationalCode,
-                     EconomicCode = x.EconomicCode,
-                     RegistrationNumber = x.RegistrationNumber,
-<<<<<<< HEAD
-                     PersonType = x.PersonType,
-=======
->>>>>>> master
-                     BranchId = x.BranchId,
-                     IsLegal = x.IsLegal
-                 })
-                 .FirstOrDefault();
-        }
-
-        public PersonFullViewModel GetFullDetails(long id)
-        {
-            var person = _context.Persons
-                .Include(x => x.Branches)
-                .Include(x => x.PersonContacts)
-                    .ThenInclude(x => x.ContactTypes)
-                .Include(x => x.PersonAddresses)
-                    .ThenInclude(x => x.Provinces)
-                .Include(x => x.PersonAddresses)
-                    .ThenInclude(x => x.Cities)
-                .Include(x => x.PersonBanks)
-                .FirstOrDefault(x => x.Id == id);
-
-            if (person == null)
-                return null;
-
-            return new PersonFullViewModel
-            {
-                Person = new PersonViewModel
-                {
-                    Id = person.Id,
-                    Code = person.Code,
-                    FullName = person.FullName,
-                    NationalCode = person.NationalCode,
-                    EconomicCode = person.EconomicCode,
-                    RegistrationNumber = person.RegistrationNumber,
-<<<<<<< HEAD
-                    PersonType = person.PersonType,
-=======
->>>>>>> master
-                    BranchName = person.Branches.Title,
-                    IsActive = person.IsActive,
-                    IsLegal = person.IsLegal
-                },
-
-                Contacts = person.PersonContacts
-                    .Where(x => !x.IsDeleted)
-                    .Select(c => new PersonContactViewModel
-                    {
-                        Id = c.Id,
-                        Value = c.Value,
-                        Description = c.Description,
-                        IsDefault = c.IsDefault,
-                        ContactTypeId = c.ContactTypeId,
-                        ContactTypeTitle = c.ContactTypes.Title,
-                        IsActive = c.IsActive,
-                        IsDeleted = c.IsDeleted
-                    }).ToList(),
-
-                Addresses = person.PersonAddresses
-                    .Where(x => !x.IsDeleted)
-                    .Select(a => new PersonAddressViewModel
-                    {
-                        Id = a.Id,
-                        Address = a.Address,
-                        PostalCode = a.PostalCode,
-                        IsDefault = a.IsDefault,
-                        ProvinceId = a.ProvinceId,
-                        CityId = a.CityId,
-                        ProvinceName = a.Provinces.Title,
-                        CityName = a.Cities.Title,
-                        IsActive = a.IsActive,
-                        IsDeleted = a.IsDeleted
-                    }).ToList(),
-
-                Banks = person.PersonBanks
-                    .Where(x => !x.IsDeleted)
-                    .Select(b => new PersonBankViewModel
-                    {
-                        Id = b.Id,
-                        BankName = b.BankName,
-                        AccountNumber = b.AccountNumber,
-                        CardNumber = b.CardNumber,
-                        Shaba = b.Shaba,
-                        IsDefault = b.IsDefault,
-                        IsActive = b.IsActive,
-                        IsDeleted = b.IsDeleted
-                    }).ToList()
-            };
->>>>>>> front
         }
 
         public List<PersonViewModel> Search(PersonSearchModel searchModel)
@@ -169,15 +68,8 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
                     EconomicCode = x.EconomicCode,
                     PersonType = x.PersonType.Title,
                     BranchName = x.Branches.Title,
-<<<<<<< HEAD
                     CreditLimit = x.CreditLimit,
                     AvailableCredit = x.AvailableCredit,
-=======
-<<<<<<< HEAD
-                    PersonType = x.PersonType,
-=======
->>>>>>> master
->>>>>>> front
                     IsActive = x.IsActive,
                 })
                 .ToList();
