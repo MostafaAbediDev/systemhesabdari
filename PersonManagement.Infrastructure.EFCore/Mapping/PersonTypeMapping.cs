@@ -61,6 +61,17 @@ namespace PersonManagement.Infrastructure.EFCore.Mapping
                     DeletedAt = (DateTime?)null,
                     DeletedBy = (long?)null,
                     CreationDate = new DateTime(2026, 6, 5, 0, 0, 0, DateTimeKind.Utc)
+                },
+                new
+                {
+                    Id = 4L,
+                    TitleId = 4,
+                    Title = "مشتری و تامین کننده",
+                    IsDeleted = false,
+                    IsActive = true,
+                    DeletedAt = (DateTime?)null,
+                    DeletedBy = (long?)null,
+                    CreationDate = new DateTime(2026, 6, 5, 0, 0, 0, DateTimeKind.Utc)
                 }
             );
 
