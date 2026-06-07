@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PayrollSystemManagement.Infrastructure.EFCore;
 
@@ -11,9 +12,11 @@ using PayrollSystemManagement.Infrastructure.EFCore;
 namespace PayrollSystemManagement.Infrastructure.EFCore.Migrations
 {
     [DbContext(typeof(PayrollSystemContext))]
-    partial class PayrollSystemContextModelSnapshot : ModelSnapshot
+    [Migration("20260607084446_FixEmployeePropertiesAndAddSomeTables")]
+    partial class FixEmployeePropertiesAndAddSomeTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1217,7 +1220,7 @@ namespace PayrollSystemManagement.Infrastructure.EFCore.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<long?>("AccountingDocumentId")
+                    b.Property<long>("AccountingDocumentId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("BranchId")
@@ -1244,6 +1247,13 @@ namespace PayrollSystemManagement.Infrastructure.EFCore.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<int>("Month")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("NetPay")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -1254,6 +1264,9 @@ namespace PayrollSystemManagement.Infrastructure.EFCore.Migrations
                     b.Property<decimal>("TotalDeduction")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -2042,7 +2055,8 @@ namespace PayrollSystemManagement.Infrastructure.EFCore.Migrations
                     b.HasOne("AccountManagement.Domain.Account.AccountingDocumentAgg.AccountingDocuments", "AccountingDocuments")
                         .WithMany()
                         .HasForeignKey("AccountingDocumentId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.HasOne("GeneralInfoManagement.Domain.BaseInfo.BranchesAgg.Branches", "Branches")
                         .WithMany()
