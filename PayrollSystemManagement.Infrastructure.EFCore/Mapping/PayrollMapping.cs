@@ -13,8 +13,6 @@ namespace PayrollSystemManagement.Infrastructure.EFCore.Mapping
 
             builder.Property(x => x.TotalBenefits).HasPrecision(18, 2).IsRequired();
             builder.Property(x => x.TotalDeduction).HasPrecision(18, 2).IsRequired();
-            builder.Property(x => x.NetPay).HasPrecision(18, 2).IsRequired();
-
 
             builder.HasOne(x => x.Employees).WithMany(x => x.Payrolls).HasForeignKey(x => x.EmployeeId);
 
