@@ -4,18 +4,20 @@ using GeneralInfoManagement.Domain.BaseInfo.BranchesAgg;
 using GeneralInfoManagement.Domain.BaseInfo.FinancialPeriodsAgg;
 using PayrollSystemManagement.Domain.Payroll.EmployeeAgg;
 using PayrollSystemManagement.Domain.Payroll.PayrollDetailAgg;
+using PayrollSystemManagement.Domain.Payroll.PayrollItemAgg;
 
 namespace PayrollSystemManagement.Domain.Payroll.PayrollAgg
 {
     public class Payrolls : EntityBase
     {
-        public decimal TotalBenefits { get; private set; }
-        public decimal TotalDeduction { get; private set; }
+        
         public long BranchId { get; private set; }
         public long EmployeeId { get; private set; }
         public long FinancialPeriodId { get; private set; }
         public long? AccountingDocumentId { get; private set; }
         public PayrollStatus Status { get; private set; }
+        public decimal TotalBenefits {  get; private set; }
+        public decimal TotalDeduction {  get; private set; }
         public decimal NetPay => TotalBenefits - TotalDeduction;
         public Branches Branches { get; private set; }
         public Employees Employees { get; private set; }
@@ -86,7 +88,7 @@ namespace PayrollSystemManagement.Domain.Payroll.PayrollAgg
 
         public void Cancel()
         {
-            if (Status == PayrollStatus.Paid)
+            if (Status is PayrollStatus.Paid or PayrollStatus.Cancelled)
                 throw new InvalidOperationException("Paid payroll cannot be cancelled");
 
             Status = PayrollStatus.Cancelled;
