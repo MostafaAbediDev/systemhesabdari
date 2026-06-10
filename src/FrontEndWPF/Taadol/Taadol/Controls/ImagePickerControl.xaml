@@ -34,17 +34,12 @@
             <StackPanel x:Name="PlaceholderPanel"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Center"
-                        Margin="0,0,0,0">
+                   >
                 <svg:SvgViewbox x:Name="PlaceholderIcon"
                                 Width="48"
                                 Height="48"
                                 HorizontalAlignment="Center" />
-                <TextBlock Text="{Binding PlaceholderLabel, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                           FontSize="12"
-                           Foreground="#94A3B8"
-                           FontFamily="{StaticResource IRANSans}"
-                           HorizontalAlignment="Center"
-                           Margin="0,8,0,0" />
+              
             </StackPanel>
 
             <Grid FlowDirection="RightToLeft">

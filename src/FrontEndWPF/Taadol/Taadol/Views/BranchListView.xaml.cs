@@ -4,65 +4,189 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
-
+using GeneralInfoManagement.Application.Contract.Branches;
+using Microsoft.Extensions.DependencyInjection;
+using System.Globalization;
+using System.Threading.Tasks;
+using System.Windows.Threading;
 namespace Taadol.Views
 {
     public partial class BranchListView : UserControl
     {
+
         public ObservableCollection<BranchItem> AllBranches { get; set; }
         public ObservableCollection<BranchItem> FilteredBranches { get; set; }
-        private int _pageSize = 20;
+
+        private readonly IBranchApplication _branchApplication;
+        private int _pageSize = 15;
         private string _currentFilter = "all";
-        private string _searchText = "";
+        private int _currentPage = 1;
+        private int _totalPages = 1;
+        private bool _isLoadedOnce = false;
 
         public BranchListView()
         {
             InitializeComponent();
-            LoadTestData();
-            ApplyFilters();
+
+            _branchApplication = App.ServiceProvider.GetRequiredService<IBranchApplication>();
+
+            AllBranches = new ObservableCollection<BranchItem>();
+
+            FillEmptyRows();
+
+            Loaded += BranchListView_Loaded;
+        }
+        private async void BranchListView_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (_isLoadedOnce) return;
+
+            _isLoadedOnce = true;
+
+            await LoadDataAsync();
         }
 
-                private void CheckBoxBorder_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private async Task LoadDataAsync()
         {
-            var border = sender as Border;
-            if (border?.DataContext is BranchItem item && !item.IsEmpty)
+            ShowLoading(true);
+
+            await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background);
+
+            try
             {
-                item.IsSelected = !item.IsSelected;
-                e.Handled = true;
+                var items = await Task.Run(() =>
+                {
+                    using var scope = App.ServiceProvider.CreateScope();
+
+                    var branchApplication = scope.ServiceProvider.GetRequiredService<IBranchApplication>();
+
+                    var branches = branchApplication.GetBranches();
+
+                    return branches.Select((b, index) => new BranchItem
+                    {
+                        RowNumber = index + 1,
+                        RegisterDate = ToPersianDate(b.CreatedAt),
+                        UniqueId = b.Id.ToString(),
+                        BranchType = "—",
+                        CompanyName = b.CompanyId.ToString(),
+                        BranchName = b.Title,
+                        RegistrationNumber = b.RegisterNumber,
+                        BranchCode = b.Code,
+                        Province = b.ProvinceName,
+                        City = b.CityName,
+                        Phone = b.TelePhone,
+                        Mobile = b.MobilePhone,
+                        Address = b.Address,
+                        Status = b.IsActive ? "فعال" : "غیرفعال",
+                        IsEmpty = false
+                    }).ToList();
+                });
+
+                AllBranches = new ObservableCollection<BranchItem>(items);
+
+                ApplyFilters();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "خطا در لود شعبه‌ها", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                AllBranches = new ObservableCollection<BranchItem>();
+
+                ApplyFilters();
+            }
+            finally
+            {
+                ShowLoading(false);
             }
         }
 
-        private void LoadTestData()
+        private void FillEmptyRows()
         {
-            AllBranches = new ObservableCollection<BranchItem>
+            FilteredBranches = new ObservableCollection<BranchItem>();
+
+            for (int i = 1; i <= _pageSize; i++)
             {
-                new BranchItem { RowNumber = 1, RegisterDate = "۱۴۰۳/۰۶/۱۰", UniqueId = "BR-1001-001", BranchType = "اصلی", CompanyName = "تعادل سامانه پارس", BranchName = "دفتر مرکزی", RegistrationNumber = "۴۸۵۲۱", BranchCode = "۱۰۰۱", Province = "تهران", City = "تهران", Phone = "۰۲۱۸۸۶۵۴۳۲۱", Mobile = "۰۹۱۲۱۲۳۴۵۶۷", Address = "تهران، خیابان ولیعصر، بالاتر از میدان ولیعصر، پلاک ۱۲۳", Status = "فعال", IsEmpty = false },
+                FilteredBranches.Add(new BranchItem
+                {
+                    RowNumber = i,
+                    IsEmpty = true
+                });
+            }
 
-                new BranchItem { RowNumber = 2, RegisterDate = "۱۴۰۳/۰۷/۱۵", UniqueId = "BR-1002-002", BranchType = "فرعی", CompanyName = "تعادل سامانه پارس", BranchName = "شعبه شمال", RegistrationNumber = "۴۸۵۲۲", BranchCode = "۱۰۰۲", Province = "مازندران", City = "ساری", Phone = "۰۱۱۳۳۲۲۱۱۴۴", Mobile = "۰۹۱۱۱۲۲۳۳۴۴", Address = "ساری، خیابان انقلاب، نبش کوچه ۱۲، طبقه ۲", Status = "فعال", IsEmpty = false },
+            BranchesDataGrid.ItemsSource = FilteredBranches;
+        }
 
-                new BranchItem { RowNumber = 3, RegisterDate = "۱۴۰۳/۰۸/۰۱", UniqueId = "BR-1003-003", BranchType = "فرعی", CompanyName = "تعادل سامانه پارس", BranchName = "شعبه جنوب", RegistrationNumber = "۴۸۵۲۳", BranchCode = "۱۰۰۳", Province = "فارس", City = "شیراز", Phone = "۰۷۱۳۲۲۳۳۴۴۵", Mobile = "۰۹۱۳۳۴۴۵۵۶۶", Address = "شیراز، خیابان زند، روبروی پارک شاعران، پلاک ۴۵", Status = "فعال", IsEmpty = false },
+        private void ShowLoading(bool show)
+        {
+            LoadingOverlay.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
+            BranchesDataGrid.IsHitTestVisible = !show;
+        }
+        private string ToPersianDate(object dateValue)
+        {
+            if (dateValue == null)
+                return "—";
 
-                new BranchItem { RowNumber = 4, RegisterDate = "۱۴۰۳/۰۸/۲۰", UniqueId = "BR-1004-004", BranchType = "اصلی", CompanyName = "تعادل سامانه پارس", BranchName = "انبار مرکزی", RegistrationNumber = "۴۸۵۲۴", BranchCode = "۱۰۰۴", Province = "اصفهان", City = "اصفهان", Phone = "۰۳۱۳۶۶۵۵۴۴۳", Mobile = "۰۹۱۴۴۵۵۶۶۷۷", Address = "اصفهان، شهرک صنعتی جی، بلوار اصلی، پلاک ۷۸", Status = "فعال", IsEmpty = false },
+            DateTime date;
 
-                new BranchItem { RowNumber = 5, RegisterDate = "۱۴۰۳/۰۹/۰۵", UniqueId = "BR-1005-005", BranchType = "فرعی", CompanyName = "تعادل سامانه پارس", BranchName = "شعبه غرب", RegistrationNumber = "۴۸۵۲۵", BranchCode = "۱۰۰۵", Province = "کرمانشاه", City = "کرمانشاه", Phone = "۰۸۳۳۸۳۲۲۱۱", Mobile = "۰۹۱۵۵۶۶۷۷۸۸", Address = "کرمانشاه، بلوار طاقبستان، پلاک ۳۲", Status = "غیرفعال", IsEmpty = false },
+            if (dateValue is DateTime dt)
+            {
+                date = dt;
+            }
+            else
+            {
+                if (!DateTime.TryParse(dateValue.ToString(), out date))
+                    return "—";
+            }
 
-                new BranchItem { RowNumber = 6, RegisterDate = "۱۴۰۳/۰۹/۱۸", UniqueId = "BR-1006-006", BranchType = "فرعی", CompanyName = "تعادل سامانه پارس", BranchName = "شعبه شرق", RegistrationNumber = "۴۸۵۲۶", BranchCode = "۱۰۰۶", Province = "خراسان رضوی", City = "مشهد", Phone = "۰۵۱۳۸۴۵۶۷۸۹", Mobile = "۰۹۱۶۶۷۷۸۸۹۹", Address = "مشهد، خیابان احمدآباد، بین احمدآباد ۲۰ و ۲۲، پلاک ۱۵", Status = "فعال", IsEmpty = false },
+            PersianCalendar pc = new PersianCalendar();
 
-                new BranchItem { RowNumber = 7, RegisterDate = "۱۴۰۳/۱۰/۰۲", UniqueId = "BR-1007-007", BranchType = "اصلی", CompanyName = "تعادل سامانه پارس", BranchName = "واحد تحقیق و توسعه", RegistrationNumber = "۴۸۵۲۷", BranchCode = "۱۰۰۷", Province = "تهران", City = "تهران", Phone = "۰۲۱۸۸۵۵۴۴۳۳", Mobile = "۰۹۱۸۸۹۹۰۰۱۱", Address = "تهران، پارک فناوری پردیس، خیابان دانش، پلاک ۷", Status = "فعال", IsEmpty = false },
+            int year = pc.GetYear(date);
+            int month = pc.GetMonth(date);
+            int day = pc.GetDayOfMonth(date);
 
-                new BranchItem { RowNumber = 8, RegisterDate = "۱۴۰۳/۱۱/۰۱", UniqueId = "BR-1008-008", BranchType = "فرعی", CompanyName = "تعادل سامانه پارس", BranchName = "شعبه جنوب غرب", RegistrationNumber = "۴۸۵۲۸", BranchCode = "۱۰۰۸", Province = "خوزستان", City = "اهواز", Phone = "۰۶۱۳۲۲۵۵۴۴۳", Mobile = "۰۹۱۹۹۰۰۱۱۲۲", Address = "اهواز، کیانپارس، خیابان ۳۵، پلاک ۱۲", Status = "فعال", IsEmpty = false },
+            return $"{year:0000}/{month:00}/{day:00}";
+        }
+        private void LoadData()
+        {
+            try
+            {
+                var branches = _branchApplication.GetBranches();
 
-                new BranchItem { RowNumber = 9, RegisterDate = "۱۴۰۳/۱۱/۲۰", UniqueId = "BR-1009-009", BranchType = "فرعی", CompanyName = "تعادل سامانه پارس", BranchName = "شعبه مرکز", RegistrationNumber = "۴۸۵۲۹", BranchCode = "۱۰۰۹", Province = "قم", City = "قم", Phone = "۰۲۵۳۶۶۵۵۴۴۳", Mobile = "۰۹۱۰۱۲۳۴۵۶۷", Address = "قم، بلوار امین، کوچه ۸، پلاک ۲۳", Status = "غیرفعال", IsEmpty = false },
 
-                new BranchItem { RowNumber = 10, RegisterDate = "۱۴۰۳/۱۲/۰۵", UniqueId = "BR-1010-010", BranchType = "اصلی", CompanyName = "تعادل سامانه پارس", BranchName = "واحد پشتیبانی", RegistrationNumber = "۴۸۵۳۰", BranchCode = "۱۰۱۰", Province = "البرز", City = "کرج", Phone = "۰۲۶۳۴۴۵۵۶۶۷", Mobile = "۰۹۲۲۳۳۴۴۵۵", Address = "کرج، مهرشهر، بلوار ارم، پلاک ۵۶", Status = "فعال", IsEmpty = false }
-            };
+                AllBranches = new ObservableCollection<BranchItem>(
+                    branches.Select((b, index) => new BranchItem
+                    {
+                        RowNumber = index + 1,
+                        RegisterDate = ToPersianDate(b.CreatedAt),
+                        UniqueId = b.Id.ToString(),
+                        BranchType = "—",
+                        CompanyName = b.CompanyId.ToString(),
+                        BranchName = b.Title,
+                        RegistrationNumber = b.RegisterNumber,
+                        BranchCode = b.Code,
+                        Province = b.ProvinceName,
+                        City = b.CityName,
+                        Phone = b.TelePhone,
+                        Mobile = b.MobilePhone,
+                        Address = b.Address,
+                        Status = b.IsActive ? "فعال" : "غیرفعال",
+                        IsEmpty = false
+                    })
+                )
+                {
+
+                };
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "خطا در لود شعبه‌ها");
+            }
         }
 
         private void ApplyFilters()
         {
-            if (AllBranches == null) return;
+            if (AllBranches == null)
+                return;
 
             var query = AllBranches.AsEnumerable();
 
@@ -71,35 +195,161 @@ namespace Taadol.Views
                 case "active":
                     query = query.Where(b => b.Status == "فعال");
                     break;
+
                 case "inactive":
                     query = query.Where(b => b.Status == "غیرفعال");
                     break;
             }
 
-            if (!string.IsNullOrWhiteSpace(_searchText))
-            {
-                query = query.Where(b =>
-                    b.CompanyName.Contains(_searchText) ||
-                    b.BranchName.Contains(_searchText) ||
-                    b.BranchCode.Contains(_searchText) ||
-                    b.City.Contains(_searchText));
-            }
-
             var filteredList = query.ToList();
-            for (int i = 0; i < filteredList.Count; i++)
-                filteredList[i].RowNumber = i + 1;
 
-            FilteredBranches = new ObservableCollection<BranchItem>(filteredList);
+            _totalPages = (int)Math.Ceiling(filteredList.Count / (double)_pageSize);
+
+            if (_totalPages < 1)
+                _totalPages = 1;
+
+            if (_currentPage > _totalPages)
+                _currentPage = _totalPages;
+
+            if (_currentPage < 1)
+                _currentPage = 1;
+
+            int skip = (_currentPage - 1) * _pageSize;
+
+            var pageItems = filteredList
+                .Skip(skip)
+                .Take(_pageSize)
+                .ToList();
+
+            for (int i = 0; i < pageItems.Count; i++)
+                pageItems[i].RowNumber = skip + i + 1;
+
+            FilteredBranches = new ObservableCollection<BranchItem>(pageItems);
 
             int realCount = FilteredBranches.Count;
+
             for (int i = realCount + 1; i <= _pageSize; i++)
             {
-                FilteredBranches.Add(new BranchItem { RowNumber = i, IsEmpty = true });
+                FilteredBranches.Add(new BranchItem
+                {
+                    RowNumber = i,
+                    IsEmpty = true
+                });
             }
 
             BranchesDataGrid.ItemsSource = FilteredBranches;
-        }
 
+            BuildPaginationButtons();
+        }
+        private void BuildPaginationButtons()
+        {
+            var pages = new ObservableCollection<PageItem>();
+
+            if (_totalPages <= 7)
+            {
+                for (int i = 1; i <= _totalPages; i++)
+                {
+                    pages.Add(new PageItem
+                    {
+                        PageNumber = i,
+                        PageNumberDisplay = ToPersianNumber(i),
+                        IsCurrent = i == _currentPage
+                    });
+                }
+
+                PageButtonsItemsControl.ItemsSource = pages;
+                return;
+            }
+
+            pages.Add(new PageItem
+            {
+                PageNumber = 1,
+                PageNumberDisplay = ToPersianNumber(1),
+                IsCurrent = _currentPage == 1
+            });
+
+            int middleStart = _currentPage - 1;
+            int middleEnd = _currentPage + 1;
+
+            if (_currentPage <= 3)
+            {
+                middleStart = 2;
+                middleEnd = 4;
+            }
+            else if (_currentPage >= _totalPages - 2)
+            {
+                middleStart = _totalPages - 3;
+                middleEnd = _totalPages - 1;
+            }
+
+            if (middleStart > 2)
+            {
+                pages.Add(new PageItem
+                {
+                    PageNumber = 0,
+                    PageNumberDisplay = "...",
+                    IsCurrent = false
+                });
+            }
+
+            for (int i = middleStart; i <= middleEnd; i++)
+            {
+                if (i > 1 && i < _totalPages)
+                {
+                    pages.Add(new PageItem
+                    {
+                        PageNumber = i,
+                        PageNumberDisplay = ToPersianNumber(i),
+                        IsCurrent = i == _currentPage
+                    });
+                }
+            }
+
+            if (middleEnd < _totalPages - 1)
+            {
+                pages.Add(new PageItem
+                {
+                    PageNumber = 0,
+                    PageNumberDisplay = "...",
+                    IsCurrent = false
+                });
+            }
+
+            pages.Add(new PageItem
+            {
+                PageNumber = _totalPages,
+                PageNumberDisplay = ToPersianNumber(_totalPages),
+                IsCurrent = _currentPage == _totalPages
+            });
+
+            PageButtonsItemsControl.ItemsSource = pages;
+        }
+        private string ToPersianNumber(int number)
+        {
+            string[] persianDigits = { "۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹" };
+
+            string result = "";
+
+            foreach (char c in number.ToString())
+                result += persianDigits[int.Parse(c.ToString())];
+
+            return result;
+        }
+        private void CheckBoxBorder_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            var border = sender as Border;
+            if (border?.DataContext is BranchItem item && !item.IsEmpty)
+            {
+                item.IsSelected = !item.IsSelected;
+                e.Handled = true;
+            }
+        }
+        public class PageItem
+        {
+            public int PageNumber { get; set; }
+            public string PageNumberDisplay { get; set; }
+            public bool IsCurrent { get; set; }
+        }
         private void FilterTab_Checked(object sender, RoutedEventArgs e)
         {
             if (sender is RadioButton rb)
@@ -107,18 +357,10 @@ namespace Taadol.Views
                 if (rb == tabAll) _currentFilter = "all";
                 else if (rb == tabActive) _currentFilter = "active";
                 else if (rb == tabInactive) _currentFilter = "inactive";
+
+                _currentPage = 1;
                 ApplyFilters();
             }
-        }
-
-        private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            ApplyFilters();
-        }
-
-        private void BtnMore_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("منوی بیشتر - شعبه‌ها", "عملیات", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void BtnDelete_Click(object sender, RoutedEventArgs e)
@@ -160,15 +402,44 @@ namespace Taadol.Views
             MessageBox.Show("فرم ثبت شعبه جدید", "شعبه جدید", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        private void BtnNextPage_Click(object sender, RoutedEventArgs e) => MessageBox.Show("صفحه بعدی");
-        private void BtnPrevPage_Click(object sender, RoutedEventArgs e) => MessageBox.Show("صفحه قبلی");
+        private void BtnMore_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("منوی بیشتر - شعبه‌ها", "عملیات", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        private void BtnNextPage_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentPage < _totalPages)
+            {
+                _currentPage++;
+                ApplyFilters();
+            }
+        }
+
+        private void BtnPrevPage_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentPage > 1)
+            {
+                _currentPage--;
+                ApplyFilters();
+            }
+        }
+
         private void BtnPage_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn && btn.Tag != null)
-                MessageBox.Show($"صفحه {btn.Tag}");
-        }
+            {
+                int pageNumber = Convert.ToInt32(btn.Tag);
 
+                if (pageNumber <= 0)
+                    return;
+
+                _currentPage = pageNumber;
+                ApplyFilters();
+            }
+        }
         private void BranchesDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e) { }
+
+        private void SearchBox_TextChanged(object sender, TextChangedEventArgs e) => ApplyFilters();
 
         private void RowCheckBox_Checked(object sender, RoutedEventArgs e)
         {
@@ -183,7 +454,7 @@ namespace Taadol.Views
         }
     }
 
-        public class BranchItem : INotifyPropertyChanged
+    public class BranchItem : INotifyPropertyChanged
     {
         private int _rowNumber;
         private bool _isSelected;
@@ -191,7 +462,12 @@ namespace Taadol.Views
         public int RowNumber
         {
             get => _rowNumber;
-            set { _rowNumber = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RowNumber))); PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RowNumberDisplay))); }
+            set
+            {
+                _rowNumber = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RowNumber)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RowNumberDisplay)));
+            }
         }
 
         public string RegisterDate { get; set; }
@@ -212,7 +488,11 @@ namespace Taadol.Views
         public bool IsSelected
         {
             get => _isSelected;
-            set { _isSelected = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsSelected))); }
+            set
+            {
+                _isSelected = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsSelected)));
+            }
         }
 
         public string RowNumberDisplay => RowNumber > 0 && !IsEmpty ? ToPersianNumber(RowNumber) : "";
@@ -229,19 +509,17 @@ namespace Taadol.Views
         public event PropertyChangedEventHandler PropertyChanged;
     }
 
-        public class InverseBooleanConverter : IValueConverter
+    public class InverseBooleanConverter : System.Windows.Data.IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            if (value is bool boolValue)
-                return !boolValue;
+            if (value is bool boolValue) return !boolValue;
             return true;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            if (value is bool boolValue)
-                return !boolValue;
+            if (value is bool boolValue) return !boolValue;
             return false;
         }
     }

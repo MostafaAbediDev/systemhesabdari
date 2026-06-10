@@ -28,7 +28,6 @@ namespace GeneralInfoManagement.Application
                 return operation.Failed("شعبه‌ای با این شناسه ملی قبلاً ثبت شده است.");
 
             var location = new Location(command.Latitude, command.Longitude);
-
             var branch = new Branches(
                 command.Title,
                 nationalId,
@@ -41,8 +40,8 @@ namespace GeneralInfoManagement.Application
                 location,
                 command.CompanyId,
                 command.TelePhone,
-                command.CityId,
-                command.ProvinceId);
+                command.ProvinceId,
+                command.CityId);
 
             _branchRepository.Create(branch);
             _branchRepository.SaveChanges();
@@ -78,19 +77,19 @@ namespace GeneralInfoManagement.Application
             var location = new Location(command.Latitude, command.Longitude);
 
             branch.Edit(
-                command.Title,
-                nationalId,
-                command.EconomicCode,
-                command.RegisterNumber,
-                command.Email,
-                command.MobilePhone,
-                command.Address,
-                command.PostCode,
-                location,
-                command.CompanyId,
-                command.TelePhone,
-                command.CityId,
-                command.ProvinceId);
+       command.Title,
+       nationalId,
+       command.EconomicCode,
+       command.RegisterNumber,
+       command.Email,
+       command.MobilePhone,
+       command.Address,
+       command.PostCode,
+       location,
+       command.CompanyId,
+       command.TelePhone,
+       command.ProvinceId,
+       command.CityId);
 
             var codeResult = _codeApplication.SetCode(new CreateCode
             {

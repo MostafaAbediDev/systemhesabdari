@@ -1044,7 +1044,7 @@
                 Value="10" />
     </Style>
     <Style x:Key="ModernTabButton"
-           TargetType="ToggleButton">
+           TargetType="RadioButton">
         <Setter Property="FontFamily"
                 Value="{StaticResource IRANSans}" />
         <Setter Property="FontSize"
@@ -1069,7 +1069,7 @@
                 Value="Hand" />
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="ToggleButton">
+                <ControlTemplate TargetType="RadioButton">
                     <Border x:Name="border"
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"

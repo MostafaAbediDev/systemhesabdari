@@ -115,19 +115,20 @@
                             Background="Transparent">
                         <svg:SvgViewbox Width="45"
                                         Height="45"
-                                        Source="/Assets/Icons/LOGO.svg"
+                                        FlowDirection="LeftToRight"
+                                        Source="/Assets/Icons/taa.svg"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Center" />
 
                     </Border>
-                    <TextBlock x:Name="LogoText"
+                    <!--<TextBlock x:Name="LogoText"
                                Text="تعادل"
                                FontSize="30"
                                FontWeight="DemiBold"
                                Foreground="#001242"
                                FontFamily="{StaticResource IRANSans}"
                                VerticalAlignment="Center"
-                               Margin="13,0,0,0" />
+                               Margin="13,0,0,0" />-->
                 </StackPanel>
 
                 
@@ -627,11 +628,15 @@
                                         <Border Style="{StaticResource SubmenuDivider}"
                                                 Margin="0,15,0,0" />
 
-                                        <Button Content="اطلاعات شرکت"
+                                        <Button Content="شرکت جدید"
                                                 Click="SubMenuClick"
                                                 Tag="company_info"
                                                 Style="{StaticResource SubmenuItem}" />
-
+                                        <Button Content="لیست شرکت‌ها"
+                                                Click="SubMenuClick"
+                                                Tag="company_list"
+                                                Style="{StaticResource SubmenuItem}" />
+                                        
                                         <Button Content="شعبه جدید"
                                                 Click="SubMenuClick"
                                                 Tag="branch_new"

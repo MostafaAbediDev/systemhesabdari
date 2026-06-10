@@ -53,6 +53,9 @@ namespace Taadol
                 case "service_new":
                     MainContent.Content = new NewServiceView();
                     break;
+                case "company_list":
+                    MainContent.Content = new CompanyListView();
+                    break;
 
                 case "person_new":
                     MainContent.Content = new NewPersonView();
