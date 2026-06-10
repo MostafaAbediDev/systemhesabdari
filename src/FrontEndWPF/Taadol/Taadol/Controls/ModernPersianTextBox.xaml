@@ -25,6 +25,7 @@
                          Padding="12,10"
                          VerticalContentAlignment="Center"
                          TextChanged="TextBox_TextChanged"
+                         PreviewTextInput="PART_TextBox_PreviewTextInput"
                          GotFocus="PART_TextBox_GotFocus"
                          LostFocus="PART_TextBox_LostFocus">
                     <TextBox.Template>

@@ -10,6 +10,7 @@
         MinWidth="1024"
         MinHeight="600"
         Background="#FFF8ED"
+        
         WindowStartupLocation="CenterScreen"
         Style="{StaticResource MainWindowStyle}"
         WindowState="Maximized">
@@ -120,32 +121,19 @@
                                  Panel.ZIndex="10"
                                  Loaded="Sidebar_Loaded" />
 
-        
         <Border x:Name="MainContentBorder"
+               
                 Grid.Row="1"
-                HorizontalAlignment="Left"
+                Padding="25,10,0,25"
                 Grid.Column="1"
                 Background="#FFF8ED"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
                 Visibility="Collapsed">
 
-            
-            
-            <ScrollViewer x:Name="MainScrollViewer"
-                          Grid.Row="1"
-                          Grid.Column="1"
-                          VerticalScrollBarVisibility="Auto"
-                          HorizontalScrollBarVisibility="Disabled"
-                          CanContentScroll="True">
+            <ContentControl x:Name="MainContent"
+                            VerticalAlignment="Top" />
 
-                
-                <ContentControl x:Name="MainContent"
-                                MinWidth="600"
-                                MaxWidth="1200"
-                                HorizontalAlignment="Center"   
-                    VerticalAlignment="Top" />
-
-            </ScrollViewer>
         </Border>
-
     </Grid>
 </Window>

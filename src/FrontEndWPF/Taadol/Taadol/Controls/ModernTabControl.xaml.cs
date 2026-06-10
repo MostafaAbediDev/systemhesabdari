@@ -12,10 +12,7 @@ namespace Taadol.Controls
 
         private void TabPricing_Checked(object sender, RoutedEventArgs e)
         {
-            if (TabInventory == null || TabTax == null) return;
-
-            TabInventory.IsChecked = false;
-            TabTax.IsChecked = false;
+            if (PricingContent == null || InventoryContent == null || TaxContent == null) return;
 
             PricingContent.Visibility = Visibility.Visible;
             InventoryContent.Visibility = Visibility.Collapsed;
@@ -24,10 +21,7 @@ namespace Taadol.Controls
 
         private void TabInventory_Checked(object sender, RoutedEventArgs e)
         {
-            if (TabPricing == null || TabTax == null) return;
-
-            TabPricing.IsChecked = false;
-            TabTax.IsChecked = false;
+            if (PricingContent == null || InventoryContent == null || TaxContent == null) return;
 
             PricingContent.Visibility = Visibility.Collapsed;
             InventoryContent.Visibility = Visibility.Visible;
@@ -36,10 +30,7 @@ namespace Taadol.Controls
 
         private void TabTax_Checked(object sender, RoutedEventArgs e)
         {
-            if (TabPricing == null || TabInventory == null) return;
-
-            TabPricing.IsChecked = false;
-            TabInventory.IsChecked = false;
+            if (PricingContent == null || InventoryContent == null || TaxContent == null) return;
 
             PricingContent.Visibility = Visibility.Collapsed;
             InventoryContent.Visibility = Visibility.Collapsed;

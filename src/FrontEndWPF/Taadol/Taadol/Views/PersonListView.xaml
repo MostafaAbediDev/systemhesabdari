@@ -495,6 +495,7 @@
                     <DataGrid x:Name="PersonsDataGrid"
                               CanUserSortColumns="False"
                               AutoGenerateColumns="False"
+                              MinHeight="496"
                               HeadersVisibility="Column"
                               GridLinesVisibility="All"
                               VerticalGridLinesBrush="#CCD0D9"
@@ -901,8 +902,207 @@
 
                         </DataGrid.Columns>
                     </DataGrid>
+                    <Border x:Name="LoadingOverlay"
+                            Background="#B8F8FAFC"
+                            Visibility="Collapsed"
+                            Panel.ZIndex="30">
 
-                    
+                        <Border Width="330"
+                                Height="170"
+                                Background="White"
+                                BorderBrush="#E2E8F0"
+                                BorderThickness="1"
+                                CornerRadius="22"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                FlowDirection="RightToLeft"
+                                Opacity="0.98"
+                                RenderTransformOrigin="0.5,0.5">
+
+                            <Border.RenderTransform>
+                                <ScaleTransform x:Name="LoaderCardScale"
+                                                ScaleX="0.96"
+                                                ScaleY="0.96" />
+                            </Border.RenderTransform>
+
+                            <Border.Effect>
+                                <DropShadowEffect Color="#2563EB"
+                                                  BlurRadius="32"
+                                                  ShadowDepth="0"
+                                                  Opacity="0.14" />
+                            </Border.Effect>
+
+                            <Grid Margin="28,22">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <!-- Icon / Modern Loading Mark -->
+                                <Grid Grid.Row="0"
+                                      Width="58"
+                                      Height="42"
+                                      HorizontalAlignment="Center"
+                                      Margin="0,0,0,14">
+
+                                    <Border Background="#F1F5FF"
+                                            CornerRadius="14" />
+
+                                    <StackPanel Orientation="Horizontal"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                FlowDirection="LeftToRight">
+
+                                        <Border Width="7"
+                                                Height="20"
+                                                CornerRadius="4"
+                                                Background="#2563EB"
+                                                Margin="3,0">
+                                            <Border.RenderTransform>
+                                                <ScaleTransform x:Name="BarOneScale"
+                                                                ScaleY="0.45"
+                                                                CenterY="10" />
+                                            </Border.RenderTransform>
+                                        </Border>
+
+                                        <Border Width="7"
+                                                Height="20"
+                                                CornerRadius="4"
+                                                Background="#3B82F6"
+                                                Margin="3,0">
+                                            <Border.RenderTransform>
+                                                <ScaleTransform x:Name="BarTwoScale"
+                                                                ScaleY="0.75"
+                                                                CenterY="10" />
+                                            </Border.RenderTransform>
+                                        </Border>
+
+                                        <Border Width="7"
+                                                Height="20"
+                                                CornerRadius="4"
+                                                Background="#60A5FA"
+                                                Margin="3,0">
+                                            <Border.RenderTransform>
+                                                <ScaleTransform x:Name="BarThreeScale"
+                                                                ScaleY="0.45"
+                                                                CenterY="10" />
+                                            </Border.RenderTransform>
+                                        </Border>
+
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- Main Text -->
+                                <TextBlock Grid.Row="1"
+                                           Text="در حال بارگذاری اطلاعات"
+                                           FontFamily="{StaticResource IRANSans}"
+                                           FontSize="15"
+                                           FontWeight="Bold"
+                                           Foreground="#001242"
+                                           HorizontalAlignment="Center" />
+
+                                <TextBlock Grid.Row="2"
+                                           Text="لطفاً چند لحظه صبر کنید..."
+                                           FontFamily="{StaticResource IRANSans}"
+                                           FontSize="12.5"
+                                           Foreground="#64748B"
+                                           Margin="0,7,0,16"
+                                           HorizontalAlignment="Center" />
+
+                                <!-- Minimal Moving Progress -->
+                                <Border Grid.Row="3"
+                                        Width="210"
+                                        Height="6"
+                                        CornerRadius="6"
+                                        Background="#EEF4FF"
+                                        ClipToBounds="True"
+                                        HorizontalAlignment="Center">
+
+                                    <Border Width="74"
+                                            Height="6"
+                                            CornerRadius="6"
+                                            HorizontalAlignment="Left">
+
+                                        <Border.Background>
+                                            <LinearGradientBrush StartPoint="0,0"
+                                                                 EndPoint="1,0">
+                                                <GradientStop Color="#93C5FD"
+                                                              Offset="0" />
+                                                <GradientStop Color="#2563EB"
+                                                              Offset="0.5" />
+                                                <GradientStop Color="#93C5FD"
+                                                              Offset="1" />
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+
+                                        <Border.RenderTransform>
+                                            <TranslateTransform x:Name="ProgressMove"
+                                                                X="-80" />
+                                        </Border.RenderTransform>
+                                    </Border>
+                                </Border>
+
+                                <Grid.Triggers>
+                                    <EventTrigger RoutedEvent="Grid.Loaded">
+                                        <BeginStoryboard>
+                                            <Storyboard RepeatBehavior="Forever">
+
+                                                <!-- Card soft breathing -->
+                                                <DoubleAnimation Storyboard.TargetName="LoaderCardScale"
+                                                                 Storyboard.TargetProperty="ScaleX"
+                                                                 From="0.96"
+                                                                 To="1"
+                                                                 Duration="0:0:0.55"
+                                                                 AutoReverse="True" />
+
+                                                <DoubleAnimation Storyboard.TargetName="LoaderCardScale"
+                                                                 Storyboard.TargetProperty="ScaleY"
+                                                                 From="0.96"
+                                                                 To="1"
+                                                                 Duration="0:0:0.55"
+                                                                 AutoReverse="True" />
+
+                                                <!-- Equalizer animation -->
+                                                <DoubleAnimation Storyboard.TargetName="BarOneScale"
+                                                                 Storyboard.TargetProperty="ScaleY"
+                                                                 From="0.45"
+                                                                 To="1"
+                                                                 Duration="0:0:0.45"
+                                                                 AutoReverse="True" />
+
+                                                <DoubleAnimation Storyboard.TargetName="BarTwoScale"
+                                                                 Storyboard.TargetProperty="ScaleY"
+                                                                 From="0.75"
+                                                                 To="0.35"
+                                                                 Duration="0:0:0.45"
+                                                                 BeginTime="0:0:0.12"
+                                                                 AutoReverse="True" />
+
+                                                <DoubleAnimation Storyboard.TargetName="BarThreeScale"
+                                                                 Storyboard.TargetProperty="ScaleY"
+                                                                 From="0.45"
+                                                                 To="1"
+                                                                 Duration="0:0:0.45"
+                                                                 BeginTime="0:0:0.24"
+                                                                 AutoReverse="True" />
+
+                                                <!-- Moving progress highlight -->
+                                                <DoubleAnimation Storyboard.TargetName="ProgressMove"
+                                                                 Storyboard.TargetProperty="X"
+                                                                 From="-80"
+                                                                 To="220"
+                                                                 Duration="0:0:1.25" />
+
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </Grid.Triggers>
+
+                            </Grid>
+                        </Border>
+                    </Border>
                     <Ellipse Style="{StaticResource EllipseLeft}" />
 
                     
@@ -965,190 +1165,67 @@
                             </Button.Template>
                         </Button>
 
-                        <Button Width="32"
-                                Height="32"
-                                Cursor="Hand"
-                                Click="BtnPage_Click"
-                                Tag="10">
-                            <Button.Template>
-                                <ControlTemplate TargetType="Button">
-                                    <Border x:Name="bd"
-                                            Background="Transparent"
-                                            CornerRadius="6">
-                                        <TextBlock Text="۱۰"
-                                                   FontSize="13"
-                                                   Foreground="#94A3B8"
-                                                   FontFamily="{StaticResource IRANSans}"
-                                                   HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center" />
-                                    </Border>
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsMouseOver"
-                                                 Value="True">
-                                            <Setter TargetName="bd"
-                                                    Property="Background"
-                                                    Value="#F5F7FA" />
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </Button.Template>
-                        </Button>
 
-                        <Border Width="28"
-                                Height="32">
-                            <TextBlock Text="..."
-                                       FontSize="14"
-                                       Foreground="#94A3B8"
-                                       FontFamily="{StaticResource IRANSans}"
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center" />
-                        </Border>
+                        <ItemsControl x:Name="PageButtonsItemsControl">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
 
-                        <Button Width="32"
-                                Height="32"
-                                Cursor="Hand"
-                                Click="BtnPage_Click"
-                                Tag="5">
-                            <Button.Template>
-                                <ControlTemplate TargetType="Button">
-                                    <Border x:Name="bd"
-                                            Background="Transparent"
-                                            CornerRadius="6">
-                                        <TextBlock Text="۵"
-                                                   FontSize="13"
-                                                   Foreground="#94A3B8"
-                                                   FontFamily="{StaticResource IRANSans}"
-                                                   HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center" />
-                                    </Border>
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsMouseOver"
-                                                 Value="True">
-                                            <Setter TargetName="bd"
-                                                    Property="Background"
-                                                    Value="#F5F7FA" />
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </Button.Template>
-                        </Button>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Width="32"
+                                            Height="32"
+                                            Cursor="Hand"
+                                            Click="BtnPage_Click"
+                                            Tag="{Binding PageNumber}">
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="bd"
+                                                        Background="Transparent"
+                                                        CornerRadius="6">
+                                                    <TextBlock Text="{Binding PageNumberDisplay}"
+                                                               FontSize="13"
+                                                               FontFamily="{StaticResource IRANSans}"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="Foreground"
+                                                                        Value="#94A3B8" />
+                                                                <Setter Property="FontWeight"
+                                                                        Value="Normal" />
 
-                        <Button Width="32"
-                                Height="32"
-                                Cursor="Hand"
-                                Click="BtnPage_Click"
-                                Tag="4">
-                            <Button.Template>
-                                <ControlTemplate TargetType="Button">
-                                    <Border x:Name="bd"
-                                            Background="Transparent"
-                                            CornerRadius="6">
-                                        <TextBlock Text="۴"
-                                                   FontSize="13"
-                                                   Foreground="#94A3B8"
-                                                   FontFamily="{StaticResource IRANSans}"
-                                                   HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center" />
-                                    </Border>
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsMouseOver"
-                                                 Value="True">
-                                            <Setter TargetName="bd"
-                                                    Property="Background"
-                                                    Value="#F5F7FA" />
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </Button.Template>
-                        </Button>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsCurrent}"
+                                                                                 Value="True">
+                                                                        <Setter Property="Foreground"
+                                                                                Value="#001242" />
+                                                                        <Setter Property="FontWeight"
+                                                                                Value="Bold" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                </Border>
 
-                        <Button Width="32"
-                                Height="32"
-                                Cursor="Hand"
-                                Click="BtnPage_Click"
-                                Tag="3">
-                            <Button.Template>
-                                <ControlTemplate TargetType="Button">
-                                    <Border x:Name="bd"
-                                            Background="Transparent"
-                                            CornerRadius="6">
-                                        <TextBlock Text="۳"
-                                                   FontSize="13"
-                                                   Foreground="#94A3B8"
-                                                   FontFamily="{StaticResource IRANSans}"
-                                                   HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center" />
-                                    </Border>
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsMouseOver"
-                                                 Value="True">
-                                            <Setter TargetName="bd"
-                                                    Property="Background"
-                                                    Value="#F5F7FA" />
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </Button.Template>
-                        </Button>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver"
+                                                             Value="True">
+                                                        <Setter TargetName="bd"
+                                                                Property="Background"
+                                                                Value="#F5F7FA" />
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
 
-                        <Button Width="32"
-                                Height="32"
-                                Cursor="Hand"
-                                Click="BtnPage_Click"
-                                Tag="2">
-                            <Button.Template>
-                                <ControlTemplate TargetType="Button">
-                                    <Border x:Name="bd"
-                                            Background="Transparent"
-                                            CornerRadius="6">
-                                        <TextBlock Text="۲"
-                                                   FontSize="13"
-                                                   Foreground="#94A3B8"
-                                                   FontFamily="{StaticResource IRANSans}"
-                                                   HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center" />
-                                    </Border>
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsMouseOver"
-                                                 Value="True">
-                                            <Setter TargetName="bd"
-                                                    Property="Background"
-                                                    Value="#F5F7FA" />
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </Button.Template>
-                        </Button>
-
-                        <Button Width="32"
-                                Height="32"
-                                Cursor="Hand"
-                                Click="BtnPage_Click"
-                                Tag="1">
-                            <Button.Template>
-                                <ControlTemplate TargetType="Button">
-                                    <Border x:Name="bd"
-                                            Background="Transparent"
-                                            CornerRadius="6">
-                                        <TextBlock Text="۱"
-                                                   FontSize="13"
-                                                   FontWeight="Bold"
-                                                   Foreground="#001242"
-                                                   FontFamily="{StaticResource IRANSans}"
-                                                   HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center" />
-                                    </Border>
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsMouseOver"
-                                                 Value="True">
-                                            <Setter TargetName="bd"
-                                                    Property="Background"
-                                                    Value="#F5F7FA" />
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </Button.Template>
-                        </Button>
 
                         <Button Width="34"
                                 Height="34"

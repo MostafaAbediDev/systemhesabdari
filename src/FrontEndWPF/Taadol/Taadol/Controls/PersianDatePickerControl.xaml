@@ -5,33 +5,50 @@
 
     <StackPanel Orientation="Horizontal">
 
-        
+
         <TextBox x:Name="PART_Day"
                  Style="{StaticResource ModernPersianTextBox}"
-                 Width="50"
+                 Width="55"
+                 Height="45"
                  Tag="روز"
                  MaxLength="2"
+                 FontSize="13"
+                 Padding="0"
+                 TextAlignment="Center"
+                 HorizontalContentAlignment="Center"
+                 VerticalContentAlignment="Center"
                  TextChanged="DayTextBox_TextChanged"
                  GotFocus="DateTextBox_GotFocus" />
-        <Rectangle Width="3" />
 
-        
+        <Rectangle Width="4" />
+
         <TextBox x:Name="PART_Month"
                  Style="{StaticResource ModernPersianTextBox}"
                  Width="55"
+                 Height="45"
                  Tag="ماه"
                  MaxLength="2"
+                 FontSize="13"
+                 Padding="0"
+                 TextAlignment="Center"
+                 HorizontalContentAlignment="Center"
+                 VerticalContentAlignment="Center"
                  TextChanged="MonthTextBox_TextChanged"
                  GotFocus="DateTextBox_GotFocus" />
 
-        <Rectangle Width="3" />
+        <Rectangle Width="4" />
 
-        
         <TextBox x:Name="PART_Year"
                  Style="{StaticResource ModernPersianTextBox}"
-                 Width="70"
+                 Width="75"
+                 Height="45"
                  Tag="سال"
                  MaxLength="4"
+                 FontSize="13"
+                 Padding="0"
+                 TextAlignment="Center"
+                 HorizontalContentAlignment="Center"
+                 VerticalContentAlignment="Center"
                  TextChanged="YearTextBox_TextChanged"
                  GotFocus="DateTextBox_GotFocus" />
 
