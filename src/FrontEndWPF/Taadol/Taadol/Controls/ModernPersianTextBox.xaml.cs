@@ -1,11 +1,27 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-
+using System.Text.RegularExpressions;
+using System.Windows.Input;
 namespace Taadol.Controls
 {
+    public enum ModernTextBoxInputType
+    {
+        Text,
+        Number,
+        Letters
+    }
     public partial class ModernPersianTextBox : UserControl
     {
+        public static readonly DependencyProperty InputTypeProperty =
+    DependencyProperty.Register(nameof(InputType), typeof(ModernTextBoxInputType), typeof(ModernPersianTextBox),
+        new PropertyMetadata(ModernTextBoxInputType.Text));
+
+        public ModernTextBoxInputType InputType
+        {
+            get => (ModernTextBoxInputType)GetValue(InputTypeProperty);
+            set => SetValue(InputTypeProperty, value);
+        }
         public static readonly DependencyProperty TextProperty =
             DependencyProperty.Register(nameof(Text), typeof(string), typeof(ModernPersianTextBox),
                 new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnTextChanged));
@@ -35,12 +51,49 @@ namespace Taadol.Controls
             get => (string)GetValue(SuffixProperty);
             set => SetValue(SuffixProperty, value);
         }
+        private void PART_TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = !IsInputAllowed(e.Text);
+        }
 
+        private void OnPaste(object sender, DataObjectPastingEventArgs e)
+        {
+            if (!e.DataObject.GetDataPresent(typeof(string)))
+            {
+                e.CancelCommand();
+                return;
+            }
+
+            string pastedText = e.DataObject.GetData(typeof(string)) as string;
+
+            if (!IsInputAllowed(pastedText))
+                e.CancelCommand();
+        }
+
+        private bool IsInputAllowed(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return true;
+
+            switch (InputType)
+            {
+                case ModernTextBoxInputType.Number:
+                    return Regex.IsMatch(input, @"^[0-9۰-۹]+$");
+
+                case ModernTextBoxInputType.Letters:
+                    return Regex.IsMatch(input, @"^[\p{L}\s]+$");
+
+                case ModernTextBoxInputType.Text:
+                default:
+                    return true;
+            }
+        }
         public ModernPersianTextBox()
         {
             InitializeComponent();
             UpdatePlaceholderVisibility();
             UpdateSuffixVisibility();
+            DataObject.AddPastingHandler(PART_TextBox, OnPaste);
         }
 
         private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

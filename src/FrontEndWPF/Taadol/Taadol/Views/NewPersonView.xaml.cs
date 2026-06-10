@@ -76,12 +76,7 @@ namespace Taadol.Views
         {
             InitializeComponent();
             AdditionalBankAccountsPanel.ItemsSource = _bankAccounts;
-            cmbCategory.ItemsSource = BuildTree();
-            cmbCategory.AddRootCommand = new RelayCommand(_ => AddRoot());
-            cmbCategory.AddChildCommand = new RelayCommand(item => AddChild((TreeComboItem)item));
-            cmbCategory.EditCommand = new RelayCommand(item => Edit((TreeComboItem)item));
-            cmbCategory.DeleteCommand = new RelayCommand(item => Delete((TreeComboItem)item));
-                                                                                                                                                                                                                                                            
+                                                                                                                                                           
                                 }
 
         private void Button_Click(object sender, RoutedEventArgs e)

@@ -101,10 +101,9 @@ namespace Taadol.Controls
             int month = 0;
             int day = 0;
 
-            bool yearOk = int.TryParse(PART_Year.Text, out year);
-            bool monthOk = int.TryParse(PART_Month.Text, out month);
-            bool dayOk = int.TryParse(PART_Day.Text, out day);
-
+            bool yearOk = int.TryParse(NormalizeDigits(PART_Year.Text), out year);
+            bool monthOk = int.TryParse(NormalizeDigits(PART_Month.Text), out month);
+            bool dayOk = int.TryParse(NormalizeDigits(PART_Day.Text), out day);
             if (!yearOk || !monthOk || !dayOk)
             {
                 SelectedDate = null;
@@ -113,6 +112,7 @@ namespace Taadol.Controls
 
             try
             {
+
                 SelectedDate = _pc.ToDateTime(year, month, day, 0, 0, 0, 0);
                 RaiseEvent(new RoutedEventArgs(DateChangedEvent, this));
             }
@@ -121,7 +121,33 @@ namespace Taadol.Controls
                 SelectedDate = null;
             }
         }
+        private string NormalizeDigits(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+                return "";
 
+            return input
+                .Replace("۰", "0")
+                .Replace("۱", "1")
+                .Replace("۲", "2")
+                .Replace("۳", "3")
+                .Replace("۴", "4")
+                .Replace("۵", "5")
+                .Replace("۶", "6")
+                .Replace("۷", "7")
+                .Replace("۸", "8")
+                .Replace("۹", "9")
+                .Replace("٠", "0")
+                .Replace("١", "1")
+                .Replace("٢", "2")
+                .Replace("٣", "3")
+                .Replace("٤", "4")
+                .Replace("٥", "5")
+                .Replace("٦", "6")
+                .Replace("٧", "7")
+                .Replace("٨", "8")
+                .Replace("٩", "9");
+        }
 
         private void FilterNumeric(TextBox txt, int maxLen)
         {

@@ -351,13 +351,13 @@
                                 Margin="0,0,0,10"
                                 HorizontalAlignment="Left">
                             <StackPanel Orientation="Horizontal">
-                                <ToggleButton Content="قیمت دهی"
+                                <RadioButton Content="قیمت دهی"
                                               Style="{StaticResource ModernTabButton}"
                                               Margin="10,0,6,0"
                                               x:Name="TabPricing"
                                               IsChecked="True"
                                               Checked="TabPricing_Checked" />
-                                <ToggleButton Content="مالیات"
+                                <RadioButton Content="مالیات"
                                               Style="{StaticResource ModernTabButton}"
                                               x:Name="TabTax"
                                               Margin="10,0,10,0"

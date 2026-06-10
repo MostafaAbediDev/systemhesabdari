@@ -28,7 +28,6 @@ namespace GeneralInfoManagement.Application
                 return operation.Failed("شعبه‌ای با این شناسه ملی قبلاً ثبت شده است.");
 
             var location = new Location(command.Latitude, command.Longitude);
-
             var branch = new Branches(
                 command.Title,
                 nationalId,
