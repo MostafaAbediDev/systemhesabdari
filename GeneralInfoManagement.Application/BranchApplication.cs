@@ -41,8 +41,8 @@ namespace GeneralInfoManagement.Application
                 location,
                 command.CompanyId,
                 command.TelePhone,
-                command.CityId,
-                command.ProvinceId);
+                command.ProvinceId,
+                command.CityId);
 
             _branchRepository.Create(branch);
             _branchRepository.SaveChanges();
@@ -89,8 +89,8 @@ namespace GeneralInfoManagement.Application
                 location,
                 command.CompanyId,
                 command.TelePhone,
-                command.CityId,
-                command.ProvinceId);
+                command.ProvinceId,
+                command.CityId);
 
             var codeResult = _codeApplication.SetCode(new CreateCode
             {
