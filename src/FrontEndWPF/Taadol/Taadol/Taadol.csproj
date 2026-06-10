@@ -42,6 +42,7 @@
     <None Remove="Assets\Icons\newdoc.svg" />
     <None Remove="Assets\Icons\newdoc21.svg" />
     <None Remove="Assets\Icons\newrepo.svg" />
+    <None Remove="Assets\Icons\Plus.svg" />
     <None Remove="Assets\Icons\profile-circle.svg" />
     <None Remove="Assets\Icons\profile.svg" />
     <None Remove="Assets\Icons\profile_u.svg" />
@@ -53,6 +54,7 @@
     <None Remove="Assets\Icons\search.svg" />
     <None Remove="Assets\Icons\share.svg" />
     <None Remove="Assets\Icons\share_u.svg" />
+    <None Remove="Assets\Icons\taa.svg" />
     <None Remove="Assets\Icons\tempsave.svg" />
     <None Remove="Assets\Icons\trash.svg" />
     <None Remove="Fonts\IRANSansXFaNum-Black.ttf" />
@@ -71,6 +73,8 @@
   <ItemGroup>
     <PackageReference Include="MaterialDesignColors" Version="2.1.4" />
     <PackageReference Include="MaterialDesignThemes" Version="4.9.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="11.0.0-preview.4.26230.115" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="11.0.0-preview.4.26230.115" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="SharpVectors" Version="1.8.5" />
     <PackageReference Include="SharpVectors.Wpf" Version="1.8.5" />
@@ -176,6 +180,9 @@
     <Content Include="Assets\Icons\newrepo.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\Icons\Plus.svg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\Icons\profile-circle.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -209,12 +216,24 @@
     <Content Include="Assets\Icons\share_u.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\Icons\taa.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\Icons\tempsave.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Icons\trash.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <ProjectReference Include="..\..\..\..\CodeManagement.Configuration\CodeManagement.Configuration.csproj" />
+    <ProjectReference Include="..\..\..\..\GeneralInfoManagement.Application.Contract\GeneralInfoManagement.Application.Contract.csproj" />
+    <ProjectReference Include="..\..\..\..\GeneralInfoManagement.Application\GeneralInfoManagement.Application.csproj" />
+    <ProjectReference Include="..\..\..\..\GeneralInfoManagement.Configuration\GeneralInfoManagement.Configuration.csproj" />
+    <ProjectReference Include="..\..\..\..\PersonManagement.Application.Contract\PersonManagement.Application.Contract.csproj" />
+    <ProjectReference Include="..\..\..\..\PersonManagement.Application\PersonManagement.Application.csproj" />
+    <ProjectReference Include="..\..\..\..\PersonManagement.Configuration\PersonManagement.Configuration.csproj" />
+    <ProjectReference Include="..\..\..\..\PersonManagement.Domain\PersonManagement.Domain.csproj" />
+    <ProjectReference Include="..\..\..\..\PersonManagement.Infrastructure.EFCore\PersonManagement.Infrastructure.EFCore.csproj" />
     <Resource Include="Fonts\IRANSansXFaNum-Black.ttf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>

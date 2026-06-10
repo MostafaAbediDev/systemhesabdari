@@ -7,7 +7,7 @@
 
     <UserControl.Resources>
         <Style x:Key="ModernTabButton"
-               TargetType="ToggleButton">
+               TargetType="RadioButton">
             <Setter Property="FontFamily"
                     Value="{StaticResource IRANSans}" />
             <Setter Property="FontSize"
@@ -32,7 +32,7 @@
                     Value="Hand" />
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="ToggleButton">
+                    <ControlTemplate TargetType="RadioButton">
                         <Border x:Name="border"
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
@@ -80,24 +80,27 @@
                     Margin="0,0,0,10"
                     HorizontalAlignment="Center">
                 <StackPanel Orientation="Horizontal">
-                    <ToggleButton Content="تماس و آدرس"
-                                  Style="{StaticResource ModernTabButton}"
-                                  Margin="10,0,6,0"
-                                  IsChecked="True"
-                                  x:Name="TabPricing"
-                                  Checked="TabPricing_Checked" />
+                    <RadioButton Content="تماس و آدرس"
+                                 Style="{StaticResource ModernTabButton}"
+                                 Margin="10,0,6,0"
+                                 IsChecked="True"
+                                 GroupName="ModernTabs"
+                                 x:Name="TabPricing"
+                                 Checked="TabPricing_Checked" />
 
-                    <ToggleButton Content="حساب های بانکی"
-                                  Style="{StaticResource ModernTabButton}"
-                                  Margin="10,0,6,0"
-                                  x:Name="TabInventory"
-                                  Checked="TabInventory_Checked" />
+                    <RadioButton Content="حساب های بانکی"
+                                 Style="{StaticResource ModernTabButton}"
+                                 Margin="10,0,6,0"
+                                 GroupName="ModernTabs"
+                                 x:Name="TabInventory"
+                                 Checked="TabInventory_Checked" />
 
-                    <ToggleButton Content="مالیات"
-                                  Style="{StaticResource ModernTabButton}"
-                                  Margin="10,0,6,0"
-                                  x:Name="TabTax"
-                                  Checked="TabTax_Checked" />
+                    <RadioButton Content="مالیات"
+                                 Style="{StaticResource ModernTabButton}"
+                                 Margin="10,0,6,0"
+                                 GroupName="ModernTabs"
+                                 x:Name="TabTax"
+                                 Checked="TabTax_Checked" />
                 </StackPanel>
             </Border>
 

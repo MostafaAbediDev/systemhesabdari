@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="11.0.0-preview.4.26230.115" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\01_FrameWork\01_FrameWork.csproj" />
     <ProjectReference Include="..\GeneralInfoManagement.Application.Contract\GeneralInfoManagement.Application.Contract.csproj" />
   </ItemGroup>

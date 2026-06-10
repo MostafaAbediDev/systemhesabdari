@@ -13,10 +13,10 @@
         <Border CornerRadius="12"
                 ClipToBounds="True"
                 Background="#ffffff"
-                Margin="24,0">
+                Margin="0">
             <StackPanel>
 
-                
+
                 <Grid Margin="10,15,10,12">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -31,7 +31,7 @@
                                         Height="14"
                                         Source="/Assets/Icons/arrow-right.svg"
                                         Margin="10,0,10,0" />
-                        <TextBlock Text="اطلاعات شرکت"
+                        <TextBlock Text="ثبت شرکت"
                                    FontSize="18"
                                    FontWeight="Bold"
                                    FontFamily="{StaticResource IRANSans}"
@@ -57,7 +57,7 @@
                     </StackPanel>
                 </Grid>
 
-                
+
                 <Border Height="1"
                         Margin="7,0,7,2">
                     <Border.Background>
@@ -83,7 +83,7 @@
                     </Border.Background>
                 </Border>
 
-                
+
                 <Border Style="{StaticResource CardPanel}">
                     <Grid Grid.IsSharedSizeScope="True">
                         <Grid.ColumnDefinitions>
@@ -92,7 +92,7 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        
+
                         <Grid Grid.Column="0">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
@@ -100,24 +100,12 @@
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
-                            
+
                             <StackPanel Grid.Row="0"
                                         Margin="0,0,0,16">
-                                <TextBlock Text="شناسه یکتا"
-                                           Style="{StaticResource FormLabel}" />
-                                <StackPanel Orientation="Horizontal">
-                                    <controls:ModernPersianTextBox Width="200"
-                                                                   Text="{Binding UniqueId, UpdateSourceTrigger=PropertyChanged}"
-                                                                   Placeholder="۱۲۳۴" />
-                                    <controls:ToggleSwitchControl Margin="12,0,0,0"
-                                                                  FirstLabel="اتوماتیک"
-                                                                  SecondLabel="دستی"
-                                                                  IsFirstSelected="True"
-                                                                  SelectionChanged="UniqueIdToggle_SelectionChanged" />
-                                </StackPanel>
-                            </StackPanel>
+                             </StackPanel>
 
-                            
+
                             <Grid Grid.Row="1"
                                   Margin="0,0,0,16">
                                 <Grid.ColumnDefinitions>
@@ -130,20 +118,22 @@
                                     <TextBlock Text="نام شرکت / کسب و کار"
                                                Style="{StaticResource FormLabel}" />
                                     <controls:ModernPersianTextBox Text="{Binding CompanyName, UpdateSourceTrigger=PropertyChanged}"
+                                                                   Width="350"
                                                                    Placeholder="ایران خودرو" />
                                 </StackPanel>
 
                                 <StackPanel Grid.Column="2"
-                                            VerticalAlignment="Bottom"
-                                            Margin="0,0,0,4">
-                                    <ToggleButton Content=".شعبه فعال است"
+                                            VerticalAlignment="Center">
+                                    <TextBlock Text=""
+                                               Style="{StaticResource FormLabel}" />
+                                    <ToggleButton Content=".شرکت فعال است"
                                                   FlowDirection="LeftToRight"
                                                   Style="{StaticResource StatusToggleButton}"
                                                   IsChecked="{Binding IsBranchActive}" />
                                 </StackPanel>
                             </Grid>
 
-                            
+
                             <Grid Grid.Row="2"
                                   Margin="0,0,0,8">
                                 <Grid.ColumnDefinitions>
@@ -156,6 +146,8 @@
                                     <TextBlock Text="نام رسمی ثبتی"
                                                Style="{StaticResource FormLabel}" />
                                     <controls:ModernPersianTextBox Text="{Binding OfficialName, UpdateSourceTrigger=PropertyChanged}"
+                                                                   Width="350"
+                                                                   InputType="Letters"
                                                                    Placeholder="ایران خودرو" />
                                 </StackPanel>
 
@@ -170,7 +162,7 @@
 
                         </Grid>
 
-                        
+
                         <StackPanel Grid.Column="2"
                                     VerticalAlignment="Top"
                                     HorizontalAlignment="Center">
@@ -185,8 +177,8 @@
                     </Grid>
                 </Border>
 
-                
-                <Grid Margin="0,2,0,5">
+
+                <Grid Margin="0,2,0,20">
                     <Ellipse Width="17"
                              Margin="-9,0,0,0"
                              Height="25"

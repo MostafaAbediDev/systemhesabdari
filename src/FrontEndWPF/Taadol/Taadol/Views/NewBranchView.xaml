@@ -55,7 +55,7 @@
 
                         <controls:IconButton ButtonText="ثبت"
                                              IconSource="/Assets/Icons/save.svg"
-                                             ButtonCommand="{Binding EditCommand}"
+                                             ButtonCommand="{Binding SaveCommand}"
                                              ButtonBackground="#2667FF" />
 
                     </StackPanel>
@@ -109,9 +109,11 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <controls:ModernPersianTextBox Grid.Column="0"
-                                                               Text="{Binding Username}"
+                                                               Text="{Binding UniqueCode, UpdateSourceTrigger=PropertyChanged}"
+                                                               InputType="Number"
                                                                FlowDirection="LeftToRight"
-                                                               Placeholder="1234" />
+                                                               Placeholder="1234"
+                                                               IsEnabled="{Binding IsUniqueCodeManual}" />
 
                                 <!--<TextBox Grid.Column="0"
                                          Text="{Binding CurrentProduct.AccountCode, UpdateSourceTrigger=PropertyChanged}"
@@ -119,14 +121,12 @@
                                          FontFamily="{StaticResource IRANSans}"
                                   
                                        />-->
-
                                 <controls:ToggleSwitchControl Margin="12,0,0,0"
                                                               FirstLabel="اتوماتیک"
                                                               SecondLabel="دستی"
                                                               IsFirstSelected="True"
                                                               Grid.Column="1"
-                                                              />
-
+                                                              SelectionChanged="UniqueCodeMode_SelectionChanged" />
                                 <!--<controls:ToggleRadioControl CheckedLabel="فعال"
                                                              UncheckedLabel="غیرفعال"
                                                              FlowDirection="LeftToRight"
@@ -141,17 +141,66 @@
                                        Style="{StaticResource FormLabel}" />
                             <StackPanel Orientation="Horizontal"
                                         Margin="0,0,0,8">
-                                <ComboBox Style="{StaticResource SearchableComboBox}"
-                                          Tag="جستجو"
-                                          Margin="0,0,0,0"
-                                          Width="315"
-                                          ItemContainerStyle="{StaticResource SearchableComboBoxItem}"
-                                          SelectionChanged="ComboBox_SelectionChanged">
-                                    <ComboBoxItem Content="گزینه ۱" />
-                                    <ComboBoxItem Content="گزینه ۲" />
-                                    <ComboBoxItem Content="گزینه ۳" />
-                                </ComboBox>
+                                <Grid Width="315">
+                                    <ComboBox x:Name="CompanyComboBox"
+                                              Style="{StaticResource SearchableComboBox}"
+                                              Tag="جستجوی شرکت"
+                                              Width="315"
+                                              ItemsSource="{Binding Companies}"
+                                              DisplayMemberPath="Title"
+                                              SelectedValuePath="Id"
+                                              SelectedValue="{Binding SelectedCompanyId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                              ItemContainerStyle="{StaticResource SearchableComboBoxItem}" />
 
+                                    <!-- لودینگ روی قسمت فلش کمبو -->
+                                    <Border x:Name="CompanyComboLoading"
+                                            Width="42"
+                                            Height="42"
+                                            Background="White"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Center"
+                                            Visibility="Collapsed"
+                                            IsHitTestVisible="False"
+                                            CornerRadius="8">
+
+                                        <Grid Width="22"
+                                              Height="22"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              RenderTransformOrigin="0.5,0.5">
+
+                                            <Grid.RenderTransform>
+                                                <RotateTransform x:Name="CompanyComboSpinnerRotate"
+                                                                 Angle="0" />
+                                            </Grid.RenderTransform>
+
+                                            <Ellipse Width="20"
+                                                     Height="20"
+                                                     Stroke="#D4E0FF"
+                                                     StrokeThickness="3" />
+
+                                            <Path Stroke="#2667FF"
+                                                  StrokeThickness="3"
+                                                  StrokeStartLineCap="Round"
+                                                  StrokeEndLineCap="Round"
+                                                  Data="M 11,1 A 10,10 0 0 1 21,11" />
+
+                                            <Grid.Triggers>
+                                                <EventTrigger RoutedEvent="Grid.Loaded">
+                                                    <BeginStoryboard>
+                                                        <Storyboard RepeatBehavior="Forever">
+                                                            <DoubleAnimation Storyboard.TargetName="CompanyComboSpinnerRotate"
+                                                                             Storyboard.TargetProperty="Angle"
+                                                                             From="0"
+                                                                             To="360"
+                                                                             Duration="0:0:0.8" />
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </EventTrigger>
+                                            </Grid.Triggers>
+                                        </Grid>
+                                    </Border>
+                                </Grid>
 
                             </StackPanel>
 
@@ -175,7 +224,7 @@
                                     <RowDefinition MaxHeight="625" />
                                 </Grid.RowDefinitions>
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="نوع شخص"
+                                    <TextBlock Text="نوع شعبه"
                                                Style="{StaticResource FormLabel}" />
                                     <controls:ToggleSwitchControl FirstLabel="اصلی"
                                                                   SecondLabel="فرعی"
@@ -183,11 +232,10 @@
                                                                   Grid.Column="1"
                                                                   Margin="9,0,0,0"
                                                                 />
-
-                                    <ToggleButton Content=".شعبه فعال است"
+                                    <ToggleButton Content="شعبه فعال است"
                                                   FlowDirection="LeftToRight"
                                                   Style="{StaticResource StatusToggleButton}"
-                                                  IsChecked="True"
+                                                  IsChecked="{Binding IsActive, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                   Margin="10,0,18,0" />
                                 </StackPanel>
                             </Grid>
@@ -207,8 +255,8 @@
                                             x:Name="FirstNamePanel">
                                     <TextBlock Text="نام شعبه"
                                                Style="{StaticResource FormLabel}" />
-                                    <controls:ModernPersianTextBox Text="{Binding Username}"
-                                                                   Placeholder="علی" />
+                                    <controls:ModernPersianTextBox Text="{Binding BranchName, UpdateSourceTrigger=PropertyChanged}"
+                                                                   Placeholder="شعبه مرکزی" />
                                 </StackPanel>
 
                               
@@ -245,7 +293,7 @@
                             </Grid>
                             <Grid Margin="0,5,0,4">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="2*" />
+                                    <ColumnDefinition Width="1.5*" />
                                     
                                     <ColumnDefinition Width="8" />
                                     <ColumnDefinition Width="1.5*" />
@@ -260,7 +308,7 @@
                                            >
                                     <TextBlock Text="کد اقتصادی"
                                                Style="{StaticResource FormLabel}" />
-                                    <controls:ModernPersianTextBox Text="{Binding Username}"
+                                    <controls:ModernPersianTextBox Text="{Binding EconomicCode, UpdateSourceTrigger=PropertyChanged}"
                                                                    FlowDirection="LeftToRight"
                                                                    Placeholder="247000" />
                                 </StackPanel>
@@ -269,20 +317,77 @@
                                          >
                                     <TextBlock Text="شماره ثبت"
                                                Style="{StaticResource FormLabel}" />
-                                    <controls:ModernPersianTextBox Text="{Binding Username}"
+                                    <controls:ModernPersianTextBox Text="{Binding RegisterNumber, UpdateSourceTrigger=PropertyChanged}"
                                                                    FlowDirection="LeftToRight"
                                                                    Placeholder="2480" />
                                 </StackPanel>
 
+                              
+                                
+                                <StackPanel Grid.Column="0"
+                                          
+                                            Visibility="Collapsed">
+                                    <TextBlock Text="نام شرکت"
+                                               Style="{StaticResource FormLabel}" />
+                                    <controls:ModernPersianTextBox Text="{Binding CompanyName}"
+                                                                   Placeholder="شرکت نمونه" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2"
+                                        
+                                            Visibility="Collapsed">
+                                    <TextBlock Text="کد اقتصادی"
+                                               Style="{StaticResource FormLabel}" />
+                                    <controls:ModernPersianTextBox FlowDirection="LeftToRight"
+                                                                   Text="{Binding EconomicCode}"
+                                                                   Placeholder="123456789" />
+                                </StackPanel>
+
                                 <StackPanel Grid.Column="4"
+                                          
+                                            Visibility="Collapsed">
+                                    <TextBlock Text="شماره ثبت"
+                                               Style="{StaticResource FormLabel}" />
+                                    <controls:ModernPersianTextBox FlowDirection="LeftToRight"
+                                                                   Text="{Binding RegistrationNumber}"
+                                                                   Placeholder="12345" />
+                                </StackPanel>
+                            </Grid>
+                            <Grid Margin="0,5,0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1.5*" />
+                                    
+                                    <ColumnDefinition Width="8" />
+                                    <ColumnDefinition Width="1.5*" />
+                                    
+                                    <ColumnDefinition Width="8" />
+                                    <ColumnDefinition Width="1.5*" />
+                                    
+                                </Grid.ColumnDefinitions>
+
+                                
+                                <StackPanel Grid.Column="0"
                                            >
                                     <TextBlock Text="کد شعبه"
                                                Style="{StaticResource FormLabel}" />
-                                    <controls:ModernPersianTextBox FlowDirection="LeftToRight"
-                                                                   Text="{Binding Username}"
-                                                                   Placeholder="2470545256" />
+
+                                    <controls:ModernPersianTextBox Text="{Binding BranchCode, UpdateSourceTrigger=PropertyChanged}"
+                                                                   InputType="Number"
+                                                                   FlowDirection="LeftToRight"
+                                                                   Placeholder="کد شعبه" />
                                 </StackPanel>
 
+                                <StackPanel Grid.Column="2"
+                                         >
+                                    <TextBlock Text="شناسه ملی"
+                                               Style="{StaticResource FormLabel}" />
+                                    <controls:ModernPersianTextBox Text="{Binding NationalId, UpdateSourceTrigger=PropertyChanged}"
+                                                                   InputType="Number"
+                                                                   FlowDirection="LeftToRight"
+                                                                   Placeholder="شناسه ملی را وارد کنید" />
+                                </StackPanel>
+
+                              
                                 
                                 <StackPanel Grid.Column="0"
                                           
@@ -393,18 +498,18 @@
                                 Margin="0,0,0,10"
                                 HorizontalAlignment="Center">
                             <StackPanel Orientation="Horizontal">
-                                <ToggleButton Content="تماس"
+                                <RadioButton Content="تماس"
                                               Style="{StaticResource ModernTabButton}"
                                               Margin="10,0,6,0"
                                               IsChecked="True"
                                               x:Name="TabPricing"
                                               Checked="TabPricing_Checked" />
-                                <ToggleButton Content="آدرس"
+                                <RadioButton Content="آدرس"
                                               Style="{StaticResource ModernTabButton}"
                                               Margin="10,0,6,0"
                                               x:Name="TabInventory"
                                               Checked="TabInventory_Checked" />
-                                <ToggleButton Content="مالیات"
+                                <RadioButton Content="مالیات"
                                               Visibility="Collapsed"
                                               Style="{StaticResource ModernTabButton}"
                                               x:Name="TabTax"
@@ -425,7 +530,7 @@
 
                                 <StackPanel x:Name="PricingContent"
                                             Width="650"
-                                            Visibility="Visible">
+                                            Visibility="Collapsed">
 
                                     <Grid>
                                         <Grid.ColumnDefinitions>
@@ -454,16 +559,16 @@
                                                                Style="{StaticResource FormLabel}" />
                                                     <controls:ModernPersianTextBox Width="200"
                                                                                    FlowDirection="LeftToRight"
-                                                                                   Text="{Binding Username}"
+                                                                                   Text="{Binding TelePhone, UpdateSourceTrigger=PropertyChanged}"
                                                                                    Placeholder="071" />
                                                 </StackPanel>
 
                                                 <StackPanel Grid.Column="2">
                                                     <TextBlock Text="موبایل"
                                                                Style="{StaticResource FormLabel}" />
-                                                   <controls:ModernPersianTextBox Width="200"
+                                                    <controls:ModernPersianTextBox Width="200"
                                                                                    FlowDirection="LeftToRight"
-                                                                                   Text="{Binding Username}"
+                                                                                   Text="{Binding MobilePhone, UpdateSourceTrigger=PropertyChanged}"
                                                                                    Placeholder="091" />
                                                 </StackPanel>
 
@@ -471,8 +576,8 @@
                                                     <TextBlock Text="ایمیل "
                                                                Style="{StaticResource FormLabel}" />
                                                     <controls:ModernPersianTextBox Width="200"
-                                                                                   Text="{Binding Username}"
-                                                                                   Placeholder="" />
+                                                                                   Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}"
+                                                                                   Placeholder="example@mail.com" />
                                                 </StackPanel>
                                             </Grid>
 
@@ -488,7 +593,7 @@
 
                                 <StackPanel x:Name="InventoryContent"
                                             Width="650"
-                                            Visibility="Collapsed">
+                                            Visibility="Visible">
 
 
                                     <Grid Margin="0,0,0,8">
@@ -523,8 +628,9 @@
                                                        HorizontalAlignment="Left"
                                                        Style="{StaticResource FormLabel}" />
                                             <controls:ModernPersianTextBox Grid.Column="0"
-                                                                           Text="{Binding Username}"
-                                                                           Placeholder="مرکزی" />
+                                                                           Text="{Binding PostCode, UpdateSourceTrigger=PropertyChanged}"
+                                                                           FlowDirection="LeftToRight"
+                                                                           Placeholder="74100" />
 
                                         </StackPanel>
                                         <StackPanel Grid.Column="4">
@@ -533,8 +639,8 @@
                                                        HorizontalAlignment="Left"
                                                        Style="{StaticResource FormLabel}" />
                                             <controls:ModernPersianTextBox Grid.Column="0"
-                                                                           Text="{Binding Username}"
-                                                                           Placeholder="" />
+                                                                           Text="{Binding Address, UpdateSourceTrigger=PropertyChanged}"
+                                                                           Placeholder="آدرس کامل شعبه" />
 
                                         </StackPanel>
                                     </Grid>
@@ -562,23 +668,23 @@
                                         </StackPanel>
 
                                         <StackPanel Grid.Column="2">
-                                            <TextBlock Text="شماره شبا"
+                                            <TextBlock Text="مختصات مکان X"
                                                        Style="{StaticResource FormLabel}" />
                                             <controls:ModernPersianTextBox Grid.Column="0"
                                                                            Width="170"
                                                                            FlowDirection="LeftToRight"
-                                                                           Text="{Binding Username}"
-                                                                           Placeholder="1122" />
+                                                                           Text="{Binding LatitudeText, UpdateSourceTrigger=PropertyChanged}"
+                                                                           Placeholder="29.5918" />
                                         </StackPanel>
 
                                         <StackPanel Grid.Column="4">
-                                            <TextBlock Text="شماره حساب"
+                                            <TextBlock Text="مختصات مکان Y"
                                                        Style="{StaticResource FormLabel}" />
                                             <controls:ModernPersianTextBox Grid.Column="0"
                                                                            Width="170"
                                                                            FlowDirection="LeftToRight"
-                                                                           Text="{Binding Username}"
-                                                                           Placeholder="456" />
+                                                                           Text="{Binding LongitudeText, UpdateSourceTrigger=PropertyChanged}"
+                                                                           Placeholder="52.5837" />
                                         </StackPanel>
 
                                     </Grid>
