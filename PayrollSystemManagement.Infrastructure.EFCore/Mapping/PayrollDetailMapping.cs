@@ -11,7 +11,6 @@ namespace PayrollSystemManagement.Infrastructure.EFCore.Mapping
             builder.ToTable("PayrollDetails");
             builder.HasKey(x => x.Id);
 
-            builder.Property(x => x.Formula).HasMaxLength(200).IsRequired();
             builder.Property(x => x.Description).HasMaxLength(300).IsRequired();
 
             builder.Property(x => x.Quantity).HasPrecision(18, 2).IsRequired();
@@ -20,7 +19,7 @@ namespace PayrollSystemManagement.Infrastructure.EFCore.Mapping
 
 
             builder.HasOne(x => x.Payrolls).WithMany(x => x.PayrollDetails).HasForeignKey(x => x.PayrollId);
-            builder.HasOne(x => x.PayrollItems).WithMany(x => x.PayrollDetails).HasForeignKey(x => x.PayrollItemId);
+            builder.HasOne(x => x.PayrollItems).WithMany().HasForeignKey(x => x.PayrollItemId).OnDelete(DeleteBehavior.Restrict);
 
         }
     }

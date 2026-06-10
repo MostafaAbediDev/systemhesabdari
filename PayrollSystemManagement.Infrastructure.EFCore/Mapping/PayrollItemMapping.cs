@@ -15,7 +15,6 @@ namespace PayrollSystemManagement.Infrastructure.EFCore.Mapping
           
             builder.HasOne(x => x.Branches).WithMany().HasForeignKey(x => x.BranchId).OnDelete(DeleteBehavior.NoAction);
 
-            builder.HasMany(s => s.PayrollDetails).WithOne(s => s.PayrollItems).HasForeignKey(s => s.PayrollItemId);
 
         }
     }
