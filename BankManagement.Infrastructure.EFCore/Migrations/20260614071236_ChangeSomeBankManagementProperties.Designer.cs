@@ -4,16 +4,19 @@ using BankManagement.Infrastructure.EFCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace BankManagement.Infrastructure.EFCore.Migrations.FakeData
+namespace BankManagement.Infrastructure.EFCore.Migrations
 {
-    [DbContext(typeof(BankFakeDataContext))]
-    partial class BankFakeDataContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(BankSystemContext))]
+    [Migration("20260614071236_ChangeSomeBankManagementProperties")]
+    partial class ChangeSomeBankManagementProperties
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
