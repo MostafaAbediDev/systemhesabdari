@@ -12,7 +12,7 @@ namespace BankManagement.Infrastructure.EFCore.Mapping
 
             builder.HasKey(x => x.Id);
 
-            builder.Property(x => x.Code)
+            builder.Property(x => x.TitleId)
                 .IsRequired();
 
             builder.Property(x => x.Title)
@@ -36,9 +36,9 @@ namespace BankManagement.Infrastructure.EFCore.Mapping
             // --- Seeding Data ---
             var fixedDate = new DateTime(2026, 6, 5, 0, 0, 0, DateTimeKind.Utc);
             builder.HasData(
-                new { Id = 1L, Code = 1, Title = "دولتی", IsActive = true, IsDeleted = false, CreationDate = fixedDate },
-                new { Id = 2L, Code = 2, Title = "خصوصی", IsActive = true, IsDeleted = false, CreationDate = fixedDate },
-                new { Id = 3L, Code = 3, Title = "قرض‌الحسنه", IsActive = true, IsDeleted = false, CreationDate = fixedDate }
+                new { Id = 1L, TitleId = 1, Title = "دولتی", IsActive = true, IsDeleted = false, CreationDate = fixedDate },
+                new { Id = 2L, TitleId = 2, Title = "خصوصی", IsActive = true, IsDeleted = false, CreationDate = fixedDate },
+                new { Id = 3L, TitleId = 3, Title = "قرض‌الحسنه", IsActive = true, IsDeleted = false, CreationDate = fixedDate }
             );
         }
     }

@@ -1,6 +1,5 @@
 ﻿using _0_FrameWork.Domain;
 using AccountManagement.Domain.Account.AccountAgg;
-using BankManagement.Domain.Bank.ReceiptsPaymentAgg;
 using GeneralInfoManagement.Domain.BaseInfo.BranchesAgg;
 
 namespace BankManagement.Domain.Bank.FundAgg
@@ -12,21 +11,22 @@ namespace BankManagement.Domain.Bank.FundAgg
         public long AccountId { get; private set; }
         public Branches Branches { get; private set; }
         public Accounts Accounts { get; private set; }
-        public List<ReceiptsPayments> ReceiptsPayments { get; private set; }
-
         protected Funds()
         {
-            ReceiptsPayments = new List<ReceiptsPayments>();
         }
 
-        public Funds(string title)
+        public Funds(string title, long branchId, long accountId)
         {
             Title = title;
+            BranchId = branchId;
+            AccountId = accountId;
         }
 
-        public void Edit(string title)
+        public void Edit(string title, long branchId, long accountId)
         {
             Title = title;
+            BranchId = branchId;
+            AccountId = accountId;
         }
 
 
