@@ -41,7 +41,8 @@ namespace GeneralInfoManagement.Application
                 command.CompanyId,
                 command.TelePhone,
                 command.ProvinceId,
-                command.CityId);
+                command.CityId,
+                command.IsMain);
 
             _branchRepository.Create(branch);
             _branchRepository.SaveChanges();

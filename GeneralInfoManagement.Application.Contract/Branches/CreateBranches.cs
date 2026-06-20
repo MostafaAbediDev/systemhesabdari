@@ -18,6 +18,7 @@
         public long CityId { get; set; }
         public long ProvinceId { get; set; }
         public bool IsCodeAutomatic { get; set; } = true;
+        public bool IsMain { get; set; }
         public string? ManualCode { get; set; }
 
     }
