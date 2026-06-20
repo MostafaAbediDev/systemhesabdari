@@ -1,6 +1,7 @@
 ﻿using AccountManagement.Configuration;
 using BankManagement.Configuration;
 using CodeManagement.Configuration;
+using FinancialManagement.Configuration;
 using FixedAssetManagement.Configuration;
 using GeneralInfoManagement.Configuration;
 using GeneralInfoManagement.Infrastructure.EFCore;
@@ -76,6 +77,7 @@ namespace ConnectionStringProject
             LogManagementBoostrapper.Configure(services, fakeConnectionString);
             PayrollSystemManagementBoostrapper.Configure(services, fakeConnectionString);
             PersonManagementBoostrapper.Configure(services, fakeConnectionString);
+            FinancialManagementBoostrapper.Configure(services, fakeConnectionString);
 
         }
     }
