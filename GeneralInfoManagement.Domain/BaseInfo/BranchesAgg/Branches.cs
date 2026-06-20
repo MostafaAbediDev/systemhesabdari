@@ -37,7 +37,7 @@ namespace GeneralInfoManagement.Domain.BaseInfo.BranchesAgg
 
         public Branches(string title, string nationalId, string economicCode,
             string registerNumber, string email, string mobilePhone,
-            string address, string postCode, Location location, long companyId, string telePhone, long provinceId, long cityId)
+            string address, string postCode, Location location, long companyId, string telePhone, long provinceId, long cityId, bool isMain)
         {
             Title = title;
             NationalId = nationalId;
@@ -52,6 +52,7 @@ namespace GeneralInfoManagement.Domain.BaseInfo.BranchesAgg
             TelePhone = telePhone;
             ProvinceId = provinceId;
             CityId = cityId;
+            IsMain = isMain;
         }
 
         public void Edit(string title, string nationalId, string economicCode,
