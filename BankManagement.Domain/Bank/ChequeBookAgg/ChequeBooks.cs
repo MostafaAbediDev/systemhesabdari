@@ -27,7 +27,7 @@ namespace BankManagement.Domain.Bank.ChequeBookAgg
             OwnerName = ownerName;
         }
 
-        public void Edit(int chequeCount, int firstChequeCode, int lastChequeCode, string ownerName)
+        public void Edit(int chequeCount, string firstChequeCode, string lastChequeCode, string ownerName)
         {
             ChequeCount = chequeCount;
             FirstChequeCode = firstChequeCode;

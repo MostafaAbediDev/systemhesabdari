@@ -4,9 +4,6 @@ using BankManagement.Domain.Bank.BankTypeAgg;
 using BankManagement.Domain.Bank.ChequeAgg;
 using BankManagement.Domain.Bank.ChequeBookAgg;
 using BankManagement.Domain.Bank.CompanyBankAccountAgg;
-using BankManagement.Domain.Bank.FundAgg;
-using BankManagement.Domain.Bank.PettyCashAgg;
-using BankManagement.Domain.Bank.ReceiptsPaymentAgg;
 using BankManagement.Infrastructure.EFCore.Mapping;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,9 +17,6 @@ namespace BankManagement.Infrastructure.EFCore
         public DbSet<Cheques> Cheques { get; set; }
         public DbSet<CompanyBankAccounts> CompanyBankAccounts { get; set; }
         public DbSet<BankTypes> BankTypes { get; set; }
-        public DbSet<Funds> Funds { get; set; }
-        public DbSet<PettyCashes> PettyCashes { get; set; }
-        public DbSet<ReceiptsPayments> ReceiptsPayments { get; set; }
 
         public BankSystemContext(DbContextOptions<BankSystemContext> options) : base(options)
         {

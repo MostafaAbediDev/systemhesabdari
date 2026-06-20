@@ -2,7 +2,7 @@
 using AccountManagement.Domain.Account.AccountAgg;
 using GeneralInfoManagement.Domain.BaseInfo.BranchesAgg;
 
-namespace BankManagement.Domain.Bank.FundAgg
+namespace FinancialManagement.Domain.FundAgg
 {
     public class Funds : EntityBase
     {

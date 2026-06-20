@@ -1,6 +1,5 @@
 ﻿using _0_FrameWork.Domain;
 using BankManagement.Domain.Bank.ChequeBookAgg;
-using BankManagement.Domain.Bank.ReceiptsPaymentAgg;
 using GeneralInfoManagement.Domain.BaseInfo.BranchesAgg;
 
 namespace BankManagement.Domain.Bank.ChequeAgg
@@ -18,11 +17,9 @@ namespace BankManagement.Domain.Bank.ChequeAgg
         public long BranchId { get; private set; }
         public ChequeBooks ChequeBooks { get; private set; }
         public Branches Branches { get; private set; }
-        public List<ReceiptsPayments> ReceiptsPayments { get; private set; }
 
         protected Cheques()
         {
-            ReceiptsPayments = new List<ReceiptsPayments>();
         }
 
         public Cheques(int chequeType, string chequeNumber, decimal amount, DateTime dueDate, int status, int referenceType, long referenceId)

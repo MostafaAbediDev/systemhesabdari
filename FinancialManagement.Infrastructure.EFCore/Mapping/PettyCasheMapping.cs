@@ -1,8 +1,8 @@
-﻿using BankManagement.Domain.Bank.PettyCashAgg;
+﻿using FinancialManagement.Domain.PettyCashAgg;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace BankManagement.Infrastructure.EFCore.Mapping
+namespace FinancialManagement.Infrastructure.EFCore.Mapping
 {
     public class PettyCasheMapping : IEntityTypeConfiguration<PettyCashes>
     {
@@ -19,11 +19,11 @@ namespace BankManagement.Infrastructure.EFCore.Mapping
             builder.Property(x => x.MaxLimit).HasPrecision(18, 2).IsRequired();
 
             builder.HasOne(x => x.Branches).WithMany().HasForeignKey(x => x.BranchId).OnDelete(DeleteBehavior.NoAction);
-            builder.HasOne(x => x.Accounts).WithMany().HasForeignKey(x => x.AccountId).OnDelete(DeleteBehavior.NoAction);
-            builder.HasOne(x => x.Accounts).WithMany().HasForeignKey(x => x.SettlementAccountId).OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(x => x.Account).WithMany().HasForeignKey(x => x.AccountId).OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(x => x.SettlementAccount).WithMany().HasForeignKey(x => x.SettlementAccountId).OnDelete(DeleteBehavior.NoAction);
 
-            //builder.HasOne(x => x.Persons).WithMany().HasForeignKey(x => x.HolderPersonId).OnDelete(DeleteBehavior.NoAction);
-            //builder.HasOne(x => x.Persons).WithMany().HasForeignKey(x => x.ResponsiblePersonId).OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(x => x.HolderPerson).WithMany().HasForeignKey(x => x.HolderPersonId).OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(x => x.ResponsiblePerson).WithMany().HasForeignKey(x => x.ResponsiblePersonId).OnDelete(DeleteBehavior.NoAction);
 
 
         }

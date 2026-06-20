@@ -1,9 +1,8 @@
-﻿using BankManagement.Domain.Bank.CompanyBankAccountAgg;
-using BankManagement.Domain.Bank.FundAgg;
+﻿using FinancialManagement.Domain.FundAgg;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace BankManagement.Infrastructure.EFCore.Mapping
+namespace FinancialManagement.Infrastructure.EFCore.Mapping
 {
     public class FundMapping : IEntityTypeConfiguration<Funds>
     {
@@ -16,8 +15,6 @@ namespace BankManagement.Infrastructure.EFCore.Mapping
 
             builder.HasOne(x => x.Branches).WithMany().HasForeignKey(x => x.BranchId).OnDelete(DeleteBehavior.NoAction);
             builder.HasOne(x => x.Accounts).WithMany().HasForeignKey(x => x.AccountId).OnDelete(DeleteBehavior.NoAction);
-
-            builder.HasMany(s => s.ReceiptsPayments).WithOne(s => s.Funds).HasForeignKey(s => s.FundId);
 
         }
     }
