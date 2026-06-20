@@ -7,7 +7,8 @@
         public string Address { get; set; }
         public string PostalCode { get; set; }
         public long PersonId { get; set; }
-        public string PersonFullName { get; set; }
+        public string PersonFirstName { get; set; }
+        public string PersonLastName { get; set; }
         public long ProvinceId { get; set; }
         public string ProvinceName { get; set; }
         public long CityId { get; set; }
