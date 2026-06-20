@@ -1,8 +1,9 @@
 ﻿using _0_FrameWork.Domain;
 using AccountManagement.Domain.Account.AccountAgg;
 using GeneralInfoManagement.Domain.BaseInfo.BranchesAgg;
+using PersonManagement.Domain.Person.PersonAgg;
 
-namespace BankManagement.Domain.Bank.PettyCashAgg
+namespace FinancialManagement.Domain.PettyCashAgg
 {
     public class PettyCashes : EntityBase
     {
@@ -18,27 +19,57 @@ namespace BankManagement.Domain.Bank.PettyCashAgg
         public long AccountId { get; private set; }
         public long SettlementAccountId { get; private set; }
         public Branches Branches { get; private set; }
-        //public Persons Persons { get; private set; }
-        public Accounts Accounts { get; private set; }
+        public Persons ResponsiblePerson { get; private set; }
+        public Persons HolderPerson { get; private set; }
+        public Accounts Account { get; private set; }
+        public Accounts SettlementAccount { get; private set; }
 
-        public PettyCashes(string title, string description, decimal initialAmount, decimal currentBalance, decimal maxLimit, DateTime lastSettlementDate)
+        public PettyCashes(string title, string description, decimal initialAmount, decimal maxLimit, DateTime lastSettlementDate,
+            long branchId, long responsiblePersonId, long holderPersonId, long accountId, long settlementAccountId)
         {
             Title = title;
             Description = description;
             InitialAmount = initialAmount;
-            CurrentBalance = currentBalance;
+            MaxLimit = maxLimit;
+            LastSettlementDate = lastSettlementDate;
+            BranchId = branchId;
+            ResponsiblePersonId = responsiblePersonId;
+            HolderPersonId = holderPersonId;
+            AccountId = accountId;
+            SettlementAccountId = settlementAccountId;
+        }
+
+        public void Edit(string title, string description, decimal maxLimit, DateTime lastSettlementDate)
+        {
+            Title = title;
+            Description = description;
             MaxLimit = maxLimit;
             LastSettlementDate = lastSettlementDate;
         }
 
-        public void Edit(string title, string description, decimal initialAmount, decimal currentBalance, decimal maxLimit, DateTime lastSettlementDate)
+        public void ChangeMaxLimit(decimal maxLimit)
         {
-            Title = title;
-            Description = description;
-            InitialAmount = initialAmount;
-            CurrentBalance = currentBalance;
             MaxLimit = maxLimit;
-            LastSettlementDate = lastSettlementDate;
+        }
+
+        public void ChangeResponsiblePerson(long responsiblePersonId)
+        {
+            ResponsiblePersonId = responsiblePersonId;
+        }
+
+        public void ChangeSettlementAccount(long settlementAccountId)
+        {
+            SettlementAccountId = settlementAccountId;
+        }
+
+        public void IncreaseBalance(decimal amount)
+        {
+            CurrentBalance += amount;
+        }
+
+        public void DecreaseBalance(decimal amount)
+        {
+            CurrentBalance -= amount;
         }
 
         public void Remove()

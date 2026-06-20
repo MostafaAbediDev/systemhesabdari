@@ -2,7 +2,7 @@
 using AccountManagement.Domain.Account.AccountingDocumentAgg;
 using BankManagement.Domain.Bank.ChequeAgg;
 using BankManagement.Domain.Bank.CompanyBankAccountAgg;
-using BankManagement.Domain.Bank.FundAgg;
+using FinancialManagement.Domain.FundAgg;
 using GeneralInfoManagement.Domain.BaseInfo.BranchesAgg;
 using GeneralInfoManagement.Domain.BaseInfo.FinancialPeriodsAgg;
 using PersonManagement.Domain.Person.PersonAgg;
