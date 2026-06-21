@@ -7,8 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BankManagement.Application\BankManagement.Application.csproj" />
-    <ProjectReference Include="..\BankManagement.Infrastructure.EFCore\BankManagement.Infrastructure.EFCore.csproj" />
+    <ProjectReference Include="..\01_FrameWork\01_FrameWork.csproj" />
   </ItemGroup>
 
 </Project>
