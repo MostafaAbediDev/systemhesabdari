@@ -10,6 +10,7 @@ namespace CodeManagement.Application
             {
                 CodeOwnerTypeDTO.Branch => "BR-",
                 CodeOwnerTypeDTO.Person => "PE-",
+                CodeOwnerTypeDTO.CompanyBankAccount => "CBA-",
                 _ => throw new ArgumentOutOfRangeException(nameof(ownerType), ownerType, null)
             };
 
