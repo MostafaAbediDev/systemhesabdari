@@ -272,11 +272,11 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<long>("BankId")
-                        .HasColumnType("bigint");
-
                     b.Property<int>("ChequeCount")
                         .HasColumnType("int");
+
+                    b.Property<long>("CompanyBankAccountId")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
@@ -301,14 +301,19 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("OwnerName")
+                    b.Property<DateTime>("ReceiveDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SerialNumber")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BankId");
+                    b.HasIndex("CompanyBankAccountId");
 
                     b.ToTable("ChequeBooks", (string)null);
                 });
@@ -535,7 +540,6 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Logo")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
@@ -721,13 +725,13 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
 
             modelBuilder.Entity("BankManagement.Domain.Bank.ChequeBookAgg.ChequeBooks", b =>
                 {
-                    b.HasOne("BankManagement.Domain.Bank.BankAgg.Banks", "Banks")
-                        .WithMany("ChequeBooks")
-                        .HasForeignKey("BankId")
+                    b.HasOne("BankManagement.Domain.Bank.CompanyBankAccountAgg.CompanyBankAccounts", "CompanyBankAccount")
+                        .WithMany()
+                        .HasForeignKey("CompanyBankAccountId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("Banks");
+                    b.Navigation("CompanyBankAccount");
                 });
 
             modelBuilder.Entity("BankManagement.Domain.Bank.CompanyBankAccountAgg.CompanyBankAccounts", b =>
@@ -812,8 +816,6 @@ namespace BankManagement.Infrastructure.EFCore.Migrations
             modelBuilder.Entity("BankManagement.Domain.Bank.BankAgg.Banks", b =>
                 {
                     b.Navigation("BankBranches");
-
-                    b.Navigation("ChequeBooks");
 
                     b.Navigation("CompanyBankAccounts");
                 });

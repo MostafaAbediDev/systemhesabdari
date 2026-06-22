@@ -14,6 +14,7 @@ namespace BankManagement.Domain.Bank.CompanyBankAccountAgg
         public long BankId { get; private set; }
         public Branches Branches { get; private set; }
         public Banks Banks { get; private set; }
+        
 
         protected CompanyBankAccounts()
         {

@@ -15,13 +15,11 @@ namespace BankManagement.Domain.Bank.BankAgg
         public string? Logo { get; private set; }
         public BankTypes BankTypes { get; private set; }
         public List<CompanyBankAccounts> CompanyBankAccounts { get; private set; }
-        public List<ChequeBooks> ChequeBooks { get; private set; }
         public List<BankBranches> BankBranches { get; private set; }
 
         protected Banks()
         {
             CompanyBankAccounts = new List<CompanyBankAccounts>();
-            ChequeBooks = new List<ChequeBooks>();
         }
         public Banks(string title, long bankTypeId, string country, string description, string? logo)
         {
