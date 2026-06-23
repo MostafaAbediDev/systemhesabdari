@@ -21,6 +21,7 @@ namespace BankManagement.Infrastructure.EFCore.Repository
                 .Include(x => x.BankTypes)
                 .Select(x => new BankViewModel
                 {
+                    Id = x.Id,
                     Title = x.Title,
                     Country = x.Country,
                     Description = x.Description,
@@ -64,6 +65,7 @@ namespace BankManagement.Infrastructure.EFCore.Repository
             return query
                 .Select(x => new BankViewModel
                 {
+                    Id = x.Id,
                     Title = x.Title,
                     Country = x.Country,
                     Description = x.Description,
