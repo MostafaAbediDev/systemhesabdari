@@ -77,9 +77,9 @@ namespace Taadol.Controls
             get => (double)GetValue(ButtonHeightProperty);
             set => SetValue(ButtonHeightProperty, value);
         }
-
         public static readonly DependencyProperty ButtonWidthProperty =
-            DependencyProperty.Register(nameof(ButtonWidth), typeof(double), typeof(IconButton), new PropertyMetadata(86.0));
+            DependencyProperty.Register(nameof(ButtonWidth), typeof(double), typeof(IconButton),
+                new PropertyMetadata(86.0)); // مقدار پیشفرض MinWidth
 
         public double ButtonWidth
         {

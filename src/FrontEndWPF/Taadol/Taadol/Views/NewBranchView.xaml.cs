@@ -1,19 +1,22 @@
-﻿using System;
+﻿using GeneralInfoManagement.Application.Contract.Branches;
+using GeneralInfoManagement.Application.Contract.City;
+using GeneralInfoManagement.Application.Contract.Company;
+using GeneralInfoManagement.Application.Contract.Province;
+using GeneralInfoManagement.Domain.General.CityAgg;
+using GeneralInfoManagement.Domain.General.ProvinceAgg;
+using GeneralInfoManagement.Infrastructure.EFCore.Repository;
+using Microsoft.Extensions.DependencyInjection;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using GeneralInfoManagement.Application.Contract.Branches;
-using GeneralInfoManagement.Application.Contract.Company;
-using Microsoft.Extensions.DependencyInjection;
-using Taadol.Controls;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Threading;
+using Taadol.Controls;
 
 namespace Taadol.Views
 {
@@ -25,7 +28,147 @@ namespace Taadol.Views
         private bool _isBranchCodeManual = false;
         private string _branchCode;
         private bool _isLoadedOnce = false;
+        public ObservableCollection<CityComboItem> Cities { get; set; } = new();
 
+        private long _selectedProvinceId;
+
+        private long _selectedCityId;
+
+        public long SelectedProvinceId
+        {
+            get => _selectedProvinceId;
+            set
+            {
+                _selectedProvinceId = value;
+                OnPropertyChanged(nameof(SelectedProvinceId));
+                if (_selectedProvinceId > 0)
+                    LoadCitiesFromSubSystemAsync(_selectedProvinceId);
+            }
+        }
+
+        private async Task LoadCitiesFromSubSystemAsync(long provinceId)
+        {
+            CityComboBox.IsEnabled = false;
+            CityLoadingOverlay.Visibility = Visibility.Visible;
+            Cities.Clear();
+
+            await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background);
+
+            await Task.Run(() =>
+            {
+                using var scope = App.ServiceProvider.CreateScope();
+                var cityRepo = scope.ServiceProvider.GetRequiredService<ICityRepository>();
+                var cities = cityRepo.GetCitiesByProvince(provinceId); // از زیرسیستم واقعی
+
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    Cities = new ObservableCollection<CityComboItem>(
+      cities.Select(c => new CityComboItem
+      {
+          Id = c.Id,
+          Title = c.Title
+      })
+  );
+                    OnPropertyChanged(nameof(Cities));
+
+                    if (Cities.Count > 0)
+                        SelectedCityId = Cities[0].Id;
+                });
+            });
+
+            CityComboBox.IsEnabled = true;
+            CityLoadingOverlay.Visibility = Visibility.Collapsed;
+        }
+        public class ProvinceComboItem
+        {
+            public long Id { get; set; }
+            public string Title { get; set; }
+        }
+
+        public class CityComboItem
+        {
+            public long Id { get; set; }
+            public string Title { get; set; }
+        }
+        private void ProvinceComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (ProvinceComboBox.SelectedValue is long id)
+                SelectedProvinceId = id;
+        }
+
+        public ObservableCollection<ProvinceComboItem> Provinces { get; set; } = new();
+
+
+        public long SelectedCityId
+        {
+            get => _selectedCityId;
+            set
+            {
+                _selectedCityId = value;
+                OnPropertyChanged(nameof(SelectedCityId));
+            }
+        }
+        private async Task LoadProvincesAsync()
+        {
+            ProvinceComboBox.IsEnabled = false;
+
+            await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background);
+
+            await Task.Run(() =>
+            {
+                using var scope = App.ServiceProvider.CreateScope();
+                var repo = scope.ServiceProvider.GetRequiredService<IProvinceRepository>();
+
+                var provincesFromBackend = repo.GetProvincesForSelectList();
+
+                var mappedProvinces = provincesFromBackend.Select(p => new ProvinceComboItem
+                {
+                    Id = p.Id,
+                    Title = p.Title
+                }).ToList();
+
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    Provinces = new ObservableCollection<ProvinceComboItem>(mappedProvinces);
+                    OnPropertyChanged(nameof(Provinces));
+                    if (Provinces.Count > 0)
+                        SelectedProvinceId = Provinces[0].Id;
+                });
+            });
+
+            ProvinceComboBox.IsEnabled = true;
+        }
+        private async Task LoadCitiesAsync(long provinceId)
+        {
+            CityComboBox.IsEnabled = false;
+            Cities.Clear();
+
+            await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background);
+
+            await Task.Run(() =>
+            {
+                using var scope = App.ServiceProvider.CreateScope();
+                var cityRepo = scope.ServiceProvider.GetRequiredService<ICityRepository>();
+
+                var citiesFromBackend = cityRepo.GetCitiesByProvince(provinceId);
+
+                var mappedCities = citiesFromBackend.Select(c => new CityComboItem
+                {
+                    Id = c.Id,
+                    Title = c.Title
+                }).ToList();
+
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    Cities = new ObservableCollection<CityComboItem>(mappedCities);
+                    OnPropertyChanged(nameof(Cities));
+                    if (Cities.Count > 0)
+                        SelectedCityId = Cities[0].Id;
+                });
+            });
+
+            CityComboBox.IsEnabled = true;
+        }
         private void UniqueCodeMode_SelectionChanged(object sender, bool isAutomatic)
         {
             _isCodeAutomatic = isAutomatic;
@@ -70,6 +213,7 @@ namespace Taadol.Views
             _isLoadedOnce = true;
 
             await LoadInitialDataAsync();
+            await LoadProvincesAsync(); // <-- صدا زده شود
         }
 
         private async Task LoadInitialDataAsync()
@@ -113,6 +257,8 @@ namespace Taadol.Views
                 ShowCompanyComboLoading(false);
             }
         }
+        private readonly IProvinceRepository _provinceRepository;
+        private readonly ICityRepository _cityRepository;
         private string GenerateNextUniqueCodeFromDatabase()
         {
             using var scope = App.ServiceProvider.CreateScope();
@@ -260,7 +406,8 @@ namespace Taadol.Views
                 OnPropertyChanged(nameof(IsUniqueCodeManual));
             }
         }
-        public ICommand SaveCommand { get; }
+        public ICommand SaveCommand { get; private set; }
+
         public string PostCode
         {
             get => _postCode;
@@ -382,75 +529,62 @@ namespace Taadol.Views
                 OnPropertyChanged(nameof(Email));
             }
         }
+        public class RelayCommand : ICommand
+        {
+            private readonly Action _execute;
+            private readonly Func<bool> _canExecute;
 
+            public RelayCommand(Action execute, Func<bool> canExecute = null)
+            {
+                _execute = execute;
+                _canExecute = canExecute;
+            }
+
+            public bool CanExecute(object parameter) => _canExecute?.Invoke() ?? true;
+
+            public void Execute(object parameter) => _execute();
+
+            public event EventHandler CanExecuteChanged
+            {
+                add => CommandManager.RequerySuggested += value;
+                remove => CommandManager.RequerySuggested -= value;
+            }
+        }
         public NewBranchView()
         {
             InitializeComponent();
 
             _branchApplication = App.ServiceProvider.GetRequiredService<IBranchApplication>();
-            _companyApplication = App.ServiceProvider.GetRequiredService<ICompanyApplication>();
-
-            SaveCommand = new BranchSaveCommand(SaveBranch);
-
-            IsUniqueCodeManual = false;
+            _provinceRepository = App.ServiceProvider.GetRequiredService<IProvinceRepository>();
+            _cityRepository = App.ServiceProvider.GetRequiredService<ICityRepository>();
 
             DataContext = this;
+            SaveCommand = new RelayCommand(SaveBranch);
 
             Loaded += NewBranchView_Loaded;
         }
 
-        private async Task LoadCompaniesAsync()
+        private bool IsValidEmail(string email)
         {
-            ShowCompanyComboLoading(true);
+            if (string.IsNullOrWhiteSpace(email))
+                return false;
 
             try
             {
-                var companies = await Task.Run(() =>
-                {
-                    using var scope = App.ServiceProvider.CreateScope();
-                    var companyApplication = scope.ServiceProvider.GetRequiredService<ICompanyApplication>();
-                    return companyApplication.GetCompanies();
-                });
-
-                Companies = new ObservableCollection<CompanyViewModel>(companies);
-                OnPropertyChanged(nameof(Companies));
-
-                if (Companies.Count > 0)
-                    SelectedCompanyId = Companies[0].Id;
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == email;
             }
-            catch (Exception ex)
+            catch
             {
-                MessageBox.Show(ex.Message, "خطا در لود شرکت‌ها", MessageBoxButton.OK, MessageBoxImage.Error);
-                Companies = new ObservableCollection<CompanyViewModel>();
-                OnPropertyChanged(nameof(Companies));
-            }
-            finally
-            {
-                ShowCompanyComboLoading(false);
+                return false;
             }
         }
-
         private void ShowCompanyComboLoading(bool show)
         {
             CompanyComboLoading.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
             CompanyComboBox.IsEnabled = !show;
         }
-        private void LoadCompanies()
-        {
-            try
-            {
-                Companies = new ObservableCollection<CompanyViewModel>(_companyApplication.GetCompanies());
-                OnPropertyChanged(nameof(Companies));
-
-                if (Companies.Count > 0)
-                    SelectedCompanyId = Companies[0].Id;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "خطا در لود شرکت‌ها", MessageBoxButton.OK, MessageBoxImage.Error);
-                Companies = new ObservableCollection<CompanyViewModel>();
-            }
-        }
+       
         private string _nationalId;
         public string NationalId
         {
@@ -461,9 +595,36 @@ namespace Taadol.Views
                 OnPropertyChanged(nameof(NationalId));
             }
         }
-      
+        private bool IsValidPhone(string phone)
+        {
+            if (string.IsNullOrWhiteSpace(phone))
+                return false;
+
+            // فقط اعداد فارسی یا لاتین
+            return phone.All(c => char.IsDigit(c)) && phone.Length >= 8 && phone.Length <= 11;
+        }
         private void SaveBranch()
         {
+            if (!string.IsNullOrEmpty(Email) && !IsValidEmail(Email))
+            {
+                MessageBox.Show("ایمیل وارد شده معتبر نیست.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            double parsedLat = double.TryParse(LatitudeText, out var lat) ? lat : double.NaN;
+            double parsedLng = double.TryParse(LongitudeText, out var lng) ? lng : double.NaN;
+            if (!IsValidPhone(MobilePhone))
+            {
+                MessageBox.Show("شماره موبایل وارد شده معتبر نیست.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (!IsValidPhone(TelePhone))
+            {
+                MessageBox.Show("شماره تلفن وارد شده معتبر نیست.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            // بررسی محدوده معتبر مختصات
+          
             if (SelectedCompanyId <= 0)
             {
                 MessageBox.Show("لطفاً شرکت را انتخاب کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -479,10 +640,11 @@ namespace Taadol.Views
             {
                 UniqueCode = GenerateNextUniqueCodeFromDatabase();
             }
+   
+            
             var command = new CreateBranches
             {
                 Title = BranchName.Trim(),
-
                 Code = UniqueCode ?? "",
                 ManualCode = _isCodeAutomatic ? "" : UniqueCode ?? "",
                 IsCodeAutomatic = _isCodeAutomatic,
@@ -498,16 +660,15 @@ namespace Taadol.Views
                 Address = Address?.Trim() ?? "",
                 PostCode = PostCode?.Trim() ?? "",
 
-                Latitude = 0,
-                Longitude = 0,
-
+                Latitude = double.TryParse(LatitudeText, out var latitudeValue) ? latitudeValue : 0,
+                Longitude = double.TryParse(LongitudeText, out var longitudeValue) ? longitudeValue : 0,
                 CompanyId = SelectedCompanyId,
 
-                CityId = 1392,
-                ProvinceId = 6,
-               
+                CityId = SelectedCityId,
+                ProvinceId = SelectedProvinceId,
+                IsMain = BranchType == "Main"
 
-            
+
             };
             try
             {
@@ -592,6 +753,7 @@ namespace Taadol.Views
         {
             BranchName = "";
             EconomicCode = "";
+            NationalId = "";
             RegisterNumber = "";
             BranchCode = "";
             TelePhone = "";
@@ -619,7 +781,20 @@ namespace Taadol.Views
 
             return true;
         }
-
+        private void BranchTypeToggle_SelectionChanged(object sender, bool isFirstSelected)
+        {
+            MessageBox.Show(isFirstSelected.ToString());
+        }
+        private string _branchType = "Main"; // Main = اصلی، Sub = فرعی
+        public string BranchType
+        {
+            get => _branchType;
+            set
+            {
+                _branchType = value;
+                OnPropertyChanged(nameof(BranchType));
+            }
+        }
         private string GetOperationMessage(object operation)
         {
             if (operation == null) return "";

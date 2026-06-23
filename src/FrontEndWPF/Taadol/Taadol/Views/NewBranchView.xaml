@@ -231,7 +231,7 @@
                                                                   IsFirstSelected="True"
                                                                   Grid.Column="1"
                                                                   Margin="9,0,0,0"
-                                                                />
+                                                                  SelectionChanged="BranchTypeToggle_SelectionChanged" />
                                     <ToggleButton Content="شعبه فعال است"
                                                   FlowDirection="LeftToRight"
                                                   Style="{StaticResource StatusToggleButton}"
@@ -530,7 +530,7 @@
 
                                 <StackPanel x:Name="PricingContent"
                                             Width="650"
-                                            Visibility="Collapsed">
+                                            Visibility="Visible">
 
                                     <Grid>
                                         <Grid.ColumnDefinitions>
@@ -593,7 +593,7 @@
 
                                 <StackPanel x:Name="InventoryContent"
                                             Width="650"
-                                            Visibility="Visible">
+                                            Visibility="Collapsed">
 
 
                                     <Grid Margin="0,0,0,8">
@@ -605,21 +605,21 @@
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
 
-
+                                     
                                         <StackPanel Grid.Column="0">
                                             <TextBlock Text="استان"
                                                        Style="{StaticResource FormLabel}" />
-                                            <ComboBox Style="{StaticResource SearchableComboBox}"
-                                                      Tag="جستجو"
+                                            <ComboBox x:Name="ProvinceComboBox"
                                                       Width="170"
-                                                      Grid.Column="0"
-                                                      HorizontalAlignment="Left"
-                                                      ItemContainerStyle="{StaticResource SearchableComboBoxItem}">
-                                                <ComboBoxItem Content="تهران" />
-                                                <ComboBoxItem Content="شیراز" />
-                                                <ComboBoxItem Content="مشهد" />
-                                            </ComboBox>
+                                                      ItemsSource="{Binding Provinces}"
+                                                      DisplayMemberPath="Title"
+                                                      SelectedValuePath="Id"
+                                                      SelectedValue="{Binding SelectedProvinceId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                      SelectionChanged="ProvinceComboBox_SelectionChanged"
+                                                      Style="{StaticResource SearchableComboBox}"
+                                                      ItemContainerStyle="{StaticResource SearchableComboBoxItem}" />
                                         </StackPanel>
+
 
 
                                         <StackPanel Grid.Column="2">
@@ -639,6 +639,7 @@
                                                        HorizontalAlignment="Left"
                                                        Style="{StaticResource FormLabel}" />
                                             <controls:ModernPersianTextBox Grid.Column="0"
+                                                                           
                                                                            Text="{Binding Address, UpdateSourceTrigger=PropertyChanged}"
                                                                            Placeholder="آدرس کامل شعبه" />
 
@@ -652,39 +653,48 @@
                                             <ColumnDefinition Width="8" />
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
-
+                                        <Border x:Name="CityLoadingOverlay"
+                                                Background="#99FAFCFF"
+                                                Visibility="Collapsed"
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Center">
+                                            <TextBlock Text="در حال بارگذاری شهرستان‌ها..."
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center" />
+                                        </Border>
                                         <StackPanel Grid.Column="0">
                                             <TextBlock Text="شهرستان"
                                                        Style="{StaticResource FormLabel}" />
-                                            <ComboBox Style="{StaticResource SearchableComboBox}"
-                                                      Tag="جستجو"
+                                            <ComboBox x:Name="CityComboBox"
                                                       Width="170"
-                                                      HorizontalAlignment="Left"
-                                                      ItemContainerStyle="{StaticResource SearchableComboBoxItem}">
-                                                <ComboBoxItem Content="جهرم" />
-                                                <ComboBoxItem Content="شیراز" />
-                                                <ComboBoxItem Content="داراب" />
-                                            </ComboBox>
+                                                      ItemsSource="{Binding Cities}"
+                                                      DisplayMemberPath="Title"
+                                                      SelectedValuePath="Id"
+                                                      SelectedValue="{Binding SelectedCityId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                      Style="{StaticResource SearchableComboBox}"
+                                                      ItemContainerStyle="{StaticResource SearchableComboBoxItem}" />
                                         </StackPanel>
 
                                         <StackPanel Grid.Column="2">
                                             <TextBlock Text="مختصات مکان X"
                                                        Style="{StaticResource FormLabel}" />
-                                            <controls:ModernPersianTextBox Grid.Column="0"
-                                                                           Width="170"
-                                                                           FlowDirection="LeftToRight"
+                                            <controls:ModernPersianTextBox x:Name="LatitudeField"
                                                                            Text="{Binding LatitudeText, UpdateSourceTrigger=PropertyChanged}"
-                                                                           Placeholder="29.5918" />
+                                                                           FlowDirection="LeftToRight"
+                                                                           InputType="Text"
+                                                                           Width="170"
+                                                                           Placeholder="35.6892" />
                                         </StackPanel>
 
                                         <StackPanel Grid.Column="4">
                                             <TextBlock Text="مختصات مکان Y"
                                                        Style="{StaticResource FormLabel}" />
-                                            <controls:ModernPersianTextBox Grid.Column="0"
-                                                                           Width="170"
-                                                                           FlowDirection="LeftToRight"
+                                            <controls:ModernPersianTextBox x:Name="LongitudeField"
                                                                            Text="{Binding LongitudeText, UpdateSourceTrigger=PropertyChanged}"
-                                                                           Placeholder="52.5837" />
+                                                                           FlowDirection="LeftToRight"
+                                                                           InputType="Text"
+                                                                           Width="170"
+                                                                           Placeholder="51.3890" />
                                         </StackPanel>
 
                                     </Grid>
