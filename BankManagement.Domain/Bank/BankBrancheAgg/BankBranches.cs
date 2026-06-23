@@ -7,7 +7,7 @@ namespace BankManagement.Domain.Bank.BankBrancheAgg
 {
     public class BankBranches : EntityBase
     {
-        public string Title { get; private set; }
+        public string BranchName { get; private set; }
         public string BranchCode { get; private set; }
         public string Address { get; private set; }
         public string Telephone { get; private set; }
@@ -18,9 +18,9 @@ namespace BankManagement.Domain.Bank.BankBrancheAgg
         public Provinces Provinces { get; private set; }
         public Cities Cities { get; private set; }
 
-        public BankBranches(string title, string branchCode, string address, string telephone, long bankId, long provinceId, long cityId)
+        public BankBranches(string branchName, string branchCode, string address, string telephone, long bankId, long provinceId, long cityId)
         {
-            Title = title;
+            BranchName = branchName;
             BranchCode = branchCode;
             Address = address;
             Telephone = telephone;
@@ -29,9 +29,9 @@ namespace BankManagement.Domain.Bank.BankBrancheAgg
             CityId = cityId;
         }
 
-        public void Edit(string title, string branchCode, string address, string telephone, long bankId, long provinceId, long cityId)
+        public void Edit(string branchName, string branchCode, string address, string telephone, long bankId, long provinceId, long cityId)
         {
-            Title = title;
+            BranchName = branchName;
             BranchCode = branchCode;
             Address = address;
             Telephone = telephone;

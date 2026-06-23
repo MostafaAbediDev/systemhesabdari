@@ -5,7 +5,7 @@ namespace BankManagement.Domain.Bank.BankTypeAgg
 {
     public class BankTypes : EntityBase
     {
-        public int Code { get; private set; }
+        public int TitleId { get; private set; }
         public string Title { get; private set; }
         public List<Banks> Banks { get; private set; }
 
@@ -14,15 +14,15 @@ namespace BankManagement.Domain.Bank.BankTypeAgg
             Banks = new List<Banks>();
         }
 
-        public BankTypes(int code, string title)
+        public BankTypes(int titleId, string title)
         {
-            Code = code;
+            TitleId = titleId;
             Title = title;
         }
 
-        public void Edit(int code, string title)
+        public void Edit(int titleId, string title)
         {
-            Code = code;
+            TitleId = titleId;
             Title = title;
         }
 

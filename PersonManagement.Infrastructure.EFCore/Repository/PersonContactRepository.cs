@@ -31,7 +31,8 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
                                 PersonId = x.PersonId,
                                 ContactTypeId = x.ContactTypeId,
                                 ContactTypeTitle = x.ContactTypes.Title,
-                                PersonFullName = x.Persons.FullName
+                                PersonFirstName = x.Persons.FirstName,
+                                PersonLastName = x.Persons.LastName
                             })
                             .ToList();
         }
@@ -90,7 +91,8 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
                     PersonId = x.PersonId,
                     ContactTypeId = x.ContactTypeId,
                     ContactTypeTitle = x.ContactTypes.Title,
-                    PersonFullName = x.Persons.FullName
+                    PersonFirstName = x.Persons.FirstName,
+                    PersonLastName = x.Persons.LastName,
                 })
                 .ToList();
         }

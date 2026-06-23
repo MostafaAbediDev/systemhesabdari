@@ -9,5 +9,7 @@ namespace GeneralInfoManagement.Domain.BaseInfo.BranchesAgg
         List<BranchViewModel> Search(BranchSearchModel searchModel);
         List<BranchViewModel> GetAllBranches();
         void ResetAllMainBranches();
+        public Branches GetCurrentMainBranch(long companyId);
+        public bool ExistsMainBranch(long companyId, long? excludeId = null);
     }
 }
