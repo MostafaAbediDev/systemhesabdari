@@ -50,6 +50,7 @@
     <None Remove="Assets\Icons\rep_u.svg" />
     <None Remove="Assets\Icons\Rightsquare.svg" />
     <None Remove="Assets\Icons\save.svg" />
+    <None Remove="Assets\Icons\save_p.svg" />
     <None Remove="Assets\Icons\Scale.svg" />
     <None Remove="Assets\Icons\search.svg" />
     <None Remove="Assets\Icons\share.svg" />
@@ -202,6 +203,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Icons\save.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\save_p.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Icons\Scale.svg">

@@ -17,7 +17,7 @@
 
                 <TextBox x:Name="PART_TextBox"
                          Grid.Column="0"
-                         FontFamily="pack://application:,,,/Fonts/#IRANSans"
+                         FontFamily="{StaticResource IRANSans}"
                          FontSize="14"
                          Foreground="#2C3E50"
                          Background="Transparent"

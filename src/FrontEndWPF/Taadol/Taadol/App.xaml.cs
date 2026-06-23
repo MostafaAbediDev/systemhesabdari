@@ -2,6 +2,9 @@
 using CodeManagement.Application.Contracts.Code;
 using CodeManagement.Configuration;
 using GeneralInfoManagement.Configuration;
+using GeneralInfoManagement.Domain.General.CityAgg;
+using GeneralInfoManagement.Domain.General.ProvinceAgg;
+using GeneralInfoManagement.Infrastructure.EFCore.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using PersonManagement.Application;
@@ -11,7 +14,6 @@ using PersonManagement.Domain.Person.PersonAgg;
 using PersonManagement.Infrastructure.EFCore;
 using PersonManagement.Infrastructure.EFCore.Repository;
 using System.Linq;
-
 using System.Windows;
 namespace Taadol
 {
@@ -37,7 +39,8 @@ namespace Taadol
             services.AddTransient<IPersonApplication, PersonApplication>();
             services.AddDbContext<PersonSystemContext>(x => x.UseSqlServer(connectionString));
             services.AddDbContext<PersonFakeDataContext>(x => x.UseSqlServer(connectionString));
-
+            services.AddTransient<IProvinceRepository, ProvinceRepository>();
+            services.AddTransient<ICityRepository, CityRepository>();
             ServiceProvider = services.BuildServiceProvider();
 
             base.OnStartup(e);
