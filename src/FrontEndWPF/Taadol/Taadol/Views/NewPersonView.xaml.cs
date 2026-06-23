@@ -142,7 +142,7 @@ namespace Taadol.Views
 
             var command = new CreatePerson
             {
-                FullName = FirstName + " " + LastName,
+              //  FullName = FirstName + " " + LastName,
                 NationalCode = NationalId,
 
                 EconomicCode = EconomicCode,

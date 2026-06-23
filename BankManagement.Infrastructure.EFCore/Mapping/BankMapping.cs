@@ -19,8 +19,6 @@ namespace BankManagement.Infrastructure.EFCore.Mapping
 
             builder.HasMany(s => s.CompanyBankAccounts).WithOne(s => s.Banks).HasForeignKey(s => s.BankId);
 
-            builder.HasMany(s => s.ChequeBooks).WithOne(s => s.Banks).HasForeignKey(s => s.BankId);
-
             builder.HasMany(s => s.BankBranches).WithOne(s => s.Banks).HasForeignKey(s => s.BankId);
 
         }

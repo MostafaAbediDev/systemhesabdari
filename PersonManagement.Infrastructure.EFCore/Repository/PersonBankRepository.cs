@@ -45,7 +45,7 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
                     CardNumber = x.CardNumber,
                     Shaba = x.Shaba,
                     IsDefault = x.IsDefault,
-                    BankBranchName = x.BankBranches.Title,
+                    BankBranchName = x.BankBranches.BranchName,
                     BankName = x.BankBranches.Banks.Title  
                 })
                 .OrderByDescending(x => x.IsDefault)
@@ -85,7 +85,7 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
                     CardNumber = x.CardNumber,
                     Shaba = x.Shaba,
                     IsDefault = x.IsDefault,
-                    BankBranchName = x.BankBranches.Title,
+                    BankBranchName = x.BankBranches.BranchName,
                     BankName = x.BankBranches.Banks.Title
                 });
 

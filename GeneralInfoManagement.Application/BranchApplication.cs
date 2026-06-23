@@ -28,6 +28,17 @@ namespace GeneralInfoManagement.Application
                 return operation.Failed("شعبه‌ای با این شناسه ملی قبلاً ثبت شده است.");
             if (command.IsMain)
                 _branchRepository.ResetAllMainBranches();
+
+            if (command.IsMain)
+            {
+                var existMainBranch = _branchRepository.Exists(x =>
+                    x.CompanyId == command.CompanyId &&
+                    x.IsMain);
+
+                if (existMainBranch)
+                    return operation.Failed("یک شعبه اصلی قبلاً ثبت شده است.");
+            }
+
             var location = new Location(command.Latitude, command.Longitude);
             var branch = new Branches(
                 command.Title,
@@ -42,7 +53,8 @@ namespace GeneralInfoManagement.Application
                 command.CompanyId,
                 command.TelePhone,
                 command.ProvinceId,
-                command.CityId);
+                command.CityId,
+                command.IsMain);
 
             _branchRepository.Create(branch);
             _branchRepository.SaveChanges();
@@ -74,6 +86,28 @@ namespace GeneralInfoManagement.Application
 
             if (_branchRepository.Exists(x => x.NationalId == nationalId && x.Id != command.Id))
                 return operation.Failed("شناسه ملی تکراری است.");
+
+            if (command.IsMain)
+            {
+                if (_branchRepository.ExistsMainBranch(command.CompanyId, command.Id))
+                {
+                    return operation.Failed("یک شعبه اصلی قبلاً ثبت شده است.");
+                }
+
+                var currentMain = _branchRepository.GetCurrentMainBranch(command.CompanyId);
+
+                if (currentMain != null)
+                {
+                    currentMain.UnsetMain();
+                }
+
+                branch.SetAsMain();
+            }
+            else
+            {
+                branch.UnsetMain();
+            }
+
 
             var location = new Location(command.Latitude, command.Longitude);
 

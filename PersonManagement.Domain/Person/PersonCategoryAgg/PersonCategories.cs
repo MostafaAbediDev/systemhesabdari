@@ -6,15 +6,10 @@ namespace PersonManagement.Domain.Person.PersonCategoryAgg
     public class PersonCategory : EntityBase
     {
         public string Title { get; private set; }
-
         public long PersonTypeId { get; private set; }
-
         public long? ParentId { get; private set; }
-
         public PersonType PersonType { get; private set; }
-
         public PersonCategory Parent { get; private set; }
-
         public List<PersonCategory> Children { get; private set; }
 
         protected PersonCategory()

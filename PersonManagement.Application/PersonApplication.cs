@@ -27,7 +27,8 @@ namespace PersonManagement.Application
                 return result.Failed("کد اقتصادی تکراری است.");
 
             var person = new Persons(
-                command.FullName,
+                command.FirstName,
+                command.LastName,
                 command.IsLegal,
                 command.NationalCode,
                 command.EconomicCode,
@@ -62,7 +63,7 @@ namespace PersonManagement.Application
             if (!command.IsLegal && _personRepository.ExistsNationalCode(command.NationalCode, command.Id))
                 return result.Failed("کد ملی وارد شده برای شخص دیگری ثبت شده است.");
 
-            person.Edit(command.FullName, command.NationalCode, command.EconomicCode,
+            person.Edit(command.FirstName, command.LastName, command.NationalCode, command.EconomicCode,
                         command.RegistrationNumber, command.PersonTypeId, command.BranchId, command.IsLegal);
 
             person.UpdateFinancialInfo(command.CreditLimit);

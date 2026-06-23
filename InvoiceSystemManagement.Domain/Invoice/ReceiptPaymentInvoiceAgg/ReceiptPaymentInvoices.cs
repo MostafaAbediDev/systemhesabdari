@@ -1,5 +1,5 @@
 ﻿using _0_FrameWork.Domain;
-using BankManagement.Domain.Bank.ReceiptsPaymentAgg;
+using FinancialManagement.Domain.ReceiptsPaymentAgg;
 using InvoiceSystemManagement.Domain.Invoice.InvoiceAgg;
 
 namespace InvoiceSystemManagement.Domain.Invoice.ReceiptPaymentInvoiceAgg

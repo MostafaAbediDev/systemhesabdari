@@ -12,31 +12,35 @@ namespace BankManagement.Domain.Bank.BankAgg
         public long BankTypeId { get; private set; }
         public string Country { get; private set; }
         public string Description { get; private set; }
-        public string Logo { get; private set; }
+        public string? Logo { get; private set; }
         public BankTypes BankTypes { get; private set; }
         public List<CompanyBankAccounts> CompanyBankAccounts { get; private set; }
-        public List<ChequeBooks> ChequeBooks { get; private set; }
         public List<BankBranches> BankBranches { get; private set; }
 
         protected Banks()
         {
             CompanyBankAccounts = new List<CompanyBankAccounts>();
-            ChequeBooks = new List<ChequeBooks>();
         }
-        public Banks(string title, long bankTypeId, string country, string description)
+        public Banks(string title, long bankTypeId, string country, string description, string? logo)
         {
             Title = title;
             BankTypeId = bankTypeId;
             Country = country;
             Description = description;
+            Logo = logo;
         }
 
-        public void Edit(string title, long bankTypeId, string country, string description)
+        public void Edit(string title, long bankTypeId, string country, string description, string? logo)
         {
+           
             Title = title;
             BankTypeId = bankTypeId;
             Country = country;
             Description = description;
+
+            if (!string.IsNullOrWhiteSpace(logo))
+                Logo = logo;
+
         }
 
         public void Remove()

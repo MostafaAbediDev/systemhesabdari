@@ -13,7 +13,7 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Mapping
             builder.HasKey(x => x.Id);
 
             builder.Property(x => x.Title).HasMaxLength(200).IsRequired();
-            builder.Property(x => x.Logo).HasMaxLength(500).IsRequired();
+            builder.Property(x => x.Logo).HasMaxLength(500).IsRequired(false);
             builder.Property(x => x.LegalName).HasMaxLength(200).IsRequired();
 
             builder.HasMany(s => s.Branch).WithOne(s => s.Company).HasForeignKey(s => s.CompanyId);
