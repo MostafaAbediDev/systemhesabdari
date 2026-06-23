@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using PersonManagement.Application.Contract.Persons;
+using System;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -7,15 +9,28 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
 using Taadol.Controls;
-
+using PersonManagement.Application.Contract.Persons;
 namespace Taadol.Views
 {
     public partial class NewPersonView : UserControl
 
     {
+        public void LoadPerson(long id)
+        {
+            var person = _personApplication.GetDetails(id);
 
+            //FullName = person.FullName;
+            //NationalCode = person.NationalCode;
+
+            EconomicCode = person.EconomicCode;
+            RegistrationNumber = person.RegistrationNumber;
+
+            isFirstSelected = !person.IsLegal;
+        }
+        public bool IsEditMode { get; set; }
+        public long PersonId { get; set; }
         private int _bankAccountCounter = 0;
-        private ObservableCollection<object> _bankAccounts = new ObservableCollection<object>();
+        private ObservableCollection<object> _bankAccounts; 
         private List<TreeComboItem> BuildTree() => new List<TreeComboItem>
         {
             new TreeComboItem("مشتری", 1) { IsRoot = true }
@@ -40,7 +55,31 @@ namespace Taadol.Views
         };
         private void AddRoot()
           => MessageBox.Show("افزودن دسته ریشه جدید");
+        private string FirstName;
+        private string LastName;
+        private string NationalId;
+        private readonly IPersonApplication _personApplication;
 
+        private string CompanyName;
+        private string EconomicCode;
+        private string RegistrationNumber;
+
+        private bool isFirstSelected = true;
+        private bool ValidatePerson()
+        {
+            if (isFirstSelected)
+            {
+                return !string.IsNullOrWhiteSpace(FirstName)
+                    && !string.IsNullOrWhiteSpace(LastName)
+                    && !string.IsNullOrWhiteSpace(NationalId);
+            }
+            else
+            {
+                return !string.IsNullOrWhiteSpace(CompanyName)
+                    && !string.IsNullOrWhiteSpace(EconomicCode)
+                    && !string.IsNullOrWhiteSpace(RegistrationNumber);
+            }
+        }
         private void AddChild(TreeComboItem parent)
             => MessageBox.Show($"افزودن زیرمجموعه برای: {parent.DisplayName}");
 
@@ -75,17 +114,53 @@ namespace Taadol.Views
         public NewPersonView()
         {
             InitializeComponent();
-            AdditionalBankAccountsPanel.ItemsSource = _bankAccounts;
-                                                                                                                                                           
-                                }
 
+            _personApplication = App.ServiceProvider
+                .GetRequiredService<IPersonApplication>();
+        }
+        public ICommand SavePersonCommand { get; set; }
+
+        private void SavePerson_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new CustomConfirmDialog();
+
+            bool? result = dialog.ShowDialog();
+
+            if (result == true)
+            {
+                SavePerson();
+            }
+        }
+
+     
+        private void SavePerson(object obj = null)
+        {
+            var dialog = new CustomConfirmDialog();
+
+            if (dialog.ShowDialog() != true)
+                return;
+
+            var command = new CreatePerson
+            {
+                FullName = FirstName + " " + LastName,
+                NationalCode = NationalId,
+
+                EconomicCode = EconomicCode,
+                RegistrationNumber = RegistrationNumber,
+
+                IsLegal = !isFirstSelected
+            };
+
+            _personApplication.Create(command);
+            MessageBox.Show("ثبت شخص با موفقیت انجام شد");
+        }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
         }
         private void AddBankAccountButton_Click(object sender, RoutedEventArgs e)
         {
             var newAccount = new { Id = _bankAccountCounter++ };
-            _bankAccounts.Add(newAccount);
+            _bankAccounts.Add(new { Id = _bankAccountCounter++ });
         }
         private void RemoveBankAccount_Click(object sender, RoutedEventArgs e)
         {
@@ -97,20 +172,21 @@ namespace Taadol.Views
         }
         private void Toggle_SelectionChanged(object sender, bool isFirstSelected)
         {
-                        
+            this.isFirstSelected = isFirstSelected;
+
             if (isFirstSelected)
             {
-                                FirstNamePanel.Visibility = Visibility.Visible;
+                FirstNamePanel.Visibility = Visibility.Visible;
                 LastNamePanel.Visibility = Visibility.Visible;
                 NationalCodePanel.Visibility = Visibility.Visible;
 
-                                CompanyNamePanel.Visibility = Visibility.Collapsed;
+                CompanyNamePanel.Visibility = Visibility.Collapsed;
                 EconomicCodePanel.Visibility = Visibility.Collapsed;
                 RegistrationNumberPanel.Visibility = Visibility.Collapsed;
             }
             else
             {
-                                FirstNamePanel.Visibility = Visibility.Collapsed;
+                FirstNamePanel.Visibility = Visibility.Collapsed;
                 LastNamePanel.Visibility = Visibility.Collapsed;
                 NationalCodePanel.Visibility = Visibility.Collapsed;
 
@@ -197,13 +273,25 @@ namespace Taadol.Views
             InventoryContent.Visibility = Visibility.Collapsed;
             TaxContent.Visibility = Visibility.Collapsed;
         }
-     
+
 
         private void ImagePickerControl_Loaded(object sender, RoutedEventArgs e)
         {
 
         }
+        private void CategoryToggle_Checked(object sender, RoutedEventArgs e)
+        {
+            if (PersonnelToggle == null || TabTax == null) return;
 
+            bool isPersonnel = PersonnelToggle.IsChecked == true;
+            TabTax.Visibility = isPersonnel ? Visibility.Visible : Visibility.Collapsed;
+
+            // اگه پرسنل غیرفعال شد ولی تب مالیات/پرسونل انتخاب شده بود، برگرد به تب پیش‌فرض
+            if (!isPersonnel && TabTax.IsChecked == true)
+            {
+                TabPricing.IsChecked = true;
+            }
+        }
         private void ToggleSwitchControl_SelectionChanged(object sender, bool e)
         {
 

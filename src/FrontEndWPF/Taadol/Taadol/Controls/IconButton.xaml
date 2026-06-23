@@ -2,19 +2,22 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:svg="clr-namespace:SharpVectors.Converters;assembly=SharpVectors.Converters.Wpf"
-             x:Name="Root">
+             x:Name="Root"
+             Width="Auto">
 
     <Button Command="{Binding ButtonCommand, ElementName=Root}"
             Background="{Binding ButtonBackground, ElementName=Root}"
             Foreground="{Binding ButtonForeground, ElementName=Root}"
             Height="{Binding ButtonHeight, ElementName=Root}"
-            Width="{Binding ButtonWidth, ElementName=Root}"
+            MinWidth="{Binding ButtonWidth, ElementName=Root}"
+            Width="Auto"
             BorderThickness="0">
         <Button.Template>
             <ControlTemplate TargetType="Button">
                 <Border x:Name="border"
                         Background="{TemplateBinding Background}"
                         CornerRadius="{Binding CornerRadius, ElementName=Root}"
+                        Padding="12,0"
                         SnapsToDevicePixels="True">
                     <ContentPresenter HorizontalAlignment="Center"
                                       VerticalAlignment="Center" />
