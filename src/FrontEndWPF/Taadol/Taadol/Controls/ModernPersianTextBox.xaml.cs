@@ -94,6 +94,7 @@ namespace Taadol.Controls
             UpdatePlaceholderVisibility();
             UpdateSuffixVisibility();
             DataObject.AddPastingHandler(PART_TextBox, OnPaste);
+
         }
 
         private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -118,9 +119,19 @@ namespace Taadol.Controls
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
+            int caret = PART_TextBox.CaretIndex;
+
+            if (InputType == ModernTextBoxInputType.Number || InputType == ModernTextBoxInputType.Text)
+            {
+                // تبدیل اعداد انگلیسی به فارسی حتی در Text mode
+                PART_TextBox.Text = ConvertToPersianDigits(PART_TextBox.Text);
+                PART_TextBox.CaretIndex = Math.Min(caret, PART_TextBox.Text.Length);
+            }
+
             Text = PART_TextBox.Text;
             UpdatePlaceholderVisibility();
         }
+
 
         private void PART_TextBox_GotFocus(object sender, RoutedEventArgs e)
         {
@@ -139,6 +150,19 @@ namespace Taadol.Controls
             PlaceholderText.Visibility = string.IsNullOrEmpty(PART_TextBox.Text) ? Visibility.Visible : Visibility.Collapsed;
         }
 
+
+        private string ConvertToPersianDigits(string input)
+        {
+            if (string.IsNullOrEmpty(input)) return input;
+
+            string[] englishDigits = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+            string[] persianDigits = { "۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹" };
+
+            for (int i = 0; i < 10; i++)
+                input = input.Replace(englishDigits[i], persianDigits[i]);
+
+            return input;
+        }
         private void UpdateSuffixVisibility()
         {
             SuffixText.Visibility = string.IsNullOrEmpty(Suffix) ? Visibility.Collapsed : Visibility.Visible;

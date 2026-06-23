@@ -305,7 +305,7 @@
                                             Height="36">
                                         <svg:SvgViewbox Width="18"
                                                         Height="18"
-                                                        Source="/Assets/Icons/newdoc21.svg" />
+                                                        Source="/Assets/Icons/plus.svg" />
                                     </Border>
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsMouseOver"

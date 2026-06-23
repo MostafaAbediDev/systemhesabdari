@@ -352,11 +352,13 @@ namespace Taadol.Controls
             slide.BeginAnimation(TranslateTransform.YProperty, slideIn);
         }
         public static readonly DependencyProperty HeaderTextProperty =
-    DependencyProperty.Register(
-        nameof(HeaderText),
-        typeof(string),
-        typeof(CategorySearchControl),
-        new PropertyMetadata("دسته بندی اشخاص"));
+     DependencyProperty.Register(
+         nameof(HeaderText),
+         typeof(string),
+         typeof(CategorySearchControl),
+         new PropertyMetadata("دسته بندی اشخاص"));
+
+   
         public event Action<CategoryItem> RootCategoryAdded;
 
         private void AddRootButton_Click(object sender, RoutedEventArgs e)
