@@ -21,7 +21,8 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
                 .Select(x => new EditPerson
                 {
                     Id = x.Id,
-                    FullName = x.FullName,
+                    FirstName = x.FirstName,
+                    LastName = x.LastName,
                     IsLegal = x.IsLegal,
                     NationalCode = x.NationalCode,
                     EconomicCode = x.EconomicCode,
@@ -43,10 +44,16 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
             // اگر SoftDelete دارید
             query = query.Where(x => !x.IsDeleted);
 
-            if (!string.IsNullOrWhiteSpace(searchModel.FullName))
+            if (!string.IsNullOrWhiteSpace(searchModel.FirstName))
             {
-                var fullName = searchModel.FullName.Trim();
-                query = query.Where(x => x.FullName.Contains(fullName));
+                var fullName = searchModel.FirstName.Trim();
+                query = query.Where(x => x.FirstName.Contains(fullName));
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchModel.LastName))
+            {
+                var fullName = searchModel.LastName.Trim();
+                query = query.Where(x => x.LastName.Contains(fullName));
             }
 
             if (!string.IsNullOrWhiteSpace(searchModel.NationalCode))
@@ -62,7 +69,8 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
                 .Select(x => new PersonViewModel
                 {
                     Id = x.Id,
-                    FullName = x.FullName,
+                    FirstName = x.FirstName,
+                    LastName = x.LastName,
                     IsLegal = x.IsLegal,
                     NationalCode = x.NationalCode,
                     EconomicCode = x.EconomicCode,
@@ -86,7 +94,8 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
                 .Select(x => new PersonViewModel
                 {
                     Id = x.Id,
-                    FullName = x.FullName,
+                    FirstName = x.FirstName,
+                    LastName = x.LastName,
                     IsLegal = x.IsLegal,
                     NationalCode = x.NationalCode,
                     EconomicCode = x.EconomicCode,

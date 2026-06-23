@@ -1,17 +1,19 @@
 ﻿using _0_FrameWork.Domain;
-using BankManagement.Domain.Bank.BankAgg;
 using BankManagement.Domain.Bank.ChequeAgg;
+using BankManagement.Domain.Bank.CompanyBankAccountAgg;
 
 namespace BankManagement.Domain.Bank.ChequeBookAgg
 {
     public class ChequeBooks : EntityBase
     {
         public int ChequeCount { get; private set; }
-        public int FirstChequeCode { get; private set; }
-        public int LastChequeCode { get; private set; }
-        public string OwnerName { get; private set; }
-        public long BankId { get; private set; }
-        public Banks Banks { get; private set; }
+        public string FirstChequeCode { get; private set; }
+        public string LastChequeCode { get; private set; }
+        public ChequeBookStatus Status { get; private set; }
+        public string SerialNumber { get; private set; }
+        public DateTime ReceiveDate { get; private set; }
+        public long CompanyBankAccountId { get; private set; }
+        public CompanyBankAccounts CompanyBankAccount { get; private set; }
         public List<Cheques> Cheques { get; private set; }
 
         protected ChequeBooks()
@@ -19,20 +21,34 @@ namespace BankManagement.Domain.Bank.ChequeBookAgg
             Cheques = new List<Cheques>();
         }
 
-        public ChequeBooks(int chequeCount, int firstChequeCode, int lastChequeCode, string ownerName)
+        public ChequeBooks(int chequeCount, string firstChequeCode, string lastChequeCode, string serialNumber, DateTime receiveDate,
+            long companyBankAccountId)
         {
             ChequeCount = chequeCount;
             FirstChequeCode = firstChequeCode;
             LastChequeCode = lastChequeCode;
-            OwnerName = ownerName;
+            SerialNumber = serialNumber;
+            ReceiveDate = receiveDate;
+            CompanyBankAccountId = companyBankAccountId;
+
+            Status = ChequeBookStatus.Active;
+
         }
 
-        public void Edit(int chequeCount, int firstChequeCode, int lastChequeCode, string ownerName)
+        public void Edit(int chequeCount, string firstChequeCode, string lastChequeCode, string serialNumber, DateTime receiveDate,
+            long companyBankAccountId)
         {
             ChequeCount = chequeCount;
             FirstChequeCode = firstChequeCode;
             LastChequeCode = lastChequeCode;
-            OwnerName = ownerName;
+            SerialNumber = serialNumber;
+            ReceiveDate = receiveDate;
+            CompanyBankAccountId = companyBankAccountId;
+        }
+
+        public void ChangeStatus(ChequeBookStatus status)
+        {
+            Status = status;
         }
         public void Remove()
         {

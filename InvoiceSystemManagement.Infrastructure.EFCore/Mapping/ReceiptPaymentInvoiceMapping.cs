@@ -1,5 +1,4 @@
-﻿using BankManagement.Domain.Bank.PettyCashAgg;
-using InvoiceSystemManagement.Domain.Invoice.ReceiptPaymentInvoiceAgg;
+﻿using InvoiceSystemManagement.Domain.Invoice.ReceiptPaymentInvoiceAgg;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

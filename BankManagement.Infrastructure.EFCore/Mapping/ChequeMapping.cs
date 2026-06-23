@@ -20,7 +20,6 @@ namespace BankManagement.Infrastructure.EFCore.Mapping
 
             builder.HasOne(x => x.ChequeBooks).WithMany(x => x.Cheques).HasForeignKey(x => x.ChequeBookId);
 
-            builder.HasMany(s => s.ReceiptsPayments).WithOne(s => s.Cheques).HasForeignKey(s => s.ChequeId);
 
         }
     }

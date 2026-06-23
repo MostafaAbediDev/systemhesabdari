@@ -9,7 +9,8 @@ namespace PersonManagement.Domain.Person.PersonAgg
 {
     public class Persons : EntityBase
     {
-        public string FullName { get; private set; }
+        public string FirstName { get; private set; }
+        public string LastName { get; private set; }
         public string? NationalCode { get; private set; }
         public string? EconomicCode { get; private set; }
         public string? RegistrationNumber { get; private set; }
@@ -31,10 +32,11 @@ namespace PersonManagement.Domain.Person.PersonAgg
             PersonContacts = new List<PersonContacts>();
         }
 
-        public Persons(string fullName, bool isLegal, string? nationalCode, string? economicCode,
+        public Persons(string firstName, string lastName , bool isLegal, string? nationalCode, string? economicCode,
             string? registrationNumber, long personTypeId, long branchId, decimal creditLimit)
         {
-            FullName = fullName;
+            FirstName = firstName;
+            LastName = lastName;
             IsLegal = isLegal;
 
             if (isLegal)
@@ -54,10 +56,12 @@ namespace PersonManagement.Domain.Person.PersonAgg
             AvailableCredit = creditLimit;
         }
 
-        public void Edit(string fullName, string? nationalCode,
+        public void Edit(string firstName, string lastName, string? nationalCode,
             string? economicCode, string? registrationNumber, long personTypeId, long branchId, bool isLegal)
         {
-            FullName = fullName;
+            FirstName = firstName;
+            LastName = lastName;
+
             PersonTypeId = personTypeId;
 
             SetBranch(branchId);
