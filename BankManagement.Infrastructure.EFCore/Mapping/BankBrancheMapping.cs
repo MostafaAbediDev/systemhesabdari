@@ -12,7 +12,7 @@ namespace BankManagement.Infrastructure.EFCore.Mapping
 
             builder.HasKey(x => x.Id);
 
-            builder.Property(x => x.Title)
+            builder.Property(x => x.BranchName)
                 .IsRequired()
                 .HasMaxLength(200);
 

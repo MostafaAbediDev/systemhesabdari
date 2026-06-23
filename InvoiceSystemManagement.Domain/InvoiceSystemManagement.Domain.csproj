@@ -10,6 +10,7 @@
     <ProjectReference Include="..\01_FrameWork\01_FrameWork.csproj" />
     <ProjectReference Include="..\AccountManagement.Domain\AccountManagement.Domain.csproj" />
     <ProjectReference Include="..\BankManagement.Domain\BankManagement.Domain.csproj" />
+    <ProjectReference Include="..\FinancialManagement.Domain\FinancialManagement.Domain.csproj" />
     <ProjectReference Include="..\GeneralInfoManagement.Domain\GeneralInfoManagement.Domain.csproj" />
     <ProjectReference Include="..\InventoryManagement.Domain\InventoryManagement.Domain.csproj" />
     <ProjectReference Include="..\PersonManagement.Domain\PersonManagement.Domain.csproj" />

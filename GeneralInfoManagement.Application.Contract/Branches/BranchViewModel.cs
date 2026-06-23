@@ -21,6 +21,7 @@
         public string ProvinceName { get; set; }
         public string Code { get; set; }
         public bool IsActive { get; set; }
+        public bool IsMain { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }

@@ -39,7 +39,8 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
                     ProvinceName = x.Provinces.Title,
                     ProvinceId = x.ProvinceId,
                     IsActive = x.IsActive,
-                    CreatedAt = x.CreationDate
+                    CreatedAt = x.CreationDate,
+                    IsMain = x.IsMain
                 })
                 .OrderByDescending(x => x.Id)
                 .ToList();
@@ -66,7 +67,8 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
                     Longitude = x.Location.Longitude,
                     CompanyId = x.CompanyId,
                     CityId = x.CityId,
-                    ProvinceId = x.ProvinceId
+                    ProvinceId = x.ProvinceId,
+                    IsMain = x.IsMain
                 })
                 .FirstOrDefault();
         }
@@ -117,6 +119,7 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
                     CityName = x.Cities.Title,
                     ProvinceName = x.Provinces.Title,
                     IsActive = x.IsActive,
+                    IsMain = x.IsMain,
                     CreatedAt = x.CreationDate
                 })
                 .OrderByDescending(x => x.Id)
@@ -128,6 +131,21 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
             _context.Branches
                 .Where(x => x.IsMain)
                 .ExecuteUpdate(x => x.SetProperty(b => b.IsMain, false));
+        }
+
+        public bool ExistsMainBranch(long companyId, long? excludeId = null)
+        {
+            return _context.Branches.Any(x =>
+                x.CompanyId == companyId &&
+                x.IsMain &&
+                !x.IsDeleted &&
+                (!excludeId.HasValue || x.Id != excludeId));
+        }
+
+        public Branches GetCurrentMainBranch(long companyId)
+        {
+            return _context.Branches
+                .FirstOrDefault(x => x.CompanyId == companyId && x.IsMain && !x.IsDeleted);
         }
     }
 }

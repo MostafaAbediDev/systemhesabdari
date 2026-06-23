@@ -6,7 +6,7 @@ namespace GeneralInfoManagement.Domain.BaseInfo.CompaniesAgg
     public class Companies : EntityBase
     {
         public string Title { get; private set; }
-        public string Logo { get; private set; }
+        public string? Logo { get; private set; }
         public string LegalName { get; private set; }
         public DateTime EstablishedDate { get; private set; }
         public List<Branches> Branch { get; private set; }
@@ -16,7 +16,7 @@ namespace GeneralInfoManagement.Domain.BaseInfo.CompaniesAgg
             Branch = new List<Branches>();
 
         }
-        public Companies(string title, string logo, string legalName, 
+        public Companies(string title, string? logo, string legalName, 
             DateTime establishedDate)
         {
             Title = title;
@@ -25,7 +25,7 @@ namespace GeneralInfoManagement.Domain.BaseInfo.CompaniesAgg
             EstablishedDate = establishedDate;
         }
 
-        public void Edit(string title, string logo, string legalName,
+        public void Edit(string title, string? logo, string legalName,
             DateTime establishedDate)
         {
             Title = title;

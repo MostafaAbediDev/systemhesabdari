@@ -1,5 +1,4 @@
-﻿using BankManagement.Domain.Bank.BankAgg;
-using BankManagement.Domain.Bank.ChequeBookAgg;
+﻿using BankManagement.Domain.Bank.ChequeBookAgg;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -12,9 +11,8 @@ namespace BankManagement.Infrastructure.EFCore.Mapping
             builder.ToTable("ChequeBooks");
             builder.HasKey(x => x.Id);
 
-            builder.Property(x => x.OwnerName).HasMaxLength(200).IsRequired();
-
-            builder.HasOne(x => x.Banks).WithMany(x => x.ChequeBooks).HasForeignKey(x => x.BankId).OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(x => x.CompanyBankAccount).WithMany()
+                .HasForeignKey(x => x.CompanyBankAccountId).OnDelete(DeleteBehavior.NoAction);
 
             builder.HasMany(s => s.Cheques).WithOne(s => s.ChequeBooks).HasForeignKey(s => s.ChequeBookId);
 
