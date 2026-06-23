@@ -1,6 +1,8 @@
 ﻿namespace BankManagement.Application.Contracts.Cheque
 {
-    public class ChequeTypeDTO
+    public enum ChequeTypeDTO
     {
+        Issued = 1,
+        Received = 2
     }
 }
