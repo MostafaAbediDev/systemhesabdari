@@ -1,12 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using _0_Framework.Application;
 
 namespace BankManagement.Application.Contracts.ChequeBook
 {
-    internal interface IChequeBookApplication
+    public interface IChequeBookApplication
     {
+        OperationResult Create(CreateChequeBook command);
+        OperationResult Edit(EditChequeBook command);
+        OperationResult Remove(long id);
+        OperationResult Restore(long id);
+        OperationResult Activate(long id);
+        OperationResult Deactivate(long id);
+        OperationResult ChangeStatus(ChangeChequeBookStatus command);
+        EditChequeBook GetDetails(long id);
+        List<ChequeBookViewModel> Search(ChequeBookSearchModel searchModel);
+        List<ChequeBookViewModel> GetChequeBooks();
     }
 }
