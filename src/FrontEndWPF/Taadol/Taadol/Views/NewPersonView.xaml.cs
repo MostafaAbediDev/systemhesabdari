@@ -1,15 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using PersonManagement.Application.Contract.Persons;
-using System;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Media.Effects;
 using Taadol.Controls;
-using PersonManagement.Application.Contract.Persons;
 namespace Taadol.Views
 {
     public partial class NewPersonView : UserControl
@@ -142,7 +137,13 @@ namespace Taadol.Views
 
             var command = new CreatePerson
             {
-                FullName = FirstName + " " + LastName,
+                //FullName = FirstName + " " + LastName,
+
+                //Add New
+                FirstName = FirstName,
+                LastName = LastName,
+
+                //
                 NationalCode = NationalId,
 
                 EconomicCode = EconomicCode,
