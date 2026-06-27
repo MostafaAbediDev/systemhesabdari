@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BankManagement.Infrastructure.EFCore.Repository
 {
-    internal class ChequeRepository : RepositoryBase<long, Cheques>, IChequeRepository
+    public class ChequeRepository : RepositoryBase<long, Cheques>, IChequeRepository
     {
         private readonly BankFakeDataContext _context;
 

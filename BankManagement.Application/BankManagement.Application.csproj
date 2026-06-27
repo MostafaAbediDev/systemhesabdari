@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BankManagement.Application.Contracts\BankManagement.Application.Contracts.csproj" />
     <ProjectReference Include="..\BankManagement.Domain\BankManagement.Domain.csproj" />
+    <ProjectReference Include="..\CodeManagement.Application.Contracts\CodeManagement.Application.Contracts.csproj" />
   </ItemGroup>
 
 </Project>
