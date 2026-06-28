@@ -14,4 +14,5 @@ namespace PersonManagement.Application.Contract.Persons
         List<PersonViewModel> Search(PersonSearchModel searchModel);
         List<PersonViewModel> GetPersons();
     }
+
 }

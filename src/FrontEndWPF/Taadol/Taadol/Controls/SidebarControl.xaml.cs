@@ -48,7 +48,8 @@ namespace Taadol.Controls
     { "dashboard", SubDashboard },
     { "products", SubProducts },
     { "persons", SubPersons },
-    { "businessinfo", SubBusinessInfo },      { "warehouse", SubWarehouse },
+    { "businessinfo", SubBusinessInfo },
+    { "warehouse", SubWarehouse },
     { "bank", SubBank },
     { "sales", SubSales },
     { "reports", SubReports }
@@ -62,10 +63,10 @@ namespace Taadol.Controls
             if (clickedBtn == null) return;
 
 
-                        if (_activeSubMenuItem != null)
+            if (_activeSubMenuItem != null)
                 SetSubMenuInactive(_activeSubMenuItem);
 
-                        _activeSubMenuItem = clickedBtn;
+            _activeSubMenuItem = clickedBtn;
             SetSubMenuActive(clickedBtn);
         }
 
@@ -216,7 +217,7 @@ namespace Taadol.Controls
             {
                 _isAnimating = false;
 
-                                if (_activeSubMenuButton != null)
+                if (_activeSubMenuButton != null)
                 {
                     SetSubMenuActive(_activeSubMenuButton);
                 }
@@ -352,7 +353,7 @@ namespace Taadol.Controls
             FadeInChild<SvgViewbox>(BtnProducts, "chevProducts");
             FadeInChild<TextBlock>(BtnPersons, "txtPersons");
             FadeInChild<SvgViewbox>(BtnPersons, "chevPersons");
-            FadeInChild<TextBlock>(BtnBusinessInfo, "txtBusinessInfo");                  FadeInChild<SvgViewbox>(BtnBusinessInfo, "chevBusinessInfo");                FadeInChild<TextBlock>(BtnWarehouse, "txtWarehouse");
+            FadeInChild<TextBlock>(BtnBusinessInfo, "txtBusinessInfo"); FadeInChild<SvgViewbox>(BtnBusinessInfo, "chevBusinessInfo"); FadeInChild<TextBlock>(BtnWarehouse, "txtWarehouse");
             FadeInChild<SvgViewbox>(BtnWarehouse, "chevWarehouse");
             FadeInChild<TextBlock>(BtnBank, "txtBank");
             FadeInChild<SvgViewbox>(BtnBank, "chevBank");
@@ -371,7 +372,7 @@ namespace Taadol.Controls
             FadeOutChild<SvgViewbox>(BtnProducts, "chevProducts");
             FadeOutChild<TextBlock>(BtnPersons, "txtPersons");
             FadeOutChild<SvgViewbox>(BtnPersons, "chevPersons");
-            FadeOutChild<TextBlock>(BtnBusinessInfo, "txtBusinessInfo");                  FadeOutChild<SvgViewbox>(BtnBusinessInfo, "chevBusinessInfo");                FadeOutChild<TextBlock>(BtnWarehouse, "txtWarehouse");
+            FadeOutChild<TextBlock>(BtnBusinessInfo, "txtBusinessInfo"); FadeOutChild<SvgViewbox>(BtnBusinessInfo, "chevBusinessInfo"); FadeOutChild<TextBlock>(BtnWarehouse, "txtWarehouse");
             FadeOutChild<SvgViewbox>(BtnWarehouse, "chevWarehouse");
             FadeOutChild<TextBlock>(BtnBank, "txtBank");
             FadeOutChild<SvgViewbox>(BtnBank, "chevBank");
@@ -395,7 +396,7 @@ namespace Taadol.Controls
             SetVis<SvgViewbox>(BtnProducts, "chevProducts", vis);
             SetVis<TextBlock>(BtnPersons, "txtPersons", vis);
             SetVis<SvgViewbox>(BtnPersons, "chevPersons", vis);
-            SetVis<TextBlock>(BtnBusinessInfo, "txtBusinessInfo", vis);                  SetVis<SvgViewbox>(BtnBusinessInfo, "chevBusinessInfo", vis);                SetVis<TextBlock>(BtnWarehouse, "txtWarehouse", vis);
+            SetVis<TextBlock>(BtnBusinessInfo, "txtBusinessInfo", vis); SetVis<SvgViewbox>(BtnBusinessInfo, "chevBusinessInfo", vis); SetVis<TextBlock>(BtnWarehouse, "txtWarehouse", vis);
             SetVis<SvgViewbox>(BtnWarehouse, "chevWarehouse", vis);
             SetVis<TextBlock>(BtnBank, "txtBank", vis);
             SetVis<SvgViewbox>(BtnBank, "chevBank", vis);
@@ -413,7 +414,7 @@ namespace Taadol.Controls
             {
                 SetActiveMenu(btn, tag);
 
-                                if (_activeSubMenuButton != null)
+                if (_activeSubMenuButton != null)
                 {
                     SetSubMenuInactive(_activeSubMenuButton);
                     _activeSubMenuButton = null;
@@ -442,17 +443,17 @@ namespace Taadol.Controls
 
             if (isOpen)
             {
-                                SmoothClose(targetSub, () =>
-                {
-                    UpdateMenuCornerRadius(btn, tag);
-                });
+                SmoothClose(targetSub, () =>
+{
+    UpdateMenuCornerRadius(btn, tag);
+});
                 SetChevron(btn, tag, "down");
                 RotateSubMenuArrow(btn, 0);
                 UpdateMenuCornerRadius(btn, tag);
             }
             else
             {
-                                StackPanel currentOpen = null;
+                StackPanel currentOpen = null;
                 string currentOpenTag = null;
 
                 foreach (var kvp in _subMenus)
@@ -491,7 +492,7 @@ namespace Taadol.Controls
             SetChevron(BtnDashboard, "dashboard", "down");
             SetChevron(BtnProducts, "products", "down");
             SetChevron(BtnPersons, "persons", "down");
-            SetChevron(BtnBusinessInfo, "businessinfo", "down");              SetChevron(BtnWarehouse, "warehouse", "down");
+            SetChevron(BtnBusinessInfo, "businessinfo", "down"); SetChevron(BtnWarehouse, "warehouse", "down");
             SetChevron(BtnBank, "bank", "down");
             SetChevron(BtnSales, "sales", "down");
             SetChevron(BtnReports, "reports", "down");
@@ -560,23 +561,30 @@ namespace Taadol.Controls
                     panel.MaxHeight = double.PositiveInfinity;
                     panel.Opacity = 1;
 
-                                        RestoreActiveSubMenuStyle();
+                    // فقط اینجا باید فالس بشه!
+                    _isSubMenuAnimating = false;
+
+                    RestoreActiveSubMenuStyle();
                 }
             };
             timer.Start();
-            _isSubMenuAnimating = false;
+
+            // این دو خط پایین رو حتماً پاک کنید چون باعث باگ میشن
+            // _isSubMenuAnimating = false; 
+            // panel.Visibility = Visibility.Visible;
+            // panel.IsHitTestVisible = true;
         }
 
         private void RestoreActiveSubMenuStyle()
         {
             if (_activeSubMenuTag != null)
             {
-                                var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(50) };
+                var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(50) };
                 timer.Tick += (s, e) =>
                 {
                     timer.Stop();
 
-                                        foreach (var subPanel in _subMenus.Values)
+                    foreach (var subPanel in _subMenus.Values)
                     {
                         if (subPanel.Visibility == Visibility.Visible)
                         {
@@ -610,7 +618,7 @@ namespace Taadol.Controls
             }
             return null;
         }
-                private bool IsButtonInPanel(Button button, StackPanel panel)
+        private bool IsButtonInPanel(Button button, StackPanel panel)
         {
             DependencyObject parent = VisualTreeHelper.GetParent(button);
             while (parent != null)
@@ -656,12 +664,16 @@ namespace Taadol.Controls
                     panel.MaxHeight = double.PositiveInfinity;
                     panel.Opacity = 1;
 
+                    // فقط اینجا باید فالس بشه!
                     _isSubMenuAnimating = false;
+
                     onComplete?.Invoke();
                 }
             };
             timer.Start();
-            _isSubMenuAnimating = false;
+
+            // این خط رو حتماً پاک کنید!
+            // _isSubMenuAnimating = false;
         }
         private double SmoothStep(double t)
         {
@@ -683,7 +695,7 @@ namespace Taadol.Controls
                 return;
             }
 
-                        int totalSteps = 5;
+            int totalSteps = 5;
             int interval = durationMs / totalSteps;
             int currentStep = 0;
 
@@ -717,7 +729,7 @@ namespace Taadol.Controls
                 SetActiveMenu(btn, "dashboard");
             }
 
-                        if (_activeSubMenuButton != null)
+            if (_activeSubMenuButton != null)
             {
                 SetSubMenuInactive(_activeSubMenuButton);
                 _activeSubMenuButton = null;
@@ -734,21 +746,12 @@ namespace Taadol.Controls
 
         private void SubMenuClick(object sender, RoutedEventArgs e)
         {
-            if (sender is Button btn && btn.Tag is string tag)
-            {
-                                if (btn == _activeSubMenuButton) return;
+            if (!(sender is Button btn)) return;
+            if (btn.Tag == null) return;
 
-                                if (_activeSubMenuButton != null)
-                {
-                    SetSubMenuInactive(_activeSubMenuButton);
-                }
+            string tag = btn.Tag.ToString();
 
-                                _activeSubMenuButton = btn;
-                _activeSubMenuTag = tag;
-                SetSubMenuActive(btn);
-
-                SubMenuClicked?.Invoke(tag);
-            }
+            SubMenuClicked?.Invoke(tag);
         }
 
         private void AnimateSizeWithBounce(Ellipse ellipse, double from, double to, int durationMs)
@@ -756,7 +759,7 @@ namespace Taadol.Controls
             int totalSteps = 20;
             int currentStep = 0;
             double stepDuration = (double)durationMs / totalSteps;
-            double overshoot = to + (to - from) * 0.3; 
+            double overshoot = to + (to - from) * 0.3;
             var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(stepDuration) };
             timer.Tick += (s, e) =>
             {
@@ -766,12 +769,12 @@ namespace Taadol.Controls
 
                 if (progress < 0.6)
                 {
-                                        double subProgress = progress / 0.6;
+                    double subProgress = progress / 0.6;
                     currentSize = from + (overshoot - from) * EaseOutQuad(subProgress);
                 }
                 else
                 {
-                                        double subProgress = (progress - 0.6) / 0.4;
+                    double subProgress = (progress - 0.6) / 0.4;
                     currentSize = overshoot + (to - overshoot) * EaseOutQuad(subProgress);
                 }
 
@@ -808,10 +811,10 @@ namespace Taadol.Controls
                     EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                 };
 
-                                anim.Completed += (s, e) =>
-                {
-                    textBlock.ClearValue(TextBlock.ForegroundProperty);
-                };
+                anim.Completed += (s, e) =>
+{
+    textBlock.ClearValue(TextBlock.ForegroundProperty);
+};
 
                 newBrush.BeginAnimation(SolidColorBrush.ColorProperty, anim);
 
@@ -833,10 +836,10 @@ namespace Taadol.Controls
                     EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                 };
 
-                                anim.Completed += (s, e) =>
-                {
-                    ellipse.ClearValue(Shape.FillProperty);
-                };
+                anim.Completed += (s, e) =>
+{
+    ellipse.ClearValue(Shape.FillProperty);
+};
 
                 newFill.BeginAnimation(SolidColorBrush.ColorProperty, anim);
                 AnimateSize(ellipse, 8, 5, 200);
@@ -942,8 +945,8 @@ namespace Taadol.Controls
 
             if (textBlock != null)
             {
-                                var newBrush = new SolidColorBrush(
-                    (Color)ColorConverter.ConvertFromString("#737791"));
+                var newBrush = new SolidColorBrush(
+    (Color)ColorConverter.ConvertFromString("#737791"));
                 textBlock.Foreground = newBrush;
 
                 newBrush.BeginAnimation(SolidColorBrush.ColorProperty,
@@ -960,8 +963,8 @@ namespace Taadol.Controls
 
             if (ellipse != null)
             {
-                                var newFill = new SolidColorBrush(
-                    (Color)ColorConverter.ConvertFromString("#737791"));
+                var newFill = new SolidColorBrush(
+    (Color)ColorConverter.ConvertFromString("#737791"));
                 ellipse.Fill = newFill;
 
                 newFill.BeginAnimation(SolidColorBrush.ColorProperty,

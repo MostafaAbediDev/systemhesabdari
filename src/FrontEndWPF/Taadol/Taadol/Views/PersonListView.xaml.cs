@@ -1,30 +1,43 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using PersonManagement.Application.Contract.PersonAddress;
+using PersonManagement.Application.Contract.PersonBank;
+using PersonManagement.Application.Contract.PersonContact;
+using PersonManagement.Application.Contract.Persons;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using Microsoft.Extensions.DependencyInjection;
-using PersonManagement.Application.Contract.Persons;
-using System.Threading.Tasks;
+using System.Windows.Threading;
+
 namespace Taadol.Views
 {
+    /// <summary>
+    /// فرم لیست اشخاص.
+    /// اطلاعات شخص + تماس‌ها (موبایل/تلفن) + آدرس (استان/شهر) رو به‌صورت یکپارچه نشون می‌ده.
+    /// الگوی async/scope از BranchListView برداشته شده.
+    /// </summary>
     public partial class PersonListView : UserControl
     {
+        // ===== Data Collections =====
         public ObservableCollection<PersonItem> AllPersons { get; set; }
         public ObservableCollection<PersonItem> FilteredPersons { get; set; }
 
-        private readonly IPersonApplication _personApplication;
-
+        // ===== State =====
         private int _pageSize = 15;
         private int _currentPage = 1;
         private int _totalPages = 1;
         private string _currentFilter = "all";
+        private bool _isLoadedOnce = false;
 
         public PersonListView()
         {
             InitializeComponent();
             FillEmptyRows();
+
             SearchBox.TextChanged += (s, e) =>
             {
                 _currentPage = 1;
@@ -33,50 +46,142 @@ namespace Taadol.Views
 
             Loaded += PersonListView_Loaded;
         }
+
+        // ======================================================
+        //  Async Data Load
+        // ======================================================
+        private async void PersonListView_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (_isLoadedOnce) return;
+            _isLoadedOnce = true;
+            await LoadDataAsync();
+        }
+
+        /// <summary>
+        /// لود کردن اشخاص از دیتابیس به‌صورت async.
+        /// برای هر شخص، تماس‌ها (موبایل/تلفن) و آدرس (استان/شهر) رو هم از سرویس‌های جداگانه می‌گیره.
+        /// </summary>
         private async Task LoadDataAsync()
         {
             ShowLoading(true);
+
+            // دادن فرصت به UI برای نمایش اسپینر قبل از کار سنگین
+            await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background);
 
             try
             {
                 var items = await Task.Run(() =>
                 {
                     using var scope = App.ServiceProvider.CreateScope();
-                    var personApplication = scope.ServiceProvider.GetRequiredService<IPersonApplication>();
+                    var sp = scope.ServiceProvider;
 
-                    var persons = personApplication.GetPersons();
+                    var personApp = sp.GetRequiredService<IPersonApplication>();
+                    var contactApp = sp.GetRequiredService<IPersonContactApplication>();
+                    var addressApp = sp.GetRequiredService<IPersonAddressApplication>();
 
-                    return persons.Select((p, index) => new PersonItem
+                    var persons = personApp.GetPersons() ?? new List<PersonViewModel>();
+
+                    // کش از تماس‌ها و آدرس‌ها برای همه‌ی اشخاص (N+1 جلوگیری)
+                    var personIds = persons.Select(p => p.Id).ToList();
+                    var allContacts = new List<PersonContactViewModel>();
+                    var allAddresses = new List<PersonAddressViewModel>();
+
+                    foreach (var pid in personIds)
                     {
-                        Id = p.Id,
-                        RowNumber = index + 1,
-                        Code = p.Code ?? p.Id.ToString(),
-                        Category = p.PersonType ?? "—",
-                        Status = p.IsActive ? "فعال" : "غیرفعال",
-                        Nickname = "—",
-                        FullNameText = p.FirstName + p.LastName,
-                        Company = p.BranchName ?? "—",
-                        Province = "—",
-                        City = "—",
-                        Phone = "—",
-                        Mobile = "—",
-                        NationalId = p.NationalCode ?? "—",
-                        EconomicId = p.EconomicCode ?? "—",
-                        AccountStatus = "—",
-                        PersonType = p.PersonType,
-                        IsEmpty = false
+                        try { allContacts.AddRange(contactApp.GetByPersonId(pid) ?? new List<PersonContactViewModel>()); } catch { }
+                        try { allAddresses.AddRange(addressApp.GetByPersonId(pid) ?? new List<PersonAddressViewModel>()); } catch { }
+                    }
+
+                    // گروه‌بندی تماس‌ها بر اساس PersonId
+                    var contactsByPerson = allContacts
+                        .GroupBy(c => c.PersonId)
+                        .ToDictionary(g => g.Key, g => g.ToList());
+
+                    // گروه‌بندی آدرس‌ها بر اساس PersonId (آدرس پیش‌فرض یا اولین)
+                    var addressesByPerson = allAddresses
+                        .GroupBy(a => a.PersonId)
+                        .ToDictionary(g => g.Key, g => g.FirstOrDefault());
+
+                    return persons.Select((p, index) =>
+                    {
+                        // پیدا کردن موبایل و تلفن از لیست تماس‌ها
+                        string mobile = "—";
+                        string phone = "—";
+
+                        if (contactsByPerson.TryGetValue(p.Id, out var contacts) && contacts.Count > 0)
+                        {
+                            // موبایل: تماسی که نوعش "موبایل" هست
+                            var mobileContact = contacts.FirstOrDefault(c =>
+                                c.ContactTypeTitle != null && c.ContactTypeTitle.Contains("موبایل"));
+                            if (mobileContact != null && !string.IsNullOrWhiteSpace(mobileContact.Value))
+                                mobile = mobileContact.Value;
+
+                            // تلفن: تماسی که نوعش "تلفن" هست
+                            var phoneContact = contacts.FirstOrDefault(c =>
+                                c.ContactTypeTitle != null && c.ContactTypeTitle.Contains("تلفن"));
+                            if (phoneContact != null && !string.IsNullOrWhiteSpace(phoneContact.Value))
+                                phone = phoneContact.Value;
+                        }
+
+                        // پیدا کردن استان و شهر از آدرس
+                        string province = "—";
+                        string city = "—";
+
+                        if (addressesByPerson.TryGetValue(p.Id, out var address) && address != null)
+                        {
+                            if (!string.IsNullOrWhiteSpace(address.ProvinceName))
+                                province = address.ProvinceName;
+                            if (!string.IsNullOrWhiteSpace(address.CityName))
+                                city = address.CityName;
+                        }
+
+                        // نام کامل
+                        string fullName;
+                        if (p.IsLegal)
+                        {
+                            // شخص حقوقی: نام شرکت در FirstName قرار داره
+                            fullName = p.FirstName ?? "";
+                        }
+                        else
+                        {
+                            fullName = $"{p.FirstName ?? ""} {p.LastName ?? ""}".Trim();
+                            if (string.IsNullOrEmpty(fullName))
+                                fullName = "—";
+                        }
+
+                        return new PersonItem
+                        {
+                            Id = p.Id,
+                            RowNumber = index + 1,
+                            Code = string.IsNullOrWhiteSpace(p.Code) ? p.Id.ToString() : p.Code,
+                            Category = string.IsNullOrWhiteSpace(p.PersonType) ? "—" : p.PersonType,
+                            Status = p.IsActive ? "فعال" : "غیرفعال",
+                            Nickname = "—",
+                            FullNameText = fullName,
+                            Company = string.IsNullOrWhiteSpace(p.BranchName) ? "—" : p.BranchName,
+                            Province = province,
+                            City = city,
+                            Phone = phone,
+                            Mobile = mobile,
+                            NationalId = string.IsNullOrWhiteSpace(p.NationalCode) ? "—" : p.NationalCode,
+                            EconomicId = string.IsNullOrWhiteSpace(p.EconomicCode) ? "—" : p.EconomicCode,
+                            AccountStatus = p.AvailableCredit > 0 ? "فعال" : "—",
+                            PersonType = p.PersonType,
+                            IsEmpty = false
+                        };
                     }).ToList();
                 });
 
                 AllPersons = new ObservableCollection<PersonItem>(items);
-
                 _currentPage = 1;
                 ApplyFilters();
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "خطا در لود اشخاص", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(BuildFullExceptionMessage(ex), "خطا در لود اشخاص",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
                 AllPersons = new ObservableCollection<PersonItem>();
+                ApplyFilters();
             }
             finally
             {
@@ -86,48 +191,15 @@ namespace Taadol.Views
 
         private void ShowLoading(bool show)
         {
-            LoadingOverlay.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
-            PersonsDataGrid.IsHitTestVisible = !show;
+            if (LoadingOverlay != null)
+                LoadingOverlay.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
+            if (PersonsDataGrid != null)
+                PersonsDataGrid.IsHitTestVisible = !show;
         }
-        private async void PersonListView_Loaded(object sender, RoutedEventArgs e)
-        {
-            await LoadDataAsync();
-        }
-        private void LoadData()
-        {
-            try
-            {
-                var persons = _personApplication.GetPersons();
 
-                AllPersons = new ObservableCollection<PersonItem>(
-                    persons.Select((p, index) => new PersonItem
-                    {
-                        Id = p.Id,
-                        RowNumber = index + 1,
-                        Code = p.Code,
-                        Category = p.PersonType,
-                        Status = p.IsActive ? "فعال" : "غیرفعال",
-                        Nickname = "",
-                        FullNameText = p.FirstName + p.LastName,
-                        Company = p.BranchName,
-                        Province = "",
-                        City = "",
-                        Phone = "",
-                        Mobile = "",
-                        NationalId = p.NationalCode,
-                        EconomicId = p.EconomicCode,
-                        AccountStatus = "",
-                        PersonType = p.PersonType,
-                        IsEmpty = false
-                    })
-                );
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "خطا در لود اشخاص", MessageBoxButton.OK, MessageBoxImage.Error);
-                AllPersons = new ObservableCollection<PersonItem>();
-            }
-        }
+        // ======================================================
+        //  Empty Rows (برای حفظ ارتفاع DataGrid وقتی داده‌ای نیست)
+        // ======================================================
         private void FillEmptyRows()
         {
             FilteredPersons = new ObservableCollection<PersonItem>();
@@ -141,8 +213,13 @@ namespace Taadol.Views
                 });
             }
 
-            PersonsDataGrid.ItemsSource = FilteredPersons;
+            if (PersonsDataGrid != null)
+                PersonsDataGrid.ItemsSource = FilteredPersons;
         }
+
+        // ======================================================
+        //  Filtering + Pagination
+        // ======================================================
         private void ApplyFilters()
         {
             if (AllPersons == null) return;
@@ -154,11 +231,9 @@ namespace Taadol.Views
                 case "customer":
                     query = query.Where(p => p.PersonType != null && p.PersonType.Contains("مشتری"));
                     break;
-
                 case "supplier":
                     query = query.Where(p => p.PersonType != null && p.PersonType.Contains("تامین"));
                     break;
-
                 case "personnel":
                     query = query.Where(p => p.PersonType != null && p.PersonType.Contains("پرسنل"));
                     break;
@@ -173,7 +248,9 @@ namespace Taadol.Views
                     (!string.IsNullOrWhiteSpace(p.FullName) && p.FullName.Contains(searchText)) ||
                     (!string.IsNullOrWhiteSpace(p.NationalId) && p.NationalId.Contains(searchText)) ||
                     (!string.IsNullOrWhiteSpace(p.EconomicId) && p.EconomicId.Contains(searchText)) ||
-                    (!string.IsNullOrWhiteSpace(p.Company) && p.Company.Contains(searchText))
+                    (!string.IsNullOrWhiteSpace(p.Company) && p.Company.Contains(searchText)) ||
+                    (!string.IsNullOrWhiteSpace(p.Mobile) && p.Mobile.Contains(searchText)) ||
+                    (!string.IsNullOrWhiteSpace(p.Phone) && p.Phone.Contains(searchText))
                 );
             }
 
@@ -196,7 +273,6 @@ namespace Taadol.Views
             FilteredPersons = new ObservableCollection<PersonItem>(pageItems);
 
             int realCount = FilteredPersons.Count;
-
             for (int i = realCount + 1; i <= _pageSize; i++)
             {
                 FilteredPersons.Add(new PersonItem
@@ -206,7 +282,8 @@ namespace Taadol.Views
                 });
             }
 
-            PersonsDataGrid.ItemsSource = FilteredPersons;
+            if (PersonsDataGrid != null)
+                PersonsDataGrid.ItemsSource = FilteredPersons;
 
             BuildPaginationButtons();
         }
@@ -228,7 +305,6 @@ namespace Taadol.Views
                         IsCurrent = i == _currentPage
                     });
                 }
-
                 PageButtonsItemsControl.ItemsSource = pages;
                 return;
             }
@@ -297,6 +373,9 @@ namespace Taadol.Views
             PageButtonsItemsControl.ItemsSource = pages;
         }
 
+        // ======================================================
+        //  Event Handlers
+        // ======================================================
         private void FilterTab_Checked(object sender, RoutedEventArgs e)
         {
             if (sender is RadioButton rb)
@@ -314,48 +393,144 @@ namespace Taadol.Views
             }
         }
 
-        private void BtnDelete_Click(object sender, RoutedEventArgs e)
+        private async void BtnDelete_Click(object sender, RoutedEventArgs e)
         {
-            if (PersonsDataGrid.SelectedItem is not PersonItem item || item.IsEmpty)
+            // پشتیبانی از حذف چندتایی با چک‌باکس (مثل BranchListView) + حذف تک‌تک با انتخاب ردیف
+            var selectedItems = AllPersons?
+                .Where(p => p.IsSelected && !p.IsEmpty)
+                .ToList() ?? new List<PersonItem>();
+
+            if (selectedItems.Count == 0)
             {
-                MessageBox.Show("لطفاً یک شخص انتخاب کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
+                if (PersonsDataGrid.SelectedItem is PersonItem item && !item.IsEmpty)
+                    selectedItems.Add(item);
+                else
+                {
+                    MessageBox.Show("لطفاً یک شخص انتخاب کنید.", "خطا",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
             }
 
+            var names = string.Join("\n", selectedItems.Take(5).Select(p => $"• {p.FullName}"));
+            if (selectedItems.Count > 5)
+                names += $"\n... و {selectedItems.Count - 5} مورد دیگر";
+
             var result = MessageBox.Show(
-                $"آیا از حذف «{item.FullName}» مطمئن هستید؟",
+                $"آیا از حذف {selectedItems.Count} شخص مطمئن هستید؟\n\n{names}",
                 "حذف شخص",
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Warning,
                 MessageBoxResult.No);
 
-            if (result != MessageBoxResult.Yes)
+            if (result != MessageBoxResult.Yes) return;
+
+            try
+            {
+                using var scope = App.ServiceProvider.CreateScope();
+                var personApp = scope.ServiceProvider.GetRequiredService<IPersonApplication>();
+
+                foreach (var item in selectedItems)
+                {
+                    var op = personApp.Remove(item.Id);
+                    if (!op.IsSucceeded)
+                    {
+                        System.Diagnostics.Debug.WriteLine(
+                            $"Failed to delete person {item.Id}: {op.Message}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("خطا در حذف: " + ex.Message, "خطا",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
+            }
 
-            var operation = _personApplication.Remove(item.Id);
+            // رفرش لیست
+            _isLoadedOnce = false;
+            await LoadDataAsync();
 
-            LoadData();
-            ApplyFilters();
-
-            MessageBox.Show("عملیات حذف انجام شد.", "حذف شخص", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show("عملیات حذف انجام شد.", "موفق",
+                MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void BtnEdit_Click(object sender, RoutedEventArgs e)
         {
             if (PersonsDataGrid.SelectedItem is PersonItem item && !item.IsEmpty)
-                MessageBox.Show($"ویرایش: {item.FullName}", "ویرایش شخص", MessageBoxButton.OK, MessageBoxImage.Information);
+            {
+                // باز کردن فرم ویرایش شخص در MainWindow
+                var mainWindow = Window.GetWindow(this) as MainWindow;
+                if (mainWindow != null)
+                {
+                    // استفاده از reflection یا متد عمومی برای دسترسی به MainContent
+                    // فعلاً NewPersonView رو در حالت ویرایش می‌سازیم
+                    var editView = new NewPersonView();
+                    editView.LoadPerson(item.Id);
+
+                    // پیدا کردن ContentControl اصلی در MainWindow و قرار دادن فرم
+                    var mainContent = mainWindow.FindName("MainContent") as ContentControl;
+                    if (mainContent != null)
+                    {
+                        mainContent.Content = editView;
+
+                        var mainContentBorder = mainWindow.FindName("MainContentBorder") as Border;
+                        if (mainContentBorder != null)
+                            mainContentBorder.Visibility = Visibility.Visible;
+                    }
+                    else
+                    {
+                        MessageBox.Show($"ویرایش شخص: {item.FullName} (ID: {item.Id})",
+                            "ویرایش شخص", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show($"ویرایش شخص: {item.FullName} (ID: {item.Id})",
+                        "ویرایش شخص", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
             else
-                MessageBox.Show("لطفاً یک شخص انتخاب کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+            {
+                MessageBox.Show("لطفاً یک شخص انتخاب کنید.", "خطا",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
         }
 
         private void BtnNew_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("فرم شخص جدید", "شخص جدید", MessageBoxButton.OK, MessageBoxImage.Information);
+            // باز کردن فرم ثبت شخص جدید در MainWindow
+            var mainWindow = Window.GetWindow(this) as MainWindow;
+            if (mainWindow != null)
+            {
+                var newView = new NewPersonView();
+
+                var mainContent = mainWindow.FindName("MainContent") as ContentControl;
+                if (mainContent != null)
+                {
+                    mainContent.Content = newView;
+
+                    var mainContentBorder = mainWindow.FindName("MainContentBorder") as Border;
+                    if (mainContentBorder != null)
+                        mainContentBorder.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    MessageBox.Show("فرم شخص جدید", "شخص جدید",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+            else
+            {
+                MessageBox.Show("فرم شخص جدید", "شخص جدید",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+            }
         }
 
         private void BtnMore_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("منوی بیشتر", "عملیات", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show("منوی بیشتر — شامل: فعال/غیرفعال کردن، صادرات Excel، چاپ، و...",
+                "عملیات", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void BtnNextPage_Click(object sender, RoutedEventArgs e)
@@ -381,34 +556,52 @@ namespace Taadol.Views
             if (sender is Button btn && btn.Tag != null)
             {
                 int pageNumber = Convert.ToInt32(btn.Tag);
-
-                if (pageNumber <= 0)
-                    return;
-
+                if (pageNumber <= 0) return;
                 _currentPage = pageNumber;
                 ApplyFilters();
             }
         }
 
-        private void PersonsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-        }
+        private void PersonsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e) { }
 
+        // ======================================================
+        //  Helpers
+        // ======================================================
         private string ToPersianNumber(int number)
         {
             string[] persianDigits = { "۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹" };
             string result = "";
-
             foreach (char c in number.ToString())
                 result += persianDigits[int.Parse(c.ToString())];
-
             return result;
+        }
+
+        private static string BuildFullExceptionMessage(Exception ex)
+        {
+            if (ex == null) return "خطای ناشناخته.";
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine($"Type: {ex.GetType().Name}");
+            sb.AppendLine($"Message: {ex.Message}");
+            var inner = ex.InnerException;
+            int depth = 1;
+            while (inner != null && depth <= 5)
+            {
+                sb.AppendLine($"--- Inner #{depth} ({inner.GetType().Name}) ---");
+                sb.AppendLine($"Message: {inner.Message}");
+                inner = inner.InnerException;
+                depth++;
+            }
+            return sb.ToString();
         }
     }
 
+    // ======================================================
+    //  PersonItem (مدل ردیف DataGrid)
+    // ======================================================
     public class PersonItem : INotifyPropertyChanged
     {
         private int _rowNumber;
+        private bool _isSelected;
 
         public long Id { get; set; }
 
@@ -423,6 +616,16 @@ namespace Taadol.Views
             }
         }
 
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set
+            {
+                _isSelected = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsSelected)));
+            }
+        }
+
         public string Code { get; set; }
         public string Category { get; set; }
         public string Status { get; set; }
@@ -430,7 +633,6 @@ namespace Taadol.Views
 
         public string FirstName { get; set; }
         public string LastName { get; set; }
-
         public string FullNameText { get; set; }
 
         public string Company { get; set; }
@@ -456,16 +658,15 @@ namespace Taadol.Views
             IsEmpty || string.IsNullOrEmpty(Status) ? Visibility.Collapsed : Visibility.Visible;
 
         public Visibility AccountStatusVisibility =>
-            IsEmpty || string.IsNullOrEmpty(AccountStatus) ? Visibility.Collapsed : Visibility.Visible;
+            IsEmpty || string.IsNullOrEmpty(AccountStatus) || AccountStatus == "—"
+                ? Visibility.Collapsed : Visibility.Visible;
 
         private string ToPersianNumber(int number)
         {
             string[] persianDigits = { "۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹" };
             string result = "";
-
             foreach (char c in number.ToString())
                 result += persianDigits[int.Parse(c.ToString())];
-
             return result;
         }
 
