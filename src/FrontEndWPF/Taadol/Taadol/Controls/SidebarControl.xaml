@@ -1,5 +1,4 @@
-﻿
-<UserControl x:Class="Taadol.Controls.SidebarControl"
+﻿<UserControl x:Class="Taadol.Controls.SidebarControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:Taadol.Controls"
@@ -28,9 +27,9 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            
-            
-            
+
+
+
             <Button x:Name="BtnToggleSidebar"
                     Click="BtnToggleSidebar_Click"
                     Grid.RowSpan="2"
@@ -99,12 +98,12 @@
                 </Button.Template>
             </Button>
 
-            
-            
-            
+
+
+
             <StackPanel Grid.Row="0">
 
-                
+
                 <StackPanel x:Name="LogoExpanded"
                             Orientation="Horizontal"
                             Margin="7,16,0,12"
@@ -131,9 +130,8 @@
                                Margin="13,0,0,0" />-->
                 </StackPanel>
 
-                
+
                 <Border x:Name="YearSelector"
-                      
                         CornerRadius="0"
                         Padding="0,8"
                         Margin="12,0,12,8"
@@ -182,14 +180,13 @@
                         </svg:SvgViewbox>
                     </Grid>
 
-                    
+
                     <Border.Resources>
-                       
+
                     </Border.Resources>
                 </Border>
-                <Popup 
-                    FlowDirection="LeftToRight"
-                    x:Name="YearPopup"
+                <Popup FlowDirection="LeftToRight"
+                       x:Name="YearPopup"
                        PlacementTarget="{Binding ElementName=YearSelector}"
                        Placement="Bottom"
                        StaysOpen="False"
@@ -211,15 +208,15 @@
                         <StackPanel x:Name="YearList" />
                     </Border>
                 </Popup>
-                
+
                 <Border Height="1"
                         Background="#E9F0FF"
                         Margin="12,4,12,8" />
             </StackPanel>
 
-            
-            
-            
+
+
+
             <Grid Grid.Row="1">
                 <ScrollViewer VerticalScrollBarVisibility="Auto"
                               CanContentScroll="False">
@@ -235,7 +232,7 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-                        
+
                         <StackPanel x:Name="MenuDashboard"
                                     Grid.Row="0"
                                     Margin="0,10,0,0">
@@ -301,12 +298,13 @@
                             <StackPanel x:Name="SubDashboard"
                                         Visibility="Collapsed">
 
-                                <Grid Style="{StaticResource SubmenuWrapper}">
+                                <Grid Style="{StaticResource SubmenuWrapper}"
+                                      Panel.ZIndex="0">
 
                                     <Border Style="{StaticResource SubmenuBackground}"
-                                            Panel.ZIndex="0" />
+                                            Panel.ZIndex="1" />
 
-                                    <StackPanel Panel.ZIndex="1">
+                                    <StackPanel Panel.ZIndex="2">
 
                                         <Border Style="{StaticResource SubmenuDivider}"
                                                 Margin="0,15,0,0" />
@@ -326,20 +324,18 @@
 
                                     </StackPanel>
 
-                                    
+
                                     <Ellipse Style="{StaticResource SubmenuEllipseLeft}"
-                                             Panel.ZIndex="2"
-                                             IsHitTestVisible="False" />
+                                             Panel.ZIndex="2" />
 
                                     <Ellipse Style="{StaticResource SubmenuEllipseRight}"
-                                             Panel.ZIndex="2"
-                                             IsHitTestVisible="False" />
+                                             Panel.ZIndex="2" />
 
                                 </Grid>
                             </StackPanel>
                         </StackPanel>
 
-                        
+
                         <StackPanel x:Name="MenuProducts"
                                     Grid.Row="1"
                                     Margin="0,10,0,0">
@@ -410,9 +406,9 @@
                                 <Grid Style="{StaticResource SubmenuWrapper}">
 
                                     <Border Style="{StaticResource SubmenuBackground}"
-                                            Panel.ZIndex="0" />
+                                            Panel.ZIndex="1" />
 
-                                    <StackPanel Panel.ZIndex="1">
+                                    <StackPanel Panel.ZIndex="2">
 
                                         <Border Style="{StaticResource SubmenuDivider}"
                                                 Margin="0,15,0,0" />
@@ -436,20 +432,18 @@
 
                                     </StackPanel>
 
-                                    
+
                                     <Ellipse Style="{StaticResource SubmenuEllipseLeft}"
-                                             Panel.ZIndex="2"
-                                             IsHitTestVisible="False" />
+                                             Panel.ZIndex="2" />
 
                                     <Ellipse Style="{StaticResource SubmenuEllipseRight}"
-                                             Panel.ZIndex="2"
-                                             IsHitTestVisible="False" />
+                                             Panel.ZIndex="2" />
 
                                 </Grid>
                             </StackPanel>
                         </StackPanel>
 
-                        
+
                         <StackPanel x:Name="MenuPersons"
                                     Grid.Row="2"
                                     Margin="0,10,0,0">
@@ -515,12 +509,13 @@
                             <StackPanel x:Name="SubPersons"
                                         Visibility="Collapsed">
 
-                                <Grid Style="{StaticResource SubmenuWrapper}">
+                                <Grid Style="{StaticResource SubmenuWrapper}"
+                                      Panel.ZIndex="0">
 
                                     <Border Style="{StaticResource SubmenuBackground}"
-                                            Panel.ZIndex="0" />
+                                            Panel.ZIndex="1" />
 
-                                    <StackPanel Panel.ZIndex="1">
+                                    <StackPanel Panel.ZIndex="2">
 
                                         <Border Style="{StaticResource SubmenuDivider}"
                                                 Margin="0,15,0,0" />
@@ -539,19 +534,17 @@
 
                                     </StackPanel>
 
-                                    
+
                                     <Ellipse Style="{StaticResource SubmenuEllipseLeft}"
-                                             Panel.ZIndex="2"
-                                             IsHitTestVisible="False" />
+                                             Panel.ZIndex="2" />
 
                                     <Ellipse Style="{StaticResource SubmenuEllipseRight}"
-                                             Panel.ZIndex="2"
-                                             IsHitTestVisible="False" />
+                                             Panel.ZIndex="2" />
 
                                 </Grid>
                             </StackPanel>
                         </StackPanel>
-                        
+
                         <StackPanel x:Name="MenuBusinessInfo"
                                     Grid.Row="3"
                                     Margin="0,10,0,0">
@@ -618,12 +611,13 @@
                             <StackPanel x:Name="SubBusinessInfo"
                                         Visibility="Collapsed">
 
-                                <Grid Style="{StaticResource SubmenuWrapper}">
+                                <Grid Style="{StaticResource SubmenuWrapper}"
+                                      Panel.ZIndex="0">
 
                                     <Border Style="{StaticResource SubmenuBackground}"
-                                            Panel.ZIndex="0" />
+                                            Panel.ZIndex="1" />
 
-                                    <StackPanel Panel.ZIndex="1">
+                                    <StackPanel Panel.ZIndex="2">
 
                                         <Border Style="{StaticResource SubmenuDivider}"
                                                 Margin="0,15,0,0" />
@@ -636,7 +630,7 @@
                                                 Click="SubMenuClick"
                                                 Tag="company_list"
                                                 Style="{StaticResource SubmenuItem}" />
-                                        
+
                                         <Button Content="شعبه جدید"
                                                 Click="SubMenuClick"
                                                 Tag="branch_new"
@@ -656,20 +650,18 @@
 
                                     </StackPanel>
 
-                                    
+
                                     <Ellipse Style="{StaticResource SubmenuEllipseLeft}"
-                                             Panel.ZIndex="2"
-                                             IsHitTestVisible="False" />
+                                             Panel.ZIndex="2" />
 
                                     <Ellipse Style="{StaticResource SubmenuEllipseRight}"
-                                             Panel.ZIndex="2"
-                                             IsHitTestVisible="False" />
+                                             Panel.ZIndex="2" />
 
                                 </Grid>
                             </StackPanel>
                         </StackPanel>
 
-                        
+
                         <StackPanel x:Name="MenuWarehouse"
                                     Grid.Row="4"
                                     Margin="0,10,0,0">
@@ -733,11 +725,13 @@
                             <StackPanel x:Name="SubWarehouse"
                                         Visibility="Collapsed">
                                 <Grid Style="{StaticResource SubmenuWrapper}"
+                                      Panel.ZIndex="0"
                                       Background="Transparent"
                                       VerticalAlignment="Top">
 
-                                    <Border Style="{StaticResource SubmenuBackground}">
-                                        <StackPanel>
+                                    <Border Style="{StaticResource SubmenuBackground}"
+                                            Panel.ZIndex="1">
+                                        <StackPanel    Panel.ZIndex="2">
                                             <Border Style="{StaticResource SubmenuDivider}" />
 
                                             <Button Content="لیست انبارها"
@@ -754,16 +748,14 @@
                                         </StackPanel>
                                     </Border>
 
-                                    <Ellipse Style="{StaticResource SubmenuEllipseLeft}"
-                                             IsHitTestVisible="False" />
-                                    <Ellipse Style="{StaticResource SubmenuEllipseRight}"
-                                             IsHitTestVisible="False" />
+                                    <Ellipse Style="{StaticResource SubmenuEllipseLeft}" />
+                                    <Ellipse Style="{StaticResource SubmenuEllipseRight}" />
                                 </Grid>
                             </StackPanel>
 
                         </StackPanel>
 
-                        
+
                         <StackPanel x:Name="MenuBank"
                                     Grid.Row="5"
                                     Margin="0,10,0,0">
@@ -827,11 +819,13 @@
                             <StackPanel x:Name="SubBank"
                                         Visibility="Collapsed">
                                 <Grid Style="{StaticResource SubmenuWrapper}"
+                                      Panel.ZIndex="0"
                                       Background="Transparent"
                                       VerticalAlignment="Top">
 
-                                    <Border Style="{StaticResource SubmenuBackground}">
-                                        <StackPanel>
+                                    <Border Style="{StaticResource SubmenuBackground}"
+                                            Panel.ZIndex="1">
+                                        <StackPanel    Panel.ZIndex="2">
                                             <Border Style="{StaticResource SubmenuDivider}" />
 
                                             <Button Content="لیست حساب‌ها"
@@ -848,16 +842,14 @@
                                         </StackPanel>
                                     </Border>
 
-                                    <Ellipse Style="{StaticResource SubmenuEllipseLeft}"
-                                             IsHitTestVisible="False" />
-                                    <Ellipse Style="{StaticResource SubmenuEllipseRight}"
-                                             IsHitTestVisible="False" />
+                                    <Ellipse Style="{StaticResource SubmenuEllipseLeft}" />
+                                    <Ellipse Style="{StaticResource SubmenuEllipseRight}" />
                                 </Grid>
                             </StackPanel>
 
                         </StackPanel>
 
-                        
+
                         <StackPanel x:Name="MenuSales"
                                     Grid.Row="6"
                                     Margin="0,10,0,0">
@@ -921,11 +913,13 @@
                             <StackPanel x:Name="SubSales"
                                         Visibility="Collapsed">
                                 <Grid Style="{StaticResource SubmenuWrapper}"
+                                      Panel.ZIndex="0"
                                       Background="Transparent"
                                       VerticalAlignment="Top">
 
-                                    <Border Style="{StaticResource SubmenuBackground}">
-                                        <StackPanel>
+                                    <Border Style="{StaticResource SubmenuBackground}"
+                                            Panel.ZIndex="1">
+                                        <StackPanel    Panel.ZIndex="2">
                                             <Border Style="{StaticResource SubmenuDivider}" />
 
                                             <Button Content="فاکتور خرید"
@@ -942,16 +936,14 @@
                                         </StackPanel>
                                     </Border>
 
-                                    <Ellipse Style="{StaticResource SubmenuEllipseLeft}"
-                                             IsHitTestVisible="False" />
-                                    <Ellipse Style="{StaticResource SubmenuEllipseRight}"
-                                             IsHitTestVisible="False" />
+                                    <Ellipse Style="{StaticResource SubmenuEllipseLeft}" />
+                                    <Ellipse Style="{StaticResource SubmenuEllipseRight}" />
                                 </Grid>
                             </StackPanel>
 
                         </StackPanel>
 
-                        
+
                         <StackPanel x:Name="MenuReports"
                                     Grid.Row="7"
                                     Margin="0,10,0,0">
@@ -1015,11 +1007,13 @@
                             <StackPanel x:Name="SubReports"
                                         Visibility="Collapsed">
                                 <Grid Style="{StaticResource SubmenuWrapper}"
+                                      Panel.ZIndex="0"
                                       VerticalAlignment="Top"
                                       Background="Transparent">
 
-                                    <Border Style="{StaticResource SubmenuBackground}">
-                                        <StackPanel>
+                                    <Border Style="{StaticResource SubmenuBackground}"
+                                            Panel.ZIndex="1">
+                                        <StackPanel    Panel.ZIndex="2">
                                             <Border Style="{StaticResource SubmenuDivider}" />
 
                                             <Button Content="گزارش فروش"
@@ -1036,10 +1030,8 @@
                                         </StackPanel>
                                     </Border>
 
-                                    <Ellipse Style="{StaticResource SubmenuEllipseLeft}"
-                                             IsHitTestVisible="False" />
-                                    <Ellipse Style="{StaticResource SubmenuEllipseRight}"
-                                             IsHitTestVisible="False" />
+                                    <Ellipse Style="{StaticResource SubmenuEllipseLeft}" />
+                                    <Ellipse Style="{StaticResource SubmenuEllipseRight}" />
                                 </Grid>
                             </StackPanel>
 
