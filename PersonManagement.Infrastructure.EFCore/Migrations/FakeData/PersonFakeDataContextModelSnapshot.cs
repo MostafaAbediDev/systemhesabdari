@@ -176,123 +176,6 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations.FakeData
                     b.ToTable("BankTypes");
                 });
 
-            modelBuilder.Entity("BankManagement.Domain.Bank.ChequeAgg.Cheques", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<long>("BranchId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("BranchesId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("ChequeBookId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("ChequeBooksId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("ChequeNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ChequeType")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long?>("DeletedBy")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("DueDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<long>("ReferenceId")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("ReferenceType")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BranchesId");
-
-                    b.HasIndex("ChequeBooksId");
-
-                    b.ToTable("Cheques");
-                });
-
-            modelBuilder.Entity("BankManagement.Domain.Bank.ChequeBookAgg.ChequeBooks", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<long>("BankId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("BanksId")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("ChequeCount")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long?>("DeletedBy")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("FirstChequeCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("LastChequeCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("OwnerName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BanksId");
-
-                    b.ToTable("ChequeBooks");
-                });
-
             modelBuilder.Entity("BankManagement.Domain.Bank.CompanyBankAccountAgg.CompanyBankAccounts", b =>
                 {
                     b.Property<long>("Id")
@@ -517,7 +400,6 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations.FakeData
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Logo")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
@@ -752,6 +634,16 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations.FakeData
 
                     b.Property<long>("BranchId")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("ContactFirstName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("ContactLastName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
@@ -1073,36 +965,6 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations.FakeData
                     b.Navigation("Provinces");
                 });
 
-            modelBuilder.Entity("BankManagement.Domain.Bank.ChequeAgg.Cheques", b =>
-                {
-                    b.HasOne("GeneralInfoManagement.Domain.BaseInfo.BranchesAgg.Branches", "Branches")
-                        .WithMany()
-                        .HasForeignKey("BranchesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BankManagement.Domain.Bank.ChequeBookAgg.ChequeBooks", "ChequeBooks")
-                        .WithMany("Cheques")
-                        .HasForeignKey("ChequeBooksId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Branches");
-
-                    b.Navigation("ChequeBooks");
-                });
-
-            modelBuilder.Entity("BankManagement.Domain.Bank.ChequeBookAgg.ChequeBooks", b =>
-                {
-                    b.HasOne("BankManagement.Domain.Bank.BankAgg.Banks", "Banks")
-                        .WithMany("ChequeBooks")
-                        .HasForeignKey("BanksId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Banks");
-                });
-
             modelBuilder.Entity("BankManagement.Domain.Bank.CompanyBankAccountAgg.CompanyBankAccounts", b =>
                 {
                     b.HasOne("BankManagement.Domain.Bank.BankAgg.Banks", "Banks")
@@ -1288,19 +1150,12 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations.FakeData
                 {
                     b.Navigation("BankBranches");
 
-                    b.Navigation("ChequeBooks");
-
                     b.Navigation("CompanyBankAccounts");
                 });
 
             modelBuilder.Entity("BankManagement.Domain.Bank.BankTypeAgg.BankTypes", b =>
                 {
                     b.Navigation("Banks");
-                });
-
-            modelBuilder.Entity("BankManagement.Domain.Bank.ChequeBookAgg.ChequeBooks", b =>
-                {
-                    b.Navigation("Cheques");
                 });
 
             modelBuilder.Entity("GeneralInfoManagement.Domain.BaseInfo.BranchesAgg.Branches", b =>

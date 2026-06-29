@@ -13,6 +13,8 @@ namespace PersonManagement.Infrastructure.EFCore.Mapping
 
             builder.Property(x => x.FirstName).HasMaxLength(200).IsRequired();
             builder.Property(x => x.LastName).HasMaxLength(200).IsRequired();
+            builder.Property(x => x.ContactFirstName).HasMaxLength(200).IsRequired();
+            builder.Property(x => x.ContactLastName).HasMaxLength(200).IsRequired();
 
             builder.Property(x => x.NationalCode).HasMaxLength(20).IsRequired(false);
             builder.Property(x => x.EconomicCode).HasMaxLength(50).IsRequired(false);
