@@ -438,9 +438,9 @@
                                                       FlowDirection="LeftToRight"
                                                       Style="{StaticResource StatusToggleButton}"
                                                       IsChecked="False"
-                                                      Checked="CategoryToggle_Checked"
-                                                      Unchecked="CategoryToggle_Checked"
                                                       Margin="0,0,8,0" />
+                                        <!--Checked="CategoryToggle_Checked"
+                                                      Unchecked="CategoryToggle_Checked" -->
                                     </StackPanel>
                                 </Grid>
                             </StackPanel>
