@@ -1013,22 +1013,16 @@ namespace Taadol.Views
             TaxContent.Visibility = Visibility.Visible;
         }
 
-        private void CategoryToggle_Checked(object sender, RoutedEventArgs e)
-        {
-            if (PersonnelToggle == null || TabTax == null) return;
+        //private void CategoryToggle_Checked(object sender, RoutedEventArgs e)
+        //{
+        //    if (PersonnelToggle == null || TabTax == null) return;
 
-            bool isPersonnel = PersonnelToggle.IsChecked == true;
-            TabTax.Visibility = isPersonnel ? Visibility.Visible : Visibility.Collapsed;
+        //    bool isPersonnel = PersonnelToggle.IsChecked == true;
+        //    TabTax.Visibility = isPersonnel ? Visibility.Visible : Visibility.Collapsed;
 
-            if (!isPersonnel && TabTax.IsChecked == true)
-                TabPricing.IsChecked = true;
-        }
-        private void CategoryToggle_Checked(object sender, RoutedEventArgs e)
-        {
-            if (PersonnelToggle == null || TabTax == null) return;
-
-            bool isPersonnel = PersonnelToggle.IsChecked == true;
-            TabTax.Visibility = isPersonnel ? Visibility.Visible : Visibility.Collapsed;
+        //    if (!isPersonnel && TabTax.IsChecked == true)
+        //        TabPricing.IsChecked = true;
+        //}
 
         // ======================================================
         //  Misc UI Handlers
