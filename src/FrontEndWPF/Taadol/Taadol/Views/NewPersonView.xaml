@@ -115,13 +115,7 @@
             Background="#ffffff"
             VerticalAlignment="Stretch"
             Margin="24,12">
-        <Border.Effect>
-            <DropShadowEffect Color="#C8A882"
-                              Opacity="0.4"
-                              BlurRadius="20"
-                              ShadowDepth="0"
-                              Direction="270" />
-        </Border.Effect>
+       
         <Grid VerticalAlignment="Stretch">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />

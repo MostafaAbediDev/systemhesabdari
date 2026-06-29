@@ -77,7 +77,7 @@
                                                FontFamily="{StaticResource IRANSans}" />
                                 </Border>
 
-                                
+
                                 <Border x:Name="separator"
                                         Width="1"
                                         Height="20"
@@ -167,7 +167,6 @@
                                         Width="16"
                                         Height="16"
                                         Source="/Assets/Icons/arrow-right_BLUE.svg"
-                                        
                                         Margin="5,0,10,0" />
                         <TextBlock Text="اشخاص"
                                    FontSize="19"
@@ -176,13 +175,13 @@
                                    Foreground="#001242"
                                    VerticalAlignment="Center" />
 
-                        <Border >
-                            
+                        <Border>
+
                             <Border Background="#ffffff"
                                     BorderBrush="#2563EB"
                                     BorderThickness="1"
                                     CornerRadius="8"
-                                    Margin="10,10,0,10" 
+                                    Margin="10,10,0,10"
                                     Width="300"
                                     HorizontalAlignment="Left">
                                 <StackPanel Orientation="Horizontal"
@@ -342,7 +341,7 @@
                                                         Height="18"
                                                         Source="/Assets/Icons/EDIT.svg" />
                                     </Border>
-                                    <ControlTemplate.Triggers> 
+                                    <ControlTemplate.Triggers>
                                         <Trigger Property="IsMouseOver"
                                                  Value="True">
                                             <Setter TargetName="bd"
@@ -368,7 +367,7 @@
                                             Height="36">
                                         <svg:SvgViewbox Width="18"
                                                         Height="18"
-                                                        Source="/Assets/Icons/newdoc21.svg" />
+                                                        Source="/Assets/Icons/PLUS.svg" />
                                     </Border>
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsMouseOver"
@@ -385,7 +384,7 @@
                 </Grid>
             </Border>
 
-            
+
             <Border Grid.Row="1"
                     BorderBrush="#D4E0FF"
                     BorderThickness="0,2,0,0"
@@ -395,7 +394,7 @@
                             FlowDirection="RightToLeft"
                             VerticalAlignment="Center">
 
-                    
+
                     <RadioButton x:Name="tabAll"
                                  Style="{StaticResource FilterTabStyle2}"
                                  GroupName="PersonFilter"
@@ -425,10 +424,10 @@
                                  Tag="۱۰ نفر"
                                  Checked="FilterTab_Checked" />
 
-                    
 
 
-                    
+
+
 
 
 
@@ -439,20 +438,20 @@
             </Border>
 
 
-            
-            
-            
+
+
+
             <Border Grid.Row="2"
                     Background="Transparent"
                     ClipToBounds="False"
                     Padding="15,0">
 
-                
+
                 <Grid x:Name="DataGridContainer">
 
-                    
+
                     <Grid.Resources>
-                        
+
                         <Style x:Key="EllipseLeft"
                                TargetType="Ellipse">
                             <Setter Property="Width"
@@ -471,7 +470,7 @@
                                     Value="-1" />
                         </Style>
 
-                        
+
                         <Style x:Key="EllipseRight"
                                TargetType="Ellipse">
                             <Setter Property="Width"
@@ -491,7 +490,7 @@
                         </Style>
                     </Grid.Resources>
 
-                    
+
                     <DataGrid x:Name="PersonsDataGrid"
                               CanUserSortColumns="False"
                               AutoGenerateColumns="False"
@@ -517,7 +516,7 @@
                               SelectionChanged="PersonsDataGrid_SelectionChanged">
 
                         <DataGrid.Resources>
-                            
+
                             <Style x:Key="BaseTextColumnStyle"
                                    TargetType="TextBlock">
                                 <Setter Property="FontFamily"
@@ -530,7 +529,7 @@
                                         Value="#5C5C5C" />
                             </Style>
 
-                            
+
                             <Style x:Key="LtrTextColumnStyle"
                                    TargetType="TextBlock"
                                    BasedOn="{StaticResource BaseTextColumnStyle}">
@@ -538,7 +537,7 @@
                                         Value="LeftToRight" />
                             </Style>
 
-                            
+
                             <Style x:Key="RowNumberColumnStyle"
                                    TargetType="TextBlock"
                                    BasedOn="{StaticResource BaseTextColumnStyle}">
@@ -548,7 +547,7 @@
                                         Value="SemiBold" />
                             </Style>
 
-                            
+
                             <Style x:Key="FullNameColumnStyle"
                                    TargetType="TextBlock"
                                    BasedOn="{StaticResource BaseTextColumnStyle}">
@@ -558,7 +557,7 @@
                                         Value="SemiBold" />
                             </Style>
 
-                            
+
                             <Style TargetType="DataGridColumnHeader">
                                 <Setter Property="Tag"
                                         Value="True" />
@@ -627,7 +626,7 @@
 
 
 
-                            
+
                             <Style TargetType="DataGridCell">
                                 <Setter Property="Background"
                                         Value="Transparent" />
@@ -689,7 +688,7 @@
 
                         </DataGrid.Resources>
 
-                        
+
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="#"
                                                 Width="50"
@@ -715,8 +714,51 @@
                                                 Binding="{Binding Category}"
                                                 ElementStyle="{StaticResource BaseTextColumnStyle}" />
 
-                            <DataGridTemplateColumn Header="وضعیت"
-                                                    Width="85">
+                            <!-- ستون وضعیت با آیکون فیلتر -->
+                            <DataGridTemplateColumn Width="110">
+                                <DataGridTemplateColumn.HeaderTemplate>
+                                    <DataTemplate>
+                                        <Border Padding="6,0">
+                                            <StackPanel Orientation="Horizontal"
+                                                        VerticalAlignment="Center">
+                                                <TextBlock Text="وضعیت"
+                                                           FontFamily="{StaticResource IRANSans}"
+                                                           FontSize="12"
+                                                           FontWeight="Medium"
+                                                           Foreground="#1F2937"
+                                                           VerticalAlignment="Center" />
+                                                <Button Click="StatusFilter_Click"
+                                                        Background="Transparent"
+                                                        BorderThickness="0"
+                                                        Cursor="Hand"
+                                                        Padding="2"
+                                                        VerticalAlignment="Center"
+                                                        Margin="4,0,0,0">
+                                                    <Button.Template>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Border x:Name="bd"
+                                                                    Background="Transparent"
+                                                                    Padding="2">
+                                                                <svg:SvgViewbox Width="12"
+                                                                                Height="12"
+                                                                                Source="/Assets/Icons/filter-search.svg"
+                                                                                VerticalAlignment="Center" />
+                                                            </Border>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsMouseOver"
+                                                                         Value="True">
+                                                                    <Setter TargetName="bd"
+                                                                            Property="Background"
+                                                                            Value="#F3F4F6" />
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Button.Template>
+                                                </Button>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.HeaderTemplate>
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Border Padding="8,3"
@@ -765,10 +807,6 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-                            <DataGridTextColumn Header="نام مستعار"
-                                                Width="110"
-                                                Binding="{Binding Nickname}"
-                                                ElementStyle="{StaticResource BaseTextColumnStyle}" />
                             <DataGridTextColumn Header="نام و نام خانوادگی"
                                                 Width="160"
                                                 Binding="{Binding FullName}"
@@ -777,14 +815,112 @@
                                                 Width="160"
                                                 Binding="{Binding Company}"
                                                 ElementStyle="{StaticResource BaseTextColumnStyle}" />
-                            <DataGridTextColumn Header="استان"
-                                                Width="100"
-                                                Binding="{Binding Province}"
-                                                ElementStyle="{StaticResource BaseTextColumnStyle}" />
-                            <DataGridTextColumn Header="شهر"
-                                                Width="85"
-                                                Binding="{Binding City}"
-                                                ElementStyle="{StaticResource BaseTextColumnStyle}" />
+
+                            <!-- ستون استان با آیکون فیلتر -->
+                            <DataGridTemplateColumn Width="130">
+                                <DataGridTemplateColumn.HeaderTemplate>
+                                    <DataTemplate>
+                                        <Border Padding="6,0">
+                                            <StackPanel Orientation="Horizontal"
+                                                        VerticalAlignment="Center">
+                                                <TextBlock Text="استان"
+                                                           FontFamily="{StaticResource IRANSans}"
+                                                           FontSize="12"
+                                                           FontWeight="Medium"
+                                                           Foreground="#1F2937"
+                                                           VerticalAlignment="Center" />
+                                                <Button Click="ProvinceFilter_Click"
+                                                        Background="Transparent"
+                                                        BorderThickness="0"
+                                                        Cursor="Hand"
+                                                        Padding="2"
+                                                        VerticalAlignment="Center"
+                                                        Margin="4,0,0,0">
+                                                    <Button.Template>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Border x:Name="bd"
+                                                                    Background="Transparent"
+                                                                    Padding="2">
+                                                                <svg:SvgViewbox Width="12"
+                                                                                Height="12"
+                                                                                Source="/Assets/Icons/filter-search.svg"
+                                                                                VerticalAlignment="Center" />
+                                                            </Border>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsMouseOver"
+                                                                         Value="True">
+                                                                    <Setter TargetName="bd"
+                                                                            Property="Background"
+                                                                            Value="#F3F4F6" />
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Button.Template>
+                                                </Button>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.HeaderTemplate>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Province}"
+                                                   Style="{StaticResource BaseTextColumnStyle}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <!-- ستون شهر با آیکون فیلتر -->
+                            <DataGridTemplateColumn Width="120">
+                                <DataGridTemplateColumn.HeaderTemplate>
+                                    <DataTemplate>
+                                        <Border Padding="6,0">
+                                            <StackPanel Orientation="Horizontal"
+                                                        VerticalAlignment="Center">
+                                                <TextBlock Text="شهر"
+                                                           FontFamily="{StaticResource IRANSans}"
+                                                           FontSize="12"
+                                                           FontWeight="Medium"
+                                                           Foreground="#1F2937"
+                                                           VerticalAlignment="Center" />
+                                                <Button Click="CityFilter_Click"
+                                                        Background="Transparent"
+                                                        BorderThickness="0"
+                                                        Cursor="Hand"
+                                                        Padding="2"
+                                                        VerticalAlignment="Center"
+                                                        Margin="4,0,0,0">
+                                                    <Button.Template>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Border x:Name="bd"
+                                                                    Background="Transparent"
+                                                                    Padding="2">
+                                                                <svg:SvgViewbox Width="12"
+                                                                                Height="12"
+                                                                                Source="/Assets/Icons/filter-search.svg"
+                                                                                VerticalAlignment="Center" />
+                                                            </Border>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsMouseOver"
+                                                                         Value="True">
+                                                                    <Setter TargetName="bd"
+                                                                            Property="Background"
+                                                                            Value="#F3F4F6" />
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Button.Template>
+                                                </Button>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.HeaderTemplate>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding City}"
+                                                   Style="{StaticResource BaseTextColumnStyle}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                             <DataGridTextColumn Header="تلفن"
                                                 Width="120"
                                                 Binding="{Binding Phone}"
@@ -873,17 +1009,17 @@
 
                                                         <DataTrigger Binding="{Binding AccountStatus}"
                                                                      Value="بدهکار">
-                                                         
+
                                                         </DataTrigger>
 
                                                         <DataTrigger Binding="{Binding AccountStatus}"
                                                                      Value="بستانکار">
-                                                          
+
                                                         </DataTrigger>
 
                                                         <DataTrigger Binding="{Binding AccountStatus}"
                                                                      Value="تسویه">
-                                                          
+
                                                         </DataTrigger>
 
                                                     </Style.Triggers>
@@ -1105,7 +1241,7 @@
                     </Border>
                     <Ellipse Style="{StaticResource EllipseLeft}" />
 
-                    
+
                     <Ellipse Style="{StaticResource EllipseRight}" />
 
                 </Grid>
@@ -1117,7 +1253,7 @@
 
 
 
-            
+
             <Border Grid.Row="3"
                     Padding="5,14"
                     Background="White"
@@ -1130,7 +1266,7 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                  
+
 
                     <StackPanel Grid.Column="2"
                                 Orientation="Horizontal"
