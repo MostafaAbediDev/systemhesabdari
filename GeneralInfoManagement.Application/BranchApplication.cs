@@ -26,6 +26,8 @@ namespace GeneralInfoManagement.Application
 
             if (_branchRepository.Exists(x => x.NationalId == nationalId))
                 return operation.Failed("شعبه‌ای با این شناسه ملی قبلاً ثبت شده است.");
+            if (command.IsMain)
+                _branchRepository.ResetAllMainBranches();
 
             if (command.IsMain)
             {
