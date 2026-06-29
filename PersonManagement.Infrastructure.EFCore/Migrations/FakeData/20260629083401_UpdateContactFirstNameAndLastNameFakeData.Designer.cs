@@ -3,17 +3,20 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PersonManagement.Infrastructure.EFCore;
 
 #nullable disable
 
-namespace PersonManagement.Infrastructure.EFCore.Migrations
+namespace PersonManagement.Infrastructure.EFCore.Migrations.FakeData
 {
-    [DbContext(typeof(PersonSystemContext))]
-    partial class PersonSystemContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(PersonFakeDataContext))]
+    [Migration("20260629083401_UpdateContactFirstNameAndLastNameFakeData")]
+    partial class UpdateContactFirstNameAndLastNameFakeData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

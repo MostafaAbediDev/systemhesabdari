@@ -23,6 +23,8 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
                     Id = x.Id,
                     FirstName = x.FirstName,
                     LastName = x.LastName,
+                    ContactFirstName = x.ContactFirstName,
+                    ContactLastName = x.ContactLastName,
                     IsLegal = x.IsLegal,
                     NationalCode = x.NationalCode,
                     EconomicCode = x.EconomicCode,
@@ -46,14 +48,26 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
 
             if (!string.IsNullOrWhiteSpace(searchModel.FirstName))
             {
-                var fullName = searchModel.FirstName.Trim();
-                query = query.Where(x => x.FirstName.Contains(fullName));
+                var firstName = searchModel.FirstName.Trim();
+                query = query.Where(x => x.FirstName.Contains(firstName));
             }
 
             if (!string.IsNullOrWhiteSpace(searchModel.LastName))
             {
-                var fullName = searchModel.LastName.Trim();
-                query = query.Where(x => x.LastName.Contains(fullName));
+                var lastName = searchModel.LastName.Trim();
+                query = query.Where(x => x.LastName.Contains(lastName));
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchModel.ContactFirstName))
+            {
+                var contactFirstName = searchModel.ContactFirstName.Trim();
+                query = query.Where(x => x.ContactFirstName.Contains(contactFirstName));
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchModel.ContactLastName))
+            {
+                var contactLastName = searchModel.ContactLastName.Trim();
+                query = query.Where(x => x.ContactLastName.Contains(contactLastName));
             }
 
             if (!string.IsNullOrWhiteSpace(searchModel.NationalCode))
@@ -71,6 +85,8 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
                     Id = x.Id,
                     FirstName = x.FirstName,
                     LastName = x.LastName,
+                    ContactFirstName = x.ContactFirstName,
+                    ContactLastName = x.ContactLastName,
                     IsLegal = x.IsLegal,
                     NationalCode = x.NationalCode,
                     EconomicCode = x.EconomicCode,
@@ -96,6 +112,8 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
                     Id = x.Id,
                     FirstName = x.FirstName,
                     LastName = x.LastName,
+                    ContactFirstName = x.ContactFirstName,
+                    ContactLastName = x.ContactLastName,
                     IsLegal = x.IsLegal,
                     NationalCode = x.NationalCode,
                     EconomicCode = x.EconomicCode,

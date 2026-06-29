@@ -4,6 +4,8 @@
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public string ContactFirstName { get; set; }
+        public string ContactLastName { get; set; }
         public bool IsLegal { get; set; }
         public string? NationalCode { get; set; }
         public string? EconomicCode { get; set; }

@@ -29,6 +29,8 @@ namespace PersonManagement.Application
             var person = new Persons(
                 command.FirstName,
                 command.LastName,
+                command.ContactFirstName,
+                command.ContactLastName,
                 command.IsLegal,
                 command.NationalCode,
                 command.EconomicCode,
@@ -63,7 +65,7 @@ namespace PersonManagement.Application
             if (!command.IsLegal && _personRepository.ExistsNationalCode(command.NationalCode, command.Id))
                 return result.Failed("کد ملی وارد شده برای شخص دیگری ثبت شده است.");
 
-            person.Edit(command.FirstName, command.LastName, command.NationalCode, command.EconomicCode,
+            person.Edit(command.FirstName, command.LastName, command.ContactFirstName, command.ContactLastName , command.NationalCode, command.EconomicCode,
                         command.RegistrationNumber, command.PersonTypeId, command.BranchId, command.IsLegal);
 
             person.UpdateFinancialInfo(command.CreditLimit);
