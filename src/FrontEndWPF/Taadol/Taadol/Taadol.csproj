@@ -229,6 +229,7 @@
     <Content Include="Assets\Icons\trash.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <ProjectReference Include="..\..\..\..\BankManagement.Configuration\BankManagement.Configuration.csproj" />
     <ProjectReference Include="..\..\..\..\CodeManagement.Configuration\CodeManagement.Configuration.csproj" />
     <ProjectReference Include="..\..\..\..\GeneralInfoManagement.Application.Contract\GeneralInfoManagement.Application.Contract.csproj" />
     <ProjectReference Include="..\..\..\..\GeneralInfoManagement.Application\GeneralInfoManagement.Application.csproj" />

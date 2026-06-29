@@ -30,6 +30,7 @@
                             <TextBlock Text="نام بانک"
                                        Style="{StaticResource FormLabel}" />
                             <controls:ModernPersianTextBox Width="230"
+                                                           Text="{Binding BankName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                            Placeholder="ملت" />
                         </StackPanel>
 
@@ -37,16 +38,18 @@
                             <TextBlock Text="نام شعبه"
                                        Style="{StaticResource FormLabel}" />
                             <controls:ModernPersianTextBox Width="230"
+                                                           Text="{Binding BranchName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                            Placeholder="مرکزی" />
                         </StackPanel>
 
-                        <StackPanel Grid.Column="6"
+                        <StackPanel Grid.Column="5"
                                     Orientation="Horizontal"
                                     VerticalAlignment="Center"
                                     Margin="15,0,0,0">
                             <ToggleButton Content="حساب پیش فرض"
                                           FlowDirection="LeftToRight"
                                           Style="{StaticResource StatusToggleButton}"
+                                          IsChecked="{Binding IsDefault, Mode=TwoWay}"
                                           Margin="0,0,10,0" />
                             <Button x:Name="RemoveButton"
                                     Click="RemoveBankAccount_Click"
@@ -75,6 +78,7 @@
                                        Style="{StaticResource FormLabel}" />
                             <controls:ModernPersianTextBox Width="230"
                                                            FlowDirection="LeftToRight"
+                                                           Text="{Binding CardNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                            Placeholder="**** **** **** ****" />
                         </StackPanel>
                         <StackPanel Grid.Column="2">
@@ -82,6 +86,7 @@
                                        Style="{StaticResource FormLabel}" />
                             <controls:ModernPersianTextBox Width="230"
                                                            FlowDirection="LeftToRight"
+                                                           Text="{Binding Shaba, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                            Placeholder="IR" />
                         </StackPanel>
                         <StackPanel Grid.Column="4">
@@ -89,6 +94,7 @@
                                        Style="{StaticResource FormLabel}" />
                             <controls:ModernPersianTextBox Width="230"
                                                            FlowDirection="LeftToRight"
+                                                           Text="{Binding AccountNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                            Placeholder="456" />
                         </StackPanel>
                     </Grid>
@@ -109,13 +115,7 @@
             Background="#ffffff"
             VerticalAlignment="Stretch"
             Margin="24,12">
-        <Border.Effect>
-            <DropShadowEffect Color="#C8A882"
-                              Opacity="0.4"
-                              BlurRadius="20"
-                              ShadowDepth="0"
-                              Direction="270" />
-        </Border.Effect>
+       
         <Grid VerticalAlignment="Stretch">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -217,29 +217,84 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <controls:ModernPersianTextBox Grid.Column="0"
-                                                           Text="{Binding Username}"
+                                                           x:Name="ManualCodeTextBox"
+                                                           Text="{Binding ManualCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                           IsEnabled="False"
                                                            Placeholder="1234" />
-                            <controls:ToggleSwitchControl Margin="12,0,0,0"
+                            <controls:ToggleSwitchControl x:Name="CodeModeToggle"
+                                                          Margin="12,0,0,0"
                                                           FirstLabel="اتوماتیک"
                                                           SecondLabel="دستی"
                                                           IsFirstSelected="True"
                                                           Grid.Column="1"
-                                                          SelectionChanged="Toggle_SelectionChanged" />
+                                                          SelectionChanged="CodeModeToggle_SelectionChanged" />
                         </Grid>
 
                         <TextBlock Text="انتخاب شعبه"
                                    Style="{StaticResource FormLabel}" />
                         <StackPanel Orientation="Horizontal"
                                     Margin="0,0,0,8">
-                            <ComboBox Style="{StaticResource SearchableComboBox}"
-                                      Tag="جستجو..."
-                                      Width="315"
-                                      ItemContainerStyle="{StaticResource SearchableComboBoxItem}"
-                                      SelectionChanged="ComboBox_SelectionChanged">
-                                <ComboBoxItem Content="گزینه ۱" />
-                                <ComboBoxItem Content="گزینه ۲" />
-                                <ComboBoxItem Content="گزینه ۳" />
-                            </ComboBox>
+                            <Grid Width="315">
+                                <ComboBox x:Name="BranchCombo"
+                                          Style="{StaticResource SearchableComboBox}"
+                                          Tag="جستجو..."
+                                          Width="315"
+                                          ItemsSource="{Binding Branches}"
+                                          DisplayMemberPath="Title"
+                                          SelectedValuePath="Id"
+                                          SelectedValue="{Binding SelectedBranchId, Mode=TwoWay}"
+                                          ItemContainerStyle="{StaticResource SearchableComboBoxItem}" />
+
+                                <!-- اسپینر لود روی فلش ComboBox شعبه
+                                     (الگو از NewBranchView.xaml: CompanyComboLoading) -->
+                                <Border x:Name="BranchComboLoading"
+                                        Width="42"
+                                        Height="42"
+                                        Background="White"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Center"
+                                        Visibility="Collapsed"
+                                        IsHitTestVisible="False"
+                                        CornerRadius="8">
+
+                                    <Grid Width="22"
+                                          Height="22"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          RenderTransformOrigin="0.5,0.5">
+
+                                        <Grid.RenderTransform>
+                                            <RotateTransform x:Name="BranchComboSpinnerRotate"
+                                                             Angle="0" />
+                                        </Grid.RenderTransform>
+
+                                        <Ellipse Width="20"
+                                                 Height="20"
+                                                 Stroke="#D4E0FF"
+                                                 StrokeThickness="3" />
+
+                                        <Path Stroke="#2667FF"
+                                              StrokeThickness="3"
+                                              StrokeStartLineCap="Round"
+                                              StrokeEndLineCap="Round"
+                                              Data="M 11,1 A 10,10 0 0 1 21,11" />
+
+                                        <Grid.Triggers>
+                                            <EventTrigger RoutedEvent="Grid.Loaded">
+                                                <BeginStoryboard>
+                                                    <Storyboard RepeatBehavior="Forever">
+                                                        <DoubleAnimation Storyboard.TargetName="BranchComboSpinnerRotate"
+                                                                         Storyboard.TargetProperty="Angle"
+                                                                         From="0"
+                                                                         To="360"
+                                                                         Duration="0:0:0.8" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </EventTrigger>
+                                        </Grid.Triggers>
+                                    </Grid>
+                                </Border>
+                            </Grid>
                         </StackPanel>
 
                         <Grid>
@@ -249,16 +304,18 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="نوع شخص"
                                            Style="{StaticResource FormLabel}" />
-                                <controls:ToggleSwitchControl FirstLabel="حقیقی"
+                                <controls:ToggleSwitchControl x:Name="LegalTypeToggle"
+                                                              FirstLabel="حقیقی"
                                                               SecondLabel="حقوقی"
                                                               IsFirstSelected="True"
                                                               Grid.Column="1"
                                                               Margin="9,0,0,0"
-                                                              SelectionChanged="Toggle_SelectionChanged" />
-                                <ToggleButton Content=".شخص فعال است"
+                                                              SelectionChanged="LegalTypeToggle_SelectionChanged" />
+                                <ToggleButton x:Name="PersonActiveToggle"
+                                              Content=".شخص فعال است"
                                               FlowDirection="LeftToRight"
                                               Style="{StaticResource StatusToggleButton}"
-                                              IsChecked="True"
+                                              IsChecked="{Binding IsActive, Mode=TwoWay}"
                                               Margin="10,0,18,0" />
                             </StackPanel>
                         </Grid>
@@ -276,14 +333,14 @@
                                         x:Name="FirstNamePanel">
                                 <TextBlock Text="نام"
                                            Style="{StaticResource FormLabel}" />
-                                <controls:ModernPersianTextBox Text="{Binding FirstName}"
+                                <controls:ModernPersianTextBox Text="{Binding FirstName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                                Placeholder="علی" />
                             </StackPanel>
                             <StackPanel Grid.Column="2"
                                         x:Name="LastNamePanel">
                                 <TextBlock Text="نام خانوادگی"
                                            Style="{StaticResource FormLabel}" />
-                                <controls:ModernPersianTextBox Text="{Binding LastName}"
+                                <controls:ModernPersianTextBox Text="{Binding LastName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                                Placeholder="علوی" />
                             </StackPanel>
                             <StackPanel Grid.Column="4"
@@ -291,7 +348,7 @@
                                 <TextBlock Text="کد ملی"
                                            Style="{StaticResource FormLabel}" />
                                 <controls:ModernPersianTextBox FlowDirection="LeftToRight"
-                                                               Text="{Binding NationalId}"
+                                                               Text="{Binding NationalCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                                Placeholder="2470545256" />
                             </StackPanel>
 
@@ -300,7 +357,7 @@
                                         Visibility="Collapsed">
                                 <TextBlock Text="نام شرکت"
                                            Style="{StaticResource FormLabel}" />
-                                <controls:ModernPersianTextBox Text="{Binding CompanyName}"
+                                <controls:ModernPersianTextBox Text="{Binding CompanyName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                                Placeholder="شرکت نمونه" />
                             </StackPanel>
                             <StackPanel Grid.Column="2"
@@ -309,7 +366,7 @@
                                 <TextBlock Text="کد اقتصادی"
                                            Style="{StaticResource FormLabel}" />
                                 <controls:ModernPersianTextBox FlowDirection="LeftToRight"
-                                                               Text="{Binding EconomicCode}"
+                                                               Text="{Binding EconomicCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                                Placeholder="123456789" />
                             </StackPanel>
                             <StackPanel Grid.Column="4"
@@ -318,7 +375,7 @@
                                 <TextBlock Text="شماره ثبت"
                                            Style="{StaticResource FormLabel}" />
                                 <controls:ModernPersianTextBox FlowDirection="LeftToRight"
-                                                               Text="{Binding RegistrationNumber}"
+                                                               Text="{Binding RegistrationNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                                Placeholder="12345" />
                             </StackPanel>
                         </Grid>
@@ -344,28 +401,46 @@
                                                VerticalAlignment="Center" />
                                     <StackPanel Orientation="Horizontal"
                                                 Grid.Row="1">
-                                        <ToggleButton Content="مشتری"
+                                        <ToggleButton x:Name="PersonTypeCustomer"
+                                                      Content="مشتری"
+                                                      Tag="1"
                                                       FlowDirection="LeftToRight"
                                                       Style="{StaticResource StatusToggleButton}"
                                                       IsChecked="False"
+                                                      Checked="PersonTypeToggle_Checked"
                                                       Margin="0,0,8,0" />
-                                        <ToggleButton Content="تامین کننده"
+                                        <ToggleButton x:Name="PersonTypeSupplier"
+                                                      Content="تامین کننده"
+                                                      Tag="3"
                                                       FlowDirection="LeftToRight"
                                                       Style="{StaticResource StatusToggleButton}"
                                                       IsChecked="False"
+                                                      Checked="PersonTypeToggle_Checked"
                                                       Margin="0,0,8,0" />
-                                        <ToggleButton Content="هردو"
+                                        <ToggleButton x:Name="PersonTypeBoth"
+                                                      Content="هردو"
+                                                      Tag="1"
                                                       FlowDirection="LeftToRight"
                                                       Style="{StaticResource StatusToggleButton}"
                                                       IsChecked="False"
+                                                      Checked="PersonTypeToggle_Checked"
                                                       Margin="0,0,8,0" />
-                                        <ToggleButton Content="پرسنل"
+                                        <ToggleButton x:Name="PersonTypePersonnel"
+                                                      Content="پرسنل"
+                                                      Tag="2"
+                                                      FlowDirection="LeftToRight"
+                                                      Style="{StaticResource StatusToggleButton}"
+                                                      IsChecked="False"
+                                                      Checked="PersonTypeToggle_Checked"
+                                                      Margin="0,0,8,0" />
+                                        <ToggleButton Content="مشخصات پرسنل"
                                                       x:Name="PersonnelToggle"
                                                       FlowDirection="LeftToRight"
                                                       Style="{StaticResource StatusToggleButton}"
                                                       IsChecked="False"
                                                       Checked="CategoryToggle_Checked"
-                                                      Unchecked="CategoryToggle_Checked" />
+                                                      Unchecked="CategoryToggle_Checked"
+                                                      Margin="0,0,8,0" />
                                     </StackPanel>
                                 </Grid>
                             </StackPanel>
@@ -501,27 +576,28 @@
                                                        Style="{StaticResource FormLabel}" />
                                             <controls:ModernPersianTextBox Width="200"
                                                                            FlowDirection="LeftToRight"
-                                                                           Text="{Binding Username}"
+                                                                           Text="{Binding Phone, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                                            Placeholder="071" />
                                         </StackPanel>
                                         <StackPanel Grid.Column="2">
                                             <TextBlock Text="استان"
                                                        Style="{StaticResource FormLabel}" />
-                                            <ComboBox Style="{StaticResource SearchableComboBox}"
+                                            <ComboBox x:Name="ProvinceCombo"
+                                                      Style="{StaticResource SearchableComboBox}"
                                                       Tag="جستجو"
                                                       Width="200"
                                                       HorizontalAlignment="Left"
-                                                      ItemContainerStyle="{StaticResource SearchableComboBoxItem}">
-                                                <ComboBoxItem Content="تهران" />
-                                                <ComboBoxItem Content="شیراز" />
-                                                <ComboBoxItem Content="مشهد" />
-                                            </ComboBox>
+                                                      ItemsSource="{Binding Provinces}"
+                                                      DisplayMemberPath="Title"
+                                                      SelectedValuePath="Id"
+                                                      SelectedValue="{Binding SelectedProvinceId, Mode=TwoWay}"
+                                                      ItemContainerStyle="{StaticResource SearchableComboBoxItem}" />
                                         </StackPanel>
                                         <StackPanel Grid.Column="4">
                                             <TextBlock Text="کد پستی"
                                                        Style="{StaticResource FormLabel}" />
                                             <controls:ModernPersianTextBox Width="200"
-                                                                           Text="{Binding Username}"
+                                                                           Text="{Binding PostalCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                                            Placeholder="" />
                                         </StackPanel>
                                     </Grid>
@@ -539,28 +615,29 @@
                                                        Style="{StaticResource FormLabel}" />
                                             <controls:ModernPersianTextBox Width="200"
                                                                            FlowDirection="LeftToRight"
-                                                                           Text="{Binding Username}"
+                                                                           Text="{Binding Mobile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                                            Placeholder="091" />
                                         </StackPanel>
                                         <StackPanel Grid.Column="2">
                                             <TextBlock Text="شهرستان"
                                                        Style="{StaticResource FormLabel}" />
-                                            <ComboBox Style="{StaticResource SearchableComboBox}"
+                                            <ComboBox x:Name="CityCombo"
+                                                      Style="{StaticResource SearchableComboBox}"
                                                       Tag="جستجو..."
                                                       Width="200"
                                                       HorizontalAlignment="Left"
-                                                      ItemContainerStyle="{StaticResource SearchableComboBoxItem}">
-                                                <ComboBoxItem Content="تهران" />
-                                                <ComboBoxItem Content="شیراز" />
-                                                <ComboBoxItem Content="مشهد" />
-                                            </ComboBox>
+                                                      ItemsSource="{Binding Cities}"
+                                                      DisplayMemberPath="Title"
+                                                      SelectedValuePath="Id"
+                                                      SelectedValue="{Binding SelectedCityId, Mode=TwoWay}"
+                                                      ItemContainerStyle="{StaticResource SearchableComboBoxItem}" />
                                         </StackPanel>
                                         <StackPanel Grid.Column="4">
                                             <TextBlock Text="ایمیل"
                                                        Style="{StaticResource FormLabel}" />
                                             <controls:ModernPersianTextBox Width="200"
                                                                            FlowDirection="LeftToRight"
-                                                                           Text="{Binding Username}"
+                                                                           Text="{Binding Email, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                                            Placeholder="example@mail.com" />
                                         </StackPanel>
                                     </Grid>
@@ -576,7 +653,7 @@
                                         <TextBlock Text="آدرس"
                                                    Style="{StaticResource FormLabel}"
                                                    Margin="0,0,0,8" />
-                                        <TextBox Text="{Binding Address}"
+                                        <TextBox Text="{Binding Address, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                  Style="{StaticResource ModernPersianTextBox}"
                                                  TextWrapping="Wrap"
                                                  AcceptsReturn="True"
@@ -603,7 +680,7 @@
                                     <TextBlock Text="نام بانک"
                                                Style="{StaticResource FormLabel}" />
                                     <controls:ModernPersianTextBox Width="230"
-                                                                   Text="{Binding Username}"
+                                                                   Text="{Binding MainBankName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                                    Placeholder="ملت" />
                                 </StackPanel>
                                 <StackPanel Grid.Column="2">
@@ -611,16 +688,25 @@
                                                Width="230"
                                                HorizontalAlignment="Left"
                                                Style="{StaticResource FormLabel}" />
-                                    <controls:ModernPersianTextBox Text="{Binding Username}"
-                                                                   Placeholder="مرکزی" />
+                                    <ComboBox x:Name="BankBranchCombo"
+                                              Style="{StaticResource SearchableComboBox}"
+                                              Tag="جستجو..."
+                                              Width="230"
+                                              HorizontalAlignment="Left"
+                                              ItemsSource="{Binding BankBranches}"
+                                              DisplayMemberPath="BranchName"
+                                              SelectedValuePath="Id"
+                                              SelectedValue="{Binding SelectedBankBranchId, Mode=TwoWay}"
+                                              ItemContainerStyle="{StaticResource SearchableComboBoxItem}" />
                                 </StackPanel>
                                 <StackPanel Grid.Column="4"
                                             Orientation="Horizontal"
                                             Margin="0,30,0,0">
-                                    <ToggleButton Content="حساب پیش فرض"
+                                    <ToggleButton x:Name="MainBankDefaultToggle"
+                                                  Content="حساب پیش فرض"
                                                   FlowDirection="LeftToRight"
                                                   Style="{StaticResource StatusToggleButton}"
-                                                  IsChecked="True"
+                                                  IsChecked="{Binding MainBankIsDefault, Mode=TwoWay}"
                                                   Margin="10,0,60,0" />
                                     <Button x:Name="AddBankAccountButton"
                                             Click="AddBankAccountButton_Click"
@@ -647,7 +733,7 @@
                                                Style="{StaticResource FormLabel}" />
                                     <controls:ModernPersianTextBox Width="230"
                                                                    FlowDirection="LeftToRight"
-                                                                   Text="{Binding Username}"
+                                                                   Text="{Binding MainCardNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                                    Placeholder="**** **** **** ****" />
                                 </StackPanel>
                                 <StackPanel Grid.Column="2">
@@ -655,7 +741,7 @@
                                                Style="{StaticResource FormLabel}" />
                                     <controls:ModernPersianTextBox Width="230"
                                                                    FlowDirection="LeftToRight"
-                                                                   Text="{Binding Username}"
+                                                                   Text="{Binding MainShaba, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                                    Placeholder="IR" />
                                 </StackPanel>
                                 <StackPanel Grid.Column="4">
@@ -663,14 +749,15 @@
                                                Style="{StaticResource FormLabel}" />
                                     <controls:ModernPersianTextBox Width="230"
                                                                    FlowDirection="LeftToRight"
-                                                                   Text="{Binding Username}"
+                                                                   Text="{Binding MainAccountNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                                    Placeholder="456" />
                                 </StackPanel>
                             </Grid>
 
                             <!-- حساب‌های بانکی اضافه‌شده -->
                             <ItemsControl x:Name="AdditionalBankAccountsPanel"
-                                          Margin="0,10,0,0">
+                                          Margin="0,10,0,0"
+                                          ItemsSource="{Binding BankAccounts}">
                                 <ItemsControl.ItemTemplate>
                                     <StaticResource ResourceKey="BankAccountTemplate" />
                                 </ItemsControl.ItemTemplate>
@@ -754,7 +841,6 @@
                                                Style="{StaticResource FormLabel}" />
                                     <controls:ModernPersianTextBox Width="230"
                                                                    FlowDirection="LeftToRight"
-                                                                   Text="{Binding Username}"
                                                                    Placeholder="**** **** **** ****" />
                                 </StackPanel>
                                 <StackPanel Grid.Column="4">
@@ -762,7 +848,6 @@
                                                Style="{StaticResource FormLabel}" />
                                     <controls:ModernPersianTextBox Width="230"
                                                                    FlowDirection="LeftToRight"
-                                                                   Text="{Binding Username}"
                                                                    Placeholder="12345" />
                                 </StackPanel>
                             </Grid>
@@ -780,30 +865,25 @@
                                                Style="{StaticResource FormLabel}" />
                                     <controls:ModernPersianTextBox Width="300"
                                                                    FlowDirection="LeftToRight"
-                                                                   Text="{Binding Username}"
                                                                    Placeholder="071" />
                                 </StackPanel>
                                 <StackPanel Grid.Column="2">
                                     <TextBlock Text="تاریخ استخدام"
                                                Style="{StaticResource FormLabel}" />
                                     <controls:PersianDatePickerControl x:Name="MyDatePicker3"
-                                                                       SelectedDate="{Binding BirthDate}"
                                                                        DateChanged="MyDatePicker_DateChanged" />
                                 </StackPanel>
                                 <StackPanel Grid.Column="4">
                                     <TextBlock Text="تاریخ قطع همکاری"
                                                Style="{StaticResource FormLabel}" />
                                     <controls:PersianDatePickerControl x:Name="MyDatePicker2"
-                                                                       SelectedDate="{Binding BirthDate}"
                                                                        DateChanged="MyDatePicker_DateChanged" />
                                 </StackPanel>
                             </Grid>
                             <StackPanel>
                                 <TextBlock Text="توضیحات"
-                                           Style="{StaticResource FormLabel}"
-                                     />
+                                           Style="{StaticResource FormLabel}" />
                                 <controls:ModernPersianTextBox Width="730"
-                                                               Text="{Binding Username}"
                                                                Placeholder=""
                                                                HorizontalAlignment="Left" />
                             </StackPanel>
