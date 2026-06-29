@@ -21,7 +21,6 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using Taadol.Controls;
-
 namespace Taadol.Views
 {
     /// <summary>
@@ -1024,6 +1023,12 @@ namespace Taadol.Views
             if (!isPersonnel && TabTax.IsChecked == true)
                 TabPricing.IsChecked = true;
         }
+        private void CategoryToggle_Checked(object sender, RoutedEventArgs e)
+        {
+            if (PersonnelToggle == null || TabTax == null) return;
+
+            bool isPersonnel = PersonnelToggle.IsChecked == true;
+            TabTax.Visibility = isPersonnel ? Visibility.Visible : Visibility.Collapsed;
 
         // ======================================================
         //  Misc UI Handlers

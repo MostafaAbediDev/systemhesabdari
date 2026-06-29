@@ -9,7 +9,7 @@
         public string DueDate { get; set; }
         public string Status { get; set; }
         public string ReferenceType { get; set; }
-        public string ChequeBookTitle { get; set; }
+        public string ChequeBookSerial { get; set; }
         public string BranchName { get; set; }
         public string CreationDate { get; set; }
         public bool IsDeleted { get; set; }
