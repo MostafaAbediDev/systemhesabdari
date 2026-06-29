@@ -18,6 +18,7 @@ namespace Taadol.Views
     /// <summary>
     /// فرم لیست اشخاص.
     /// اطلاعات شخص + تماس‌ها (موبایل/تلفن) + آدرس (استان/شهر) رو به‌صورت یکپارچه نشون می‌ده.
+    /// دارای فیلترهای پاپ‌آپ روی ستون‌های وضعیت/استان/شهر.
     /// الگوی async/scope از BranchListView برداشته شده.
     /// </summary>
     public partial class PersonListView : UserControl
@@ -32,6 +33,13 @@ namespace Taadol.Views
         private int _totalPages = 1;
         private string _currentFilter = "all";
         private bool _isLoadedOnce = false;
+
+        // ===== Filter Selections =====
+        // برای فیلتر پاپ‌آپ: مقادیر انتخاب‌شده توسط کاربر
+        // اگه خالی باشه = هیچ فیلتری اعمال نشده (همه نشون داده می‌شه)
+        private readonly HashSet<string> _selectedStatuses = new HashSet<string>();
+        private readonly HashSet<string> _selectedProvinces = new HashSet<string>();
+        private readonly HashSet<string> _selectedCities = new HashSet<string>();
 
         public PersonListView()
         {
@@ -226,6 +234,7 @@ namespace Taadol.Views
 
             var query = AllPersons.AsEnumerable();
 
+            // فیلتر نوع شخص (تب‌های بالا)
             switch (_currentFilter)
             {
                 case "customer":
@@ -237,6 +246,24 @@ namespace Taadol.Views
                 case "personnel":
                     query = query.Where(p => p.PersonType != null && p.PersonType.Contains("پرسنل"));
                     break;
+            }
+
+            // فیلتر پاپ‌آپ وضعیت
+            if (_selectedStatuses.Count > 0)
+            {
+                query = query.Where(p => p.Status != null && _selectedStatuses.Contains(p.Status));
+            }
+
+            // فیلتر پاپ‌آپ استان
+            if (_selectedProvinces.Count > 0)
+            {
+                query = query.Where(p => p.Province != null && p.Province != "—" && _selectedProvinces.Contains(p.Province));
+            }
+
+            // فیلتر پاپ‌آپ شهر
+            if (_selectedCities.Count > 0)
+            {
+                query = query.Where(p => p.City != null && p.City != "—" && _selectedCities.Contains(p.City));
             }
 
             var searchText = SearchBox?.Text?.Trim();
@@ -563,6 +590,115 @@ namespace Taadol.Views
         }
 
         private void PersonsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e) { }
+
+        // ======================================================
+        //  Popup Filter Handlers (وضعیت / استان / شهر)
+        //  همه‌ی منطق پاپ‌آپ داخل FilterPopupControl قرار داره.
+        //  برای ویرایش ظاهر، فایل Controls/FilterPopupControl.xaml رو ببینید.
+        // ======================================================
+
+        /// <summary>کلیک روی آیکون فیلتر وضعیت → پاپ‌آپ با «فعال» و «غیرفعال»</summary>
+        private void StatusFilter_Click(object sender, RoutedEventArgs e)
+        {
+            ShowFilterPopup(
+                anchor: sender as Button,
+                title: "فیلتر وضعیت",
+                options: new List<string> { "فعال", "غیرفعال" },
+                selected: _selectedStatuses,
+                showSearch: false,
+                immediateApply: true,
+                onSelectionChanged: result =>
+                {
+                    _selectedStatuses.Clear();
+                    foreach (var r in result) _selectedStatuses.Add(r);
+                    _currentPage = 1;
+                    ApplyFilters();
+                });
+        }
+
+        /// <summary>کلیک روی آیکون فیلتر استان</summary>
+        private void ProvinceFilter_Click(object sender, RoutedEventArgs e)
+        {
+            var options = AllPersons?
+                .Select(p => p.Province)
+                .Where(x => !string.IsNullOrWhiteSpace(x) && x != "—")
+                .Distinct()
+                .OrderBy(x => x)
+                .ToList() ?? new List<string>();
+
+            ShowFilterPopup(
+                anchor: sender as Button,
+                title: "فیلتر استان",
+                options: options,
+                selected: _selectedProvinces,
+                showSearch: true,
+                immediateApply: false,
+                onSelectionChanged: result =>
+                {
+                    _selectedProvinces.Clear();
+                    foreach (var r in result) _selectedProvinces.Add(r);
+                    _currentPage = 1;
+                    ApplyFilters();
+                });
+        }
+
+        /// <summary>کلیک روی آیکون فیلتر شهر</summary>
+        private void CityFilter_Click(object sender, RoutedEventArgs e)
+        {
+            var options = AllPersons?
+                .Select(p => p.City)
+                .Where(x => !string.IsNullOrWhiteSpace(x) && x != "—")
+                .Distinct()
+                .OrderBy(x => x)
+                .ToList() ?? new List<string>();
+
+            ShowFilterPopup(
+                anchor: sender as Button,
+                title: "فیلتر شهر",
+                options: options,
+                selected: _selectedCities,
+                showSearch: true,
+                immediateApply: false,
+                onSelectionChanged: result =>
+                {
+                    _selectedCities.Clear();
+                    foreach (var r in result) _selectedCities.Add(r);
+                    _currentPage = 1;
+                    ApplyFilters();
+                });
+        }
+
+        /// <summary>
+        /// راه‌اندازی FilterPopupControl و نمایش آن.
+        /// همه‌ی منطق پاپ‌آپ (ظاهر، سرچ، چک‌باکس‌ها، دکمه‌ها) داخل UserControl قرار داره.
+        /// </summary>
+        private void ShowFilterPopup(
+            Button anchor,
+            string title,
+            List<string> options,
+            HashSet<string> selected,
+            bool showSearch,
+            bool immediateApply,
+            Action<List<string>> onSelectionChanged)
+        {
+            if (anchor == null) return;
+
+            var popup = new Taadol.Controls.FilterPopupControl
+            {
+                Title = title,
+                Options = options,
+                SelectedOptions = new HashSet<string>(selected),
+                ShowSearch = showSearch,
+                ImmediateApply = immediateApply
+            };
+
+            popup.SelectionChanged += (selectedList) =>
+            {
+                onSelectionChanged(selectedList);
+            };
+
+            popup.ShowAt(anchor);
+        }
 
         // ======================================================
         //  Helpers

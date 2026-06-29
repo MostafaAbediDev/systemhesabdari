@@ -1,0 +1,356 @@
+﻿<UserControl x:Class="Taadol.Controls.FilterPopupControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:Taadol.Controls"
+             xmlns:svg="http://sharpvectors.codeplex.com/svgc/"
+             FlowDirection="RightToLeft"
+             Background="Transparent">
+
+    <!-- ============================================================
+         FilterPopupControl
+
+         ⚠️  برای پیش‌نمایش در Designer:
+         این UserControl خودش کارت پاپ‌آپ رو نشون می‌ده.
+         در زمان اجرا، با متد ShowAt() این کارت داخل یک Popup واقعی
+         قرار می‌گیره و نسبت به anchor باز می‌شه.
+
+         Property ها (از code-behind ست می‌شن):
+           - Title            : عنوان پاپ‌آپ
+           - Options          : لیست همه‌ی گزینه‌ها
+           - SelectedOptions  : گزینه‌های انتخاب‌شده (HashSet<string>)
+           - ShowSearch       : آیا TextBox سرچ نشون داده بشه
+           - ImmediateApply   : آیا فیلتر با هر کلیک اعمال بشه (بدون دکمه اعمال)
+
+         Event:
+           - SelectionChanged : وقتی انتخاب‌ها عوض می‌شن
+    ============================================================ -->
+
+    <!-- ===== Style های دکمه‌های Footer ===== -->
+    <UserControl.Resources>
+        <!-- Style دکمه‌های ثانویه (همه / پاک) -->
+        <Style x:Key="SecondaryFooterButtonStyle"
+               TargetType="Button">
+            <Setter Property="FontFamily"
+                    Value="{StaticResource IRANSans}" />
+            <Setter Property="FontSize"
+                    Value="12" />
+            <Setter Property="FontWeight"
+                    Value="Medium" />
+            <Setter Property="Foreground"
+                    Value="#1F2937" />
+            <Setter Property="Background"
+                    Value="White" />
+            <Setter Property="BorderBrush"
+                    Value="#C0C7DD" />
+            <Setter Property="BorderThickness"
+                    Value="1" />
+            <Setter Property="Padding"
+                    Value="10,6,10,6" />
+            <Setter Property="HorizontalContentAlignment"
+                    Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="Bd"
+                                        Property="Background"
+                                        Value="#F3F4F6" />
+                                <Setter TargetName="Bd"
+                                        Property="BorderBrush"
+                                        Value="#2667FF" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Style دکمه‌ی اصلی (اعمال) -->
+        <Style x:Key="PrimaryFooterButtonStyle"
+               TargetType="Button">
+            <Setter Property="FontFamily"
+                    Value="{StaticResource IRANSans}" />
+            <Setter Property="FontSize"
+                    Value="12" />
+            <Setter Property="FontWeight"
+                    Value="Bold" />
+            <Setter Property="Foreground"
+                    Value="White" />
+            <Setter Property="Background"
+                    Value="#2667FF" />
+            <Setter Property="BorderBrush"
+                    Value="#2667FF" />
+            <Setter Property="BorderThickness"
+                    Value="1" />
+            <Setter Property="Padding"
+                    Value="10,6,10,6" />
+            <Setter Property="HorizontalContentAlignment"
+                    Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="Bd"
+                                        Property="Background"
+                                        Value="#1E4DCC" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Style ردیف چک‌باکس (ToggleButton) -->
+        <Style x:Key="FilterCheckBoxStyle"
+               TargetType="ToggleButton">
+            <Setter Property="Cursor"
+                    Value="Hand" />
+            <Setter Property="Background"
+                    Value="Transparent" />
+            <Setter Property="BorderThickness"
+                    Value="0" />
+            <Setter Property="Padding"
+                    Value="6,4,6,4" />
+            <Setter Property="Margin"
+                    Value="2,1,2,1" />
+            <Setter Property="HorizontalAlignment"
+                    Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment"
+                    Value="Stretch" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <StackPanel Orientation="Horizontal"
+                                        VerticalAlignment="Center">
+
+                                <!-- ★ ۱. چک‌باکس — اول (سمت راست در RTL) -->
+                                <Border x:Name="CheckBoxBorder"
+                                        Width="20"
+                                        Height="20"
+                                        BorderThickness="2"
+                                        BorderBrush="#BDC3C7"
+                                        CornerRadius="4"
+                                        Background="White"
+                                        Padding="2"
+                                        VerticalAlignment="Center">
+                                    <svg:SvgViewbox x:Name="CheckMark"
+                                                    Width="8"
+                                                    Height="8"
+                                                    Source="/Assets/Icons/Line.svg"
+                                                    FlowDirection="LeftToRight"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"
+                                                    Visibility="Collapsed" />
+                                </Border>
+
+                                <!-- ★ ۲. متن — بعد از چک‌باکس (سمت چپ در RTL) -->
+                                <ContentPresenter Content="{TemplateBinding Content}"
+                                                  VerticalAlignment="Center"
+                                                  Margin="8,0,0,0">
+                                    <ContentPresenter.Resources>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="FontFamily"
+                                                    Value="{StaticResource IRANSans}" />
+                                            <Setter Property="FontSize"
+                                                    Value="12" />
+                                            <Setter Property="Foreground"
+                                                    Value="#1F2937" />
+                                        </Style>
+                                    </ContentPresenter.Resources>
+                                </ContentPresenter>
+
+                            </StackPanel>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked"
+                                     Value="True">
+                                <Setter TargetName="CheckBoxBorder"
+                                        Property="BorderBrush"
+                                        Value="#2ECC71" />
+                                <Setter TargetName="CheckMark"
+                                        Property="Visibility"
+                                        Value="Visible" />
+                            </Trigger>
+                            <Trigger Property="IsChecked"
+                                     Value="False">
+                                <Setter TargetName="CheckBoxBorder"
+                                        Property="BorderBrush"
+                                        Value="#BDC3C7" />
+                                <Setter TargetName="CheckBoxBorder"
+                                        Property="Background"
+                                        Value="White" />
+                                <Setter TargetName="CheckMark"
+                                        Property="Visibility"
+                                        Value="Collapsed" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="Bd"
+                                        Property="Background"
+                                        Value="#F3F4F6" />
+                                <Setter TargetName="CheckBoxBorder"
+                                        Property="BorderBrush"
+                                        Value="#27AE60" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <!-- ===== ریشه: کارت پاپ‌آپ ===== -->
+    <!-- این Border در Designer هم دیده می‌شه -->
+    <Border Background="White"
+            BorderBrush="#D4E1FF"
+            BorderThickness="1"
+            CornerRadius="8"
+            Padding="6"
+            MinWidth="220"
+            x:Name="RootCard">
+
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="12"
+                              ShadowDepth="2"
+                              Opacity="0.12"
+                              Color="#001242"
+                              Direction="270" />
+        </Border.Effect>
+
+        <StackPanel>
+            <!-- ===== Header ===== -->
+            <Border Background="#F8FAFF"
+                    CornerRadius="6,6,0,0"
+                    Padding="12,8,12,8"
+                    BorderBrush="#E2E8F0"
+                    BorderThickness="0,0,0,1"
+                    Margin="-6,-6,-6,6">
+                <TextBlock x:Name="HeaderText"
+                           Text="فیلتر"
+                           FontFamily="{StaticResource IRANSans}"
+                           FontSize="13"
+                           FontWeight="Bold"
+                           Foreground="#2667FF" />
+            </Border>
+
+            <!-- ===== Search Box ===== -->
+            <!-- از TextBox ساده استفاده می‌کنیم چون ModernPersianTextBox ارتفاع ثابت 45 داره.
+                 کاربر می‌تونه Style و ارتفاع رو از همینجا ویرایش کنه. -->
+            <Border x:Name="SearchBoxBorder"
+                    Background="White"
+                    BorderBrush="#E8E8E8"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Height="28"
+                    Width="200"
+                    Margin="0,0,0,6"
+                    Visibility="Collapsed"
+                    FlowDirection="RightToLeft">
+                <Grid>
+                    <TextBlock x:Name="PlaceholderText"
+                               Foreground="#BFBFBF"
+                               FontFamily="{StaticResource IRANSans}"
+                               FontSize="12"
+                               VerticalAlignment="Center"
+                               Margin="10,0"
+                               IsHitTestVisible="False"
+                               Text="جستجو..." />
+                    <TextBox x:Name="SearchBox"
+                             FontFamily="{StaticResource IRANSans}"
+                             FontSize="12"
+                             Foreground="#2C3E50"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             Padding="10,0"
+                             VerticalContentAlignment="Center"
+                             TextChanged="SearchBox_TextChanged">
+                        <TextBox.Template>
+                            <ControlTemplate TargetType="TextBox">
+                                <ScrollViewer x:Name="PART_ContentHost"
+                                              Focusable="false"
+                                              HorizontalScrollBarVisibility="Hidden"
+                                              VerticalScrollBarVisibility="Hidden" />
+                            </ControlTemplate>
+                        </TextBox.Template>
+                    </TextBox>
+                </Grid>
+            </Border>
+            <ToggleButton x:Name="SelectAllToggle"
+                          Style="{StaticResource FilterCheckBoxStyle}"
+                          Content="همه"
+                          Checked="SelectAllToggle_Checked"
+                          Unchecked="SelectAllToggle_Unchecked"
+                          Margin="2,0,2,4" />
+
+            <!-- ===== لیست چک‌باکس‌ها ===== -->
+            <ScrollViewer MaxHeight="240"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Hidden"
+                          Padding="2">
+                <StackPanel x:Name="ItemsHost" />
+            </ScrollViewer>
+
+            <!-- ===== Footer (دکمه‌ها) ===== -->
+            <!-- برای دیدن دکمه‌ها در Designer، Visibility رو روی Visible می‌ذاریم.
+                 در زمان اجرا اگر ImmediateApply=true باشه، مخفی می‌شه. -->
+            <Border x:Name="FooterBorder"
+                    Background="#F8FAFF"
+                    CornerRadius="0,0,6,6"
+                    Padding="6,6,6,6"
+                    BorderBrush="#E2E8F0"
+                    BorderThickness="0,1,0,0"
+                    Margin="-6,6,-6,-6">
+                <!-- Footer — ستون همه حذف شد -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="1.5*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Button x:Name="ClearButton"
+                            Grid.Column="0"
+                            Content="پاک"
+                            Click="ClearButton_Click"
+                            Margin="0,0,4,0"
+                            Cursor="Hand"
+                            Style="{StaticResource SecondaryFooterButtonStyle}" />
+
+                    <Button x:Name="ApplyButton"
+                            Grid.Column="1"
+                            Content="اعمال"
+                            Click="ApplyButton_Click"
+                            Margin="4,0,0,0"
+                            Cursor="Hand"
+                            Style="{StaticResource PrimaryFooterButtonStyle}" />
+                </Grid>
+            </Border>
+        </StackPanel>
+    </Border>
+</UserControl>

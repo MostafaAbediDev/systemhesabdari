@@ -593,45 +593,12 @@ namespace Taadol.Views
                         SaveContacts(newPersonId);
                         SaveAddress(newPersonId);
                         SaveBanks(newPersonId);
-
-                        // ★ فعال/غیرفعال‌کردن شخص
-                        // نکته: CreatePerson فعلاً فیلد IsActive نداره (در بک‌اند).
-                        // بنابراین بعد از Create، اگه کاربر تیک «شخص فعال است» زده باشه،
-                        // متد Activate صدا زده می‌شه. اگر نزده باشه، Deactivate.
-                        try
-                        {
-                            if (IsActive)
-                                _personApplication.Activate(newPersonId);
-                            else
-                                _personApplication.Deactivate(newPersonId);
-                        }
-                        catch (Exception actEx)
-                        {
-                            System.Diagnostics.Debug.WriteLine(
-                                "Activate/Deactivate failed: " + actEx.Message);
-                        }
                     }
                     else
                     {
                         MessageBox.Show(
                             "شخص ثبت شد ولی پیدا کردن شناسه‌ی او برای ذخیره‌ی تماس/آدرس/بانک ناموفق بود.",
                             "هشدار", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    }
-                }
-                else
-                {
-                    // در حالت Edit هم وضعیت فعال بودن رو آپدیت کن
-                    try
-                    {
-                        if (IsActive)
-                            _personApplication.Activate(PersonId);
-                        else
-                            _personApplication.Deactivate(PersonId);
-                    }
-                    catch (Exception actEx)
-                    {
-                        System.Diagnostics.Debug.WriteLine(
-                            "Activate/Deactivate failed: " + actEx.Message);
                     }
                 }
 
@@ -929,19 +896,6 @@ namespace Taadol.Views
             CreditLimit = person.CreditLimit;
             ManualCode = person.ManualCode ?? person.CurrentCode ?? "";
             IsCodeAutomatic = person.IsCodeAutomatic;
-
-            // GetDetails فیلد IsActive برنمی‌گردونه، پس از GetPersons می‌گیریم
-            try
-            {
-                var allPersons = _personApplication.GetPersons();
-                var vm = allPersons?.FirstOrDefault(p => p.Id == id);
-                if (vm != null)
-                    IsActive = vm.IsActive;
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Load IsActive failed: " + ex.Message);
-            }
 
             UpdateLegalTypePanels();
             UpdatePersonTypeToggleSelection();
