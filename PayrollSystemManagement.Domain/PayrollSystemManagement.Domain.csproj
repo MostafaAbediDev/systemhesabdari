@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AccountManagement.Domain\AccountManagement.Domain.csproj" />
     <ProjectReference Include="..\GeneralInfoManagement.Domain\GeneralInfoManagement.Domain.csproj" />
+    <ProjectReference Include="..\PayrollSystemManagement.Application.Contracts\PayrollSystemManagement.Application.Contracts.csproj" />
     <ProjectReference Include="..\PersonManagement.Domain\PersonManagement.Domain.csproj" />
   </ItemGroup>
 
