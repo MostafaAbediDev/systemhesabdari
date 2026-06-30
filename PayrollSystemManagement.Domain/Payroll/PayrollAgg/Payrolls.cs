@@ -4,7 +4,6 @@ using GeneralInfoManagement.Domain.BaseInfo.BranchesAgg;
 using GeneralInfoManagement.Domain.BaseInfo.FinancialPeriodsAgg;
 using PayrollSystemManagement.Domain.Payroll.EmployeeAgg;
 using PayrollSystemManagement.Domain.Payroll.PayrollDetailAgg;
-using PayrollSystemManagement.Domain.Payroll.PayrollItemAgg;
 
 namespace PayrollSystemManagement.Domain.Payroll.PayrollAgg
 {
