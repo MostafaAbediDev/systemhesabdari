@@ -14,7 +14,7 @@ namespace PayrollSystemManagement.Infrastructure.EFCore
                 .Build();
 
             var options = new DbContextOptionsBuilder<PayrollFakeDataContext>()
-                .UseSqlServer(config.GetConnectionString("TaadolDb"))
+                .UseSqlServer(config.GetConnectionString("TaadolFakeDb"))
                 .Options;
 
             return new PayrollFakeDataContext(options);
