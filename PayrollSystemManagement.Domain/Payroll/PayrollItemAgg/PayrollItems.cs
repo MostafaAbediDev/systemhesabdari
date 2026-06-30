@@ -38,6 +38,9 @@ namespace PayrollSystemManagement.Domain.Payroll.PayrollItemAgg
             if (IsFixed)
                 throw new InvalidOperationException("Fixed items cannot be edited");
 
+            if (string.IsNullOrWhiteSpace(title))
+                throw new ArgumentException("Title is required");
+
             Title = title;
             ItemType = itemType;
             RuleType = ruleType;
@@ -48,6 +51,11 @@ namespace PayrollSystemManagement.Domain.Payroll.PayrollItemAgg
         public void SetFixed()
         {
             IsFixed = true;
+        }
+
+        public void UnSetFixed()
+        {
+            IsFixed = false;
         }
 
 
