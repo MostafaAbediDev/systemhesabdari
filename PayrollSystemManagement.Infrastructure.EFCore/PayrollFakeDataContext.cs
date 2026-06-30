@@ -9,7 +9,7 @@ using PayrollSystemManagement.Infrastructure.EFCore.Mapping;
 
 namespace PayrollSystemManagement.Infrastructure.EFCore
 {
-    public class PayrollSystemContext : DbContext
+    public class PayrollFakeDataContext : DbContext
     {
         public DbSet<Payrolls> Payrolls { get; set; }
         public DbSet<Employees> Employees { get; set; }
@@ -19,7 +19,7 @@ namespace PayrollSystemManagement.Infrastructure.EFCore
         public DbSet<JobTitles> JobTitles { get; set; }
 
 
-        public PayrollSystemContext(DbContextOptions<PayrollSystemContext> options) : base(options)
+        public PayrollFakeDataContext(DbContextOptions<PayrollFakeDataContext> options) : base(options)
         {
         }
 
