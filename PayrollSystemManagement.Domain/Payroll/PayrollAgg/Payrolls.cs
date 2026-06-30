@@ -4,6 +4,7 @@ using GeneralInfoManagement.Domain.BaseInfo.BranchesAgg;
 using GeneralInfoManagement.Domain.BaseInfo.FinancialPeriodsAgg;
 using PayrollSystemManagement.Domain.Payroll.EmployeeAgg;
 using PayrollSystemManagement.Domain.Payroll.PayrollDetailAgg;
+using PayrollSystemManagement.Domain.Payroll.PayrollItemAgg;
 
 namespace PayrollSystemManagement.Domain.Payroll.PayrollAgg
 {
@@ -63,6 +64,20 @@ namespace PayrollSystemManagement.Domain.Payroll.PayrollAgg
             EmployeeId = employeeId;
             BranchId = branchId;
             FinancialPeriodId = financialPeriodId;
+        }
+
+        public void RecalculateTotals(List<PayrollDetails> details)
+        {
+            if (details == null)
+                details = new List<PayrollDetails>();
+
+            TotalBenefits = details
+                .Where(x => x.PayrollItems != null && x.PayrollItems.ItemType == PayrollItemType.Income)
+                .Sum(x => x.Amount);
+
+            TotalDeduction = details
+                .Where(x => x.PayrollItems != null && x.PayrollItems.ItemType == PayrollItemType.Deduction)
+                .Sum(x => x.Amount);
         }
 
         public void Approve()

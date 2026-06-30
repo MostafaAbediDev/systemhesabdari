@@ -15,20 +15,53 @@ namespace PayrollSystemManagement.Domain.Payroll.PayrollDetailAgg
         public Payrolls Payrolls { get; private set; }
         public PayrollItems PayrollItems { get; private set; }
 
-        public PayrollDetails(decimal quantity, decimal rate, decimal amount, string description)
+        protected PayrollDetails()
         {
-            Quantity = quantity;
-            Rate = rate;
-            Amount = amount;
-            Description = description;
         }
 
-        public void Edit(decimal quantity, decimal rate, decimal amount, string description)
+        public PayrollDetails(decimal quantity, decimal rate, string description, long payrollItemId)
         {
+            if (payrollItemId <= 0)
+                throw new ArgumentException(nameof(payrollItemId));
+
+            if (quantity <= 0)
+                throw new ArgumentException(nameof(quantity));
+
+            if (rate < 0)
+                throw new ArgumentException(nameof(rate));
+
             Quantity = quantity;
             Rate = rate;
-            Amount = amount;
             Description = description;
+            PayrollItemId = payrollItemId;
+
+            CalculateAmount();
+
+        }
+
+        public void Edit(decimal quantity, decimal rate, string description, long payrollItemId)
+        {
+            if (payrollItemId <= 0)
+                throw new ArgumentException(nameof(payrollItemId));
+
+            if (quantity <= 0)
+                throw new ArgumentException(nameof(quantity));
+
+            if (rate < 0)
+                throw new ArgumentException(nameof(rate));
+
+            Quantity = quantity;
+            Rate = rate;
+            Description = description;
+            PayrollItemId = payrollItemId;
+
+            CalculateAmount();
+
+        }
+
+        private void CalculateAmount()
+        {
+            Amount = Quantity * Rate;
         }
 
         public void Remove()
