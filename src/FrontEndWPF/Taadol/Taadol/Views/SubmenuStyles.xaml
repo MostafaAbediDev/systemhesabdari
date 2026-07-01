@@ -1,14 +1,14 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    
+
     <Style x:Key="SubmenuWrapper"
            TargetType="Grid">
         <Setter Property="Background"
                 Value="Transparent" />
     </Style>
 
-    
+
     <Style x:Key="SubmenuBackground"
            TargetType="Border">
         <Setter Property="Background"
@@ -21,7 +21,7 @@
                 Value="10,0,10,0" />
     </Style>
 
-    
+
     <Style x:Key="SubmenuDivider"
            TargetType="Border">
         <Setter Property="Height"
@@ -53,7 +53,7 @@
         </Setter>
     </Style>
 
-    
+
     <Style x:Key="SubmenuEllipseLeft"
            TargetType="Ellipse">
         <Setter Property="Width"
@@ -72,7 +72,7 @@
                 Value="2" />
     </Style>
 
-    
+
     <Style x:Key="SubmenuEllipseRight"
            TargetType="Ellipse">
         <Setter Property="Width"
@@ -91,7 +91,7 @@
                 Value="2" />
     </Style>
 
-    
+
     <Style x:Key="SubmenuItem"
            TargetType="Button">
         <Setter Property="Height"

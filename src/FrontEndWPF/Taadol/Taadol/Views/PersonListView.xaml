@@ -168,7 +168,7 @@
                                         Height="16"
                                         Source="/Assets/Icons/arrow-right_BLUE.svg"
                                         Margin="5,0,10,0" />
-                        <TextBlock Text="اشخاص"
+                        <TextBlock Text="لیست اشخاص"
                                    FontSize="19"
                                    FontFamily="{StaticResource IRANSans}"
                                    FontWeight="Bold"
