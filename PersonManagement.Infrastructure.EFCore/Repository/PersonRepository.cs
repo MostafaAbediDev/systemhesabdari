@@ -32,6 +32,7 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
                     PersonTypeId = x.PersonTypeId,
                     BranchId = x.BranchId,
                     CreditLimit = x.CreditLimit,
+                    PersonCategoryId = x.PersonCategoryId,
                 })
                 .FirstOrDefault(x => x.Id == id);
         }
@@ -95,6 +96,7 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
                     CreditLimit = x.CreditLimit,
                     AvailableCredit = x.AvailableCredit,
                     IsActive = x.IsActive,
+                    PersonCategoryTitle = x.PersonCategory.Title
                 })
                 .ToList();
 
@@ -122,7 +124,9 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
                     IsActive = x.IsActive,
 
                     PersonType = x.PersonType.Title,
-                    BranchName = x.Branches.Title
+                    BranchName = x.Branches.Title,
+                    PersonCategoryTitle = x.PersonCategory.Title
+
                 })
                 .ToList();
         }

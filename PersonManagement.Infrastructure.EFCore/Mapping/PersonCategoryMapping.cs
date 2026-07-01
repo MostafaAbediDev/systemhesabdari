@@ -45,6 +45,8 @@ namespace PersonManagement.Infrastructure.EFCore.Mapping
                    .HasForeignKey(x => x.ParentId)
                    .OnDelete(DeleteBehavior.Restrict);
 
+            builder.HasMany(s => s.Persons).WithOne(s => s.PersonCategory).HasForeignKey(s => s.PersonCategoryId);
+
             builder.HasIndex(x => x.PersonTypeId);
 
             builder.HasIndex(x => x.ParentId);

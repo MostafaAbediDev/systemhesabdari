@@ -25,6 +25,7 @@ namespace PersonManagement.Infrastructure.EFCore.Mapping
 
             builder.HasOne(x => x.Branches).WithMany().HasForeignKey(x => x.BranchId).OnDelete(DeleteBehavior.Restrict);
             builder.HasOne(x => x.PersonType).WithMany(x => x.Persons).HasForeignKey(x => x.PersonTypeId);
+            builder.HasOne(x => x.PersonCategory).WithMany(x => x.Persons).HasForeignKey(x => x.PersonCategoryId);
 
             builder.HasMany(s => s.PersonBanks).WithOne(s => s.Persons).HasForeignKey(s => s.PersonId);
             builder.HasMany(s => s.PersonAddresses).WithOne(s => s.Persons).HasForeignKey(s => s.PersonId);
