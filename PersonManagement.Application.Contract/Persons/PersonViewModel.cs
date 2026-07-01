@@ -16,5 +16,7 @@
         public decimal CreditLimit { get; set; }
         public decimal AvailableCredit { get; set; }
         public bool IsActive { get; set; }
+        public string? PersonCategoryTitle { get; set; }
+
     }
 }

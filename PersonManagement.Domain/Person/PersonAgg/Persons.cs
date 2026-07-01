@@ -2,6 +2,7 @@
 using GeneralInfoManagement.Domain.BaseInfo.BranchesAgg;
 using PersonManagement.Domain.Person.PersonAddressAgg;
 using PersonManagement.Domain.Person.PersonBankAgg;
+using PersonManagement.Domain.Person.PersonCategoryAgg;
 using PersonManagement.Domain.Person.PersonContactAgg;
 using PersonManagement.Domain.Person.PersonTypeAgg;
 
@@ -16,6 +17,7 @@ namespace PersonManagement.Domain.Person.PersonAgg
         public string? NationalCode { get; private set; }
         public string? EconomicCode { get; private set; }
         public string? RegistrationNumber { get; private set; }
+        public long? PersonCategoryId { get; private set; }
         public long PersonTypeId { get; private set; }
         public bool IsLegal { get; private set; }
         public decimal CreditLimit { get; private set; }
@@ -23,6 +25,7 @@ namespace PersonManagement.Domain.Person.PersonAgg
         public long BranchId { get; private set; }
         public Branches Branches { get; private set; }
         public PersonType PersonType { get; private set; }
+        public PersonCategory PersonCategory { get; private set; }
         public List<PersonBanks> PersonBanks { get; private set; }
         public List<PersonAddresses> PersonAddresses { get; private set; }
         public List<PersonContacts> PersonContacts { get; private set; }
@@ -35,7 +38,7 @@ namespace PersonManagement.Domain.Person.PersonAgg
         }
 
         public Persons(string firstName, string lastName , string contactFirstName, string contactLastName, bool isLegal, string? nationalCode, string? economicCode,
-            string? registrationNumber, long personTypeId, long branchId, decimal creditLimit)
+            string? registrationNumber, long personTypeId, long branchId, decimal creditLimit, long? perosnCategoryId)
         {
             FirstName = firstName;
             LastName = lastName;
@@ -60,10 +63,11 @@ namespace PersonManagement.Domain.Person.PersonAgg
             AvailableCredit = creditLimit;
             ContactFirstName = contactFirstName;
             ContactLastName = contactLastName;
+            PersonTypeId = personTypeId;
         }
 
         public void Edit(string firstName, string lastName, string contactFirstName, string contactLastName, string? nationalCode,
-            string? economicCode, string? registrationNumber, long personTypeId, long branchId, bool isLegal)
+            string? economicCode, string? registrationNumber, long personTypeId, long branchId, bool isLegal, long? personCategoryId)
         {
             FirstName = firstName;
             LastName = lastName;
@@ -75,6 +79,7 @@ namespace PersonManagement.Domain.Person.PersonAgg
             SetBranch(branchId);
 
             IsLegal = isLegal;
+
 
             if (IsLegal)
             {
@@ -90,6 +95,8 @@ namespace PersonManagement.Domain.Person.PersonAgg
                 EconomicCode = null;
                 RegistrationNumber = null;
             }
+
+            PersonCategoryId = personCategoryId;
         }
 
         public void UpdateFinancialInfo(decimal creditLimit)

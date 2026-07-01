@@ -1,4 +1,5 @@
 ﻿using _0_FrameWork.Domain;
+using PersonManagement.Domain.Person.PersonAgg;
 using PersonManagement.Domain.Person.PersonTypeAgg;
 
 namespace PersonManagement.Domain.Person.PersonCategoryAgg
@@ -11,10 +12,12 @@ namespace PersonManagement.Domain.Person.PersonCategoryAgg
         public PersonType PersonType { get; private set; }
         public PersonCategory Parent { get; private set; }
         public List<PersonCategory> Children { get; private set; }
+        public List<Persons> Persons { get; private set; }
 
         protected PersonCategory()
         {
             Children = new List<PersonCategory>();
+            Persons = new List<Persons>();
         }
 
         public PersonCategory(

@@ -37,7 +37,8 @@ namespace PersonManagement.Application
                 command.RegistrationNumber,
                 command.PersonTypeId,
                 command.BranchId,
-                command.CreditLimit);
+                command.CreditLimit,
+                command.PersonCategoryId);
 
             _personRepository.Create(person);
 
@@ -66,7 +67,7 @@ namespace PersonManagement.Application
                 return result.Failed("کد ملی وارد شده برای شخص دیگری ثبت شده است.");
 
             person.Edit(command.FirstName, command.LastName, command.ContactFirstName, command.ContactLastName , command.NationalCode, command.EconomicCode,
-                        command.RegistrationNumber, command.PersonTypeId, command.BranchId, command.IsLegal);
+                        command.RegistrationNumber, command.PersonTypeId, command.BranchId, command.IsLegal, command.PersonCategoryId);
 
             person.UpdateFinancialInfo(command.CreditLimit);
 
