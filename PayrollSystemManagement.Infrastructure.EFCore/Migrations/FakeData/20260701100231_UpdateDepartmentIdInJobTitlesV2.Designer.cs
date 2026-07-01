@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PayrollSystemManagement.Infrastructure.EFCore;
 
@@ -11,9 +12,11 @@ using PayrollSystemManagement.Infrastructure.EFCore;
 namespace PayrollSystemManagement.Infrastructure.EFCore.Migrations.FakeData
 {
     [DbContext(typeof(PayrollFakeDataContext))]
-    partial class PayrollFakeDataContextModelSnapshot : ModelSnapshot
+    [Migration("20260701100231_UpdateDepartmentIdInJobTitlesV2")]
+    partial class UpdateDepartmentIdInJobTitlesV2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
