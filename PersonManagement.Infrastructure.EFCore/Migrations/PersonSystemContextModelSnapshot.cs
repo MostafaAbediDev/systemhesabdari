@@ -685,6 +685,9 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<long?>("PersonCategoryId")
+                        .HasColumnType("bigint");
+
                     b.Property<long>("PersonTypeId")
                         .HasColumnType("bigint");
 
@@ -695,6 +698,8 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BranchId");
+
+                    b.HasIndex("PersonCategoryId");
 
                     b.HasIndex("PersonTypeId");
 
@@ -1079,6 +1084,10 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("PersonManagement.Domain.Person.PersonCategoryAgg.PersonCategory", "PersonCategory")
+                        .WithMany("Persons")
+                        .HasForeignKey("PersonCategoryId");
+
                     b.HasOne("PersonManagement.Domain.Person.PersonTypeAgg.PersonType", "PersonType")
                         .WithMany("Persons")
                         .HasForeignKey("PersonTypeId")
@@ -1086,6 +1095,8 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
                         .IsRequired();
 
                     b.Navigation("Branches");
+
+                    b.Navigation("PersonCategory");
 
                     b.Navigation("PersonType");
                 });
@@ -1199,6 +1210,8 @@ namespace PersonManagement.Infrastructure.EFCore.Migrations
             modelBuilder.Entity("PersonManagement.Domain.Person.PersonCategoryAgg.PersonCategory", b =>
                 {
                     b.Navigation("Children");
+
+                    b.Navigation("Persons");
                 });
 
             modelBuilder.Entity("PersonManagement.Domain.Person.PersonTypeAgg.PersonType", b =>
