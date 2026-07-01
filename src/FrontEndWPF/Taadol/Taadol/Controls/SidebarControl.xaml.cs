@@ -21,7 +21,9 @@ namespace Taadol.Controls
         private bool _isSidebarOpen = true;
         private bool _isAnimating = false;
         private const double SIDEBAR_OPEN = 240;
-        private const double SIDEBAR_CLOSED = 62;
+        // ★ عرض حالت بسته از 62 به 76 افزایش یافت
+        // چون آیکون‌ها از 20 به 24 بزرگ‌تر شدن، در عرض 62 ناقص دیده می‌شدن
+        private const double SIDEBAR_CLOSED = 68;
         private Dictionary<string, StackPanel> _subMenus;
         private Button _activeMenuButton = null;
 
@@ -48,8 +50,7 @@ namespace Taadol.Controls
     { "dashboard", SubDashboard },
     { "products", SubProducts },
     { "persons", SubPersons },
-    { "businessinfo", SubBusinessInfo },
-    { "warehouse", SubWarehouse },
+    { "businessinfo", SubBusinessInfo },      { "warehouse", SubWarehouse },
     { "bank", SubBank },
     { "sales", SubSales },
     { "reports", SubReports }
@@ -110,6 +111,12 @@ namespace Taadol.Controls
                 }
             }
 
+            // ★ متن منو: حالت فعال → ExtraBold 14
+            var textBlock = FindChild<TextBlock>(button, null);
+            if (textBlock != null)
+            {
+                textBlock.FontWeight = FontWeights.ExtraBold;
+            }
 
             string iconName = GetIconName(menuTag, false);
             var icon = FindChild<SvgViewbox>(button, null);
@@ -127,6 +134,13 @@ namespace Taadol.Controls
                 border.ClearValue(Border.BackgroundProperty);
                 border.ClearValue(Border.BackgroundProperty);
                 border.CornerRadius = new CornerRadius(8);
+            }
+
+            // ★ متن منو: حالت غیرفعال → Regular 14
+            var textBlock = FindChild<TextBlock>(button, null);
+            if (textBlock != null)
+            {
+                textBlock.FontWeight = FontWeights.Regular;
             }
 
             string menuTag = button.Tag as string ?? GetMenuTagFromButton(button);
@@ -444,9 +458,9 @@ namespace Taadol.Controls
             if (isOpen)
             {
                 SmoothClose(targetSub, () =>
-{
-    UpdateMenuCornerRadius(btn, tag);
-});
+                {
+                    UpdateMenuCornerRadius(btn, tag);
+                });
                 SetChevron(btn, tag, "down");
                 RotateSubMenuArrow(btn, 0);
                 UpdateMenuCornerRadius(btn, tag);
@@ -561,18 +575,11 @@ namespace Taadol.Controls
                     panel.MaxHeight = double.PositiveInfinity;
                     panel.Opacity = 1;
 
-                    // فقط اینجا باید فالس بشه!
-                    _isSubMenuAnimating = false;
-
                     RestoreActiveSubMenuStyle();
                 }
             };
             timer.Start();
-
-            // این دو خط پایین رو حتماً پاک کنید چون باعث باگ میشن
-            // _isSubMenuAnimating = false; 
-            // panel.Visibility = Visibility.Visible;
-            // panel.IsHitTestVisible = true;
+            _isSubMenuAnimating = false;
         }
 
         private void RestoreActiveSubMenuStyle()
@@ -664,16 +671,12 @@ namespace Taadol.Controls
                     panel.MaxHeight = double.PositiveInfinity;
                     panel.Opacity = 1;
 
-                    // فقط اینجا باید فالس بشه!
                     _isSubMenuAnimating = false;
-
                     onComplete?.Invoke();
                 }
             };
             timer.Start();
-
-            // این خط رو حتماً پاک کنید!
-            // _isSubMenuAnimating = false;
+            _isSubMenuAnimating = false;
         }
         private double SmoothStep(double t)
         {
@@ -746,12 +749,21 @@ namespace Taadol.Controls
 
         private void SubMenuClick(object sender, RoutedEventArgs e)
         {
-            if (!(sender is Button btn)) return;
-            if (btn.Tag == null) return;
+            if (sender is Button btn && btn.Tag is string tag)
+            {
+                if (btn == _activeSubMenuButton) return;
 
-            string tag = btn.Tag.ToString();
+                if (_activeSubMenuButton != null)
+                {
+                    SetSubMenuInactive(_activeSubMenuButton);
+                }
 
-            SubMenuClicked?.Invoke(tag);
+                _activeSubMenuButton = btn;
+                _activeSubMenuTag = tag;
+                SetSubMenuActive(btn);
+
+                SubMenuClicked?.Invoke(tag);
+            }
         }
 
         private void AnimateSizeWithBounce(Ellipse ellipse, double from, double to, int durationMs)
@@ -793,6 +805,7 @@ namespace Taadol.Controls
         private void SetSubMenuInactive(Button btn)
         {
             btn.ApplyTemplate();
+            btn.UpdateLayout();
 
             var textBlock = btn.Template.FindName("PART_Text", btn) as TextBlock;
             var ellipse = btn.Template.FindName("PART_Dot", btn) as Ellipse;
@@ -812,14 +825,15 @@ namespace Taadol.Controls
                 };
 
                 anim.Completed += (s, e) =>
-{
-    textBlock.ClearValue(TextBlock.ForegroundProperty);
-};
+                {
+                    textBlock.ClearValue(TextBlock.ForegroundProperty);
+                };
 
                 newBrush.BeginAnimation(SolidColorBrush.ColorProperty, anim);
 
-                AnimateFontSize(textBlock, 14, 13, 200);
-                textBlock.FontWeight = FontWeights.Medium;
+                // ★ زیرمنو غیرفعال: سایز ۱۴ ثابت، وزن Regular
+                AnimateFontSize(textBlock, 14, 14, 200);
+                textBlock.FontWeight = FontWeights.Regular;
             }
 
             if (ellipse != null)
@@ -837,9 +851,9 @@ namespace Taadol.Controls
                 };
 
                 anim.Completed += (s, e) =>
-{
-    ellipse.ClearValue(Shape.FillProperty);
-};
+                {
+                    ellipse.ClearValue(Shape.FillProperty);
+                };
 
                 newFill.BeginAnimation(SolidColorBrush.ColorProperty, anim);
                 AnimateSize(ellipse, 8, 5, 200);
@@ -939,6 +953,7 @@ namespace Taadol.Controls
         private void SetSubMenuActive(Button btn)
         {
             btn.ApplyTemplate();
+            btn.UpdateLayout();
 
             var textBlock = btn.Template.FindName("PART_Text", btn) as TextBlock;
             var ellipse = btn.Template.FindName("PART_Dot", btn) as Ellipse;
@@ -957,7 +972,8 @@ namespace Taadol.Controls
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                     });
 
-                AnimateFontSize(textBlock, 13, 14, 200);
+                // ★ زیرمنو فعال: سایز ۱۴ ثابت، وزن ExtraBold
+                AnimateFontSize(textBlock, 14, 14, 200);
                 textBlock.FontWeight = FontWeights.ExtraBold;
             }
 
