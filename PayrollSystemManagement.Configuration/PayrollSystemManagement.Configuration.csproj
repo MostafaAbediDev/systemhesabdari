@@ -10,6 +10,7 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="11.0.0-preview.4.26230.115" />  </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PayrollSystemManagement.Application\PayrollSystemManagement.Application.csproj" />
     <ProjectReference Include="..\PayrollSystemManagement.Infrastructure.EFCore\PayrollSystemManagement.Infrastructure.EFCore.csproj" />
   </ItemGroup>
 
