@@ -5,11 +5,11 @@ using PayrollSystemManagement.Domain.Payroll.DepartmentAgg;
 
 namespace PayrollSystemManagement.Infrastructure.EFCore.Repository
 {
-    public class DepatrmentRepository : RepositoryBase<long, Departments>, IDepartmentRepository
+    public class DepartmentRepository : RepositoryBase<long, Departments>, IDepartmentRepository
     {
         private readonly PayrollFakeDataContext _context;
 
-        public DepatrmentRepository(PayrollFakeDataContext context) : base(context)
+        public DepartmentRepository(PayrollFakeDataContext context) : base(context)
         {
             _context = context;
         }
