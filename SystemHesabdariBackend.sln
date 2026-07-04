@@ -169,6 +169,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PSM.Application", "PSM.Appl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PayrollSystemManagement.Application.Contracts", "PayrollSystemManagement.Application.Contracts\PayrollSystemManagement.Application.Contracts.csproj", "{EDD687CA-06D5-4B50-8A4E-64F6E3A3EBE5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PayrollSystemManagement.Application", "PayrollSystemManagement.Application\PayrollSystemManagement.Application.csproj", "{CBD32F93-4B61-4D45-8596-7CC811E78D5A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -355,6 +357,10 @@ Global
 		{EDD687CA-06D5-4B50-8A4E-64F6E3A3EBE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EDD687CA-06D5-4B50-8A4E-64F6E3A3EBE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EDD687CA-06D5-4B50-8A4E-64F6E3A3EBE5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CBD32F93-4B61-4D45-8596-7CC811E78D5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBD32F93-4B61-4D45-8596-7CC811E78D5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CBD32F93-4B61-4D45-8596-7CC811E78D5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CBD32F93-4B61-4D45-8596-7CC811E78D5A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -429,6 +435,7 @@ Global
 		{5DDB4D17-FF24-490A-96B4-032864210B5E} = {11682754-C8AF-4DFD-9782-1C4A7D9E70F2}
 		{E1931D47-F307-4FDF-AD60-12DD1064CAB3} = {1AB2CE50-BF2E-4EF8-82F4-0962A6105953}
 		{EDD687CA-06D5-4B50-8A4E-64F6E3A3EBE5} = {E1931D47-F307-4FDF-AD60-12DD1064CAB3}
+		{CBD32F93-4B61-4D45-8596-7CC811E78D5A} = {E1931D47-F307-4FDF-AD60-12DD1064CAB3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {755146A5-DE3D-4433-86D5-CFC10BD5F267}
