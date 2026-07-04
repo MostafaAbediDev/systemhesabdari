@@ -18,7 +18,7 @@ namespace PayrollSystemManagement.Application.Contracts.Payroll
             OperationResult Deactivate(long id);
             EditPayroll GetDetails(long id);
             List<PayrollViewModel> Search(PayrollSearchModel searchModel);
-            List<PayrollViewModel> GetAll();
+            List<PayrollViewModel> GetAllPayrolls();
         }
     }
 }
