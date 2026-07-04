@@ -7,7 +7,7 @@ namespace PayrollSystemManagement.Domain.Payroll.PayrollAgg
     {
         EditPayroll GetDetails(long id);
         List<PayrollViewModel> Search(PayrollSearchModel searchModel);
-        List<PayrollViewModel> GetAll();
+        List<PayrollViewModel> GetAllPayrolls();
         Payrolls GetWithDetails(long id);
     }
 }

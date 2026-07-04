@@ -7,5 +7,6 @@
         public string? Description { get; set; }
         public string DepartmentName { get; set; }
         public string CreationDate { get; set; }
+        public bool IsActive { get; set; }
     }
 }
