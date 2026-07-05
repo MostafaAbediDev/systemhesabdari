@@ -16,6 +16,7 @@ using PersonManagement.Application.Contract.PersonTypes;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using PersonManagement.Application.Contract.PersonCategory;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -44,7 +45,8 @@ namespace Taadol.Views
         // این سرویس اختیاری است (ممکن است در App.xaml.cs ثبت نشده باشد)
         private readonly IBankBranchApplication? _bankBranchApplication;
         private readonly ICodeGeneratorService _codeGeneratorService;
-
+        private readonly IPersonCategoryApplication _personCategoryApplication;
+        private long? _selectedPersonCategoryId;
         // ===== وضعیت ویرایش =====
         public bool IsEditMode { get; set; }
         public long PersonId { get; set; }
@@ -146,9 +148,36 @@ namespace Taadol.Views
         public long SelectedPersonTypeId
         {
             get => _selectedPersonTypeId;
-            set { _selectedPersonTypeId = value; OnPropertyChanged(); }
+            set
+            {
+                if (_selectedPersonTypeId == value) return;
+                _selectedPersonTypeId = value;
+                OnPropertyChanged();
+                _ = LoadCategoriesAsync(value);   // ← اضافه بشه
+            }
         }
+        private async Task LoadCategoriesAsync(long personTypeId)
+        {
+            if (personTypeId <= 0) return;
 
+            try
+            {
+                var tree = await Task.Run(() =>
+                {
+                    using var scope = App.ServiceProvider.CreateScope();
+                    var app = scope.ServiceProvider.GetRequiredService<IPersonCategoryApplication>();
+                    return app.GetTree(personTypeId);
+                });
+
+                // تبدیل DTO به CategoryItem و لود در کنترل
+                CategorySearch?.LoadFromTreeDto(tree);
+                CategorySearch?.ClearSelection();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Categories load failed: " + ex.Message);
+            }
+        }
         public decimal CreditLimit { get => _creditLimit; set { _creditLimit = value; OnPropertyChanged(); } }
 
         // Contact
@@ -210,7 +239,7 @@ namespace Taadol.Views
 
             // سرویس تولید کد یکتا (از CodeManagement)
             _codeGeneratorService = App.ServiceProvider.GetRequiredService<ICodeGeneratorService>();
-
+            _personCategoryApplication = App.ServiceProvider.GetRequiredService<IPersonCategoryApplication>();
             SavePersonCommand = new RelayCommand(() => SavePerson());
             DataContext = this;
 
@@ -226,8 +255,12 @@ namespace Taadol.Views
             }
 
             Loaded += OnLoaded;
+            CategorySearch.CategorySelected += OnCategorySelected;
         }
-
+        private void OnCategorySelected(CategorySearchControl.CategoryItem category)
+        {
+            _selectedPersonCategoryId = category.Id;
+        }
         // ======================================================
         //  Async Loaders
         // ======================================================
@@ -568,7 +601,8 @@ namespace Taadol.Views
                 BranchId = SelectedBranchId,
                 CreditLimit = CreditLimit,
                 IsCodeAutomatic = IsCodeAutomatic,
-                ManualCode = IsCodeAutomatic ? null : ManualCode
+                ManualCode = IsCodeAutomatic ? null : ManualCode,
+                PersonCategoryId = _selectedPersonCategoryId    // ← اضافه بشه
             };
 
             try
@@ -592,7 +626,8 @@ namespace Taadol.Views
                         BranchId = command.BranchId,
                         CreditLimit = command.CreditLimit,
                         IsCodeAutomatic = command.IsCodeAutomatic,
-                        ManualCode = command.ManualCode
+                        ManualCode = command.ManualCode,
+                        PersonCategoryId = _selectedPersonCategoryId    // ← اضافه بشه
                     };
                     personResult = _personApplication.Edit(editCommand);
                 }
@@ -947,6 +982,17 @@ namespace Taadol.Views
 
             UpdateLegalTypePanels();
             UpdatePersonTypeToggleSelection();
+            // لود دسته‌بندی شخص در حالت ویرایش
+            if (person.PersonCategoryId.HasValue && person.PersonCategoryId > 0)
+            {
+                _selectedPersonCategoryId = person.PersonCategoryId;
+                _ = LoadCategoriesAsync(person.PersonTypeId);
+
+                // بعد از لود درخت، دسته انتخاب‌شده رو Set کن
+                // (چون LoadCategoriesAsync async هست، از یه روش ساده استفاده می‌کنیم)
+                // بهتره تو PersonViewModel هم فیلد PersonCategoryTitle اضافه بشه
+                // فعلاً با Id کار می‌کنیم
+            }
         }
 
         private void LoadPersonForEdit(long id)
@@ -974,7 +1020,8 @@ namespace Taadol.Views
             IsLegal = false;
             IsActive = true;
             CreditLimit = 0;
-
+            _selectedPersonCategoryId = null;
+            CategorySearch?.ClearSelection();
             Phone = "";
             Mobile = "";
             Email = "";
