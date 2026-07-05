@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PersonManagement.Application.Contract.PersonCategory;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
-
+using PersonManagement.Application.Contract.PersonCategory;
 namespace Taadol.Controls
 {
     public partial class CategorySearchControl : UserControl
@@ -58,51 +59,56 @@ namespace Taadol.Controls
             VirtualizingPanel.SetIsVirtualizing(CategoryTree, true);
             VirtualizingPanel.SetVirtualizationMode(CategoryTree, VirtualizationMode.Recycling);
 
-            LoadSampleData();
+            // LoadSampleData();  ← این خط حذف/کامنت بشه
 
             _searchTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(300) };
             _searchTimer.Tick += SearchTimer_Tick;
         }
+        // این متد رو حذف کن:
+        // private void LoadSampleData() { ... }
 
-        private void LoadSampleData()
+        // به جاش این متد رو اضافه کن:
+        /// <summary>
+        /// بارگذاری درخت دسته‌بندی از بک‌اند (PersonCategoryTreeViewModel)
+        /// </summary>
+        public void LoadFromTreeDto(List<PersonCategoryTreeViewModel> tree, int level = 0)
         {
             _allCategories = new List<CategoryItem>();
 
-            var customer = new CategoryItem { Title = "مشتری", Level = 0 };
-            var customerBulk = new CategoryItem { Title = "مشتری عمده", Level = 1 };
-            customerBulk.Children.Add(new CategoryItem { Title = "مشتری عمده شیراز", Level = 2 });
-            customerBulk.Children.Add(new CategoryItem { Title = "مشتری عمده تهران", Level = 2 });
-            var customerRetail = new CategoryItem { Title = "مشتری خرده", Level = 1 };
-            customerRetail.Children.Add(new CategoryItem { Title = "مشتری خرده جهرم", Level = 2 });
-            customerRetail.Children.Add(new CategoryItem { Title = "مشتری خرده بجگال", Level = 2 });
-            customer.Children.Add(customerBulk);
-            customer.Children.Add(customerRetail);
-            customer.Children.Add(new CategoryItem { Title = "مشتری شیراز", Level = 1 });
-            customer.Children.Add(new CategoryItem { Title = "مشتری تهران", Level = 1 });
-            customer.Children.Add(new CategoryItem { Title = "مشتری بجگال", Level = 1 });
-            customer.Children.Add(new CategoryItem { Title = "مشتری جهرم", Level = 1 });
+            foreach (var node in tree)
+            {
+                var item = new CategoryItem
+                {
+                    Id = node.Id,
+                    Title = node.Title,
+                    Level = level
+                };
 
-            var customerSupplier = new CategoryItem { Title = "مشتری و تامین کننده", Level = 0 };
-            customerSupplier.Children.Add(new CategoryItem { Title = "مشتری و پرسنل", Level = 1 });
-            customerSupplier.Children.Add(new CategoryItem { Title = "تامین کننده و پرسنل", Level = 1 });
+                if (node.Children != null && node.Children.Count > 0)
+                    AddChildrenRecursive(item, node.Children, level + 1);
 
-            var supplier = new CategoryItem { Title = "تامین کننده", Level = 0 };
-            supplier.Children.Add(new CategoryItem { Title = "تامین کننده عمده", Level = 1 });
-            supplier.Children.Add(new CategoryItem { Title = "تامین کارتن", Level = 1 });
-            supplier.Children.Add(new CategoryItem { Title = "تامین بجگال", Level = 1 });
-            supplier.Children.Add(new CategoryItem { Title = "تامین تلویزیون", Level = 1 });
-
-            var personnel = new CategoryItem { Title = "پرسنل", Level = 0 };
-            personnel.Children.Add(new CategoryItem { Title = "مدیران", Level = 1 });
-            personnel.Children.Add(new CategoryItem { Title = "کارمندان", Level = 1 });
-            personnel.Children.Add(new CategoryItem { Title = "پیمانکاران", Level = 1 });
-
-            _allCategories.Add(customer);
-            _allCategories.Add(customerSupplier);
-            _allCategories.Add(supplier);
-            _allCategories.Add(personnel);
+                _allCategories.Add(item);
+            }
 
             BuildTree(_allCategories);
+        }
+
+        private void AddChildrenRecursive(CategoryItem parent, List<PersonCategoryTreeViewModel> children, int level)
+        {
+            foreach (var child in children)
+            {
+                var item = new CategoryItem
+                {
+                    Id = child.Id,
+                    Title = child.Title,
+                    Level = level
+                };
+
+                if (child.Children != null && child.Children.Count > 0)
+                    AddChildrenRecursive(item, child.Children, level + 1);
+
+                parent.Children.Add(item);
+            }
         }
 
         private void BuildTree(List<CategoryItem> items, TreeViewItem parent = null)
@@ -685,6 +691,7 @@ namespace Taadol.Controls
 
         public class CategoryItem
         {
+            public long Id { get; set; }              // ← اضافه بشه
             public string Title { get; set; }
             public string IconPath { get; set; }
             public ObservableCollection<CategoryItem> Children { get; set; }
