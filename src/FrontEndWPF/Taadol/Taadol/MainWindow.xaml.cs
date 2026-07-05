@@ -14,10 +14,8 @@ namespace Taadol
         {
             InitializeComponent();
 
-            // تغییر اینجا: App.ServiceProvider رو پاس دادیم
             _factory = new ViewFactory(App.ServiceProvider);
 
-            // ثبت همه صفحات (دقیقاً مثل قبل خودتان)
             _factory.Register("person_list", () => new PersonListView());
             _factory.Register("person_new", () => new NewPersonView());
 
@@ -32,7 +30,6 @@ namespace Taadol
 
             _factory.Register("financial_period", () => new NewFinancialPeriodView());
 
-            // تغییر اینجا: _factory رو به عنوان پارامتر دوم دادیم
             _nav = new NavigationService(MainContent, _factory);
 
             Sidebar.SidebarWidthChanged += (width) =>
@@ -72,7 +69,7 @@ namespace Taadol
             };
         }
 
-       
+
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
