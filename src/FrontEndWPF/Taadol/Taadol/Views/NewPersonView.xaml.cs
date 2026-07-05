@@ -67,6 +67,8 @@ namespace Taadol.Views
         // ===== Property backing fields =====
         private string _firstName = "";
         private string _lastName = "";
+        private string _contactFirstName = "";
+        private string _contactLastName = "";
         private string _nationalCode = "";
         private string _companyName = "";
         private string _economicCode = "";
@@ -102,6 +104,13 @@ namespace Taadol.Views
         // ===== Properties =====
         public string FirstName { get => _firstName; set { _firstName = value; OnPropertyChanged(); } }
         public string LastName { get => _lastName; set { _lastName = value; OnPropertyChanged(); } }
+
+        /// <summary>نام فرد رابط (فقط برای شخص حقوقی) — فردی که از طرف شرکت با ما در ارتباط است</summary>
+        public string ContactFirstName { get => _contactFirstName; set { _contactFirstName = value; OnPropertyChanged(); } }
+
+        /// <summary>نام خانوادگی فرد رابط (فقط برای شخص حقوقی)</summary>
+        public string ContactLastName { get => _contactLastName; set { _contactLastName = value; OnPropertyChanged(); } }
+
         public string NationalCode { get => _nationalCode; set { _nationalCode = value; OnPropertyChanged(); } }
         public string CompanyName { get => _companyName; set { _companyName = value; OnPropertyChanged(); } }
         public string EconomicCode { get => _economicCode; set { _economicCode = value; OnPropertyChanged(); } }
@@ -460,6 +469,7 @@ namespace Taadol.Views
 
             if (IsLegal)
             {
+                // شخص حقوقی → فیلدهای حقیقی مخفی، فیلدهای حقوقی + فرد رابط visible
                 FirstNamePanel.Visibility = Visibility.Collapsed;
                 LastNamePanel.Visibility = Visibility.Collapsed;
                 NationalCodePanel.Visibility = Visibility.Collapsed;
@@ -467,9 +477,14 @@ namespace Taadol.Views
                 CompanyNamePanel.Visibility = Visibility.Visible;
                 EconomicCodePanel.Visibility = Visibility.Visible;
                 RegistrationNumberPanel.Visibility = Visibility.Visible;
+
+                // ★ پنل «فرد رابط» فقط برای شخص حقوقی نشون داده می‌شه
+                if (ContactPersonPanel != null)
+                    ContactPersonPanel.Visibility = Visibility.Visible;
             }
             else
             {
+                // شخص حقیقی → فیلدهای حقیقی visible، فیلدهای حقوقی + فرد رابط مخفی
                 FirstNamePanel.Visibility = Visibility.Visible;
                 LastNamePanel.Visibility = Visibility.Visible;
                 NationalCodePanel.Visibility = Visibility.Visible;
@@ -477,6 +492,10 @@ namespace Taadol.Views
                 CompanyNamePanel.Visibility = Visibility.Collapsed;
                 EconomicCodePanel.Visibility = Visibility.Collapsed;
                 RegistrationNumberPanel.Visibility = Visibility.Collapsed;
+
+                // ★ پنل «فرد رابط» برای شخص حقیقی پنهان می‌شه
+                if (ContactPersonPanel != null)
+                    ContactPersonPanel.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -532,10 +551,15 @@ namespace Taadol.Views
             if (!ValidatePerson()) return;
 
             // 3) ساخت Command
+            // نکته: ContactFirstName و ContactLastName در DB به‌صورت NOT NULL تعریف شدن.
+            // برای شخص حقیقی، مقدارشون رو "" می‌فرستیم تا NULL خطا نده (مفهومی هم ندارن).
+            // برای شخص حقوقی، از TextBox های مخصوص «فرد رابط» پر می‌شن.
             var command = new CreatePerson
             {
                 FirstName = IsLegal ? CompanyName : FirstName,
                 LastName = IsLegal ? "" : LastName,
+                ContactFirstName = IsLegal ? (ContactFirstName ?? "") : "",
+                ContactLastName = IsLegal ? (ContactLastName ?? "") : "",
                 NationalCode = IsLegal ? null : NationalCode,
                 EconomicCode = IsLegal ? EconomicCode : null,
                 RegistrationNumber = IsLegal ? RegistrationNumber : null,
@@ -558,6 +582,8 @@ namespace Taadol.Views
                         Id = PersonId,
                         FirstName = command.FirstName,
                         LastName = command.LastName,
+                        ContactFirstName = command.ContactFirstName,
+                        ContactLastName = command.ContactLastName,
                         NationalCode = command.NationalCode,
                         EconomicCode = command.EconomicCode,
                         RegistrationNumber = command.RegistrationNumber,
@@ -682,6 +708,19 @@ namespace Taadol.Views
                 if (string.IsNullOrWhiteSpace(EconomicCode))
                 {
                     MessageBox.Show("کد اقتصادی را وارد کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return false;
+                }
+
+                // ★ برای شخص حقوقی، وارد کردن نام و نام خانوادگی «فرد رابط» الزامی است
+                // (چون فیلدها در DB به‌صورت NOT NULL تعریف شدن)
+                if (string.IsNullOrWhiteSpace(ContactFirstName))
+                {
+                    MessageBox.Show("نام فرد رابط را وارد کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return false;
+                }
+                if (string.IsNullOrWhiteSpace(ContactLastName))
+                {
+                    MessageBox.Show("نام خانوادگی فرد رابط را وارد کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return false;
                 }
             }
@@ -886,6 +925,16 @@ namespace Taadol.Views
 
             FirstName = person.FirstName;
             LastName = person.LastName;
+
+            // ★ فیلدهای «فرد رابط» (برای شخص حقوقی)
+            ContactFirstName = person.ContactFirstName ?? "";
+            ContactLastName = person.ContactLastName ?? "";
+
+            // اگه شخص حقوقی هست، FirstName در واقع نام شرکت هست
+            // → در TextBox «نام شرکت» نمایشش می‌دیم
+            if (person.IsLegal)
+                CompanyName = person.FirstName;
+
             NationalCode = person.NationalCode;
             EconomicCode = person.EconomicCode;
             RegistrationNumber = person.RegistrationNumber;
@@ -913,6 +962,8 @@ namespace Taadol.Views
         {
             FirstName = "";
             LastName = "";
+            ContactFirstName = "";
+            ContactLastName = "";
             NationalCode = "";
             CompanyName = "";
             EconomicCode = "";
@@ -1013,16 +1064,16 @@ namespace Taadol.Views
             TaxContent.Visibility = Visibility.Visible;
         }
 
-        //private void CategoryToggle_Checked(object sender, RoutedEventArgs e)
-        //{
-        //    if (PersonnelToggle == null || TabTax == null) return;
+        private void CategoryToggle_Checked(object sender, RoutedEventArgs e)
+        {
+            if (PersonnelToggle == null || TabTax == null) return;
 
-        //    bool isPersonnel = PersonnelToggle.IsChecked == true;
-        //    TabTax.Visibility = isPersonnel ? Visibility.Visible : Visibility.Collapsed;
+            bool isPersonnel = PersonnelToggle.IsChecked == true;
+            TabTax.Visibility = isPersonnel ? Visibility.Visible : Visibility.Collapsed;
 
-        //    if (!isPersonnel && TabTax.IsChecked == true)
-        //        TabPricing.IsChecked = true;
-        //}
+            if (!isPersonnel && TabTax.IsChecked == true)
+                TabPricing.IsChecked = true;
+        }
 
         // ======================================================
         //  Misc UI Handlers

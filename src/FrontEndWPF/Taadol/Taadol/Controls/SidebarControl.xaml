@@ -36,7 +36,7 @@
                     HorizontalAlignment="Right"
                     VerticalAlignment="Top"
                     Panel.ZIndex="999"
-                    Margin="0,109,-14,0"
+                    Margin="0,102,-13,0"
                     Cursor="Hand">
                 <Button.Template>
                     <ControlTemplate TargetType="Button">
@@ -44,16 +44,10 @@
                                 Background="White"
                                 BorderBrush="#D4E1FF"
                                 BorderThickness="1"
-                                CornerRadius="14"
+                                CornerRadius="4"
                                 Width="28"
                                 Height="28">
-                            <Border.Effect>
-                                <DropShadowEffect BlurRadius="12"
-                                                  ShadowDepth="2"
-                                                  Opacity="0.18"
-                                                  Color="#001242"
-                                                  Direction="0" />
-                            </Border.Effect>
+                           
                             <svg:SvgViewbox x:Name="ToggleArrowIcon"
                                             Width="5"
                                             Height="8"
@@ -70,22 +64,11 @@
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver"
                                      Value="True">
-                                <Setter TargetName="toggleBorder"
-                                        Property="Background"
-                                        Value="#E9F0FF" />
+                            
                                 <Setter TargetName="toggleBorder"
                                         Property="BorderBrush"
                                         Value="#7DA4FF" />
-                                <Setter TargetName="toggleBorder"
-                                        Property="Effect">
-                                    <Setter.Value>
-                                        <DropShadowEffect BlurRadius="16"
-                                                          ShadowDepth="3"
-                                                          Opacity="0.25"
-                                                          Color="#2667FF"
-                                                          Direction="0" />
-                                    </Setter.Value>
-                                </Setter>
+                               
                             </Trigger>
                             <Trigger Property="IsPressed"
                                      Value="True">
@@ -106,15 +89,12 @@
 
                 <StackPanel x:Name="LogoExpanded"
                             Orientation="Horizontal"
-                            Margin="7,16,0,12"
+                            Margin="13,16,0,0"
                             HorizontalAlignment="Left">
-                    <Border Width="46"
-                            Height="46"
-                            CornerRadius="10"
+                    <Border Width="45"
+                            Height="48"
                             Background="Transparent">
-                        <svg:SvgViewbox Width="45"
-                                        Height="45"
-                                        FlowDirection="LeftToRight"
+                        <svg:SvgViewbox FlowDirection="LeftToRight"
                                         Source="/Assets/Icons/taa.svg"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Center" />
@@ -124,94 +104,25 @@
                                Text="تعادل"
                                FontSize="30"
                                FontWeight="DemiBold"
-                               Foreground="#001242"
+                               Foreground="#001182"
                                FontFamily="{StaticResource IRANSans}"
                                VerticalAlignment="Center"
                                Margin="13,0,0,0" />-->
                 </StackPanel>
 
+                <TextBlock x:Name="LogoText"
+                           Text="نرم افزار حسابداری تعادل"
+                           FontSize="13"
+                           FontWeight="ExtraBlack"
+                           Foreground="#0D2159"
+                           FontFamily="{StaticResource IRANSans}"
+                           VerticalAlignment="Center"
+                           Margin="13,0,0,14" />
+                <!-- ★ سلکتور سال مالی (UserControl مستقل — برای ویرایش ظاهر، فایل Controls/YearSelectorControl.xaml رو ببینید) -->
+                <local:YearSelectorControl x:Name="YearSelector"
+                                           HorizontalAlignment="Stretch" />
 
-                <Border x:Name="YearSelector"
-                        CornerRadius="0"
-                        Padding="0,8"
-                        Margin="12,0,12,8"
-                        BorderBrush="#2667FF"
-                        BorderThickness="0,1,0,1"
-                        Cursor="Hand"
-                        MouseLeftButtonUp="YearSelector_Click">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-
-                        <svg:SvgViewbox Grid.Column="0"
-                                        Margin="10,0,10,0"
-                                        Width="17"
-                                        Height="17"
-                                        Stretch="Uniform"
-                                        Source="/Assets/Icons/calendar-tick.svg"
-                                        VerticalAlignment="Center" />
-
-                        <TextBlock x:Name="YearText"
-                                   Grid.Column="1"
-                                   Text="سال مالی ۱۴۰۴"
-                                   FontSize="13"
-                                   FontWeight="Medium"
-                                   Foreground="#737791"
-                                   FontFamily="{StaticResource IRANSans}"
-                                   VerticalAlignment="Center" />
-
-                        <svg:SvgViewbox Grid.Column="2"
-                                        x:Name="YearChevron"
-                                        Margin="0,0,10,0"
-                                        MouseLeftButtonUp="YearSelector_Click"
-                                        Width="10"
-                                        Height="4"
-                                        Stretch="Uniform"
-                                        Source="/Assets/Icons/Arrow.svg"
-                                        VerticalAlignment="Center"
-                                        RenderTransformOrigin="0.5,0.5">
-                            <svg:SvgViewbox.RenderTransform>
-                                <RotateTransform x:Name="YearChevronRotation"
-                                                 Angle="0" />
-                            </svg:SvgViewbox.RenderTransform>
-                        </svg:SvgViewbox>
-                    </Grid>
-
-
-                    <Border.Resources>
-
-                    </Border.Resources>
-                </Border>
-                <Popup FlowDirection="LeftToRight"
-                       x:Name="YearPopup"
-                       PlacementTarget="{Binding ElementName=YearSelector}"
-                       Placement="Bottom"
-                       StaysOpen="False"
-                       AllowsTransparency="True"
-                       PopupAnimation="Fade">
-                    <Border Background="White"
-                            BorderBrush="#D4E1FF"
-                            BorderThickness="1"
-                            CornerRadius="0,0,8,8"
-                            MinWidth="{Binding ActualWidth, ElementName=YearSelector}"
-                            Padding="4,4,4,4">
-                        <Border.Effect>
-                            <DropShadowEffect BlurRadius="12"
-                                              ShadowDepth="2"
-                                              Opacity="0.12"
-                                              Color="#001242"
-                                              Direction="270" />
-                        </Border.Effect>
-                        <StackPanel x:Name="YearList" />
-                    </Border>
-                </Popup>
-
-                <Border Height="1"
-                        Background="#E9F0FF"
-                        Margin="12,4,12,8" />
+              
             </StackPanel>
 
 
@@ -246,7 +157,7 @@
                                     <ControlTemplate TargetType="Button">
                                         <Border x:Name="bd"
                                                 Background="Transparent"
-                                                CornerRadius="16,16,0,0"
+                                                CornerRadius="4"
                                                 Padding="12,0"
                                                 Margin="0,2,0,0">
                                             <Grid>
@@ -255,16 +166,16 @@
                                                     <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
-                                                <svg:SvgViewbox Width="20"
-                                                                Height="20"
+                                                <svg:SvgViewbox Width="18"
+                                                                Height="18"
                                                                 Source="/Assets/Icons/briefcase_u.svg"
                                                                 VerticalAlignment="Center"
                                                                 Margin="0,0,10,0" />
                                                 <TextBlock x:Name="txtDashboard"
                                                            Grid.Column="1"
                                                            Text="داشبورد مدیریت"
-                                                           FontSize="15"
-                                                           FontWeight="ExtraBold"
+                                                           FontSize="13"
+                                                           FontWeight="Regular"
                                                            Foreground="#0D2159"
                                                            FontFamily="{StaticResource IRANSans}"
                                                            VerticalAlignment="Center" />
@@ -298,13 +209,12 @@
                             <StackPanel x:Name="SubDashboard"
                                         Visibility="Collapsed">
 
-                                <Grid Style="{StaticResource SubmenuWrapper}"
-                                      Panel.ZIndex="0">
+                                <Grid Style="{StaticResource SubmenuWrapper}">
 
                                     <Border Style="{StaticResource SubmenuBackground}"
-                                            Panel.ZIndex="1" />
+                                            Panel.ZIndex="0" />
 
-                                    <StackPanel Panel.ZIndex="2">
+                                    <StackPanel Panel.ZIndex="1">
 
                                         <Border Style="{StaticResource SubmenuDivider}"
                                                 Margin="0,15,0,0" />
@@ -326,10 +236,12 @@
 
 
                                     <Ellipse Style="{StaticResource SubmenuEllipseLeft}"
-                                             Panel.ZIndex="2" />
+                                             Panel.ZIndex="2"
+                                             IsHitTestVisible="False" />
 
                                     <Ellipse Style="{StaticResource SubmenuEllipseRight}"
-                                             Panel.ZIndex="2" />
+                                             Panel.ZIndex="2"
+                                             IsHitTestVisible="False" />
 
                                 </Grid>
                             </StackPanel>
@@ -349,7 +261,7 @@
                                     <ControlTemplate TargetType="Button">
                                         <Border x:Name="bd"
                                                 Background="Transparent"
-                                                CornerRadius="16,16,0,0"
+                                                CornerRadius="4"
                                                 Padding="12,0"
                                                 Margin="0,2,0,0">
                                             <Grid>
@@ -358,16 +270,16 @@
                                                     <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
-                                                <svg:SvgViewbox Width="20"
-                                                                Height="20"
+                                                <svg:SvgViewbox Width="18"
+                                                                Height="18"
                                                                 Source="/Assets/Icons/chart_u.svg"
                                                                 VerticalAlignment="Center"
                                                                 Margin="0,0,10,0" />
                                                 <TextBlock x:Name="txtProducts"
                                                            Grid.Column="1"
                                                            Text="کالاها و خدمات"
-                                                           FontSize="15"
-                                                           FontWeight="ExtraBold"
+                                                           FontSize="13"
+                                                           FontWeight="Regular"
                                                            Foreground="#0D2159"
                                                            FontFamily="{StaticResource IRANSans}"
                                                            VerticalAlignment="Center" />
@@ -406,9 +318,9 @@
                                 <Grid Style="{StaticResource SubmenuWrapper}">
 
                                     <Border Style="{StaticResource SubmenuBackground}"
-                                            Panel.ZIndex="1" />
+                                            Panel.ZIndex="0" />
 
-                                    <StackPanel Panel.ZIndex="2">
+                                    <StackPanel Panel.ZIndex="1">
 
                                         <Border Style="{StaticResource SubmenuDivider}"
                                                 Margin="0,15,0,0" />
@@ -434,10 +346,12 @@
 
 
                                     <Ellipse Style="{StaticResource SubmenuEllipseLeft}"
-                                             Panel.ZIndex="2" />
+                                             Panel.ZIndex="2"
+                                             IsHitTestVisible="False" />
 
                                     <Ellipse Style="{StaticResource SubmenuEllipseRight}"
-                                             Panel.ZIndex="2" />
+                                             Panel.ZIndex="2"
+                                             IsHitTestVisible="False" />
 
                                 </Grid>
                             </StackPanel>
@@ -457,7 +371,7 @@
                                     <ControlTemplate TargetType="Button">
                                         <Border x:Name="bd"
                                                 Background="Transparent"
-                                                CornerRadius="16,16,0,0"
+                                                CornerRadius="4"
                                                 Padding="12,0"
                                                 Margin="0,2,0,0">
                                             <Grid>
@@ -466,16 +380,16 @@
                                                     <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
-                                                <svg:SvgViewbox Width="20"
-                                                                Height="20"
+                                                <svg:SvgViewbox Width="18"
+                                                                Height="18"
                                                                 Source="/Assets/Icons/profile_u.svg"
                                                                 VerticalAlignment="Center"
                                                                 Margin="0,0,10,0" />
                                                 <TextBlock x:Name="txtPersons"
                                                            Grid.Column="1"
                                                            Text="اشخاص"
-                                                           FontSize="15"
-                                                           FontWeight="ExtraBold"
+                                                           FontSize="13"
+                                                           FontWeight="Regular"
                                                            Foreground="#0D2159"
                                                            FontFamily="{StaticResource IRANSans}"
                                                            VerticalAlignment="Center" />
@@ -509,13 +423,12 @@
                             <StackPanel x:Name="SubPersons"
                                         Visibility="Collapsed">
 
-                                <Grid Style="{StaticResource SubmenuWrapper}"
-                                      Panel.ZIndex="0">
+                                <Grid Style="{StaticResource SubmenuWrapper}">
 
                                     <Border Style="{StaticResource SubmenuBackground}"
-                                            Panel.ZIndex="1" />
+                                            Panel.ZIndex="0" />
 
-                                    <StackPanel Panel.ZIndex="2">
+                                    <StackPanel Panel.ZIndex="1">
 
                                         <Border Style="{StaticResource SubmenuDivider}"
                                                 Margin="0,15,0,0" />
@@ -536,10 +449,12 @@
 
 
                                     <Ellipse Style="{StaticResource SubmenuEllipseLeft}"
-                                             Panel.ZIndex="2" />
+                                             Panel.ZIndex="2"
+                                             IsHitTestVisible="False" />
 
                                     <Ellipse Style="{StaticResource SubmenuEllipseRight}"
-                                             Panel.ZIndex="2" />
+                                             Panel.ZIndex="2"
+                                             IsHitTestVisible="False" />
 
                                 </Grid>
                             </StackPanel>
@@ -558,7 +473,7 @@
                                     <ControlTemplate TargetType="Button">
                                         <Border x:Name="bd"
                                                 Background="Transparent"
-                                                CornerRadius="16,16,0,0"
+                                                CornerRadius="4"
                                                 Padding="12,0"
                                                 Margin="0,2,0,0">
                                             <Grid>
@@ -567,8 +482,8 @@
                                                     <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
-                                                <svg:SvgViewbox Width="20"
-                                                                Height="20"
+                                                <svg:SvgViewbox Width="18"
+                                                                Height="18"
                                                                 Source="/Assets/Icons/NewBranchView_off.svg"
                                                                 VerticalAlignment="Center"
                                                                 Margin="0,0,10,0" />
@@ -576,8 +491,8 @@
                                                            FlowDirection="RightToLeft"
                                                            Grid.Column="1"
                                                            Text="اطلاعات پایه کسب و کار"
-                                                           FontSize="15"
-                                                           FontWeight="ExtraBold"
+                                                           FontSize="13"
+                                                           FontWeight="Regular"
                                                            Foreground="#0D2159"
                                                            FontFamily="{StaticResource IRANSans}"
                                                            VerticalAlignment="Center" />
@@ -611,13 +526,12 @@
                             <StackPanel x:Name="SubBusinessInfo"
                                         Visibility="Collapsed">
 
-                                <Grid Style="{StaticResource SubmenuWrapper}"
-                                      Panel.ZIndex="0">
+                                <Grid Style="{StaticResource SubmenuWrapper}">
 
                                     <Border Style="{StaticResource SubmenuBackground}"
-                                            Panel.ZIndex="1" />
+                                            Panel.ZIndex="0" />
 
-                                    <StackPanel Panel.ZIndex="2">
+                                    <StackPanel Panel.ZIndex="1">
 
                                         <Border Style="{StaticResource SubmenuDivider}"
                                                 Margin="0,15,0,0" />
@@ -652,10 +566,12 @@
 
 
                                     <Ellipse Style="{StaticResource SubmenuEllipseLeft}"
-                                             Panel.ZIndex="2" />
+                                             Panel.ZIndex="2"
+                                             IsHitTestVisible="False" />
 
                                     <Ellipse Style="{StaticResource SubmenuEllipseRight}"
-                                             Panel.ZIndex="2" />
+                                             Panel.ZIndex="2"
+                                             IsHitTestVisible="False" />
 
                                 </Grid>
                             </StackPanel>
@@ -674,7 +590,7 @@
                                     <ControlTemplate TargetType="Button">
                                         <Border x:Name="bd"
                                                 Background="Transparent"
-                                                CornerRadius="10"
+                                                CornerRadius="4"
                                                 Padding="12,0"
                                                 Margin="8,0,8,0">
                                             <Grid>
@@ -683,16 +599,16 @@
                                                     <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
-                                                <svg:SvgViewbox Width="20"
-                                                                Height="20"
+                                                <svg:SvgViewbox Width="18"
+                                                                Height="18"
                                                                 Source="/Assets/Icons/buildings_u.svg"
                                                                 VerticalAlignment="Center"
                                                                 Margin="0,0,10,0" />
                                                 <TextBlock x:Name="txtWarehouse"
                                                            Grid.Column="1"
                                                            Text="انبار"
-                                                           FontSize="15"
-                                                           FontWeight="ExtraBold"
+                                                           FontSize="13"
+                                                           FontWeight="Regular"
                                                            Foreground="#0D2159"
                                                            FontFamily="{StaticResource IRANSans}"
                                                            VerticalAlignment="Center" />
@@ -725,31 +641,39 @@
                             <StackPanel x:Name="SubWarehouse"
                                         Visibility="Collapsed">
                                 <Grid Style="{StaticResource SubmenuWrapper}"
-                                      Panel.ZIndex="0"
                                       Background="Transparent"
                                       VerticalAlignment="Top">
 
                                     <Border Style="{StaticResource SubmenuBackground}"
-                                            Panel.ZIndex="1">
-                                        <StackPanel    Panel.ZIndex="2">
-                                            <Border Style="{StaticResource SubmenuDivider}" />
+                                            Panel.ZIndex="0" />
 
-                                            <Button Content="لیست انبارها"
-                                                    Tag="warehouse_list"
-                                                    Click="SubMenuClick"
-                                                    Style="{StaticResource SubmenuItem}" />
+                                    <StackPanel Panel.ZIndex="1">
 
-                                            <Button Content="موجودی کالا"
-                                                    Click="SubMenuClick"
-                                                    Tag="warehouse_inventory"
-                                                    Style="{StaticResource SubmenuItem}" />
+                                        <Border Style="{StaticResource SubmenuDivider}"
+                                                Margin="0,15,0,0" />
 
-                                            <Border Height="6" />
-                                        </StackPanel>
-                                    </Border>
+                                        <Button Content="لیست انبارها"
+                                                Tag="warehouse_list"
+                                                Click="SubMenuClick"
+                                                Style="{StaticResource SubmenuItem}" />
 
-                                    <Ellipse Style="{StaticResource SubmenuEllipseLeft}" />
-                                    <Ellipse Style="{StaticResource SubmenuEllipseRight}" />
+                                        <Button Content="موجودی کالا"
+                                                Click="SubMenuClick"
+                                                Tag="warehouse_inventory"
+                                                Style="{StaticResource SubmenuItem}" />
+
+                                        <Border Height="6" />
+
+                                    </StackPanel>
+
+
+                                    <Ellipse Style="{StaticResource SubmenuEllipseLeft}"
+                                             Panel.ZIndex="2"
+                                             IsHitTestVisible="False" />
+
+                                    <Ellipse Style="{StaticResource SubmenuEllipseRight}"
+                                             Panel.ZIndex="2"
+                                             IsHitTestVisible="False" />
                                 </Grid>
                             </StackPanel>
 
@@ -768,7 +692,7 @@
                                     <ControlTemplate TargetType="Button">
                                         <Border x:Name="bd"
                                                 Background="Transparent"
-                                                CornerRadius="10"
+                                                CornerRadius="4"
                                                 Padding="12,0"
                                                 Margin="8,0,8,0">
                                             <Grid>
@@ -777,16 +701,16 @@
                                                     <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
-                                                <svg:SvgViewbox Width="20"
-                                                                Height="20"
+                                                <svg:SvgViewbox Width="18"
+                                                                Height="18"
                                                                 Source="/Assets/Icons/dollar-circle_u.svg"
                                                                 VerticalAlignment="Center"
                                                                 Margin="0,0,10,0" />
                                                 <TextBlock x:Name="txtBank"
                                                            Grid.Column="1"
                                                            Text="بانک ها و صندوق"
-                                                           FontSize="15"
-                                                           FontWeight="ExtraBold"
+                                                           FontSize="13"
+                                                           FontWeight="Regular"
                                                            Foreground="#0D2159"
                                                            FontFamily="{StaticResource IRANSans}"
                                                            VerticalAlignment="Center" />
@@ -819,31 +743,39 @@
                             <StackPanel x:Name="SubBank"
                                         Visibility="Collapsed">
                                 <Grid Style="{StaticResource SubmenuWrapper}"
-                                      Panel.ZIndex="0"
                                       Background="Transparent"
                                       VerticalAlignment="Top">
 
                                     <Border Style="{StaticResource SubmenuBackground}"
-                                            Panel.ZIndex="1">
-                                        <StackPanel    Panel.ZIndex="2">
-                                            <Border Style="{StaticResource SubmenuDivider}" />
+                                            Panel.ZIndex="0" />
 
-                                            <Button Content="لیست حساب‌ها"
-                                                    Tag="bank_list"
-                                                    Click="SubMenuClick"
-                                                    Style="{StaticResource SubmenuItem}" />
+                                    <StackPanel Panel.ZIndex="1">
 
-                                            <Button Content="صندوق"
-                                                    Click="SubMenuClick"
-                                                    Tag="bank_cash"
-                                                    Style="{StaticResource SubmenuItem}" />
+                                        <Border Style="{StaticResource SubmenuDivider}"
+                                                Margin="0,15,0,0" />
 
-                                            <Border Height="6" />
-                                        </StackPanel>
-                                    </Border>
+                                        <Button Content="لیست حساب‌ها"
+                                                Tag="bank_list"
+                                                Click="SubMenuClick"
+                                                Style="{StaticResource SubmenuItem}" />
 
-                                    <Ellipse Style="{StaticResource SubmenuEllipseLeft}" />
-                                    <Ellipse Style="{StaticResource SubmenuEllipseRight}" />
+                                        <Button Content="صندوق"
+                                                Click="SubMenuClick"
+                                                Tag="bank_cash"
+                                                Style="{StaticResource SubmenuItem}" />
+
+                                        <Border Height="6" />
+
+                                    </StackPanel>
+
+
+                                    <Ellipse Style="{StaticResource SubmenuEllipseLeft}"
+                                             Panel.ZIndex="2"
+                                             IsHitTestVisible="False" />
+
+                                    <Ellipse Style="{StaticResource SubmenuEllipseRight}"
+                                             Panel.ZIndex="2"
+                                             IsHitTestVisible="False" />
                                 </Grid>
                             </StackPanel>
 
@@ -862,7 +794,7 @@
                                     <ControlTemplate TargetType="Button">
                                         <Border x:Name="bd"
                                                 Background="Transparent"
-                                                CornerRadius="10"
+                                                CornerRadius="4"
                                                 Padding="12,0"
                                                 Margin="8,0,8,0">
                                             <Grid>
@@ -871,16 +803,16 @@
                                                     <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
-                                                <svg:SvgViewbox Width="20"
-                                                                Height="20"
+                                                <svg:SvgViewbox Width="18"
+                                                                Height="18"
                                                                 Source="/Assets/Icons/share_u.svg"
                                                                 VerticalAlignment="Center"
                                                                 Margin="0,0,10,0" />
                                                 <TextBlock x:Name="txtSales"
                                                            Grid.Column="1"
                                                            Text="عملیات خرید و فروش"
-                                                           FontSize="15"
-                                                           FontWeight="ExtraBold"
+                                                           FontSize="13"
+                                                           FontWeight="Regular"
                                                            Foreground="#0D2159"
                                                            FontFamily="{StaticResource IRANSans}"
                                                            VerticalAlignment="Center" />
@@ -913,31 +845,39 @@
                             <StackPanel x:Name="SubSales"
                                         Visibility="Collapsed">
                                 <Grid Style="{StaticResource SubmenuWrapper}"
-                                      Panel.ZIndex="0"
                                       Background="Transparent"
                                       VerticalAlignment="Top">
 
                                     <Border Style="{StaticResource SubmenuBackground}"
-                                            Panel.ZIndex="1">
-                                        <StackPanel    Panel.ZIndex="2">
-                                            <Border Style="{StaticResource SubmenuDivider}" />
+                                            Panel.ZIndex="0" />
 
-                                            <Button Content="فاکتور خرید"
-                                                    Click="SubMenuClick"
-                                                    Tag="invoice_purchase"
-                                                    Style="{StaticResource SubmenuItem}" />
+                                    <StackPanel Panel.ZIndex="1">
 
-                                            <Button Content="فاکتور فروش"
-                                                    Click="SubMenuClick"
-                                                    Tag="invoice_sale"
-                                                    Style="{StaticResource SubmenuItem}" />
+                                        <Border Style="{StaticResource SubmenuDivider}"
+                                                Margin="0,15,0,0" />
 
-                                            <Border Height="6" />
-                                        </StackPanel>
-                                    </Border>
+                                        <Button Content="فاکتور خرید"
+                                                Click="SubMenuClick"
+                                                Tag="invoice_purchase"
+                                                Style="{StaticResource SubmenuItem}" />
 
-                                    <Ellipse Style="{StaticResource SubmenuEllipseLeft}" />
-                                    <Ellipse Style="{StaticResource SubmenuEllipseRight}" />
+                                        <Button Content="فاکتور فروش"
+                                                Click="SubMenuClick"
+                                                Tag="invoice_sale"
+                                                Style="{StaticResource SubmenuItem}" />
+
+                                        <Border Height="6" />
+
+                                    </StackPanel>
+
+
+                                    <Ellipse Style="{StaticResource SubmenuEllipseLeft}"
+                                             Panel.ZIndex="2"
+                                             IsHitTestVisible="False" />
+
+                                    <Ellipse Style="{StaticResource SubmenuEllipseRight}"
+                                             Panel.ZIndex="2"
+                                             IsHitTestVisible="False" />
                                 </Grid>
                             </StackPanel>
 
@@ -956,7 +896,7 @@
                                     <ControlTemplate TargetType="Button">
                                         <Border x:Name="bd"
                                                 Background="Transparent"
-                                                CornerRadius="10"
+                                                CornerRadius="4"
                                                 Padding="12,0"
                                                 Margin="8,0,8,0">
                                             <Grid>
@@ -965,16 +905,16 @@
                                                     <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
-                                                <svg:SvgViewbox Width="20"
-                                                                Height="20"
+                                                <svg:SvgViewbox Width="18"
+                                                                Height="18"
                                                                 Source="/Assets/Icons/rep_u.svg"
                                                                 VerticalAlignment="Center"
                                                                 Margin="0,0,10,0" />
                                                 <TextBlock x:Name="txtReports"
                                                            Grid.Column="1"
                                                            Text="گزارش ها"
-                                                           FontSize="15"
-                                                           FontWeight="ExtraBold"
+                                                           FontSize="13"
+                                                           FontWeight="Regular"
                                                            Foreground="#0D2159"
                                                            FontFamily="{StaticResource IRANSans}"
                                                            VerticalAlignment="Center" />
@@ -1007,31 +947,39 @@
                             <StackPanel x:Name="SubReports"
                                         Visibility="Collapsed">
                                 <Grid Style="{StaticResource SubmenuWrapper}"
-                                      Panel.ZIndex="0"
                                       VerticalAlignment="Top"
                                       Background="Transparent">
 
                                     <Border Style="{StaticResource SubmenuBackground}"
-                                            Panel.ZIndex="1">
-                                        <StackPanel    Panel.ZIndex="2">
-                                            <Border Style="{StaticResource SubmenuDivider}" />
+                                            Panel.ZIndex="0" />
 
-                                            <Button Content="گزارش فروش"
-                                                    Tag="report_sales"
-                                                    Click="SubMenuClick"
-                                                    Style="{StaticResource SubmenuItem}" />
+                                    <StackPanel Panel.ZIndex="1">
 
-                                            <Button Content="گزارش مالی"
-                                                    Tag="report_financial"
-                                                    Click="SubMenuClick"
-                                                    Style="{StaticResource SubmenuItem}" />
+                                        <Border Style="{StaticResource SubmenuDivider}"
+                                                Margin="0,15,0,0" />
 
-                                            <Border Height="6" />
-                                        </StackPanel>
-                                    </Border>
+                                        <Button Content="گزارش فروش"
+                                                Tag="report_sales"
+                                                Click="SubMenuClick"
+                                                Style="{StaticResource SubmenuItem}" />
 
-                                    <Ellipse Style="{StaticResource SubmenuEllipseLeft}" />
-                                    <Ellipse Style="{StaticResource SubmenuEllipseRight}" />
+                                        <Button Content="گزارش مالی"
+                                                Tag="report_financial"
+                                                Click="SubMenuClick"
+                                                Style="{StaticResource SubmenuItem}" />
+
+                                        <Border Height="6" />
+
+                                    </StackPanel>
+
+
+                                    <Ellipse Style="{StaticResource SubmenuEllipseLeft}"
+                                             Panel.ZIndex="2"
+                                             IsHitTestVisible="False" />
+
+                                    <Ellipse Style="{StaticResource SubmenuEllipseRight}"
+                                             Panel.ZIndex="2"
+                                             IsHitTestVisible="False" />
                                 </Grid>
                             </StackPanel>
 

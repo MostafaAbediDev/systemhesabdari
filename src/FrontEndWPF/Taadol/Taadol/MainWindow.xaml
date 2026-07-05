@@ -4,6 +4,7 @@
         xmlns:views="clr-namespace:Taadol.Views"
         xmlns:controls="clr-namespace:Taadol.Controls"
         xmlns:svg="http://sharpvectors.codeplex.com/svgc/"
+        
         Title="تعادل - نرم‌افزار حسابداری"
         Width="1280"
         Height="800"
@@ -119,6 +120,7 @@
                                  Grid.RowSpan="2"
                                  Grid.Column="0"
                                  Panel.ZIndex="10"
+                                 
                                  Loaded="Sidebar_Loaded" />
 
         <Border x:Name="MainContentBorder"

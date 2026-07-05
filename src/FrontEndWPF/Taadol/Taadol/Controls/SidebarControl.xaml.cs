@@ -21,7 +21,9 @@ namespace Taadol.Controls
         private bool _isSidebarOpen = true;
         private bool _isAnimating = false;
         private const double SIDEBAR_OPEN = 240;
-        private const double SIDEBAR_CLOSED = 62;
+        // ★ عرض حالت بسته از 62 به 76 افزایش یافت
+        // چون آیکون‌ها از 20 به 24 بزرگ‌تر شدن، در عرض 62 ناقص دیده می‌شدن
+        private const double SIDEBAR_CLOSED = 63;
         private Dictionary<string, StackPanel> _subMenus;
         private Button _activeMenuButton = null;
 
@@ -31,13 +33,6 @@ namespace Taadol.Controls
         public SidebarControl()
         {
             InitializeComponent();
-            BuildYearList();
-            YearPopup.Closed += (s, e) =>
-            {
-                _isYearPopupOpen = false;
-                RotateYearChevron(0);
-            };
-            YearChevron.Visibility = Visibility.Visible;
 
             var rotation = FindArrowRotation(BtnToggleSidebar);
             if (rotation != null)
@@ -48,8 +43,7 @@ namespace Taadol.Controls
     { "dashboard", SubDashboard },
     { "products", SubProducts },
     { "persons", SubPersons },
-    { "businessinfo", SubBusinessInfo },
-    { "warehouse", SubWarehouse },
+    { "businessinfo", SubBusinessInfo },      { "warehouse", SubWarehouse },
     { "bank", SubBank },
     { "sales", SubSales },
     { "reports", SubReports }
@@ -63,10 +57,10 @@ namespace Taadol.Controls
             if (clickedBtn == null) return;
 
 
-            if (_activeSubMenuItem != null)
+                        if (_activeSubMenuItem != null)
                 SetSubMenuInactive(_activeSubMenuItem);
 
-            _activeSubMenuItem = clickedBtn;
+                        _activeSubMenuItem = clickedBtn;
             SetSubMenuActive(clickedBtn);
         }
 
@@ -110,6 +104,12 @@ namespace Taadol.Controls
                 }
             }
 
+            // ★ متن منو: حالت فعال → ExtraBold 14
+            var textBlock = FindChild<TextBlock>(button, null);
+            if (textBlock != null)
+            {
+                textBlock.FontWeight = FontWeights.ExtraBold;
+            }
 
             string iconName = GetIconName(menuTag, false);
             var icon = FindChild<SvgViewbox>(button, null);
@@ -127,6 +127,13 @@ namespace Taadol.Controls
                 border.ClearValue(Border.BackgroundProperty);
                 border.ClearValue(Border.BackgroundProperty);
                 border.CornerRadius = new CornerRadius(8);
+            }
+
+            // ★ متن منو: حالت غیرفعال → Regular 14
+            var textBlock = FindChild<TextBlock>(button, null);
+            if (textBlock != null)
+            {
+                textBlock.FontWeight = FontWeights.Regular;
             }
 
             string menuTag = button.Tag as string ?? GetMenuTagFromButton(button);
@@ -210,29 +217,27 @@ namespace Taadol.Controls
             var arrow = FindChild<SvgViewbox>(BtnToggleSidebar, "ToggleArrowIcon");
             if (arrow != null) arrow.Source = new Uri("/Assets/Icons/chevron-left.svg", UriKind.Relative);
 
-            YearChevron.Visibility = Visibility.Visible;
             SetAllTextsVisibility(Visibility.Visible);
+            YearSelector.Expand(); // ★ اضافه شد
 
             AnimateWidth(SIDEBAR_CLOSED, SIDEBAR_OPEN, 180, () =>
             {
                 _isAnimating = false;
-
                 if (_activeSubMenuButton != null)
-                {
                     SetSubMenuActive(_activeSubMenuButton);
-                }
             });
 
             var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
             timer.Tick += (s, e2) =>
             {
                 timer.Stop();
-                FadeIn(YearText, 150);
-                FadeIn(YearChevron, 150);
                 FadeInAllTexts();
             };
             timer.Start();
+            SetAllTextsVisibility(Visibility.Visible);
+            YearSelector.Expand(); // ★
         }
+
         private void AnimateClose()
         {
             _isAnimating = true;
@@ -244,9 +249,8 @@ namespace Taadol.Controls
             var arrow = FindChild<SvgViewbox>(BtnToggleSidebar, "ToggleArrowIcon");
             if (arrow != null) arrow.Source = new Uri("/Assets/Icons/chevron-right.svg", UriKind.Relative);
 
-            FadeOut(YearText, 100);
-            FadeOut(YearChevron, 100);
             FadeOutAllTexts();
+            YearSelector.Collapse(); // ★ اضافه شد
 
             foreach (var sub in _subMenus.Values)
                 sub.Visibility = Visibility.Collapsed;
@@ -261,7 +265,6 @@ namespace Taadol.Controls
             timer.Tick += (s, e2) =>
             {
                 timer.Stop();
-                YearChevron.Visibility = Visibility.Collapsed;
                 SetAllTextsVisibility(Visibility.Collapsed);
 
                 AnimateWidth(SIDEBAR_OPEN, SIDEBAR_CLOSED, 180, () =>
@@ -269,9 +272,10 @@ namespace Taadol.Controls
                     _isAnimating = false;
                 });
             };
+            FadeOutAllTexts();
+            YearSelector.Collapse(); // ★
             timer.Start();
         }
-
         private void AnimateWidth(double from, double to, int durationMs, Action onComplete)
         {
             int steps = 30;
@@ -305,19 +309,14 @@ namespace Taadol.Controls
 
         private void ShowElements()
         {
-            YearChevron.Visibility = Visibility.Visible;
             SetAllTextsVisibility(Visibility.Visible);
 
-            FadeIn(YearText);
-            FadeIn(YearChevron);
             FadeInAllTexts();
             SetAllTextsVisibility(Visibility.Visible);
         }
 
         private void HideElements()
         {
-            FadeOut(YearText);
-            FadeOut(YearChevron);
             FadeOutAllTexts();
             SetAllTextsVisibility(Visibility.Collapsed);
         }
@@ -353,7 +352,7 @@ namespace Taadol.Controls
             FadeInChild<SvgViewbox>(BtnProducts, "chevProducts");
             FadeInChild<TextBlock>(BtnPersons, "txtPersons");
             FadeInChild<SvgViewbox>(BtnPersons, "chevPersons");
-            FadeInChild<TextBlock>(BtnBusinessInfo, "txtBusinessInfo"); FadeInChild<SvgViewbox>(BtnBusinessInfo, "chevBusinessInfo"); FadeInChild<TextBlock>(BtnWarehouse, "txtWarehouse");
+            FadeInChild<TextBlock>(BtnBusinessInfo, "txtBusinessInfo");                  FadeInChild<SvgViewbox>(BtnBusinessInfo, "chevBusinessInfo");                FadeInChild<TextBlock>(BtnWarehouse, "txtWarehouse");
             FadeInChild<SvgViewbox>(BtnWarehouse, "chevWarehouse");
             FadeInChild<TextBlock>(BtnBank, "txtBank");
             FadeInChild<SvgViewbox>(BtnBank, "chevBank");
@@ -372,7 +371,7 @@ namespace Taadol.Controls
             FadeOutChild<SvgViewbox>(BtnProducts, "chevProducts");
             FadeOutChild<TextBlock>(BtnPersons, "txtPersons");
             FadeOutChild<SvgViewbox>(BtnPersons, "chevPersons");
-            FadeOutChild<TextBlock>(BtnBusinessInfo, "txtBusinessInfo"); FadeOutChild<SvgViewbox>(BtnBusinessInfo, "chevBusinessInfo"); FadeOutChild<TextBlock>(BtnWarehouse, "txtWarehouse");
+            FadeOutChild<TextBlock>(BtnBusinessInfo, "txtBusinessInfo");                  FadeOutChild<SvgViewbox>(BtnBusinessInfo, "chevBusinessInfo");                FadeOutChild<TextBlock>(BtnWarehouse, "txtWarehouse");
             FadeOutChild<SvgViewbox>(BtnWarehouse, "chevWarehouse");
             FadeOutChild<TextBlock>(BtnBank, "txtBank");
             FadeOutChild<SvgViewbox>(BtnBank, "chevBank");
@@ -396,7 +395,7 @@ namespace Taadol.Controls
             SetVis<SvgViewbox>(BtnProducts, "chevProducts", vis);
             SetVis<TextBlock>(BtnPersons, "txtPersons", vis);
             SetVis<SvgViewbox>(BtnPersons, "chevPersons", vis);
-            SetVis<TextBlock>(BtnBusinessInfo, "txtBusinessInfo", vis); SetVis<SvgViewbox>(BtnBusinessInfo, "chevBusinessInfo", vis); SetVis<TextBlock>(BtnWarehouse, "txtWarehouse", vis);
+            SetVis<TextBlock>(BtnBusinessInfo, "txtBusinessInfo", vis);                  SetVis<SvgViewbox>(BtnBusinessInfo, "chevBusinessInfo", vis);                SetVis<TextBlock>(BtnWarehouse, "txtWarehouse", vis);
             SetVis<SvgViewbox>(BtnWarehouse, "chevWarehouse", vis);
             SetVis<TextBlock>(BtnBank, "txtBank", vis);
             SetVis<SvgViewbox>(BtnBank, "chevBank", vis);
@@ -414,7 +413,7 @@ namespace Taadol.Controls
             {
                 SetActiveMenu(btn, tag);
 
-                if (_activeSubMenuButton != null)
+                                if (_activeSubMenuButton != null)
                 {
                     SetSubMenuInactive(_activeSubMenuButton);
                     _activeSubMenuButton = null;
@@ -443,17 +442,17 @@ namespace Taadol.Controls
 
             if (isOpen)
             {
-                SmoothClose(targetSub, () =>
-{
-    UpdateMenuCornerRadius(btn, tag);
-});
+                                SmoothClose(targetSub, () =>
+                {
+                    UpdateMenuCornerRadius(btn, tag);
+                });
                 SetChevron(btn, tag, "down");
                 RotateSubMenuArrow(btn, 0);
                 UpdateMenuCornerRadius(btn, tag);
             }
             else
             {
-                StackPanel currentOpen = null;
+                                StackPanel currentOpen = null;
                 string currentOpenTag = null;
 
                 foreach (var kvp in _subMenus)
@@ -492,7 +491,7 @@ namespace Taadol.Controls
             SetChevron(BtnDashboard, "dashboard", "down");
             SetChevron(BtnProducts, "products", "down");
             SetChevron(BtnPersons, "persons", "down");
-            SetChevron(BtnBusinessInfo, "businessinfo", "down"); SetChevron(BtnWarehouse, "warehouse", "down");
+            SetChevron(BtnBusinessInfo, "businessinfo", "down");              SetChevron(BtnWarehouse, "warehouse", "down");
             SetChevron(BtnBank, "bank", "down");
             SetChevron(BtnSales, "sales", "down");
             SetChevron(BtnReports, "reports", "down");
@@ -561,30 +560,23 @@ namespace Taadol.Controls
                     panel.MaxHeight = double.PositiveInfinity;
                     panel.Opacity = 1;
 
-                    // فقط اینجا باید فالس بشه!
-                    _isSubMenuAnimating = false;
-
-                    RestoreActiveSubMenuStyle();
+                                        RestoreActiveSubMenuStyle();
                 }
             };
             timer.Start();
-
-            // این دو خط پایین رو حتماً پاک کنید چون باعث باگ میشن
-            // _isSubMenuAnimating = false; 
-            // panel.Visibility = Visibility.Visible;
-            // panel.IsHitTestVisible = true;
+            _isSubMenuAnimating = false;
         }
 
         private void RestoreActiveSubMenuStyle()
         {
             if (_activeSubMenuTag != null)
             {
-                var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(50) };
+                                var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(50) };
                 timer.Tick += (s, e) =>
                 {
                     timer.Stop();
 
-                    foreach (var subPanel in _subMenus.Values)
+                                        foreach (var subPanel in _subMenus.Values)
                     {
                         if (subPanel.Visibility == Visibility.Visible)
                         {
@@ -618,7 +610,7 @@ namespace Taadol.Controls
             }
             return null;
         }
-        private bool IsButtonInPanel(Button button, StackPanel panel)
+                private bool IsButtonInPanel(Button button, StackPanel panel)
         {
             DependencyObject parent = VisualTreeHelper.GetParent(button);
             while (parent != null)
@@ -664,16 +656,12 @@ namespace Taadol.Controls
                     panel.MaxHeight = double.PositiveInfinity;
                     panel.Opacity = 1;
 
-                    // فقط اینجا باید فالس بشه!
                     _isSubMenuAnimating = false;
-
                     onComplete?.Invoke();
                 }
             };
             timer.Start();
-
-            // این خط رو حتماً پاک کنید!
-            // _isSubMenuAnimating = false;
+            _isSubMenuAnimating = false;
         }
         private double SmoothStep(double t)
         {
@@ -681,9 +669,7 @@ namespace Taadol.Controls
             return t * t * (3 - 2 * t);
         }
 
-        private bool _isYearPopupOpen = false;
-        private int _selectedYear = 1404;
-        private readonly int[] _years = { 1404, 1403, 1402 };
+        // ★ فیلدهای سال مالی به YearSelectorControl منتقل شدن
 
         private void AnimateCornerRadius(Border border, CornerRadius targetRadius, int durationMs = 90, Action onComplete = null)
         {
@@ -695,7 +681,7 @@ namespace Taadol.Controls
                 return;
             }
 
-            int totalSteps = 5;
+                        int totalSteps = 5;
             int interval = durationMs / totalSteps;
             int currentStep = 0;
 
@@ -729,7 +715,7 @@ namespace Taadol.Controls
                 SetActiveMenu(btn, "dashboard");
             }
 
-            if (_activeSubMenuButton != null)
+                        if (_activeSubMenuButton != null)
             {
                 SetSubMenuInactive(_activeSubMenuButton);
                 _activeSubMenuButton = null;
@@ -746,12 +732,21 @@ namespace Taadol.Controls
 
         private void SubMenuClick(object sender, RoutedEventArgs e)
         {
-            if (!(sender is Button btn)) return;
-            if (btn.Tag == null) return;
+            if (sender is Button btn && btn.Tag is string tag)
+            {
+                                if (btn == _activeSubMenuButton) return;
 
-            string tag = btn.Tag.ToString();
+                                if (_activeSubMenuButton != null)
+                {
+                    SetSubMenuInactive(_activeSubMenuButton);
+                }
 
-            SubMenuClicked?.Invoke(tag);
+                                _activeSubMenuButton = btn;
+                _activeSubMenuTag = tag;
+                SetSubMenuActive(btn);
+
+                SubMenuClicked?.Invoke(tag);
+            }
         }
 
         private void AnimateSizeWithBounce(Ellipse ellipse, double from, double to, int durationMs)
@@ -759,7 +754,7 @@ namespace Taadol.Controls
             int totalSteps = 20;
             int currentStep = 0;
             double stepDuration = (double)durationMs / totalSteps;
-            double overshoot = to + (to - from) * 0.3;
+            double overshoot = to + (to - from) * 0.3; 
             var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(stepDuration) };
             timer.Tick += (s, e) =>
             {
@@ -769,12 +764,12 @@ namespace Taadol.Controls
 
                 if (progress < 0.6)
                 {
-                    double subProgress = progress / 0.6;
+                                        double subProgress = progress / 0.6;
                     currentSize = from + (overshoot - from) * EaseOutQuad(subProgress);
                 }
                 else
                 {
-                    double subProgress = (progress - 0.6) / 0.4;
+                                        double subProgress = (progress - 0.6) / 0.4;
                     currentSize = overshoot + (to - overshoot) * EaseOutQuad(subProgress);
                 }
 
@@ -793,6 +788,7 @@ namespace Taadol.Controls
         private void SetSubMenuInactive(Button btn)
         {
             btn.ApplyTemplate();
+            btn.UpdateLayout();
 
             var textBlock = btn.Template.FindName("PART_Text", btn) as TextBlock;
             var ellipse = btn.Template.FindName("PART_Dot", btn) as Ellipse;
@@ -811,15 +807,16 @@ namespace Taadol.Controls
                     EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                 };
 
-                anim.Completed += (s, e) =>
-{
-    textBlock.ClearValue(TextBlock.ForegroundProperty);
-};
+                                anim.Completed += (s, e) =>
+                {
+                    textBlock.ClearValue(TextBlock.ForegroundProperty);
+                };
 
                 newBrush.BeginAnimation(SolidColorBrush.ColorProperty, anim);
 
-                AnimateFontSize(textBlock, 14, 13, 200);
-                textBlock.FontWeight = FontWeights.Medium;
+                // ★ زیرمنو غیرفعال: سایز ۱۴ ثابت، وزن Regular
+                AnimateFontSize(textBlock, 14, 14, 200);
+                textBlock.FontWeight = FontWeights.Regular;
             }
 
             if (ellipse != null)
@@ -836,10 +833,10 @@ namespace Taadol.Controls
                     EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                 };
 
-                anim.Completed += (s, e) =>
-{
-    ellipse.ClearValue(Shape.FillProperty);
-};
+                                anim.Completed += (s, e) =>
+                {
+                    ellipse.ClearValue(Shape.FillProperty);
+                };
 
                 newFill.BeginAnimation(SolidColorBrush.ColorProperty, anim);
                 AnimateSize(ellipse, 8, 5, 200);
@@ -847,106 +844,21 @@ namespace Taadol.Controls
         }
 
 
-        private void YearSelector_Click(object sender, MouseButtonEventArgs e)
-        {
-            if (_isYearPopupOpen)
-                CloseYearPopup();
-            else
-                OpenYearPopup();
-        }
-        private void OpenYearPopup()
-        {
-            BuildYearList();
-            _isYearPopupOpen = true;
-            YearPopup.IsOpen = true;
-            RotateYearChevron(180);
-        }
-        private void CloseYearPopup()
-        {
-            _isYearPopupOpen = false;
-            YearPopup.IsOpen = false;
-            RotateYearChevron(0);
-        }
-        private void RotateYearChevron(double angle)
-        {
-            YearChevronRotation.BeginAnimation(RotateTransform.AngleProperty,
-                new DoubleAnimation(angle, TimeSpan.FromMilliseconds(180))
-                { EasingFunction = new CircleEase() });
-        }
-        private void BuildYearList()
-        {
-            YearList.Children.Clear();
+        // ★ تمام منطق سال مالی (YearSelector_Click, BuildYearList, OpenYearPopup,
+        //    CloseYearPopup, RotateYearChevron, ToPersianDigits) به YearSelectorControl منتقل شد.
 
-            foreach (var year in _years)
-            {
-                bool isSelected = year == _selectedYear;
-
-                var btn = new Button
-                {
-                    Content = $"سال مالی {ToPersianDigits(year)}",
-                    Height = 36,
-                    Cursor = Cursors.Hand,
-                    HorizontalAlignment = HorizontalAlignment.Stretch,
-                    HorizontalContentAlignment = HorizontalAlignment.Right,
-                    Background = isSelected
-                        ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E9F0FF"))
-                        : Brushes.Transparent,
-                    BorderThickness = new Thickness(0),
-                    FontFamily = (FontFamily)FindResource("IRANSans"),
-                    FontSize = 13,
-                    FontWeight = isSelected ? FontWeights.Bold : FontWeights.Medium,
-                    Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString(
-                        isSelected ? "#0D2159" : "#737791")),
-                    Padding = new Thickness(10, 0, 10, 0),
-                    Tag = year
-                };
-
-                btn.MouseEnter += (s, e) =>
-                {
-                    var b = (Button)s;
-                    if ((int)b.Tag != _selectedYear)
-                        b.Background = new SolidColorBrush(
-                            (Color)ColorConverter.ConvertFromString("#F0F5FF"));
-                };
-
-                btn.MouseLeave += (s, e) =>
-                {
-                    var b = (Button)s;
-                    b.Background = (int)b.Tag == _selectedYear
-                        ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E9F0FF"))
-                        : Brushes.Transparent;
-                };
-
-                btn.Click += (s, e) =>
-                {
-                    _selectedYear = (int)((Button)s).Tag;
-                    YearText.Text = $"سال مالی {ToPersianDigits(_selectedYear)}";
-                    CloseYearPopup();
-                };
-
-                YearList.Children.Add(btn);
-            }
-        }
-
-        private string ToPersianDigits(int number)
-        {
-            return number.ToString()
-                .Replace("0", "۰").Replace("1", "۱").Replace("2", "۲")
-                .Replace("3", "۳").Replace("4", "۴").Replace("5", "۵")
-                .Replace("6", "۶").Replace("7", "۷").Replace("8", "۸")
-                .Replace("9", "۹");
-        }
         private void SetSubMenuActive(Button btn)
         {
             btn.ApplyTemplate();
+            btn.UpdateLayout();
 
             var textBlock = btn.Template.FindName("PART_Text", btn) as TextBlock;
             var ellipse = btn.Template.FindName("PART_Dot", btn) as Ellipse;
 
             if (textBlock != null)
             {
-                var newBrush = new SolidColorBrush(
-    (Color)ColorConverter.ConvertFromString("#737791"));
+                                var newBrush = new SolidColorBrush(
+                    (Color)ColorConverter.ConvertFromString("#737791"));
                 textBlock.Foreground = newBrush;
 
                 newBrush.BeginAnimation(SolidColorBrush.ColorProperty,
@@ -957,14 +869,15 @@ namespace Taadol.Controls
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                     });
 
-                AnimateFontSize(textBlock, 13, 14, 200);
+                // ★ زیرمنو فعال: سایز ۱۴ ثابت، وزن ExtraBold
+                AnimateFontSize(textBlock, 14, 14, 200);
                 textBlock.FontWeight = FontWeights.ExtraBold;
             }
 
             if (ellipse != null)
             {
-                var newFill = new SolidColorBrush(
-    (Color)ColorConverter.ConvertFromString("#737791"));
+                                var newFill = new SolidColorBrush(
+                    (Color)ColorConverter.ConvertFromString("#737791"));
                 ellipse.Fill = newFill;
 
                 newFill.BeginAnimation(SolidColorBrush.ColorProperty,
