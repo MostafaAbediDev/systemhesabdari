@@ -115,7 +115,7 @@
             Background="#ffffff"
             VerticalAlignment="Stretch"
             Margin="24,12">
-       
+
         <Grid VerticalAlignment="Stretch">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -380,6 +380,31 @@
                             </StackPanel>
                         </Grid>
 
+                        <!-- ردیف دوم: نام و نام خانوادگی فرد رابط (فقط برای شخص حقوقی)
+                             این فرد از طرف شرکت با ما در ارتباط خواهد بود. -->
+                        <Grid x:Name="ContactPersonPanel"
+                              Margin="0,5,0,4"
+                              Visibility="Collapsed">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="8" />
+                                <ColumnDefinition Width="1.5*" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="نام فرد رابط"
+                                           Style="{StaticResource FormLabel}" />
+                                <controls:ModernPersianTextBox Text="{Binding ContactFirstName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                               Placeholder="علی" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="نام خانوادگی فرد رابط"
+                                           Style="{StaticResource FormLabel}" />
+                                <controls:ModernPersianTextBox Text="{Binding ContactLastName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                               Placeholder="رضایی" />
+                            </StackPanel>
+                        </Grid>
+
                         <Grid HorizontalAlignment="Left">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="auto" />
@@ -438,9 +463,10 @@
                                                       FlowDirection="LeftToRight"
                                                       Style="{StaticResource StatusToggleButton}"
                                                       IsChecked="False"
+                                                      Checked="CategoryToggle_Checked"
+                                                      Unchecked="CategoryToggle_Checked"
                                                       Margin="0,0,8,0" />
-                                        <!--Checked="CategoryToggle_Checked"
-                                                      Unchecked="CategoryToggle_Checked" -->
+                                      
                                     </StackPanel>
                                 </Grid>
                             </StackPanel>
@@ -554,7 +580,7 @@
 
                         <!-- تب: تماس و آدرس -->
                         <StackPanel x:Name="PricingContent"
-                                    Visibility="Collapsed">
+                                    Visibility="Visible">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
@@ -766,7 +792,7 @@
 
                         <!-- تب: مالیات -->
                         <StackPanel x:Name="TaxContent"
-                                    Visibility="Visible">
+                                    Visibility="Collapsed">
                             <Grid Margin="0,0,0,10"
                                   HorizontalAlignment="Left"
                                   MaxWidth="700">
