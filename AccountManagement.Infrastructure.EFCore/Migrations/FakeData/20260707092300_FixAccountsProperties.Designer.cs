@@ -4,16 +4,19 @@ using AccountManagement.Infrastructure.EFCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace AccountManagement.Infrastructure.EFCore.Migrations
+namespace AccountManagement.Infrastructure.EFCore.Migrations.FakeData
 {
-    [DbContext(typeof(AccountSystemContext))]
-    partial class AccountSystemContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(AccountFakeDataContext))]
+    [Migration("20260707092300_FixAccountsProperties")]
+    partial class FixAccountsProperties
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
