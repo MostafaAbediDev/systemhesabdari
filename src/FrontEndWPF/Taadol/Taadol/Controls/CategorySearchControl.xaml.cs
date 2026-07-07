@@ -1,15 +1,17 @@
-﻿using PersonManagement.Application.Contract.PersonCategory;
+﻿using _0_Framework.Application;
+using Microsoft.Extensions.DependencyInjection;
+using PersonManagement.Application.Contract.PersonCategory;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
-using PersonManagement.Application.Contract.PersonCategory;
 namespace Taadol.Controls
 {
     public partial class CategorySearchControl : UserControl
@@ -26,7 +28,13 @@ namespace Taadol.Controls
         public event Action<CategoryItem> ItemAdded;
         public event Action<CategoryItem> ItemEdited;
         public event Action<CategoryItem> ItemDeleted;
+        public event Action DataChanged;
 
+        /// <summary>
+        /// شناسه نوع شخصی که دسته‌بندی‌ها به آن تعلق دارند.
+        /// این مقدار باید قبل از عملیات Add/Edit/Delete توسط View والد ست شود.
+        /// </summary>
+        public long PersonTypeId { get; set; }
         private static readonly Color[] DotColors = new[]
         {
             Color.FromRgb(0x26, 0x67, 0xFF),
@@ -363,30 +371,115 @@ namespace Taadol.Controls
          typeof(string),
          typeof(CategorySearchControl),
          new PropertyMetadata("دسته بندی اشخاص"));
-
-   
         public event Action<CategoryItem> RootCategoryAdded;
 
-        private void AddRootButton_Click(object sender, RoutedEventArgs e)
+        private async void AddRootButton_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new InputDialog("افزودن دسته اصلی", "نام دسته اصلی جدید:");
-            if (dialog.ShowDialog() == true && !string.IsNullOrWhiteSpace(dialog.InputText))
+            if (PersonTypeId <= 0)
             {
-                var newRoot = new CategoryItem
+                ModernDialog.ShowConfirm(
+                    "نوع شخص انتخاب نشده",
+                    "برای افزودن دسته‌بندی، ابتدا باید نوع شخص را انتخاب کنید.",
+                    ModernDialog.DialogType.Warning,
+                    "متوجه شدم",
+                    "بستن",
+                    Window.GetWindow(this));
+                return;
+            }
+
+            var title = ModernDialog.ShowInput(
+                "افزودن دسته اصلی",
+                "نام دسته اصلی جدید را وارد کنید:",
+                "",
+                ModernDialog.DialogType.Primary,
+                "افزودن",
+                "انصراف",
+                Window.GetWindow(this));
+
+            if (string.IsNullOrWhiteSpace(title)) return;
+            title = title.Trim();
+
+            try
+            {
+                var result = await Task.Run(() =>
                 {
-                    Title = dialog.InputText.Trim(),
-                    Level = 0
-                };
+                    using var scope = App.ServiceProvider.CreateScope();
+                    var app = scope.ServiceProvider.GetRequiredService<IPersonCategoryApplication>();
+                    return app.Create(new CreatePersonCategory
+                    {
+                        Title = title,
+                        PersonTypeId = PersonTypeId,
+                        ParentId = null
+                    });
+                });
 
-                _allCategories.Add(newRoot);
-                BuildTree(_allCategories);
+                if (result.IsSucceeded)
+                {
+                    await RefreshTreeAsync();
+                    DataChanged?.Invoke();
+                    ModernDialog.ShowConfirm(
+                        "افزوده شد",
+                        $"دسته «{title}» با موفقیت اضافه شد.",
+                        ModernDialog.DialogType.Success,
+                        "عالی",
+                        "بستن",
+                        Window.GetWindow(this));
+                }
+                else
+                {
+                    ModernDialog.ShowConfirm(
+                        "خطا در افزودن",
+                        result.Message ?? "افزودن دسته با خطا مواجه شد.",
+                        ModernDialog.DialogType.Warning,
+                        "متوجه شدم",
+                        "بستن",
+                        Window.GetWindow(this));
+                }
+            }
+            catch (Exception ex)
+            {
+                ModernDialog.ShowConfirm(
+                    "خطای سیستمی",
+                    ex.Message,
+                    ModernDialog.DialogType.Danger,
+                    "بستن",
+                    "بستن",
+                    Window.GetWindow(this));
+            }
+        }
+        public async Task RefreshTreeAsync(long? expandToId = null)
+        {
+            if (PersonTypeId <= 0) return;
 
+            List<PersonCategoryTreeViewModel> tree = null;
+            try
+            {
+                tree = await Task.Run(() =>
+                {
+                    using var scope = App.ServiceProvider.CreateScope();
+                    var app = scope.ServiceProvider.GetRequiredService<IPersonCategoryApplication>();
+                    return app.GetTree(PersonTypeId);
+                });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("RefreshTreeAsync failed: " + ex.Message);
+                return;
+            }
+
+            if (tree == null) return;
+
+            LoadFromTreeDto(tree);
+
+            if (expandToId.HasValue)
+            {
                 Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    ExpandAllItems(CategoryTree);
+                    ExpandToId(CategoryTree, expandToId.Value);
                 }), DispatcherPriority.Loaded);
             }
         }
+
         public string HeaderText
         {
             get => (string)GetValue(HeaderTextProperty);
@@ -542,62 +635,250 @@ namespace Taadol.Controls
 
         // ==================== Item Operations ====================
 
-        private void AddButton_Click(object sender, MouseButtonEventArgs e)
+        // ==================== Item Operations ====================
+        private async void EditButton_Click(object sender, MouseButtonEventArgs e)
         {
+            e.Handled = true;
+
             var border = sender as Border;
             var treeItem = FindParentTreeViewItem(border);
+            if (treeItem?.Tag is not CategoryItem category) return;
 
-            if (treeItem?.Tag is CategoryItem category)
+            var newTitle = ModernDialog.ShowInput(
+                "ویرایش دسته",
+                $"ویرایش «{category.Title}»:",
+                category.Title,
+                ModernDialog.DialogType.Success,
+                "ذخیره",
+                "انصراف",
+                Window.GetWindow(this));
+
+            if (string.IsNullOrWhiteSpace(newTitle)) return;
+            newTitle = newTitle.Trim();
+            if (newTitle == category.Title) return;
+
+            try
             {
-                ItemAdded?.Invoke(category);
-                var dialog = new InputDialog("افزودن زیرمجموعه", $"نام زیرمجموعه برای {category.Title}:");
-                if (dialog.ShowDialog() == true && !string.IsNullOrWhiteSpace(dialog.InputText))
+                var result = await Task.Run(() =>
                 {
-                    var newItem = new CategoryItem { Title = dialog.InputText, Level = category.Level + 1 };
-                    category.Children.Add(newItem);
-                    BuildTree(_allCategories);
-                    treeItem.IsExpanded = true;
+                    using var scope = App.ServiceProvider.CreateScope();
+                    var app = scope.ServiceProvider.GetRequiredService<IPersonCategoryApplication>();
+
+                    var details = app.GetDetails(category.Id);
+                    if (details == null)
+                        return new OperationResult().Failed("رکورد یافت نشد.");
+
+                    return app.Edit(new EditPersonCategory
+                    {
+                        Id = category.Id,
+                        Title = newTitle,
+                        PersonTypeId = details.PersonTypeId,
+                        ParentId = details.ParentId
+                    });
+                });
+
+                if (result.IsSucceeded)
+                {
+                    category.Title = newTitle;
+                    ItemEdited?.Invoke(category);
+                    await RefreshTreeAsync(expandToId: category.Id);
+                    DataChanged?.Invoke();
+                    ModernDialog.ShowConfirm(
+                        "ذخیره شد",
+                        $"دسته به «{newTitle}» تغییر یافت.",
+                        ModernDialog.DialogType.Success,
+                        "عالی",
+                        "بستن",
+                        Window.GetWindow(this));
+                }
+                else
+                {
+                    ModernDialog.ShowConfirm(
+                        "خطا در ویرایش",
+                        result.Message ?? "ویرایش با خطا مواجه شد.",
+                        ModernDialog.DialogType.Warning,
+                        "متوجه شدم",
+                        "بستن",
+                        Window.GetWindow(this));
                 }
             }
-            e.Handled = true;
-        }
-
-        private void EditButton_Click(object sender, MouseButtonEventArgs e)
-        {
-            var border = sender as Border;
-            var treeItem = FindParentTreeViewItem(border);
-
-            if (treeItem?.Tag is CategoryItem category)
+            catch (Exception ex)
             {
-                ItemEdited?.Invoke(category);
-                var dialog = new InputDialog("ویرایش", $"ویرایش {category.Title}:", category.Title);
-                if (dialog.ShowDialog() == true && !string.IsNullOrWhiteSpace(dialog.InputText))
-                {
-                    category.Title = dialog.InputText;
-                    treeItem.Header = dialog.InputText;
-                    BuildTree(_allCategories);
-                }
+                ModernDialog.ShowConfirm(
+                    "خطای سیستمی",
+                    ex.Message,
+                    ModernDialog.DialogType.Danger,
+                    "بستن",
+                    "بستن",
+                    Window.GetWindow(this));
             }
-            e.Handled = true;
         }
-
-        private void DeleteButton_Click(object sender, MouseButtonEventArgs e)
+        private async void DeleteButton_Click(object sender, MouseButtonEventArgs e)
         {
+            e.Handled = true;
+
             var border = sender as Border;
             var treeItem = FindParentTreeViewItem(border);
+            if (treeItem?.Tag is not CategoryItem category) return;
 
-            if (treeItem?.Tag is CategoryItem category)
+            bool confirm = ModernDialog.ShowConfirm(
+                "حذف دسته‌بندی",
+                $"آیا از حذف «{category.Title}» اطمینان دارید؟ این عملیات قابل بازگشت نیست.",
+                ModernDialog.DialogType.Danger,
+                "حذف",
+                "انصراف",
+                Window.GetWindow(this));
+
+            if (!confirm) return;
+
+            try
             {
-                var result = MessageBox.Show($"آیا از حذف '{category.Title}' اطمینان دارید؟",
-                    "تأیید حذف", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                if (result == MessageBoxResult.Yes)
+                var result = await Task.Run(() =>
+                {
+                    using var scope = App.ServiceProvider.CreateScope();
+                    var app = scope.ServiceProvider.GetRequiredService<IPersonCategoryApplication>();
+                    return app.Remove(category.Id);
+                });
+
+                if (result.IsSucceeded)
                 {
                     ItemDeleted?.Invoke(category);
-                    RemoveCategory(_allCategories, category);
-                    BuildTree(_allCategories);
+                    await RefreshTreeAsync();
+                    DataChanged?.Invoke();
+                    ModernDialog.ShowConfirm(
+                        "حذف شد",
+                        $"دسته «{category.Title}» با موفقیت حذف شد.",
+                        ModernDialog.DialogType.Success,
+                        "عالی",
+                        "بستن",
+                        Window.GetWindow(this));
+                }
+                else
+                {
+                    ModernDialog.ShowConfirm(
+                        "امکان حذف نیست",
+                        result.Message ?? "حذف با خطا مواجه شد.",
+                        ModernDialog.DialogType.Warning,
+                        "متوجه شدم",
+                        "بستن",
+                        Window.GetWindow(this));
                 }
             }
+            catch (Exception ex)
+            {
+                ModernDialog.ShowConfirm(
+                    "خطای سیستمی",
+                    ex.Message,
+                    ModernDialog.DialogType.Danger,
+                    "بستن",
+                    "بستن",
+                    Window.GetWindow(this));
+            }
+        }
+
+        private async void AddButton_Click(object sender, MouseButtonEventArgs e)
+        {
             e.Handled = true;
+
+            if (PersonTypeId <= 0)
+            {
+                ModernDialog.ShowConfirm(
+                    "نوع شخص انتخاب نشده",
+                    "برای افزودن زیرمجموعه، ابتدا باید نوع شخص را انتخاب کنید.",
+                    ModernDialog.DialogType.Warning,
+                    "متوجه شدم",
+                    "بستن",
+                    Window.GetWindow(this));
+                return;
+            }
+
+            var border = sender as Border;
+            var treeItem = FindParentTreeViewItem(border);
+            if (treeItem?.Tag is not CategoryItem parent) return;
+
+            var title = ModernDialog.ShowInput(
+                "افزودن زیرمجموعه",
+                $"نام زیرمجموعه برای «{parent.Title}» را وارد کنید:",
+                "",
+                ModernDialog.DialogType.Primary,
+                "افزودن",
+                "انصراف",
+                Window.GetWindow(this));
+
+            if (string.IsNullOrWhiteSpace(title)) return;
+            title = title.Trim();
+
+            try
+            {
+                var result = await Task.Run(() =>
+                {
+                    using var scope = App.ServiceProvider.CreateScope();
+                    var app = scope.ServiceProvider.GetRequiredService<IPersonCategoryApplication>();
+                    return app.Create(new CreatePersonCategory
+                    {
+                        Title = title,
+                        PersonTypeId = PersonTypeId,
+                        ParentId = parent.Id
+                    });
+                });
+
+                if (result.IsSucceeded)
+                {
+                    ItemAdded?.Invoke(parent);
+                    await RefreshTreeAsync(expandToId: parent.Id);
+                    DataChanged?.Invoke();
+                    ModernDialog.ShowConfirm(
+                        "افزوده شد",
+                        $"زیرمجموعه «{title}» به «{parent.Title}» اضافه شد.",
+                        ModernDialog.DialogType.Success,
+                        "عالی",
+                        "بستن",
+                        Window.GetWindow(this));
+                }
+                else
+                {
+                    ModernDialog.ShowConfirm(
+                        "خطا در افزودن",
+                        result.Message ?? "افزودن زیرمجموعه با خطا مواجه شد.",
+                        ModernDialog.DialogType.Warning,
+                        "متوجه شدم",
+                        "بستن",
+                        Window.GetWindow(this));
+                }
+            }
+            catch (Exception ex)
+            {
+                ModernDialog.ShowConfirm(
+                    "خطای سیستمی",
+                    ex.Message,
+                    ModernDialog.DialogType.Danger,
+                    "بستن",
+                    "بستن",
+                    Window.GetWindow(this));
+            }
+        }
+        private bool ExpandToId(ItemsControl parent, long targetId)
+        {
+            foreach (var item in parent.Items)
+            {
+                if (parent.ItemContainerGenerator.ContainerFromItem(item) is TreeViewItem treeItem)
+                {
+                    if (treeItem.Tag is CategoryItem cat && cat.Id == targetId)
+                    {
+                        treeItem.IsExpanded = true;
+                        treeItem.Focus();
+                        treeItem.IsSelected = true;
+                        return true;
+                    }
+
+                    treeItem.IsExpanded = true;
+                    if (ExpandToId(treeItem, targetId))
+                        return true;
+
+                    treeItem.IsExpanded = false;
+                }
+            }
+            return false;
         }
 
         private bool RemoveCategory(List<CategoryItem> items, CategoryItem target)
@@ -705,78 +986,6 @@ namespace Taadol.Controls
             }
         }
 
-        public class InputDialog : Window
-        {
-            public string InputText { get; private set; }
-
-            public InputDialog(string title, string prompt, string defaultValue = "")
-            {
-                Title = title;
-                Width = 350;
-                Height = 180;
-                WindowStartupLocation = WindowStartupLocation.CenterOwner;
-                FlowDirection = FlowDirection.RightToLeft;
-
-                var grid = new Grid();
-                grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-                grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-                grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-                grid.Margin = new Thickness(15);
-
-                var promptText = new TextBlock
-                {
-                    Text = prompt,
-                    FontFamily = (FontFamily)FindResource("IRANSans"),
-                    FontSize = 13,
-                    Margin = new Thickness(0, 0, 0, 10)
-                };
-                Grid.SetRow(promptText, 0);
-
-                var textBox = new TextBox
-                {
-                    Text = defaultValue,
-                    FontFamily = (FontFamily)FindResource("IRANSans"),
-                    FontSize = 13,
-                    Height = 30,
-                    Margin = new Thickness(0, 0, 0, 15)
-                };
-                Grid.SetRow(textBox, 1);
-
-                var buttonPanel = new StackPanel
-                {
-                    Orientation = Orientation.Horizontal,
-                    HorizontalAlignment = HorizontalAlignment.Center
-                };
-
-                var okButton = new Button
-                {
-                    Content = "تأیید",
-                    Width = 80,
-                    Height = 30,
-                    Margin = new Thickness(5),
-                    FontFamily = (FontFamily)FindResource("IRANSans")
-                };
-                okButton.Click += (s, e) => { InputText = textBox.Text; DialogResult = true; };
-
-                var cancelButton = new Button
-                {
-                    Content = "انصراف",
-                    Width = 80,
-                    Height = 30,
-                    Margin = new Thickness(5),
-                    FontFamily = (FontFamily)FindResource("IRANSans")
-                };
-                cancelButton.Click += (s, e) => { DialogResult = false; };
-
-                buttonPanel.Children.Add(okButton);
-                buttonPanel.Children.Add(cancelButton);
-                Grid.SetRow(buttonPanel, 2);
-
-                grid.Children.Add(promptText);
-                grid.Children.Add(textBox);
-                grid.Children.Add(buttonPanel);
-                Content = grid;
-            }
-        }
+        
     }
 }
