@@ -6,3 +6,4 @@
 
         public long FundId { get; set; }
     }
+}

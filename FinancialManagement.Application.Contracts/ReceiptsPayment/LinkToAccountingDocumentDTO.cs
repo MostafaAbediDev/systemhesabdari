@@ -6,3 +6,4 @@
 
         public long AccountingDocumentId { get; set; }
     }
+}
