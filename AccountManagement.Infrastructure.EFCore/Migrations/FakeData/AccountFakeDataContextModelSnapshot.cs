@@ -36,11 +36,6 @@ namespace AccountManagement.Infrastructure.EFCore.Migrations.FakeData
                     b.Property<bool>("AllowManualEntry")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.Property<long>("CompanyId")
                         .HasColumnType("bigint");
 
@@ -54,7 +49,6 @@ namespace AccountManagement.Infrastructure.EFCore.Migrations.FakeData
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -87,10 +81,6 @@ namespace AccountManagement.Infrastructure.EFCore.Migrations.FakeData
 
                     b.Property<int>("Nature")
                         .HasColumnType("int");
-
-                    b.Property<decimal>("OpeningBalance")
-                        .HasPrecision(4, 2)
-                        .HasColumnType("decimal(4,2)");
 
                     b.Property<long?>("ParentId")
                         .HasColumnType("bigint");

@@ -12,11 +12,7 @@ namespace AccountManagement.Infrastructure.EFCore.Mapping
             builder.HasKey(x => x.Id);
 
             builder.Property(x => x.Title).HasMaxLength(200).IsRequired();
-            builder.Property(x => x.Code).HasMaxLength(50).IsRequired();
-            builder.Property(x => x.Description).HasMaxLength(500).IsRequired();
-
-            builder.Property(x => x.OpeningBalance).HasPrecision(4, 2).IsRequired();
-
+            builder.Property(x => x.Description).HasMaxLength(500).IsRequired(false);
 
             builder.HasOne(x => x.Parent).WithMany(x => x.Children).HasForeignKey(x => x.ParentId);
             builder.HasOne(x => x.Company).WithMany().HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.NoAction);

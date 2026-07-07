@@ -8,12 +8,11 @@ namespace AccountManagement.Domain.Account.AccountAgg
 {
     public class Accounts : EntityBase
     {
-        public string Code { get; private set; }
         public string Title { get; private set; }
-        public string Description { get; private set; }
-        public int Level { get; private set; }
-        public int AccountType { get; private set; }
-        public int Nature { get; private set; }
+        public string? Description { get; private set; }
+        public AccountLevel Level { get; private set; }
+        public AccountType AccountType { get; private set; }
+        public AccountNature Nature { get; private set; }
         public bool IsPersonRelated { get; private set; }
         public bool IsProductRelated { get; private set; }
         public bool IsBankRelated { get; private set; }
@@ -21,11 +20,10 @@ namespace AccountManagement.Domain.Account.AccountAgg
         public bool IsEmployeeRelated { get; private set; }
         public bool AllowManualEntry { get; private set; }
         public bool IsControlAccount { get; private set; }
-        public decimal OpeningBalance { get; private set; }
         public DateTime UpdatedAt { get; private set; }
         public long? ParentId { get; private set; }
         public long CompanyId { get; private set; }
-        public Accounts Parent { get; private set; }
+        public Accounts? Parent { get; private set; }
         public Companies Company { get; private set; }
         public List<Accounts> Children { get; private set; }
         public List<AccountLinks> AccountLink { get; private set; }
@@ -39,15 +37,15 @@ namespace AccountManagement.Domain.Account.AccountAgg
             AccountingEntrie = new List<AccountingEntries>();
         }
 
-        public Accounts(string code, string title, string description, int level, int accountType, int nature, decimal openingBalance, DateTime updatedAt)
+        public Accounts(string title, string? description, AccountLevel level, AccountType accountType,
+            AccountNature nature, long companyId)
         {
-            Code = code;
             Title = title;
             Description = description;
             Level = level;
             AccountType = accountType;
             Nature = nature;
-            OpeningBalance = openingBalance;
+            CompanyId = companyId;
             IsPersonRelated = false;
             IsProductRelated = false;
             IsBankRelated = false;
@@ -55,30 +53,122 @@ namespace AccountManagement.Domain.Account.AccountAgg
             IsEmployeeRelated = false;
             AllowManualEntry = false;
             IsControlAccount = false;
-            UpdatedAt = updatedAt;
+            IsActive = true;
         }
 
-        public void Edit(string code, string title, string description, int level, int accountType, int nature, decimal openingBalance, DateTime updatedAt)
+        public void Edit(string title, string? description)
         {
-            Code = code;
+            if (string.IsNullOrWhiteSpace(title))
+                throw new InvalidOperationException(
+                    "Account title is required.");
+
             Title = title;
             Description = description;
+        }
+
+        public void ChangeAccountClassification(AccountLevel level, AccountType accountType, AccountNature nature)
+        {
+            if (AccountingEntrie.Any())
+                throw new InvalidOperationException(
+                    "Account classification cannot be changed because account has transactions.");
+
             Level = level;
             AccountType = accountType;
             Nature = nature;
-            OpeningBalance = openingBalance;
-            IsPersonRelated = false;
-            IsProductRelated = false;
-            IsBankRelated = false;
-            IsFundRelated = false;
-            IsEmployeeRelated = false;
-            AllowManualEntry = false;
-            IsControlAccount = false;
-            UpdatedAt = updatedAt;
+
+            UpdatedAt = DateTime.Now;
         }
 
+        public void ChangeParent(long? parentId)
+        {
+            if (AccountingEntrie.Any())
+                throw new InvalidOperationException(
+                    "Account parent cannot be changed because account has transactions.");
+
+            ParentId = parentId;
+
+            UpdatedAt = DateTime.Now;
+        }
+
+        public void EnablePersonRelation()
+        {
+            IsPersonRelated = true;
+        }
+
+        public void DisablePersonRelation()
+        {
+            IsPersonRelated = false;
+        }
+
+        public void EnableProductRelation()
+        {
+            IsProductRelated = true;
+        }
+
+        public void DisableProductRelation()
+        {
+            IsProductRelated = false;
+        }
+
+        public void EnableBankRelation()
+        {
+            IsBankRelated = true;
+        }
+
+        public void DisableBankRelation()
+        {
+            IsBankRelated = false;
+        }
+
+        public void EnableFundRelation()
+        {
+            IsFundRelated = true;
+        }
+
+        public void DisableFundRelation()
+        {
+            IsFundRelated = false;
+        }
+
+        public void EnableEmployeeRelation()
+        {
+            IsEmployeeRelated = true;
+        }
+
+        public void DisableEmployeeRelation()
+        {
+            IsEmployeeRelated = false;
+        }
+
+        public void AllowManualEntries()
+        {
+            AllowManualEntry = true;
+        }
+
+        public void DisableManualEntries()
+        {
+            AllowManualEntry = false;
+        }
+
+        public void SetAsControlAccount()
+        {
+            IsControlAccount = true;
+        }
+
+        public void RemoveControlAccount()
+        {
+            IsControlAccount = false;
+        }
         public void Remove()
         {
+            if (AccountingEntrie.Any())
+                throw new InvalidOperationException(
+                    "Account with transactions cannot be deleted.");
+
+            if (Children.Any())
+                throw new InvalidOperationException(
+                    "Account with child accounts cannot be deleted.");
+
             IsDeleted = true;
         }
 

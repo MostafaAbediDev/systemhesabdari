@@ -36,10 +36,6 @@ namespace FinancialManagement.Infrastructure.EFCore.Migrations.FakeData
                     b.Property<bool>("AllowManualEntry")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<long>("CompanyId")
                         .HasColumnType("bigint");
 
@@ -53,7 +49,6 @@ namespace FinancialManagement.Infrastructure.EFCore.Migrations.FakeData
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
@@ -85,9 +80,6 @@ namespace FinancialManagement.Infrastructure.EFCore.Migrations.FakeData
 
                     b.Property<int>("Nature")
                         .HasColumnType("int");
-
-                    b.Property<decimal>("OpeningBalance")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<long?>("ParentId")
                         .HasColumnType("bigint");
@@ -163,8 +155,11 @@ namespace FinancialManagement.Infrastructure.EFCore.Migrations.FakeData
                     b.Property<DateTime?>("ApprovedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("ApprovedBy")
-                        .HasColumnType("int");
+                    b.Property<long?>("ApprovedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("ApproverId")
+                        .HasColumnType("bigint");
 
                     b.Property<long>("BranchId")
                         .HasColumnType("bigint");
@@ -175,6 +170,9 @@ namespace FinancialManagement.Infrastructure.EFCore.Migrations.FakeData
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<long>("CreatorId")
+                        .HasColumnType("bigint");
+
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
@@ -182,14 +180,13 @@ namespace FinancialManagement.Infrastructure.EFCore.Migrations.FakeData
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("DocumentDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("DocumentDate")
+                        .HasColumnType("date");
 
-                    b.Property<int>("DocumentNumber")
-                        .HasColumnType("int");
+                    b.Property<long>("DocumentNumber")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("DocumentType")
                         .HasColumnType("int");
@@ -203,8 +200,8 @@ namespace FinancialManagement.Infrastructure.EFCore.Migrations.FakeData
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("ReferenceId")
-                        .HasColumnType("int");
+                    b.Property<long?>("ReferenceId")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("ReferenceType")
                         .HasColumnType("int");
@@ -214,7 +211,11 @@ namespace FinancialManagement.Infrastructure.EFCore.Migrations.FakeData
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ApproverId");
+
                     b.HasIndex("BranchId");
+
+                    b.HasIndex("CreatorId");
 
                     b.HasIndex("FinancialPeriodId");
 
@@ -503,14 +504,11 @@ namespace FinancialManagement.Infrastructure.EFCore.Migrations.FakeData
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<long>("BankId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("BanksId")
-                        .HasColumnType("bigint");
-
                     b.Property<int>("ChequeCount")
                         .HasColumnType("int");
+
+                    b.Property<long>("CompanyBankAccountId")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
@@ -535,13 +533,19 @@ namespace FinancialManagement.Infrastructure.EFCore.Migrations.FakeData
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("OwnerName")
+                    b.Property<DateTime>("ReceiveDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SerialNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("BanksId");
+                    b.HasIndex("CompanyBankAccountId");
 
                     b.ToTable("ChequeBooks");
                 });
@@ -972,7 +976,6 @@ namespace FinancialManagement.Infrastructure.EFCore.Migrations.FakeData
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Logo")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
@@ -1215,6 +1218,14 @@ namespace FinancialManagement.Infrastructure.EFCore.Migrations.FakeData
                     b.Property<long>("BranchesId")
                         .HasColumnType("bigint");
 
+                    b.Property<string>("ContactFirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContactLastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
@@ -1250,6 +1261,9 @@ namespace FinancialManagement.Infrastructure.EFCore.Migrations.FakeData
                     b.Property<string>("NationalCode")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<long?>("PersonCategoryId")
+                        .HasColumnType("bigint");
+
                     b.Property<long>("PersonTypeId")
                         .HasColumnType("bigint");
 
@@ -1259,6 +1273,8 @@ namespace FinancialManagement.Infrastructure.EFCore.Migrations.FakeData
                     b.HasKey("Id");
 
                     b.HasIndex("BranchesId");
+
+                    b.HasIndex("PersonCategoryId");
 
                     b.HasIndex("PersonTypeId");
 
@@ -1322,6 +1338,48 @@ namespace FinancialManagement.Infrastructure.EFCore.Migrations.FakeData
                     b.HasIndex("PersonsId");
 
                     b.ToTable("PersonBanks");
+                });
+
+            modelBuilder.Entity("PersonManagement.Domain.Person.PersonCategoryAgg.PersonCategory", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DeletedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<long?>("ParentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("PersonTypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParentId");
+
+                    b.HasIndex("PersonTypeId");
+
+                    b.ToTable("PersonCategory");
                 });
 
             modelBuilder.Entity("PersonManagement.Domain.Person.PersonContactAgg.PersonContacts", b =>
@@ -1452,9 +1510,19 @@ namespace FinancialManagement.Infrastructure.EFCore.Migrations.FakeData
 
             modelBuilder.Entity("AccountManagement.Domain.Account.AccountingDocumentAgg.AccountingDocuments", b =>
                 {
+                    b.HasOne("PersonManagement.Domain.Person.PersonAgg.Persons", "Approver")
+                        .WithMany()
+                        .HasForeignKey("ApproverId");
+
                     b.HasOne("GeneralInfoManagement.Domain.BaseInfo.BranchesAgg.Branches", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PersonManagement.Domain.Person.PersonAgg.Persons", "Creator")
+                        .WithMany()
+                        .HasForeignKey("CreatorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1464,7 +1532,11 @@ namespace FinancialManagement.Infrastructure.EFCore.Migrations.FakeData
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Approver");
+
                     b.Navigation("Branch");
+
+                    b.Navigation("Creator");
 
                     b.Navigation("FinancialPeriod");
                 });
@@ -1547,13 +1619,13 @@ namespace FinancialManagement.Infrastructure.EFCore.Migrations.FakeData
 
             modelBuilder.Entity("BankManagement.Domain.Bank.ChequeBookAgg.ChequeBooks", b =>
                 {
-                    b.HasOne("BankManagement.Domain.Bank.BankAgg.Banks", "Banks")
-                        .WithMany("ChequeBooks")
-                        .HasForeignKey("BanksId")
+                    b.HasOne("BankManagement.Domain.Bank.CompanyBankAccountAgg.CompanyBankAccounts", "CompanyBankAccount")
+                        .WithMany()
+                        .HasForeignKey("CompanyBankAccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Banks");
+                    b.Navigation("CompanyBankAccount");
                 });
 
             modelBuilder.Entity("BankManagement.Domain.Bank.CompanyBankAccountAgg.CompanyBankAccounts", b =>
@@ -1786,6 +1858,10 @@ namespace FinancialManagement.Infrastructure.EFCore.Migrations.FakeData
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("PersonManagement.Domain.Person.PersonCategoryAgg.PersonCategory", "PersonCategory")
+                        .WithMany("Persons")
+                        .HasForeignKey("PersonCategoryId");
+
                     b.HasOne("PersonManagement.Domain.Person.PersonTypeAgg.PersonType", "PersonType")
                         .WithMany("Persons")
                         .HasForeignKey("PersonTypeId")
@@ -1793,6 +1869,8 @@ namespace FinancialManagement.Infrastructure.EFCore.Migrations.FakeData
                         .IsRequired();
 
                     b.Navigation("Branches");
+
+                    b.Navigation("PersonCategory");
 
                     b.Navigation("PersonType");
                 });
@@ -1814,6 +1892,23 @@ namespace FinancialManagement.Infrastructure.EFCore.Migrations.FakeData
                     b.Navigation("BankBranches");
 
                     b.Navigation("Persons");
+                });
+
+            modelBuilder.Entity("PersonManagement.Domain.Person.PersonCategoryAgg.PersonCategory", b =>
+                {
+                    b.HasOne("PersonManagement.Domain.Person.PersonCategoryAgg.PersonCategory", "Parent")
+                        .WithMany("Children")
+                        .HasForeignKey("ParentId");
+
+                    b.HasOne("PersonManagement.Domain.Person.PersonTypeAgg.PersonType", "PersonType")
+                        .WithMany()
+                        .HasForeignKey("PersonTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Parent");
+
+                    b.Navigation("PersonType");
                 });
 
             modelBuilder.Entity("PersonManagement.Domain.Person.PersonContactAgg.PersonContacts", b =>
@@ -1852,8 +1947,6 @@ namespace FinancialManagement.Infrastructure.EFCore.Migrations.FakeData
             modelBuilder.Entity("BankManagement.Domain.Bank.BankAgg.Banks", b =>
                 {
                     b.Navigation("BankBranches");
-
-                    b.Navigation("ChequeBooks");
 
                     b.Navigation("CompanyBankAccounts");
                 });
@@ -1904,6 +1997,13 @@ namespace FinancialManagement.Infrastructure.EFCore.Migrations.FakeData
                     b.Navigation("PersonBanks");
 
                     b.Navigation("PersonContacts");
+                });
+
+            modelBuilder.Entity("PersonManagement.Domain.Person.PersonCategoryAgg.PersonCategory", b =>
+                {
+                    b.Navigation("Children");
+
+                    b.Navigation("Persons");
                 });
 
             modelBuilder.Entity("PersonManagement.Domain.Person.PersonTypeAgg.PersonType", b =>
