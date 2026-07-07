@@ -6,3 +6,4 @@
 
         public long ChequeId { get; set; }
     }
+}
