@@ -619,10 +619,18 @@ namespace Taadol.Views
                 PersonTypeId = SelectedPersonTypeId,
                 BranchId = SelectedBranchId,
                 CreditLimit = CreditLimit,
-                IsCodeAutomatic = IsCodeAutomatic,
-                ManualCode = IsCodeAutomatic ? null : ManualCode,
+                // ★ همیشه مقدار نمایش‌داده‌شده در TextBox را ذخیره کن.
+                // بک‌اند وقتی IsAutomatic=true باشه، ManualCode را نادیده می‌گیره و کد جدید تولید می‌کنه
+                // که باعث می‌شه کدی که کاربر می‌بینه با کدی که در DB ذخیره می‌شه فرق کنه.
+                // چون IsCodeAutomatic در DB اصلاً ذخیره نمی‌شه (فقط flag موقت بک‌اند هست)،
+                // ما IsAutomatic=false می‌فرستیم تا بک‌اند دقیقاً همون مقدار ManualCode را ذخیره کنه.
+                // این کار هم برای حالت اتوماتیک (که کد از قبل توسط CodeGenerator تولید شده)
+                // و هم حالت دستی (که کاربر خودش کد را تایپ کرده) درست کار می‌کنه.
+                IsCodeAutomatic = false,
+                ManualCode = ManualCode,
                 PersonCategoryId = _selectedPersonCategoryId
-            };
+           
+        };
 
             try
             {
@@ -830,13 +838,29 @@ namespace Taadol.Views
                     return false;
                 }
             }
-
             if (!IsCodeAutomatic && string.IsNullOrWhiteSpace(ManualCode))
             {
                 MessageBox.Show("شناسه یکتای دستی را وارد کنید یا حالت اتوماتیک را فعال کنید.",
                     "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return false;
             }
+
+            // ★ در حالت اتوماتیک هم اطمینان حاصل کن که کد تولید شده و خالی نیست
+            // (ممکنه CodeGenerator به هر دلیلی fail کرده باشه)
+            if (IsCodeAutomatic && string.IsNullOrWhiteSpace(ManualCode))
+            {
+                // سعی کن یک بار دیگه کد تولید کنی
+                ManualCode = GenerateNextUniqueCode();
+                if (string.IsNullOrWhiteSpace(ManualCode))
+                {
+                    MessageBox.Show(
+                        "تولید شناسه یکتای اتوماتیک ناموفق بود. لطفاً حالت دستی را انتخاب کرده و کد را وارد کنید.",
+                        "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return false;
+                }
+            }
+
+            // ★ اعتبارسنجی فرمت موبایل (در صورت وارد شدن)
 
             // ★ اعتبارسنجی فرمت موبایل (در صورت وارد شدن)
             if (!string.IsNullOrWhiteSpace(Mobile) && !IsValidMobile(Mobile))
