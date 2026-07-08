@@ -10,8 +10,4 @@
     <ProjectReference Include="..\01_FrameWork\01_FrameWork.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="PettyCash\NewFolder\" />
-  </ItemGroup>
-
 </Project>
