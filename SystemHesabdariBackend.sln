@@ -175,6 +175,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FM.Application", "FM.Applic
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinancialManagement.Application.Contracts", "FinancialManagement.Application.Contracts\FinancialManagement.Application.Contracts.csproj", "{FACB1068-C0AA-42B4-A71A-F3FF97130DDE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinancialManagement.Application", "FinancialManagement.Application\FinancialManagement.Application.csproj", "{44AA01F7-07A1-4F4D-A0AF-7A36EE9304B6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -369,6 +371,10 @@ Global
 		{FACB1068-C0AA-42B4-A71A-F3FF97130DDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FACB1068-C0AA-42B4-A71A-F3FF97130DDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FACB1068-C0AA-42B4-A71A-F3FF97130DDE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44AA01F7-07A1-4F4D-A0AF-7A36EE9304B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44AA01F7-07A1-4F4D-A0AF-7A36EE9304B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44AA01F7-07A1-4F4D-A0AF-7A36EE9304B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44AA01F7-07A1-4F4D-A0AF-7A36EE9304B6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -446,6 +452,7 @@ Global
 		{CBD32F93-4B61-4D45-8596-7CC811E78D5A} = {E1931D47-F307-4FDF-AD60-12DD1064CAB3}
 		{3848C8BE-70B0-4003-9945-F7207F9D7EFC} = {9B30A45C-5AD9-4B1C-A993-FA343D6EDFF7}
 		{FACB1068-C0AA-42B4-A71A-F3FF97130DDE} = {3848C8BE-70B0-4003-9945-F7207F9D7EFC}
+		{44AA01F7-07A1-4F4D-A0AF-7A36EE9304B6} = {3848C8BE-70B0-4003-9945-F7207F9D7EFC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {755146A5-DE3D-4433-86D5-CFC10BD5F267}

@@ -61,9 +61,7 @@ namespace PersonManagement.Domain.Person.PersonAgg
 
             CreditLimit = creditLimit;
             AvailableCredit = creditLimit;
-            ContactFirstName = contactFirstName;
-            ContactLastName = contactLastName;
-            PersonTypeId = personTypeId;
+            PersonCategoryId = PersonCategoryId;
         }
 
         public void Edit(string firstName, string lastName, string contactFirstName, string contactLastName, string? nationalCode,
@@ -74,11 +72,6 @@ namespace PersonManagement.Domain.Person.PersonAgg
             ContactFirstName = contactFirstName;
             ContactLastName = contactLastName;
 
-            PersonTypeId = personTypeId;
-
-            SetBranch(branchId);
-
-            IsLegal = isLegal;
 
 
             if (IsLegal)
@@ -95,6 +88,12 @@ namespace PersonManagement.Domain.Person.PersonAgg
                 EconomicCode = null;
                 RegistrationNumber = null;
             }
+
+            PersonTypeId = personTypeId;
+
+            SetBranch(branchId);
+
+            IsLegal = isLegal;
 
             PersonCategoryId = personCategoryId;
         }
