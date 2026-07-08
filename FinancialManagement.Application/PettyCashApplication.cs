@@ -4,12 +4,12 @@ using FinancialManagement.Domain.PettyCashAgg;
 
 namespace FinancialManagement.Application
 {
-    public class PettyCasheApplication : IPettyCashApplication
+    public class PettyCashApplication : IPettyCashApplication
     {
 
         private readonly IPettyCashRepository _pettyCashRepository;
 
-        public PettyCasheApplication(IPettyCashRepository pettyCashRepository)
+        public PettyCashApplication(IPettyCashRepository pettyCashRepository)
         {
             _pettyCashRepository = pettyCashRepository;
         }

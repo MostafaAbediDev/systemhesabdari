@@ -61,7 +61,7 @@ namespace PersonManagement.Domain.Person.PersonAgg
 
             CreditLimit = creditLimit;
             AvailableCredit = creditLimit;
-            PersonCategoryId = PersonCategoryId;
+            PersonCategoryId = perosnCategoryId;
         }
 
         public void Edit(string firstName, string lastName, string contactFirstName, string contactLastName, string? nationalCode,
