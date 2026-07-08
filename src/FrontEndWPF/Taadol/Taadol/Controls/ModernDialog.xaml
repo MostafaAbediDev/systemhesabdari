@@ -16,7 +16,7 @@
 
     <Border x:Name="RootBorder"
             Background="White"
-            CornerRadius="20"
+            CornerRadius="4"
             Padding="30,28"
             Margin="20"
             RenderTransformOrigin="0.5,0.5">
@@ -48,13 +48,13 @@
                     Grid.Row="0"
                     Width="76"
                     Height="76"
-                    CornerRadius="38"
+                    CornerRadius="4"
                     HorizontalAlignment="Center"
                     Margin="0,0,0,18">
                 <Border x:Name="IconInner"
                         Width="44"
                         Height="44"
-                        CornerRadius="22"
+                        CornerRadius="4"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center">
                     <svg:SvgViewbox x:Name="DialogIcon"
