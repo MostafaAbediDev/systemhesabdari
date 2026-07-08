@@ -35,7 +35,7 @@ namespace FinancialManagement.Infrastructure.EFCore.Repository
                 .FirstOrDefault(x => x.Id == id);
         }
 
-        public List<PettyCashViewModel> GetPettyCahes()
+        public List<PettyCashViewModel> GetPettyCashes()
         {
             return _context.PettyCashes
                .Include(x => x.Branches)
