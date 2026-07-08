@@ -37,6 +37,7 @@ namespace BankManagement.Application
             );
 
             _companyBankAccountRepository.Create(companyBankAccount);
+            _companyBankAccountRepository.SaveChanges();
 
             var codeResult = _codeApplication.SetCode(new CreateCode
             {
@@ -49,7 +50,6 @@ namespace BankManagement.Application
             if (!codeResult.IsSucceeded)
                 return operation.Failed(codeResult.Message);
 
-            _companyBankAccountRepository.SaveChanges();
             return operation.Succedded();
         }
 
