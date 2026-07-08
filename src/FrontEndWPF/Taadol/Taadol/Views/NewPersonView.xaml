@@ -35,11 +35,16 @@
                         </StackPanel>
 
                         <StackPanel Grid.Column="2">
-                            <TextBlock Text="نام شعبه"
+                            <TextBlock Text="شعبه"
                                        Style="{StaticResource FormLabel}" />
-                            <controls:ModernPersianTextBox Width="230"
-                                                           Text="{Binding BranchName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                           Placeholder="مرکزی" />
+                            <ComboBox Width="230"
+                                      Style="{StaticResource SearchableComboBox}"
+                                      Tag="جستجو..."
+                                      ItemsSource="{Binding DataContext.BankBranches, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                      DisplayMemberPath="BranchName"
+                                      SelectedValuePath="Id"
+                                      SelectedValue="{Binding BankBranchId, Mode=TwoWay}"
+                                      ItemContainerStyle="{StaticResource SearchableComboBoxItem}" />
                         </StackPanel>
 
                         <StackPanel Grid.Column="5"
@@ -50,17 +55,43 @@
                                           FlowDirection="LeftToRight"
                                           Style="{StaticResource StatusToggleButton}"
                                           IsChecked="{Binding IsDefault, Mode=TwoWay}"
+                                          Checked="RowDefaultToggle_Checked"
                                           Margin="0,0,10,0" />
+                            <Button Click="AddBankAccountFromRow_Click"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Cursor="Hand"
+                                    Margin="5,0,0,0"
+                                    ToolTip="افزودن حساب جدید"
+                                    Opacity="1"
+                                    Focusable="False">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <ContentPresenter Content="{TemplateBinding Content}" />
+                                    </ControlTemplate>
+                                </Button.Template>
+                                <svg:SvgViewbox Width="16"
+                                                Height="16"
+                                                Source="/Assets/Icons/addAc.svg" />
+                            </Button>
                             <Button x:Name="RemoveButton"
                                     Click="RemoveBankAccount_Click"
                                     Tag="{Binding}"
                                     Background="Transparent"
                                     BorderThickness="0"
                                     Cursor="Hand"
-                                    Margin="5,0,0,0">
+                                    Margin="5,0,0,0"
+                                    ToolTip="حذف"
+                                    Opacity="1"
+                                    Focusable="False">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <ContentPresenter Content="{TemplateBinding Content}" />
+                                    </ControlTemplate>
+                                </Button.Template>
                                 <svg:SvgViewbox Width="16"
                                                 Height="16"
-                                                Source="/Assets/Icons/delete.svg" />
+                                                Source="/Assets/Icons/trash.svg" />
                             </Button>
                         </StackPanel>
                     </Grid>
@@ -451,21 +482,14 @@
                                                       Checked="PersonTypeToggle_Checked"
                                                       Margin="0,0,8,0" />
                                         <ToggleButton x:Name="PersonTypePersonnel"
-                                                      Content="پرسنل"
-                                                      Tag="2"
-                                                      FlowDirection="LeftToRight"
-                                                      Style="{StaticResource StatusToggleButton}"
-                                                      IsChecked="False"
-                                                      Checked="PersonTypeToggle_Checked"
-                                                      Margin="0,0,8,0" />
-                                        <ToggleButton Content="مشخصات پرسنل"
-                                                      x:Name="PersonnelToggle"
-                                                      FlowDirection="LeftToRight"
-                                                      Style="{StaticResource StatusToggleButton}"
-                                                      IsChecked="False"
-                                                      Checked="CategoryToggle_Checked"
-                                                      Unchecked="CategoryToggle_Checked"
-                                                      Margin="0,0,8,0" />
+                                                       Content="پرسنل"
+                                                       Tag="2"
+                                                       FlowDirection="LeftToRight"
+                                                       Style="{StaticResource StatusToggleButton}"
+                                                       IsChecked="False"
+                                                       Checked="PersonTypeToggle_Checked"
+                                                       Unchecked="PersonTypeToggle_Checked"
+                                                       Margin="0,0,8,0" />
                                       
                                     </StackPanel>
                                 </Grid>
@@ -729,16 +753,23 @@
                                             Orientation="Horizontal"
                                             Margin="0,30,0,0">
                                     <ToggleButton x:Name="MainBankDefaultToggle"
-                                                  Content="حساب پیش فرض"
-                                                  FlowDirection="LeftToRight"
-                                                  Style="{StaticResource StatusToggleButton}"
-                                                  IsChecked="{Binding MainBankIsDefault, Mode=TwoWay}"
-                                                  Margin="10,0,60,0" />
+                                                   Content="حساب پیش فرض"
+                                                   FlowDirection="LeftToRight"
+                                                   Style="{StaticResource StatusToggleButton}"
+                                                   IsChecked="{Binding MainBankIsDefault, Mode=TwoWay}"
+                                                   Checked="MainDefaultToggle_Checked"
+                                                   Margin="10,0,60,0" />
                                     <Button x:Name="AddBankAccountButton"
                                             Click="AddBankAccountButton_Click"
                                             Background="Transparent"
                                             BorderThickness="0"
-                                            Cursor="Hand">
+                                            Cursor="Hand"
+                                            Focusable="False">
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <ContentPresenter Content="{TemplateBinding Content}" />
+                                            </ControlTemplate>
+                                        </Button.Template>
                                         <svg:SvgViewbox Width="18"
                                                         Height="18"
                                                         Source="/Assets/Icons/addAc.svg" />
