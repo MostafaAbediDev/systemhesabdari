@@ -7,6 +7,6 @@ namespace FinancialManagement.Domain.PettyCashAgg
     {
         EditPettyCash GetDetails(long id);
         List<PettyCashViewModel> Search(PettyCashSearchModel searchModel);
-        List<PettyCashViewModel> GetFunds();
+        List<PettyCashViewModel> GetPettyCahes();
     }
 }
