@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Threading;
 
 namespace Taadol.Views
@@ -173,7 +174,7 @@ namespace Taadol.Views
                             Mobile = mobile,
                             NationalId = string.IsNullOrWhiteSpace(p.NationalCode) ? "—" : p.NationalCode,
                             EconomicId = string.IsNullOrWhiteSpace(p.EconomicCode) ? "—" : p.EconomicCode,
-                            AccountStatus = p.AvailableCredit > 0 ? "فعال" : "—",
+                            AccountStatus = "—",
                             PersonType = p.PersonType,
                             IsEmpty = false
                         };
@@ -336,6 +337,7 @@ namespace Taadol.Views
                 return;
             }
 
+            // صفحه اول
             pages.Add(new PageItem
             {
                 PageNumber = 1,
@@ -343,6 +345,15 @@ namespace Taadol.Views
                 IsCurrent = _currentPage == 1
             });
 
+            // سه نقطه اول — همیشه ثابت
+            pages.Add(new PageItem
+            {
+                PageNumber = 0,
+                PageNumberDisplay = "...",
+                IsCurrent = false
+            });
+
+            // صفحات وسط (۳ تا)
             int middleStart = _currentPage - 1;
             int middleEnd = _currentPage + 1;
 
@@ -355,16 +366,6 @@ namespace Taadol.Views
             {
                 middleStart = _totalPages - 3;
                 middleEnd = _totalPages - 1;
-            }
-
-            if (middleStart > 2)
-            {
-                pages.Add(new PageItem
-                {
-                    PageNumber = 0,
-                    PageNumberDisplay = "...",
-                    IsCurrent = false
-                });
             }
 
             for (int i = middleStart; i <= middleEnd; i++)
@@ -380,16 +381,15 @@ namespace Taadol.Views
                 }
             }
 
-            if (middleEnd < _totalPages - 1)
+            // سه نقطه دوم — همیشه ثابت
+            pages.Add(new PageItem
             {
-                pages.Add(new PageItem
-                {
-                    PageNumber = 0,
-                    PageNumberDisplay = "...",
-                    IsCurrent = false
-                });
-            }
+                PageNumber = 0,
+                PageNumberDisplay = "...",
+                IsCurrent = false
+            });
 
+            // صفحه آخر
             pages.Add(new PageItem
             {
                 PageNumber = _totalPages,
@@ -486,36 +486,8 @@ namespace Taadol.Views
         {
             if (PersonsDataGrid.SelectedItem is PersonItem item && !item.IsEmpty)
             {
-                // باز کردن فرم ویرایش شخص در MainWindow
                 var mainWindow = Window.GetWindow(this) as MainWindow;
-                if (mainWindow != null)
-                {
-                    // استفاده از reflection یا متد عمومی برای دسترسی به MainContent
-                    // فعلاً NewPersonView رو در حالت ویرایش می‌سازیم
-                    var editView = new NewPersonView();
-                    editView.LoadPerson(item.Id);
-
-                    // پیدا کردن ContentControl اصلی در MainWindow و قرار دادن فرم
-                    var mainContent = mainWindow.FindName("MainContent") as ContentControl;
-                    if (mainContent != null)
-                    {
-                        mainContent.Content = editView;
-
-                        var mainContentBorder = mainWindow.FindName("MainContentBorder") as Border;
-                        if (mainContentBorder != null)
-                            mainContentBorder.Visibility = Visibility.Visible;
-                    }
-                    else
-                    {
-                        MessageBox.Show($"ویرایش شخص: {item.FullName} (ID: {item.Id})",
-                            "ویرایش شخص", MessageBoxButton.OK, MessageBoxImage.Information);
-                    }
-                }
-                else
-                {
-                    MessageBox.Show($"ویرایش شخص: {item.FullName} (ID: {item.Id})",
-                        "ویرایش شخص", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
+                mainWindow?.NavigateToEditPerson(item.Id);
             }
             else
             {
@@ -560,6 +532,14 @@ namespace Taadol.Views
                 "عملیات", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
+        private void CheckBoxBorder_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (sender is System.Windows.FrameworkElement fe && fe.DataContext is PersonItem item)
+            {
+                item.IsSelected = !item.IsSelected;
+            }
+        }
+
         private void BtnNextPage_Click(object sender, RoutedEventArgs e)
         {
             if (_currentPage < _totalPages)
@@ -590,6 +570,15 @@ namespace Taadol.Views
         }
 
         private void PersonsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e) { }
+
+        private void PersonsDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (PersonsDataGrid.SelectedItem is PersonItem item && !item.IsEmpty)
+            {
+                var mainWindow = Window.GetWindow(this) as MainWindow;
+                mainWindow?.NavigateToEditPerson(item.Id);
+            }
+        }
 
         // ======================================================
         //  Popup Filter Handlers (وضعیت / استان / شهر)
