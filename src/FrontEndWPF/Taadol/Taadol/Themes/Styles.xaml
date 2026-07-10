@@ -1578,4 +1578,106 @@
         </Setter>
     </Style>
 
+    <!-- ═══════════════════════════════════════════════════
+         اسکرول بار مینیمال — رنگ تم برنامه (#2667FF)
+    ════════════════════════════════════════════════════ -->
+    <Style x:Key="MinimalScrollBar" TargetType="ScrollBar">
+        <Setter Property="Width" Value="6" />
+        <Setter Property="MinWidth" Value="6" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ScrollBar">
+                    <Grid>
+                        <Track x:Name="PART_Track"
+                               IsDirectionReversed="True">
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton Command="ScrollBar.PageUpCommand"
+                                              Opacity="0">
+                                    <RepeatButton.Template>
+                                        <ControlTemplate>
+                                            <Border Background="{StaticResource AccentBrush}"
+                                                    CornerRadius="3" />
+                                        </ControlTemplate>
+                                    </RepeatButton.Template>
+                                </RepeatButton>
+                            </Track.DecreaseRepeatButton>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton Command="ScrollBar.PageDownCommand"
+                                              Opacity="0">
+                                    <RepeatButton.Template>
+                                        <ControlTemplate>
+                                            <Border Background="{StaticResource AccentBrush}"
+                                                    CornerRadius="3" />
+                                        </ControlTemplate>
+                                    </RepeatButton.Template>
+                                </RepeatButton>
+                            </Track.IncreaseRepeatButton>
+                            <Track.Thumb>
+                                <Thumb>
+                                    <Thumb.Template>
+                                        <ControlTemplate TargetType="Thumb">
+                                            <Border x:Name="ThumbBorder"
+                                                    Width="6"
+                                                    CornerRadius="3"
+                                                    Background="#C0C0C0"
+                                                    Margin="0">
+                                                <Border.Triggers>
+                                                    <EventTrigger RoutedEvent="MouseEnter">
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <ColorAnimation To="#2667FF"
+                                                                                Duration="0:0:0.2"
+                                                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                                                Storyboard.TargetName="ThumbBorder" />
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </EventTrigger>
+                                                    <EventTrigger RoutedEvent="MouseLeave">
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <ColorAnimation To="#C0C0C0"
+                                                                                Duration="0:0:0.2"
+                                                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                                                Storyboard.TargetName="ThumbBorder" />
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </EventTrigger>
+                                                </Border.Triggers>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Thumb.Template>
+                                </Thumb>
+                            </Track.Thumb>
+                        </Track>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="MinimalScrollViewer" TargetType="ScrollViewer">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ScrollViewer">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ScrollContentPresenter Grid.Column="0"
+                                                Content="{TemplateBinding Content}" />
+                        <ScrollBar x:Name="PART_VerticalScrollBar"
+                                   Grid.Column="1"
+                                   Style="{StaticResource MinimalScrollBar}"
+                                   Value="{TemplateBinding VerticalOffset}"
+                                   Maximum="{TemplateBinding ScrollableHeight}"
+                                   ViewportSize="{TemplateBinding ViewportHeight}"
+                                   Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
+                                   Width="6" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>

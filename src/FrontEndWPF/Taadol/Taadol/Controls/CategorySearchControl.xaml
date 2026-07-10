@@ -951,8 +951,11 @@
                             Height="1"
                             Background="#E9F0FF" />
 
-                    <ScrollViewer Grid.Row="2"
-                                  VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer x:Name="CategoryScrollViewer"
+                                  Grid.Row="2"
+                                  Style="{StaticResource MinimalScrollViewer}"
+                                  VerticalScrollBarVisibility="Auto"
+                                  PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
                         <TreeView x:Name="CategoryTree"
                                   BorderThickness="0"
                                   Background="Transparent"
