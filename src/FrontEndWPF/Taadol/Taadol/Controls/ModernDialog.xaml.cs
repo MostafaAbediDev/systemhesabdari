@@ -132,6 +132,23 @@ namespace Taadol.Controls
             return dlg.IsConfirmed ? dlg.InputText : null;
         }
 
+        /// <summary>
+        /// نمایش پیام ساده با یک دکمه تأیید.
+        /// </summary>
+        public static void ShowMessage(
+            string title,
+            string message,
+            DialogType type = DialogType.Primary,
+            string confirmText = "باشه",
+            Window owner = null)
+        {
+            var dlg = new ModernDialog();
+            dlg.Configure(title, message, type, confirmText, "", showInput: false);
+            dlg.CancelButton.Visibility = Visibility.Collapsed;
+            if (owner != null) dlg.Owner = owner;
+            dlg.ShowDialog();
+        }
+
         // ==================== Configuration ====================
 
         private void Configure(

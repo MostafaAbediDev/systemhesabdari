@@ -134,8 +134,48 @@
                 Visibility="Collapsed">
 
             <ContentControl x:Name="MainContent"
-                            VerticalAlignment="Top" />
+                            VerticalAlignment="Stretch"
+                            HorizontalAlignment="Stretch" />
 
+        </Border>
+
+        <!-- Toast Container — بالای صفحه، روی همه چیز -->
+        <StackPanel x:Name="ToastContainer"
+                    Grid.Row="0"
+                    Grid.RowSpan="2"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    VerticalAlignment="Top"
+                    HorizontalAlignment="Center"
+                    Margin="0,20,0,0"
+                    IsHitTestVisible="False"
+                    Panel.ZIndex="99" />
+
+        <!-- ═══ Modal Overlay ═══ -->
+        <Border x:Name="ModalOverlay"
+                Grid.Row="0"
+                Grid.RowSpan="2"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Background="#66000000"
+                Visibility="Collapsed"
+                Panel.ZIndex="90"
+                MouseLeftButtonDown="ModalOverlay_MouseLeftButtonDown">
+            <Border x:Name="ModalPanel"
+                    Background="White"
+                    CornerRadius="12"
+                    ClipToBounds="True"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    MaxWidth="1200"
+                    MaxHeight="820"
+                    MinWidth="700"
+                    MinHeight="500"
+                    PreviewMouseLeftButtonDown="ModalPanel_PreviewMouseLeftButtonDown">
+                <ContentControl x:Name="ModalContent"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch" />
+            </Border>
         </Border>
     </Grid>
 </Window>

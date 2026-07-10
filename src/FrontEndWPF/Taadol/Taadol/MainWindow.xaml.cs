@@ -1,5 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using Taadol.Controls;
 using Taadol.Services;
 using Taadol.Views;
 namespace Taadol
@@ -13,6 +16,8 @@ namespace Taadol
         public MainWindow()
         {
             InitializeComponent();
+
+            ToastManager.Initialize(ToastContainer);
 
             _factory = new ViewFactory(App.ServiceProvider);
 
@@ -69,7 +74,75 @@ namespace Taadol
             };
         }
 
+        public void NavigateTo(string tag)
+        {
+            MainContentBorder.Visibility = Visibility.Visible;
+            _nav.Navigate(tag);
+        }
 
+        public void NavigateToEditPerson(long personId)
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine($"[DEBUG] NavigateToEditPerson called with personId={personId}");
+                ToastManager.Info($"Opening edit for person {personId}...");
+
+                var editView = new EditPersonView(personId);
+                System.Diagnostics.Debug.WriteLine("[DEBUG] EditPersonView created successfully");
+                ModalContent.Content = editView;
+                System.Diagnostics.Debug.WriteLine("[DEBUG] ModalContent.Content set");
+                ModalOverlay.Visibility = Visibility.Visible;
+                System.Diagnostics.Debug.WriteLine("[DEBUG] ModalOverlay set to Visible");
+                
+                // Debug: check ContentControl size after layout
+                Dispatcher.InvokeAsync(() =>
+                {
+                    System.Diagnostics.Debug.WriteLine($"[DEBUG] ModalContent ActualWidth={ModalContent.ActualWidth}, ActualHeight={ModalContent.ActualHeight}");
+                    System.Diagnostics.Debug.WriteLine($"[DEBUG] ModalOverlay ActualWidth={ModalOverlay.ActualWidth}, ActualHeight={ModalOverlay.ActualHeight}");
+                }, System.Windows.Threading.DispatcherPriority.Loaded);
+                
+                ToastManager.Success("فرم ویرایش باز شد");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[ERROR] {ex}");
+                ToastManager.Error($"Error: {ex.Message}");
+                
+                ModalContent.Content = new Border
+                {
+                    Background = System.Windows.Media.Brushes.Red,
+                    MinWidth = 400,
+                    MinHeight = 300,
+                    Child = new TextBlock
+                    {
+                        Text = $"ERROR:\n{ex.Message}",
+                        Foreground = System.Windows.Media.Brushes.White,
+                        FontSize = 16,
+                        HorizontalAlignment = System.Windows.HorizontalAlignment.Center,
+                        VerticalAlignment = System.Windows.VerticalAlignment.Center,
+                        TextWrapping = TextWrapping.Wrap,
+                        Margin = new Thickness(20)
+                    }
+                };
+                ModalOverlay.Visibility = Visibility.Visible;
+            }
+        }
+
+        public void CloseModal()
+        {
+            ModalOverlay.Visibility = Visibility.Collapsed;
+            ModalContent.Content = null;
+        }
+
+        private void ModalOverlay_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            CloseModal();
+        }
+
+        private void ModalPanel_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            e.Handled = true;
+        }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {

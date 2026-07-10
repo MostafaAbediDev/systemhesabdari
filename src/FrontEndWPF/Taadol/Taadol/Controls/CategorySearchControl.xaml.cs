@@ -910,6 +910,19 @@ namespace Taadol.Controls
             }
         }
 
+        private void ScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            var scrollViewer = sender as ScrollViewer;
+            if (scrollViewer == null) return;
+
+            if (e.Delta > 0)
+                scrollViewer.LineUp();
+            else
+                scrollViewer.LineDown();
+
+            e.Handled = true;
+        }
+
         // ==================== Public API ====================
 
         public void SetSelectedCategory(string title)

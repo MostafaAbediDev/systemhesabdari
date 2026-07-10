@@ -513,7 +513,8 @@
                               ScrollViewer.HorizontalScrollBarVisibility="Auto"
                               ScrollViewer.VerticalScrollBarVisibility="Hidden"
                               FontFamily="{StaticResource IRANSans}"
-                              SelectionChanged="PersonsDataGrid_SelectionChanged">
+                              SelectionChanged="PersonsDataGrid_SelectionChanged"
+                              MouseDoubleClick="PersonsDataGrid_MouseDoubleClick">
 
                         <DataGrid.Resources>
 
@@ -690,6 +691,85 @@
 
 
                         <DataGrid.Columns>
+                            <DataGridTemplateColumn Header=""
+                                                    Width="60">
+                                <DataGridTemplateColumn.HeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader"
+                                           BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                                        <Setter Property="Tag"
+                                                Value="False" />
+                                        <Setter Property="HorizontalContentAlignment"
+                                                Value="Center" />
+                                    </Style>
+                                </DataGridTemplateColumn.HeaderStyle>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border x:Name="CheckBoxBorder"
+                                                Width="22"
+                                                Height="22"
+                                                BorderThickness="2"
+                                                CornerRadius="4"
+                                                Cursor="Hand"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                MouseLeftButtonUp="CheckBoxBorder_MouseLeftButtonUp">
+
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Background"
+                                                            Value="White" />
+                                                    <Setter Property="BorderBrush"
+                                                            Value="#CBD5E1" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsSelected}"
+                                                                     Value="True">
+                                                            <Setter Property="Background"
+                                                                    Value="White" />
+                                                            <Setter Property="BorderBrush"
+                                                                    Value="#2ECC71" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding IsEmpty}"
+                                                                     Value="True">
+                                                            <Setter Property="Visibility"
+                                                                    Value="Collapsed" />
+                                                        </DataTrigger>
+                                                        <Trigger Property="IsMouseOver"
+                                                                 Value="True">
+                                                            <Setter Property="Background"
+                                                                    Value="#F0F5FF" />
+                                                            <Setter Property="BorderBrush"
+                                                                    Value="#2ECC71" />
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+
+                                            <svg:SvgViewbox x:Name="CheckMark"
+                                                            Width="10"
+                                                            Height="10"
+                                                            Source="/Assets/Icons/Line.svg"
+                                                            FlowDirection="LeftToRight"
+                                                            HorizontalAlignment="Center"
+                                                            VerticalAlignment="Center">
+                                                <svg:SvgViewbox.Style>
+                                                    <Style TargetType="svg:SvgViewbox">
+                                                        <Setter Property="Visibility"
+                                                                Value="Collapsed" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsSelected}"
+                                                                         Value="True">
+                                                                <Setter Property="Visibility"
+                                                                        Value="Visible" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </svg:SvgViewbox.Style>
+                                            </svg:SvgViewbox>
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
                             <DataGridTextColumn Header="#"
                                                 Width="50"
                                                 Binding="{Binding RowNumberDisplay}"
