@@ -2,7 +2,8 @@
 {
     public enum PictureOwnerType
     {
-        Product = 1
+        Product = 1,
+        Person =2
     }
 
 }

@@ -2,6 +2,7 @@
 {
     public enum PictureOwnerTypeDTO
     {
-        Product = 1
+        Product = 1,
+        Person = 2
     }
 }
