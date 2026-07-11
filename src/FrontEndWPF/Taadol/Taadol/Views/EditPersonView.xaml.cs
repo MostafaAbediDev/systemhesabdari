@@ -131,7 +131,7 @@ namespace Taadol.Views
             DataContext = this;
 
             Loaded += OnLoaded;
-            
+
             // Debug toast
             System.Diagnostics.Debug.WriteLine($"[DEBUG] EditPersonView constructor called for personId={personId}");
             ToastManager.Info($"EditPersonView created for ID: {personId}");
@@ -573,7 +573,7 @@ namespace Taadol.Views
             return true;
         }
 
-private void OnImageSelected(object sender, RoutedEventArgs e) { }
+        private void OnImageSelected(object sender, RoutedEventArgs e) { }
         private void OnImageRemoved(object sender, RoutedEventArgs e) { }
         private void ImagePickerControl_Loaded(object sender, RoutedEventArgs e) { }
 

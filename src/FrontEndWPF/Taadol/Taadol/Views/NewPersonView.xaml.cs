@@ -16,6 +16,8 @@ using PersonManagement.Application.Contract.Persons;
 using PersonManagement.Application.Contract.PersonTypes;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using GeneralInfoManagement.Application.Contract.Picture;
+using System.IO;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -54,7 +56,8 @@ namespace Taadol.Views
         private readonly ICodeGeneratorService _codeGeneratorService;
         private readonly IPersonCategoryApplication _personCategoryApplication;
         private long? _selectedPersonCategoryId;
-
+        private readonly IPictureApplication _pictureApplication;
+        private string? _selectedImagePath;
         // ===== Command =====
         public ICommand SavePersonCommand { get; }
 
@@ -269,7 +272,7 @@ namespace Taadol.Views
             _personBankApplication = App.ServiceProvider.GetRequiredService<IPersonBankApplication>();
             _provinceRepository = App.ServiceProvider.GetRequiredService<IProvinceRepository>();
             _cityRepository = App.ServiceProvider.GetRequiredService<ICityRepository>();
-
+            _pictureApplication = App.ServiceProvider.GetRequiredService<IPictureApplication>();
             // سرویس اختیاری — اگه BankManagementBoostrapper در App.xaml.cs ثبت نشده باشه،
             // null برمی‌گردانه و فرم باز می‌شه (بدون لیست شعب بانک)
             _bankBranchApplication = App.ServiceProvider.GetService<IBankBranchApplication>();
@@ -665,6 +668,7 @@ namespace Taadol.Views
                     SaveContacts(personIdForChildren);
                     SaveAddress(personIdForChildren);
                     SaveBanks(personIdForChildren);
+                   // SavePersonPicture(personIdForChildren);  // ← جدید
                 }
                 else
                 {
@@ -1070,7 +1074,9 @@ namespace Taadol.Views
             Address = "";
             SelectedProvinceId = 0;
             SelectedCityId = 0;
-
+            _selectedImagePath = null;
+            if (PersonImagePicker != null)
+                PersonImagePicker.ImagePath = null;
             MainBankName = "";
             MainBranchName = "";
             MainCardNumber = "";
@@ -1291,8 +1297,15 @@ namespace Taadol.Views
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e) { }
         private void MyDatePicker_DateChanged(object sender, RoutedEventArgs e) { }
         private void Radio_Checked(object sender, RoutedEventArgs e) { }
-        private void OnImageSelected(object sender, RoutedEventArgs e) { }
-        private void OnImageRemoved(object sender, RoutedEventArgs e) { }
+        private void OnImageSelected(object sender, RoutedEventArgs e)
+        {
+            _selectedImagePath = PersonImagePicker?.ImagePath;
+        }
+
+        private void OnImageRemoved(object sender, RoutedEventArgs e)
+        {
+            _selectedImagePath = null;
+        }
         private void ImagePickerControl_Loaded(object sender, RoutedEventArgs e) { }
         private void TextBox_TextChanged_1(object sender, TextChangedEventArgs e) { }
         private void TextBox_TextChanged_2(object sender, TextChangedEventArgs e) { }

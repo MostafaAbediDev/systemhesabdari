@@ -507,9 +507,10 @@
                     <StackPanel Grid.Column="1"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Top">
-                        <controls:ImagePickerControl ImageSelected="OnImageSelected"
-                                                     ImageRemoved="OnImageRemoved"
-                                                     Loaded="ImagePickerControl_Loaded" />
+                        <controls:ImagePickerControl x:Name="PersonImagePicker"   
+                            ImageSelected="OnImageSelected"
+                             ImageRemoved="OnImageRemoved"
+                             Loaded="ImagePickerControl_Loaded" />
                     </StackPanel>
                 </Grid>
             </Border>
