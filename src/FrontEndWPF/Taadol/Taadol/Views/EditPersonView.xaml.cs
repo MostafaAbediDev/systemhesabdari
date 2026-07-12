@@ -38,12 +38,12 @@ namespace Taadol.Views
         private readonly ICityRepository _cityRepository;
         private readonly IBankBranchApplication? _bankBranchApplication;
         private readonly IPersonCategoryApplication _personCategoryApplication;
-
+        private bool _isUpdatingDefault;
         private long _personId;
         private long? _selectedPersonCategoryId;
         private List<ContactTypeViewModel> _contactTypes = new();
         private readonly Dictionary<string, long> _contactTypeByName = new(StringComparer.OrdinalIgnoreCase);
-
+        public ObservableCollection<BankAccountRow> BankAccounts { get; } = new();
         public ICommand SaveCommand { get; }
 
         public BulkObservableCollection<BranchComboItem> Branches { get; } = new();
@@ -108,6 +108,124 @@ namespace Taadol.Views
         public string MainAccountNumber { get => _mainAccountNumber; set { _mainAccountNumber = value; OnPropertyChanged(); } }
         public bool MainBankIsDefault { get => _mainBankIsDefault; set { _mainBankIsDefault = value; OnPropertyChanged(); } }
         public long SelectedBankBranchId { get => _selectedBankBranchId; set { _selectedBankBranchId = value; OnPropertyChanged(); } }
+        private static bool IsBankAccountRowEmpty(BankAccountRow row)
+        {
+            return row.BankBranchId <= 0
+                && string.IsNullOrWhiteSpace(row.BankName)
+                && string.IsNullOrWhiteSpace(row.BranchName)
+                && string.IsNullOrWhiteSpace(row.CardNumber)
+                && string.IsNullOrWhiteSpace(row.Shaba)
+                && string.IsNullOrWhiteSpace(row.AccountNumber);
+        }
+        private void RemoveMainBankButton_Click(object sender, RoutedEventArgs e)
+        {
+            MainBankName = "";
+            MainCardNumber = "";
+            MainShaba = "";
+            MainAccountNumber = "";
+            MainBankIsDefault = false;
+            SelectedBankBranchId = 0;
+        }
+        private void AddBankAccountFromRow_Click(object sender, RoutedEventArgs e)
+        {
+            if (HasEmptyBankRow())
+            {
+                MessageBox.Show("لطفاً ابتدا ردیف‌های قبلی را تکمیل کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            if (sender is Button btn && btn.DataContext is BankAccountRow currentRow)
+            {
+                var currentIndex = BankAccounts.IndexOf(currentRow);
+                BankAccounts.Insert(currentIndex, new BankAccountRow());
+            }
+            else
+            {
+                BankAccounts.Insert(0, new BankAccountRow());
+            }
+        }
+        private void RemoveBankAccount_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is BankAccountRow row)
+                BankAccounts.Remove(row);
+        }
+        private void MainDefaultToggle_Checked(object sender, RoutedEventArgs e)
+        {
+            if (_isUpdatingDefault || !MainBankIsDefault) return;
+            _isUpdatingDefault = true;
+
+            var defaultRows = BankAccounts.Where(r => r.IsDefault).ToList();
+            if (defaultRows.Count > 0)
+            {
+                var result = MessageBox.Show("فقط یک حساب می‌تواند پیش‌فرض باشد. آیا پیش‌فرض قبلی لغو شود؟", "تغییر حساب پیش‌فرض", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (result == MessageBoxResult.Yes)
+                    foreach (var row in defaultRows) row.IsDefault = false;
+                else
+                    MainBankIsDefault = false;
+            }
+
+            _isUpdatingDefault = false;
+        }
+        private void RowDefaultToggle_Checked(object sender, RoutedEventArgs e)
+        {
+            if (_isUpdatingDefault) return;
+            if (sender is not ToggleButton toggle) return;
+            if (toggle.DataContext is not BankAccountRow row || !row.IsDefault) return;
+
+            _isUpdatingDefault = true;
+
+            var otherRows = BankAccounts.Where(r => r.IsDefault && r != row).ToList();
+            bool hasMainDefault = MainBankIsDefault;
+
+            if (otherRows.Count > 0 || hasMainDefault)
+            {
+                var result = MessageBox.Show("فقط یک حساب می‌تواند پیش‌فرض باشد. آیا پیش‌فرض قبلی لغو شود؟", "تغییر حساب پیش‌فرض", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (result == MessageBoxResult.Yes)
+                {
+                    if (hasMainDefault) MainBankIsDefault = false;
+                    foreach (var other in otherRows) other.IsDefault = false;
+                }
+                else
+                {
+                    row.IsDefault = false;
+                }
+            }
+
+            _isUpdatingDefault = false;
+        }
+        private void AddBankAccountButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (!MainBankHasData())
+            {
+                MessageBox.Show("لطفاً ابتدا اطلاعات حساب بانکی را وارد کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            if (HasEmptyBankRow())
+            {
+                MessageBox.Show("لطفاً ابتدا ردیف‌های قبلی را تکمیل کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            BankAccounts.Insert(0, new BankAccountRow
+            {
+                BankBranchId = SelectedBankBranchId,
+                BankName = MainBankName ?? "",
+                CardNumber = MainCardNumber ?? "",
+                Shaba = MainShaba ?? "",
+                AccountNumber = MainAccountNumber ?? "",
+                IsDefault = MainBankIsDefault
+            });
+
+            MainBankName = "";
+            MainCardNumber = "";
+            MainShaba = "";
+            MainAccountNumber = "";
+            MainBankIsDefault = false;
+            SelectedBankBranchId = 0;
+        }
+        private bool MainBankHasData() =>
+    !string.IsNullOrWhiteSpace(MainCardNumber) || !string.IsNullOrWhiteSpace(MainShaba);
+
+        private bool HasEmptyBankRow() => BankAccounts.Any(IsBankAccountRowEmpty);
 
         public EditPersonView(long personId)
         {
@@ -353,21 +471,37 @@ namespace Taadol.Views
                 try
                 {
                     var banks = _personBankApplication.GetByPersonId(_personId) ?? new List<PersonBankViewModel>();
-                    var bank = banks.FirstOrDefault();
-                    if (bank != null)
+                    if (banks.Count > 0)
                     {
-                        MainBankName = bank.BankName ?? "";
-                        MainCardNumber = bank.CardNumber ?? "";
-                        MainShaba = bank.Shaba ?? "";
-                        MainAccountNumber = bank.AccountNumber ?? "";
-                        MainBankIsDefault = bank.IsDefault;
-                        if (bank.BankBranchId > 0)
-                            SelectedBankBranchId = bank.BankBranchId;
+                        var mainBank = banks.FirstOrDefault(b => b.IsDefault) ?? banks[0];
+
+                        MainBankName = mainBank.BankName ?? "";
+                        MainCardNumber = mainBank.CardNumber ?? "";
+                        MainShaba = mainBank.Shaba ?? "";
+                        MainAccountNumber = mainBank.AccountNumber ?? "";
+                        MainBankIsDefault = mainBank.IsDefault;
+                        if (mainBank.BankBranchId > 0)
+                            SelectedBankBranchId = mainBank.BankBranchId;
+
+                        BankAccounts.Clear();
+                        foreach (var b in banks.Where(b => b.Id != mainBank.Id))
+                        {
+                            BankAccounts.Add(new BankAccountRow
+                            {
+                                BankBranchId = b.BankBranchId,
+                                BankName = b.BankName ?? "",
+                                CardNumber = b.CardNumber ?? "",
+                                Shaba = b.Shaba ?? "",
+                                AccountNumber = b.AccountNumber ?? "",
+                                IsDefault = b.IsDefault
+                            });
+                        }
                     }
                 }
                 catch (Exception bankEx)
                 {
                     System.Diagnostics.Debug.WriteLine("Bank load failed: " + bankEx.Message);
+                    ToastManager.Warning("بارگذاری اطلاعات بانک ناموفق بود (مشکل بک‌اند).");
                 }
             }
             catch (Exception ex)
@@ -482,7 +616,7 @@ namespace Taadol.Views
 
                 SaveContacts(_personId);
                 SaveAddress(_personId);
-                SaveBank(_personId);
+                SaveBanks(_personId);
 
                 MessageBox.Show("ویرایش شخص با موفقیت انجام شد.", "موفقیت", MessageBoxButton.OK, MessageBoxImage.Information);
 
@@ -535,23 +669,63 @@ namespace Taadol.Views
             }
         }
 
-        private void SaveBank(long personId)
+        private void SaveBanks(long personId)
         {
-            var existing = _personBankApplication.GetByPersonId(personId) ?? new List<PersonBankViewModel>();
-            foreach (var b in existing)
-                _personBankApplication.Remove(b.Id);
+            try
+            {
+                var existing = _personBankApplication.GetByPersonId(personId) ?? new List<PersonBankViewModel>();
+                foreach (var b in existing)
+                    _personBankApplication.Remove(b.Id);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Bank existing load failed: " + ex.Message);
+                ToastManager.Warning("حذف بانک‌های قبلی ناموفق بود (مشکل بک‌اند).");
+            }
 
+            // حساب اصلی
             if (!string.IsNullOrWhiteSpace(MainShaba) || !string.IsNullOrWhiteSpace(MainCardNumber))
             {
-                _personBankApplication.Create(new CreatePersonBank
+                TryCreateBankAccount(personId, SelectedBankBranchId, MainBankName, MainAccountNumber, MainCardNumber, MainShaba, MainBankIsDefault);
+            }
+
+            // حساب‌های اضافه‌شده (هر ردیف BankBranchId خودش رو داره)
+            foreach (var row in BankAccounts)
+            {
+                if (string.IsNullOrWhiteSpace(row.Shaba) && string.IsNullOrWhiteSpace(row.CardNumber))
+                    continue;
+
+                TryCreateBankAccount(personId, row.BankBranchId, row.BankName, row.AccountNumber, row.CardNumber, row.Shaba, row.IsDefault);
+            }
+        }
+
+        private void TryCreateBankAccount(long personId, long bankBranchId, string bankName, string accountNumber, string cardNumber, string shaba, bool isDefault)
+        {
+            if (bankBranchId <= 0)
+            {
+                System.Diagnostics.Debug.WriteLine(
+                    $"⚠️ Bank account not saved: BankBranch is required. BankBranchId = 0, BankName = {bankName}");
+                return;
+            }
+
+            try
+            {
+                var result = _personBankApplication.Create(new CreatePersonBank
                 {
                     PersonId = personId,
-                    BankBranchId = SelectedBankBranchId,
-                    CardNumber = MainCardNumber ?? "",
-                    Shaba = MainShaba ?? "",
-                    AccountNumber = MainAccountNumber ?? "",
-                    IsDefault = MainBankIsDefault
+                    BankBranchId = bankBranchId,
+                    AccountNumber = accountNumber ?? "",
+                    CardNumber = cardNumber ?? "",
+                    Shaba = shaba ?? "",
+                    IsDefault = isDefault
                 });
+
+                if (!result.IsSucceeded)
+                    System.Diagnostics.Debug.WriteLine($"❌ Bank save FAILED: {result.Message}");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ Bank save EXCEPTION: {ex.Message}");
             }
         }
 
@@ -583,10 +757,31 @@ namespace Taadol.Views
             mainWindow?.CloseModal();
         }
 
-        private void RootBorder_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        // ★ Clip داینامیک برای حفظ گوشه‌های گرد در همه حالت‌ها
+        // (حتی هنگام اسکرول و حرکت ScrollViewer)
+        private void RootBorder_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            e.Handled = true;
+            var border = sender as Border;
+            if (border == null) return;
+
+            var width = border.ActualWidth;
+            var height = border.ActualHeight;
+            if (width <= 0 || height <= 0) return;
+
+            // RectangleGeometry با RadiusX/RadiusY برای clip واقعی گوشه‌های گرد
+            border.Clip = new System.Windows.Media.RectangleGeometry(
+                new Rect(0, 0, width, height),
+                12, 12);
         }
+        private void UpdatePersonnelSectionVisibility()
+        {
+            if (PersonnelSection == null) return;
+            PersonnelSection.Visibility =
+                (PersonTypePersonnel?.IsChecked == true)
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
+        }
+        // ★ جلوگیری از بسته شدن مودال وقتی روی خود فرم کلیک می‌شه
 
         private void MyDatePicker_DateChanged(object sender, RoutedEventArgs e) { }
 
@@ -618,13 +813,17 @@ namespace Taadol.Views
 
         public class BankAccountRow : INotifyPropertyChanged
         {
+            private long _bankBranchId;
             private string _bankName = "";
+            private string _branchName = "";
             private string _cardNumber = "";
             private string _shaba = "";
             private string _accountNumber = "";
             private bool _isDefault = false;
 
+            public long BankBranchId { get => _bankBranchId; set { _bankBranchId = value; OnPropertyChanged(); } }
             public string BankName { get => _bankName; set { _bankName = value; OnPropertyChanged(); } }
+            public string BranchName { get => _branchName; set { _branchName = value; OnPropertyChanged(); } }
             public string CardNumber { get => _cardNumber; set { _cardNumber = value; OnPropertyChanged(); } }
             public string Shaba { get => _shaba; set { _shaba = value; OnPropertyChanged(); } }
             public string AccountNumber { get => _accountNumber; set { _accountNumber = value; OnPropertyChanged(); } }

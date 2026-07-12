@@ -668,7 +668,7 @@ namespace Taadol.Views
                     SaveContacts(personIdForChildren);
                     SaveAddress(personIdForChildren);
                     SaveBanks(personIdForChildren);
-                   // SavePersonPicture(personIdForChildren);  // ← جدید
+                    SavePersonPicture(personIdForChildren);  // ← جدید
                 }
                 else
                 {
@@ -699,7 +699,66 @@ namespace Taadol.Views
                 }
             }
         }
+        /// <summary>
+        /// ★ ذخیره عکس شخص.
+        /// فایل انتخاب‌شده توسط کاربر در پوشه‌ی Pictures/Persons کنار فایل اجرایی کپی می‌شه
+        /// و مسیر نسبی اون در جدول Pictures با OwnerType=Person ذخیره می‌شه.
+        /// </summary>
+        private void SavePersonPicture(long personId)
+        {
+            // اگه کاربر عکسی انتخاب نکرده، رد شو
+            if (string.IsNullOrWhiteSpace(_selectedImagePath) || !File.Exists(_selectedImagePath))
+            {
+                System.Diagnostics.Debug.WriteLine("📷 SavePersonPicture: No image selected, skipping.");
+                return;
+            }
 
+            try
+            {
+                // ساخت پوشه‌ی مقصد در کنار فایل اجرایی
+                var appDir = AppDomain.CurrentDomain.BaseDirectory;
+                var picturesDir = Path.Combine(appDir, "Pictures", "Persons");
+                Directory.CreateDirectory(picturesDir);
+
+                // ساخت نام فایل یکتا با timestamp + personId
+                var ext = Path.GetExtension(_selectedImagePath); // مثلاً ".jpg"
+                if (string.IsNullOrWhiteSpace(ext)) ext = ".jpg";
+                var fileName = $"person_{personId}_{DateTime.Now:yyyyMMdd_HHmmss}{ext}";
+                var destPath = Path.Combine(picturesDir, fileName);
+
+                // کپی فایل (حتی اگه مبدا و مقصد یکی باشن، با overwrite=true)
+                File.Copy(_selectedImagePath, destPath, overwrite: true);
+
+                // مسیر نسبی برای ذخیره در DB
+                var relativeUrl = $"Pictures/Persons/{fileName}";
+
+                // ثبت در جدول Pictures
+                // ✅ بک‌اند آپدیت شده و Person = 2 به PictureOwnerTypeDTO اضافه شده
+                var result = _pictureApplication.Create(new CreatePicture
+                {
+                    OwnerId = personId,
+                    OwnerType = PictureOwnerTypeDTO.Person,
+                    Url = relativeUrl
+                });
+
+                if (!result.IsSucceeded)
+                {
+                    System.Diagnostics.Debug.WriteLine($"📷 SavePersonPicture: Failed to save picture record — {result.Message}");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine($"📷 SavePersonPicture: Picture saved successfully — Url={relativeUrl}");
+                }
+
+                // پاک کردن مسیر بعد از ثبت
+                _selectedImagePath = null;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"📷 SavePersonPicture ERROR: {ex.Message}");
+                // عکس optional هست، نباید کل عملیات ثبت رو لغو کنه
+            }
+        }
         private static string BuildFullExceptionMessage(Exception ex)
         {
             if (ex == null) return "خطای ناشناخته.";

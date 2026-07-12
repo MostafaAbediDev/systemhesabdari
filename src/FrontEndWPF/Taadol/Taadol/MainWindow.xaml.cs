@@ -136,12 +136,9 @@ namespace Taadol
 
         private void ModalOverlay_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            CloseModal();
-        }
-
-        private void ModalPanel_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            e.Handled = true;
+            // فقط اگر روی پس‌زمینه تیره کلیک شد (نه روی خود فرم) ببند
+            if (e.OriginalSource == ModalOverlay)
+                CloseModal();
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
