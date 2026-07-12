@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using BankManagement.Infrastructure.EFCore.Mapping;
+using Microsoft.EntityFrameworkCore;
 using PersonManagement.Domain.Person.ContactTypeAgg;
 using PersonManagement.Domain.Person.PersonAddressAgg;
 using PersonManagement.Domain.Person.PersonAgg;
@@ -30,8 +31,13 @@ namespace PersonManagement.Infrastructure.EFCore
         {
             modelBuilder.Ignore<GeneralInfoManagement.Domain.BaseInfo.BranchesAgg.Location>();
 
+
+            var bankAssembly = typeof(BankBrancheMapping).Assembly;
+            modelBuilder.ApplyConfigurationsFromAssembly(bankAssembly);
+
             var assembly = typeof(PersonMapping).Assembly;
             modelBuilder.ApplyConfigurationsFromAssembly(assembly);
+
             base.OnModelCreating(modelBuilder);
         }
     }
