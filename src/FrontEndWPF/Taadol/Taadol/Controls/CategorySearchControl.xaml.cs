@@ -81,14 +81,27 @@ namespace Taadol.Controls
         /// </summary>
         public void LoadFromTreeDto(List<PersonCategoryTreeViewModel> tree, int level = 0)
         {
+            // ★ جلوگیری از NullReferenceException اگه tree برابر null باشه
+            if (tree == null)
+            {
+                System.Diagnostics.Debug.WriteLine("⚠️ LoadFromTreeDto: tree is null");
+                _allCategories = new List<CategoryItem>();
+                BuildTree(_allCategories);
+                return;
+            }
+
+            System.Diagnostics.Debug.WriteLine($"📊 LoadFromTreeDto: loading {tree.Count} root categories");
+
             _allCategories = new List<CategoryItem>();
 
             foreach (var node in tree)
             {
+                if (node == null) continue;
+
                 var item = new CategoryItem
                 {
                     Id = node.Id,
-                    Title = node.Title,
+                    Title = node.Title ?? "(بدون عنوان)",
                     Level = level
                 };
 
@@ -98,17 +111,23 @@ namespace Taadol.Controls
                 _allCategories.Add(item);
             }
 
+            System.Diagnostics.Debug.WriteLine($"✅ LoadFromTreeDto: built {_allCategories.Count} categories");
+
             BuildTree(_allCategories);
         }
 
         private void AddChildrenRecursive(CategoryItem parent, List<PersonCategoryTreeViewModel> children, int level)
         {
+            if (children == null) return;
+
             foreach (var child in children)
             {
+                if (child == null) continue;
+
                 var item = new CategoryItem
                 {
                     Id = child.Id,
-                    Title = child.Title,
+                    Title = child.Title ?? "(بدون عنوان)",
                     Level = level
                 };
 
@@ -121,6 +140,10 @@ namespace Taadol.Controls
 
         private void BuildTree(List<CategoryItem> items, TreeViewItem parent = null)
         {
+            // ★ جلوگیری از NullReferenceException
+            if (items == null) return;
+            if (CategoryTree == null) return;
+
             if (parent == null)
             {
                 CategoryTree.Items.Clear();
@@ -129,6 +152,8 @@ namespace Taadol.Controls
 
             foreach (var item in items)
             {
+                if (item == null) continue;
+
                 var treeItem = new TreeViewItem
                 {
                     Header = item.Title,
@@ -142,7 +167,7 @@ namespace Taadol.Controls
                 else
                     treeItem.SetResourceReference(FrameworkElement.StyleProperty, "GrandChildTreeViewItemStyle");
 
-                if (item.HasChildren)
+                if (item.HasChildren && item.Children != null)
                     BuildTree(item.Children.ToList(), treeItem);
 
                 if (parent == null)
@@ -906,6 +931,10 @@ namespace Taadol.Controls
                 SelectedText.Foreground = new SolidColorBrush(
                     (Color)ColorConverter.ConvertFromString("#0D2159"));
                 ClosePopup();
+
+                // ★ نگه داشتن Id دسته انتخاب‌شده
+                _selectedCategoryId = category.Id;
+
                 CategorySelected?.Invoke(category);
             }
         }
@@ -932,6 +961,69 @@ namespace Taadol.Controls
                 (Color)ColorConverter.ConvertFromString("#0D2159"));
         }
 
+        /// <summary>
+        /// ★ انتخاب دسته‌بندی با Id — برای لود دسته‌بندی شخص در فرم ویرایش
+        /// این متد درخت دسته‌بندی‌ها رو می‌گرده و اگه دسته با Id مورد نظر پیدا کنه،
+        /// اون رو به‌عنوان دسته انتخاب‌شده تنظیم می‌کنه.
+        /// </summary>
+        public void SelectCategoryById(long categoryId)
+        {
+            if (categoryId <= 0 || _allCategories == null || _allCategories.Count == 0)
+            {
+                System.Diagnostics.Debug.WriteLine($"⚠️ SelectCategoryById: categoryId={categoryId}, _allCategories is null or empty");
+                return;
+            }
+
+            System.Diagnostics.Debug.WriteLine($"🔍 SelectCategoryById: searching for categoryId={categoryId}");
+
+            var found = FindCategoryById(_allCategories, categoryId);
+            if (found != null)
+            {
+                System.Diagnostics.Debug.WriteLine($"✅ SelectCategoryById: found '{found.Title}'");
+                SetSelectedCategory(found.Title);
+
+                // یادآوری: در event دسته‌بندی هم اطلاع بدیم
+                _selectedCategoryId = found.Id;
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ SelectCategoryById: categoryId={categoryId} not found in tree");
+            }
+        }
+
+        /// <summary>
+        /// جستجوی دسته‌بندی با Id در درخت (به‌صورت بازگشتی)
+        /// </summary>
+        private CategoryItem FindCategoryById(List<CategoryItem> items, long categoryId)
+        {
+            if (items == null) return null;
+
+            foreach (var item in items)
+            {
+                if (item == null) continue;
+
+                if (item.Id == categoryId)
+                    return item;
+
+                if (item.HasChildren && item.Children != null)
+                {
+                    var found = FindCategoryById(item.Children.ToList(), categoryId);
+                    if (found != null)
+                        return found;
+                }
+            }
+
+            return null;
+        }
+
+        // ★ فیلد برای نگه داشتن Id دسته انتخاب‌شده
+        private long? _selectedCategoryId;
+
+        /// <summary>
+        /// Id دسته‌بندی انتخاب‌شده (null اگه هیچی انتخاب نشده)
+        /// </summary>
+        public long? SelectedCategoryId => _selectedCategoryId;
+
         public void SetCategories(List<CategoryItem> categories)
         {
             _allCategories = categories;
@@ -943,6 +1035,7 @@ namespace Taadol.Controls
             SelectedText.Text = "یک دسته جستجو کنید...";
             SelectedText.Foreground = new SolidColorBrush(
                 (Color)ColorConverter.ConvertFromString("#737791"));
+            _selectedCategoryId = null;
         }
 
         // ==================== Helper Methods ====================
@@ -999,6 +1092,6 @@ namespace Taadol.Controls
             }
         }
 
-        
+
     }
 }

@@ -496,7 +496,6 @@ namespace Taadol.Views
         }
 
         public string RowNumberDisplay => RowNumber > 0 && !IsEmpty ? ToPersianNumber(RowNumber) : "";
-
         private string ToPersianNumber(int number)
         {
             string[] persianDigits = { "۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹" };

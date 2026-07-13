@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GeneralInfoManagement.Infrastructure.EFCore\GeneralInfoManagement.Infrastructure.EFCore.csproj" />
+
     <ProjectReference Include="..\PersonManagement.Domain\PersonManagement.Domain.csproj" />
   </ItemGroup>
 

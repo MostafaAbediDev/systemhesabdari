@@ -5,15 +5,11 @@
              xmlns:controls="clr-namespace:Taadol.Controls"
              xmlns:svg="http://sharpvectors.codeplex.com/svgc/"
              FlowDirection="RightToLeft"
-             Width="920"
-             MinHeight="500"
-             VerticalAlignment="Top"
-             HorizontalAlignment="Left"
+             VerticalAlignment="Stretch"
+             HorizontalAlignment="Stretch"
              Background="Transparent">
 
     <UserControl.Resources>
-        <!-- ═══ BankAccountTemplate — برای آیتم‌های لیست (ItemsControl)
-             این دکمه‌ها برای هر ردیف در لیست هستن، نه برای فیلد اصلی ═══ -->
         <DataTemplate x:Key="BankAccountTemplate">
             <Border BorderBrush="#E0E0E0"
                     BorderThickness="0,1,0,0"
@@ -54,34 +50,12 @@
                                     Orientation="Horizontal"
                                     VerticalAlignment="Center"
                                     Margin="15,0,0,0">
-                            <!-- ★ toggle مال آیتم هست (IsDefault + RowDefaultToggle_Checked) -->
                             <ToggleButton Content="حساب پیش فرض"
                                           FlowDirection="LeftToRight"
                                           Style="{StaticResource StatusToggleButton}"
                                           IsChecked="{Binding IsDefault, Mode=TwoWay}"
-                                          Checked="RowDefaultToggle_Checked"
                                           Margin="0,0,10,0" />
-                            <!-- ★ دکمه افزودن ردیف جدید قبل از این آیتم -->
-                            <Button Click="AddBankAccountFromRow_Click"
-                                    Background="Transparent"
-                                    BorderThickness="0"
-                                    Cursor="Hand"
-                                    Margin="5,0,0,0"
-                                    ToolTip="افزودن ردیف جدید"
-                                    Focusable="False">
-                                <Button.Template>
-                                    <ControlTemplate TargetType="Button">
-                                        <ContentPresenter Content="{TemplateBinding Content}" />
-                                    </ControlTemplate>
-                                </Button.Template>
-                                <svg:SvgViewbox Width="16"
-                                                Height="16"
-                                                Source="/Assets/Icons/addAc.svg" />
-                            </Button>
-                            <!-- ★ دکمه حذف این آیتم -->
-                            <Button Click="RemoveBankAccount_Click"
-                                    Tag="{Binding}"
-                                    Background="Transparent"
+                            <Button Background="Transparent"
                                     BorderThickness="0"
                                     Cursor="Hand"
                                     Margin="5,0,0,0"
@@ -137,6 +111,13 @@
         </DataTemplate>
     </UserControl.Resources>
 
+    <!-- ═══════════════════════════════════════════════════
+         ساختار اصلی: Grid با 4 ردیف (بدون تب بار)
+         ردیف 0: هدر (ثابت)
+         ردیف 1: CardPanel اصلی (ثابت)
+         ردیف 2: جداکننده دکمه‌ای (ثابت)
+         ردیف 3: محتوای کامل (اسکرول‌پذیر، زیر هم)
+    ════════════════════════════════════════════════════ -->
     <Border x:Name="RootBorder"
             CornerRadius="12"
             ClipToBounds="True"
@@ -180,10 +161,18 @@
 
                 <StackPanel Grid.Column="1"
                             Orientation="Horizontal">
-                    <controls:IconButton ButtonText="ذخیره"
-                                         IconSource="/Assets/Icons/save.svg"
-                                         ButtonCommand="{Binding SaveCommand}"
-                                         ButtonBackground="#2667FF" />
+                    <controls:CustomOutlinedButton Text="ویرایش"
+                                                   Width="111"
+                                                   Height="44"
+                                                   Command="{Binding SaveCommand}">
+                        <controls:CustomOutlinedButton.Icon>
+                            <svg:SvgViewbox Source="/Assets/Icons/editblue.svg"
+                                            Width="18"
+                                            Margin="0,0,5,0"
+                                            FlowDirection="LeftToRight"
+                                            Height="18" />
+                        </controls:CustomOutlinedButton.Icon>
+                    </controls:CustomOutlinedButton>
                 </StackPanel>
             </Grid>
 
@@ -232,16 +221,17 @@
                         </StackPanel>
                         <Grid Margin="0,0,0,8">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="200" />
+                                <ColumnDefinition Width="240" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <controls:ModernPersianTextBox Grid.Column="0"
+                                                           FlowDirection="LeftToRight"
                                                            x:Name="ManualCodeTextBox"
                                                            Text="{Binding ManualCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                            IsEnabled="False"
                                                            Placeholder="1234" />
                             <controls:ToggleSwitchControl x:Name="CodeModeToggle"
-                                                          Margin="12,0,0,0"
+                                                          Margin="15,0,0,0"
                                                           FirstLabel="اتوماتیک"
                                                           SecondLabel="دستی"
                                                           IsFirstSelected="True"
@@ -253,11 +243,11 @@
                                    Style="{StaticResource FormLabel}" />
                         <StackPanel Orientation="Horizontal"
                                     Margin="0,0,0,8">
-                            <Grid Width="315">
+                            <Grid Width="400">
                                 <ComboBox x:Name="BranchCombo"
                                           Style="{StaticResource SearchableComboBox}"
                                           Tag="جستجو..."
-                                          Width="315"
+                                         
                                           ItemsSource="{Binding Branches}"
                                           DisplayMemberPath="Title"
                                           SelectedValuePath="Id"
@@ -285,7 +275,7 @@
                                               FlowDirection="LeftToRight"
                                               Style="{StaticResource StatusToggleButton}"
                                               IsChecked="{Binding IsActive, Mode=TwoWay}"
-                                              Margin="10,0,18,0" />
+                                              Margin="15,0,18,0" />
                             </StackPanel>
                         </Grid>
 
@@ -443,7 +433,7 @@
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Top">
                         <controls:ImagePickerControl x:Name="PersonImagePicker"
-                                                    
+                                                     Margin="0,0,10,0"
                                                      ImageSelected="OnImageSelected"
                                                      ImageRemoved="OnImageRemoved"
                                                      Loaded="ImagePickerControl_Loaded" />
@@ -453,8 +443,9 @@
 
             <!-- ═══ ردیف 2: جداکننده دکمه‌ای ═══ -->
             <Grid Grid.Row="2"
-                  Margin="24,0,24,2">
-                <Border Height="3">
+                  Margin="0,0,0,2">
+                <Border Height="3"
+                        Margin="12,0,12,2">
                     <Border.Background>
                         <VisualBrush TileMode="Tile"
                                      Viewport="0,0,10,1"
@@ -505,20 +496,14 @@
 
                         <!-- ═══ بخش تماس و آدرس ═══ -->
                         <Border Style="{StaticResource CardPanel}"
-                                Margin="0,0,0,12">
+                                Margin="4,0,8,12">
                             <StackPanel>
-                                <TextBlock Text="تماس و آدرس"
-                                           FontSize="14"
-                                           FontWeight="Bold"
-                                           FontFamily="{StaticResource IRANSans}"
-                                           Foreground="{StaticResource PrimaryBrush}"
-                                           Margin="0,0,0,12" />
 
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="16" />
-                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
 
                                     <StackPanel Grid.Column="0">
@@ -603,10 +588,8 @@
                                     </StackPanel>
 
                                     <Border Grid.Column="2"
-                                            Width="208"
                                             BorderThickness="0"
                                             CornerRadius="6"
-                                            Padding="0"
                                             VerticalAlignment="Stretch">
                                         <StackPanel>
                                             <TextBlock Text="آدرس"
@@ -616,10 +599,10 @@
                                                      Style="{StaticResource ModernPersianTextBox}"
                                                      TextWrapping="Wrap"
                                                      AcceptsReturn="True"
-                                                     Height="120"
+                                                     Height="130"
                                                      VerticalAlignment="Top"
                                                      VerticalContentAlignment="Top"
-                                                     Padding="8,8,8,8"
+                                                     Padding="4,4,4,4"
                                                      materialDesign:HintAssist.Hint="آدرس را وارد کنید..." />
                                         </StackPanel>
                                     </Border>
@@ -629,69 +612,60 @@
 
                         <!-- ═══ بخش حساب‌های بانکی — با بردر نازک ═══ -->
                         <Border Style="{StaticResource CardPanel}"
-                                Margin="0,0,0,12"
+                                Margin="12,0,12,12"
+                                Padding="15,0,15,0"
                                 BorderBrush="#E0E7FF"
                                 BorderThickness="1"
                                 CornerRadius="8">
                             <StackPanel>
-                                <TextBlock Text="حساب‌های بانکی"
-                                           FontSize="14"
-                                           FontWeight="Bold"
-                                           FontFamily="{StaticResource IRANSans}"
-                                           Foreground="{StaticResource PrimaryBrush}"
-                                           Margin="0,0,0,12" />
 
-                                <!-- ردیف اول: نام بانک + نام شعبه + toggle + دکمه‌های اصلی -->
+                                <!-- ردیف اول: نام بانک + نام شعبه + دکمه‌ها (3 ستون مساوی) -->
                                 <Grid Margin="0,0,0,8">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="8" />
-                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="8" />
-                                        <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
                                     <StackPanel Grid.Column="0">
                                         <TextBlock Text="نام بانک"
                                                    Style="{StaticResource FormLabel}" />
-                                        <controls:ModernPersianTextBox Width="260"
+                                        <controls:ModernPersianTextBox HorizontalAlignment="Stretch"
                                                                        Text="{Binding MainBankName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                                        Placeholder="ملت" />
                                     </StackPanel>
                                     <StackPanel Grid.Column="2">
                                         <TextBlock Text="نام شعبه"
-                                                   Width="230"
-                                                   HorizontalAlignment="Left"
                                                    Style="{StaticResource FormLabel}" />
                                         <ComboBox x:Name="BankBranchCombo"
+                                                  HorizontalAlignment="Stretch"
                                                   Style="{StaticResource SearchableComboBox}"
                                                   Tag="جستجو..."
-                                                  Width="260"
-                                                  HorizontalAlignment="Left"
                                                   ItemsSource="{Binding BankBranches}"
                                                   DisplayMemberPath="BranchName"
                                                   SelectedValuePath="Id"
                                                   SelectedValue="{Binding SelectedBankBranchId, Mode=TwoWay}"
                                                   ItemContainerStyle="{StaticResource SearchableComboBoxItem}" />
                                     </StackPanel>
-                                    <!-- ★ دکمه‌های فیلد اصلی: toggle اصلی + ➕ اصلی + 🗑️ اصلی -->
                                     <StackPanel Grid.Column="4"
                                                 Orientation="Horizontal"
-                                                VerticalAlignment="Center"
-                                                Margin="0,30,0,0">
+                                                VerticalAlignment="Bottom"
+                                                HorizontalAlignment="Right"
+                                                Margin="0,0,0,0">
                                         <ToggleButton x:Name="MainBankDefaultToggle"
                                                       Content="حساب پیش فرض"
                                                       FlowDirection="LeftToRight"
                                                       Style="{StaticResource StatusToggleButton}"
                                                       IsChecked="{Binding MainBankIsDefault, Mode=TwoWay}"
                                                       Checked="MainDefaultToggle_Checked"
-                                                      Margin="10,0,10,0" />
+                                                      Margin="0,0,10,0" />
                                         <Button x:Name="AddBankAccountButton"
                                                 Click="AddBankAccountButton_Click"
                                                 Background="Transparent"
                                                 BorderThickness="0"
                                                 Cursor="Hand"
-                                                ToolTip="انتقال به لیست و خالی کردن باکس"
+                                                ToolTip="افزودن حساب جدید"
                                                 Focusable="False">
                                             <Button.Template>
                                                 <ControlTemplate TargetType="Button">
@@ -707,7 +681,7 @@
                                                 Background="Transparent"
                                                 BorderThickness="0"
                                                 Cursor="Hand"
-                                                Margin="5,0,0,0"
+                                                Margin="2,0,0,0"
                                                 ToolTip="پاک کردن باکس"
                                                 Focusable="False">
                                             <Button.Template>
@@ -762,13 +736,130 @@
                                               Margin="0,10,0,0"
                                               ItemsSource="{Binding BankAccounts}">
                                     <ItemsControl.ItemTemplate>
-                                        <StaticResource ResourceKey="BankAccountTemplate" />
+                                        <DataTemplate>
+                                            <Border BorderBrush="#E0E0E0"
+                                                    BorderThickness="0,1,0,0"
+                                                    Padding="0,15,0,15"
+                                                    Margin="10,5,10,5">
+                                                <StackPanel>
+                                                    <!-- ردیف اول هر آیتم: نام بانک + شعبه + دکمه‌ها -->
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="8" />
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="8" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <StackPanel Grid.Column="0">
+                                                            <TextBlock Text="نام بانک"
+                                                                       Style="{StaticResource FormLabel}" />
+                                                            <controls:ModernPersianTextBox HorizontalAlignment="Stretch"
+                                                                                           Text="{Binding BankName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                                           Placeholder="ملت" />
+                                                        </StackPanel>
+                                                        <StackPanel Grid.Column="2">
+                                                            <TextBlock Text="شعبه"
+                                                                       Style="{StaticResource FormLabel}" />
+                                                            <ComboBox HorizontalAlignment="Stretch"
+                                                                      Style="{StaticResource SearchableComboBox}"
+                                                                      Tag="جستجو..."
+                                                                      ItemsSource="{Binding DataContext.BankBranches, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                      DisplayMemberPath="BranchName"
+                                                                      SelectedValuePath="Id"
+                                                                      SelectedValue="{Binding BankBranchId, Mode=TwoWay}"
+                                                                      ItemContainerStyle="{StaticResource SearchableComboBoxItem}" />
+                                                        </StackPanel>
+                                                        <StackPanel Grid.Column="4"
+                                                                    Orientation="Horizontal"
+                                                                    VerticalAlignment="Bottom"
+                                                                    HorizontalAlignment="Right"
+                                                                    Margin="0,0,0,12">
+                                                            <ToggleButton Content="حساب پیش فرض"
+                                                                          FlowDirection="LeftToRight"
+                                                                          Style="{StaticResource StatusToggleButton}"
+                                                                          IsChecked="{Binding IsDefault, Mode=TwoWay}"
+                                                                          Checked="RowDefaultToggle_Checked"
+                                                                          Margin="0,0,10,0" />
+                                                            <Button Click="AddBankAccountFromRow_Click"
+                                                                    Background="Transparent"
+                                                                    BorderThickness="0"
+                                                                    Cursor="Hand"
+                                                                    Margin="2,0,0,0"
+                                                                    ToolTip="افزودن ردیف جدید"
+                                                                    Focusable="False">
+                                                                <Button.Template>
+                                                                    <ControlTemplate TargetType="Button">
+                                                                        <ContentPresenter Content="{TemplateBinding Content}" />
+                                                                    </ControlTemplate>
+                                                                </Button.Template>
+                                                                <svg:SvgViewbox Width="18"
+                                                                                Height="18"
+                                                                                Source="/Assets/Icons/addAc.svg" />
+                                                            </Button>
+                                                            <Button Click="RemoveBankAccount_Click"
+                                                                    Tag="{Binding}"
+                                                                    Background="Transparent"
+                                                                    BorderThickness="0"
+                                                                    Cursor="Hand"
+                                                                    Margin="2,0,0,0"
+                                                                    ToolTip="حذف"
+                                                                    Focusable="False">
+                                                                <Button.Template>
+                                                                    <ControlTemplate TargetType="Button">
+                                                                        <ContentPresenter Content="{TemplateBinding Content}" />
+                                                                    </ControlTemplate>
+                                                                </Button.Template>
+                                                                <svg:SvgViewbox Width="16"
+                                                                                Height="16"
+                                                                                Source="/Assets/Icons/trash.svg" />
+                                                            </Button>
+                                                        </StackPanel>
+                                                    </Grid>
+
+                                                    <!-- ردیف دوم هر آیتم: شماره کارت + شبا + حساب -->
+                                                    <Grid Margin="0,10,0,0">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="8" />
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="8" />
+                                                            <ColumnDefinition Width="*" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <StackPanel Grid.Column="0">
+                                                            <TextBlock Text="شماره کارت"
+                                                                       Style="{StaticResource FormLabel}" />
+                                                            <controls:ModernPersianTextBox HorizontalAlignment="Stretch"
+                                                                                           FlowDirection="LeftToRight"
+                                                                                           Text="{Binding CardNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                                           Placeholder="**** **** **** ****" />
+                                                        </StackPanel>
+                                                        <StackPanel Grid.Column="2">
+                                                            <TextBlock Text="شماره شبا"
+                                                                       Style="{StaticResource FormLabel}" />
+                                                            <controls:ModernPersianTextBox HorizontalAlignment="Stretch"
+                                                                                           FlowDirection="LeftToRight"
+                                                                                           Text="{Binding Shaba, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                                           Placeholder="IR" />
+                                                        </StackPanel>
+                                                        <StackPanel Grid.Column="4">
+                                                            <TextBlock Text="شماره حساب"
+                                                                       Style="{StaticResource FormLabel}" />
+                                                            <controls:ModernPersianTextBox HorizontalAlignment="Stretch"
+                                                                                           FlowDirection="LeftToRight"
+                                                                                           Text="{Binding AccountNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                                           Placeholder="456" />
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </StackPanel>
+                                            </Border>
+                                        </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
                             </StackPanel>
                         </Border>
 
-                        <!-- ═══ بخش مشخصات پرسونل ═══ -->
+                        <!-- ═══ بخش مشخصات پرسونل — فقط وقتی PersonTypePersonnel فعال باشه نمایش داده می‌شه ═══ -->
                         <Border x:Name="PersonnelSection"
                                 Style="{StaticResource CardPanel}"
                                 Margin="0,0,0,12"
