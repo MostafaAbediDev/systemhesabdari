@@ -37,12 +37,12 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
+                </Grid.ColumnDefinitions> 
 
                 <Border Grid.Column="1"
-                        CornerRadius="12"
+                        CornerRadius="6"
                         Width="320"
-                        Height="75"
+                        Height="65"
                         Background="#ffffff"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Right"
@@ -58,8 +58,8 @@
                             <Button Command="{Binding SaveCommand}"
                                     Background="Transparent"
                                     Foreground="#0D2159"
-                                    Height="45"
-                                    Width="140"
+                                    Height="40"
+                                    Width="135"
                                     Margin="11,0,11,0"
                                     Click="Button_Click_1">
                                 <Button.Template>

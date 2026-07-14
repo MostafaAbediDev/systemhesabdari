@@ -12,23 +12,25 @@
     <UserControl.Resources>
         <DataTemplate x:Key="BankAccountTemplate">
             <Border BorderBrush="#E0E0E0"
-                    BorderThickness="0,1,0,0"
-                    Padding="0,15,0,15"
+                    BorderThickness="1,1,1,1"
+                    CornerRadius="12"
+                    Padding="10,15,10,15"
                     Margin="0,5,0,5">
                 <StackPanel>
+                    <!-- ردیف اول هر آیتم: نام بانک + شعبه + دکمه‌ها -->
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="8" />
-                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="8" />
-                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Grid.Column="0">
                             <TextBlock Text="نام بانک"
                                        Style="{StaticResource FormLabel}" />
-                            <controls:ModernPersianTextBox Width="230"
+                            <controls:ModernPersianTextBox HorizontalAlignment="Stretch"
                                                            Text="{Binding BankName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                            Placeholder="ملت" />
                         </StackPanel>
@@ -36,7 +38,7 @@
                         <StackPanel Grid.Column="2">
                             <TextBlock Text="شعبه"
                                        Style="{StaticResource FormLabel}" />
-                            <ComboBox Width="230"
+                            <ComboBox HorizontalAlignment="Stretch"
                                       Style="{StaticResource SearchableComboBox}"
                                       Tag="جستجو..."
                                       ItemsSource="{Binding DataContext.BankBranches, RelativeSource={RelativeSource AncestorType=UserControl}}"
@@ -46,67 +48,79 @@
                                       ItemContainerStyle="{StaticResource SearchableComboBoxItem}" />
                         </StackPanel>
 
-                        <StackPanel Grid.Column="4"
-                                    Orientation="Horizontal"
-                                    VerticalAlignment="Center"
-                                    Margin="15,0,0,0">
-                            <ToggleButton Content="حساب پیش فرض"
+                        <Grid Grid.Column="4"
+                              VerticalAlignment="Bottom"
+                              Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- حساب پیش‌فرض: می‌چسبه راست -->
+                            <ToggleButton Grid.Column="0"
+                                          Content="حساب پیش فرض"
                                           FlowDirection="LeftToRight"
                                           Style="{StaticResource StatusToggleButton}"
                                           IsChecked="{Binding IsDefault, Mode=TwoWay}"
                                           Checked="RowDefaultToggle_Checked"
-                                          Margin="0,0,10,0" />
-                            <Button Click="AddBankAccountFromRow_Click"
-                                    Background="Transparent"
-                                    BorderThickness="0"
-                                    Cursor="Hand"
-                                    Margin="5,0,0,0"
-                                    ToolTip="افزودن حساب جدید"
-                                    Opacity="1"
-                                    Focusable="False">
-                                <Button.Template>
-                                    <ControlTemplate TargetType="Button">
-                                        <ContentPresenter Content="{TemplateBinding Content}" />
-                                    </ControlTemplate>
-                                </Button.Template>
-                                <svg:SvgViewbox Width="16"
-                                                Height="16"
-                                                Source="/Assets/Icons/addAc.svg" />
-                            </Button>
-                            <Button x:Name="RemoveButton"
-                                    Click="RemoveBankAccount_Click"
-                                    Tag="{Binding}"
-                                    Background="Transparent"
-                                    BorderThickness="0"
-                                    Cursor="Hand"
-                                    Margin="5,0,0,0"
-                                    ToolTip="حذف"
-                                    Opacity="1"
-                                    Focusable="False">
-                                <Button.Template>
-                                    <ControlTemplate TargetType="Button">
-                                        <ContentPresenter Content="{TemplateBinding Content}" />
-                                    </ControlTemplate>
-                                </Button.Template>
-                                <svg:SvgViewbox Width="16"
-                                                Height="16"
-                                                Source="/Assets/Icons/trash.svg" />
-                            </Button>
-                        </StackPanel>
+                                          HorizontalAlignment="Left" />
+
+                            <!-- دکمه‌ها: می‌چسبن چپ -->
+                            <StackPanel Grid.Column="1"
+                                        Orientation="Horizontal"
+                                        HorizontalAlignment="Left">
+                                <Button Click="AddBankAccountFromRow_Click"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        Cursor="Hand"
+                                        ToolTip="افزودن ردیف جدید"
+                                        Opacity="1"
+                                        Focusable="False">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <ContentPresenter Content="{TemplateBinding Content}" />
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                    <svg:SvgViewbox Width="18"
+                                                    Height="18"
+                                                    Source="/Assets/Icons/addAc.svg" />
+                                </Button>
+                                <Button x:Name="RemoveButton"
+                                        Click="RemoveBankAccount_Click"
+                                        Tag="{Binding}"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        Cursor="Hand"
+                                        Margin="10,0,0,0"
+                                        ToolTip="حذف"
+                                        Opacity="1"
+                                        Focusable="False">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <ContentPresenter Content="{TemplateBinding Content}" />
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                    <svg:SvgViewbox Width="16"
+                                                    Height="16"
+                                                    Source="/Assets/Icons/trash.svg" />
+                                </Button>
+                            </StackPanel>
+                        </Grid>
                     </Grid>
 
+                    <!-- ردیف دوم هر آیتم: شماره کارت + شبا + حساب -->
                     <Grid Margin="0,10,0,0">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="8" />
-                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="8" />
-                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0">
                             <TextBlock Text="شماره کارت"
                                        Style="{StaticResource FormLabel}" />
-                            <controls:ModernPersianTextBox Width="230"
+                            <controls:ModernPersianTextBox HorizontalAlignment="Stretch"
                                                            FlowDirection="LeftToRight"
                                                            Text="{Binding CardNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                            Placeholder="**** **** **** ****" />
@@ -114,7 +128,7 @@
                         <StackPanel Grid.Column="2">
                             <TextBlock Text="شماره شبا"
                                        Style="{StaticResource FormLabel}" />
-                            <controls:ModernPersianTextBox Width="230"
+                            <controls:ModernPersianTextBox HorizontalAlignment="Stretch"
                                                            FlowDirection="LeftToRight"
                                                            Text="{Binding Shaba, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                            Placeholder="IR" />
@@ -122,7 +136,7 @@
                         <StackPanel Grid.Column="4">
                             <TextBlock Text="شماره حساب"
                                        Style="{StaticResource FormLabel}" />
-                            <controls:ModernPersianTextBox Width="230"
+                            <controls:ModernPersianTextBox HorizontalAlignment="Stretch"
                                                            FlowDirection="LeftToRight"
                                                            Text="{Binding AccountNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                            Placeholder="456" />
@@ -132,19 +146,12 @@
             </Border>
         </DataTemplate>
     </UserControl.Resources>
-
-    <!-- ═══════════════════════════════════════════════════
-         ساختار اصلی: Grid با 4 ردیف
-         ردیف 0: هدر (ثابت)
-         ردیف 1: CardPanel اصلی (ثابت)
-         ردیف 2: تب بار (ثابت)
-         ردیف 3: محتوای تب‌ها (اسکرول‌پذیر)
-    ════════════════════════════════════════════════════ -->
+   
     <Border CornerRadius="12"
             ClipToBounds="False"
             Background="#ffffff"
             VerticalAlignment="Stretch"
-            Margin="24,12">
+         >
 
         <Grid VerticalAlignment="Stretch">
             <Grid.RowDefinitions>
@@ -242,7 +249,7 @@
                         </StackPanel>
                         <Grid Margin="0,0,0,8">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="200" />
+                                <ColumnDefinition Width="240" />
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
@@ -264,11 +271,11 @@
                                    Style="{StaticResource FormLabel}" />
                         <StackPanel Orientation="Horizontal"
                                     Margin="0,0,0,8">
-                            <Grid Width="315">
+                            <Grid Width="400">
                                 <ComboBox x:Name="BranchCombo"
                                           Style="{StaticResource SearchableComboBox}"
                                           Tag="جستجو..."
-                                          Width="315"
+                                         
                                           ItemsSource="{Binding Branches}"
                                           DisplayMemberPath="Title"
                                           SelectedValuePath="Id"
@@ -346,7 +353,7 @@
                                               FlowDirection="LeftToRight"
                                               Style="{StaticResource StatusToggleButton}"
                                               IsChecked="{Binding IsActive, Mode=TwoWay}"
-                                              Margin="10,0,18,0" />
+                                              Margin="14,0,18,0" />
                             </StackPanel>
                         </Grid>
 
@@ -505,6 +512,7 @@
 
                     <!-- تصویر -->
                     <StackPanel Grid.Column="1"
+                                Margin="0,0,10,0"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Top">
                         <controls:ImagePickerControl x:Name="PersonImagePicker"   
@@ -559,7 +567,7 @@
 
             <!-- ═══ ردیف 3: تب بار (ثابت، اسکرول نمی‌شه) ═══ -->
             <StackPanel Grid.Row="3"
-                        Margin="0,0,0,0"
+                        Margin="12,0,0,0"
                         HorizontalAlignment="Left">
                 <Border CornerRadius="12"
                         BorderThickness="1.5"
@@ -601,11 +609,14 @@
                           VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Disabled">
                 <Border Style="{StaticResource CardPanel}">
-                    <Grid>
+                    <Grid
+                        Margin="12,0,12,0"
+                        >
 
                         <!-- تب: تماس و آدرس -->
                         <StackPanel x:Name="PricingContent"
-                                    Visibility="Visible">
+                                    
+                                    Visibility="Collapsed">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
@@ -708,9 +719,10 @@
                                                  Style="{StaticResource ModernPersianTextBox}"
                                                  TextWrapping="Wrap"
                                                  AcceptsReturn="True"
-                                                 Height="120"
-                                                 VerticalContentAlignment="Top"
+                                                 Height="130"
                                                  VerticalAlignment="Top"
+                                                 VerticalContentAlignment="Top"
+                                                 Padding="4,4,4,4"
                                                  materialDesign:HintAssist.Hint="آدرس را وارد کنید..." />
                                     </StackPanel>
                                 </Border>
@@ -719,98 +731,107 @@
 
                         <!-- تب: حساب های بانکی -->
                         <StackPanel x:Name="InventoryContent"
-                                    Visibility="Collapsed">
-                            <Grid Margin="0,0,0,8">
+                                    Visibility="Visible">
+                            <Grid Margin="0,8,0,8">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="8" />
-                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="8" />
-                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0">
                                     <TextBlock Text="نام بانک"
                                                Style="{StaticResource FormLabel}" />
-                                    <controls:ModernPersianTextBox Width="260"
+                                    <controls:ModernPersianTextBox HorizontalAlignment="Stretch"
                                                                    Text="{Binding MainBankName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                                    Placeholder="ملت" />
                                 </StackPanel>
                                 <StackPanel Grid.Column="2">
                                     <TextBlock Text="نام شعبه"
-                                               Width="230"
-                                               HorizontalAlignment="Left"
                                                Style="{StaticResource FormLabel}" />
                                     <ComboBox x:Name="BankBranchCombo"
+                                              HorizontalAlignment="Stretch"
                                               Style="{StaticResource SearchableComboBox}"
                                               Tag="جستجو..."
-                                              Width="260"
-                                              HorizontalAlignment="Left"
                                               ItemsSource="{Binding BankBranches}"
                                               DisplayMemberPath="BranchName"
                                               SelectedValuePath="Id"
                                               SelectedValue="{Binding SelectedBankBranchId, Mode=TwoWay}"
                                               ItemContainerStyle="{StaticResource SearchableComboBoxItem}" />
                                 </StackPanel>
-                                <StackPanel Grid.Column="4"
-                                            Orientation="Horizontal"
-                                            VerticalAlignment="Center"
-                                            Margin="0,30,0,0">
+                                <Grid Grid.Column="4"
+                                      VerticalAlignment="Bottom"
+                                      Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- حساب پیش‌فرض: می‌چسبه راست -->
                                     <ToggleButton x:Name="MainBankDefaultToggle"
-                                                   Content="حساب پیش فرض"
-                                                   FlowDirection="LeftToRight"
-                                                   Style="{StaticResource StatusToggleButton}"
-                                                   IsChecked="{Binding MainBankIsDefault, Mode=TwoWay}"
-                                                   Checked="MainDefaultToggle_Checked"
-                                                   Margin="10,0,10,0" />
-                                    <Button x:Name="AddBankAccountButton"
-                                            Click="AddBankAccountButton_Click"
-                                            Background="Transparent"
-                                            BorderThickness="0"
-                                            Cursor="Hand"
-                                            ToolTip="انتقال به لیست و خالی کردن باکس"
-                                            Focusable="False">
-                                        <Button.Template>
-                                            <ControlTemplate TargetType="Button">
-                                                <ContentPresenter Content="{TemplateBinding Content}" />
-                                            </ControlTemplate>
-                                        </Button.Template>
-                                        <svg:SvgViewbox Width="18"
-                                                        Height="18"
-                                                        Source="/Assets/Icons/addAc.svg" />
-                                    </Button>
-                                    <Button x:Name="RemoveMainBankButton"
-                                            Click="RemoveMainBankButton_Click"
-                                            Background="Transparent"
-                                            BorderThickness="0"
-                                            
-                                            Cursor="Hand"
-                                            Margin="5,0,0,0"
-                                            ToolTip="پاک کردن باکس بالایی"
-                                            Focusable="False">
-                                        <Button.Template>
-                                            <ControlTemplate TargetType="Button">
-                                                <ContentPresenter Content="{TemplateBinding Content}" />
-                                            </ControlTemplate>
-                                        </Button.Template>
-                                        <svg:SvgViewbox Width="16"
-                                                        Height="16"
-                                                        Source="/Assets/Icons/trash.svg" />
-                                    </Button>
-                                </StackPanel>
+                                                  Grid.Column="0"
+                                                  Content="حساب پیش فرض"
+                                                  FlowDirection="LeftToRight"
+                                                  Style="{StaticResource StatusToggleButton}"
+                                                  IsChecked="{Binding MainBankIsDefault, Mode=TwoWay}"
+                                                  Checked="MainDefaultToggle_Checked"
+                                                  HorizontalAlignment="Left" />
+
+                                    <!-- دکمه‌ها: می‌چسبن چپ -->
+                                    <StackPanel Grid.Column="1"
+                                                Orientation="Horizontal"
+                                                HorizontalAlignment="Left">
+                                        <Button x:Name="AddBankAccountButton"
+                                                Click="AddBankAccountButton_Click"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                Cursor="Hand"
+                                                ToolTip="انتقال به لیست و خالی کردن باکس"
+                                                Focusable="False">
+                                            <Button.Template>
+                                                <ControlTemplate TargetType="Button">
+                                                    <ContentPresenter Content="{TemplateBinding Content}" />
+                                                </ControlTemplate>
+                                            </Button.Template>
+                                            <svg:SvgViewbox Width="18"
+                                                            Height="18"
+                                                            Source="/Assets/Icons/addAc.svg" />
+                                        </Button>
+                                        <Button x:Name="RemoveMainBankButton"
+                                                Click="RemoveMainBankButton_Click"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                Cursor="Hand"
+                                                Margin="10,0,0,0"
+                                                ToolTip="پاک کردن باکس بالایی"
+                                                Focusable="False">
+                                            <Button.Template>
+                                                <ControlTemplate TargetType="Button">
+                                                    <ContentPresenter Content="{TemplateBinding Content}" />
+                                                </ControlTemplate>
+                                            </Button.Template>
+                                            <svg:SvgViewbox Width="16"
+                                                            Height="16"
+                                                            Source="/Assets/Icons/trash.svg" />
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
                             </Grid>
 
-                            <Grid Margin="0,0,0,8">
+                            <!-- ردیف دوم: شماره کارت + شماره شبا + شماره حساب -->
+                            <Grid Margin="0,8,0,8">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="8" />
-                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="8" />
-                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0">
                                     <TextBlock Text="شماره کارت"
                                                Style="{StaticResource FormLabel}" />
-                                    <controls:ModernPersianTextBox Width="260"
+                                    <controls:ModernPersianTextBox HorizontalAlignment="Stretch"
                                                                    FlowDirection="LeftToRight"
                                                                    Text="{Binding MainCardNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                                    Placeholder="**** **** **** ****" />
@@ -818,7 +839,7 @@
                                 <StackPanel Grid.Column="2">
                                     <TextBlock Text="شماره شبا"
                                                Style="{StaticResource FormLabel}" />
-                                    <controls:ModernPersianTextBox Width="260"
+                                    <controls:ModernPersianTextBox HorizontalAlignment="Stretch"
                                                                    FlowDirection="LeftToRight"
                                                                    Text="{Binding MainShaba, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                                    Placeholder="IR" />
@@ -826,13 +847,12 @@
                                 <StackPanel Grid.Column="4">
                                     <TextBlock Text="شماره حساب"
                                                Style="{StaticResource FormLabel}" />
-                                    <controls:ModernPersianTextBox Width="260"
+                                    <controls:ModernPersianTextBox HorizontalAlignment="Stretch"
                                                                    FlowDirection="LeftToRight"
                                                                    Text="{Binding MainAccountNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                                    Placeholder="456" />
                                 </StackPanel>
                             </Grid>
-
                             <!-- حساب‌های بانکی اضافه‌شده -->
                             <ItemsControl x:Name="AdditionalBankAccountsPanel"
                                           Margin="0,10,0,0"

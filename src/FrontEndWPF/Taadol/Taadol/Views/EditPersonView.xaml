@@ -620,7 +620,7 @@
                             <StackPanel>
 
                                 <!-- ردیف اول: نام بانک + نام شعبه + دکمه‌ها (3 ستون مساوی) -->
-                                <Grid Margin="0,0,0,8">
+                                <Grid Margin="0,8,0,8">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="8" />
@@ -648,56 +648,67 @@
                                                   SelectedValue="{Binding SelectedBankBranchId, Mode=TwoWay}"
                                                   ItemContainerStyle="{StaticResource SearchableComboBoxItem}" />
                                     </StackPanel>
-                                    <StackPanel Grid.Column="4"
-                                                Orientation="Horizontal"
-                                                VerticalAlignment="Bottom"
-                                                HorizontalAlignment="Right"
-                                                Margin="0,0,0,0">
+                                    <Grid Grid.Column="4"
+                                          VerticalAlignment="Bottom"
+                                          Margin="0,0,0,12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- حساب پیش‌فرض: می‌چسبه راست -->
                                         <ToggleButton x:Name="MainBankDefaultToggle"
+                                                      Grid.Column="0"
                                                       Content="حساب پیش فرض"
                                                       FlowDirection="LeftToRight"
                                                       Style="{StaticResource StatusToggleButton}"
                                                       IsChecked="{Binding MainBankIsDefault, Mode=TwoWay}"
                                                       Checked="MainDefaultToggle_Checked"
-                                                      Margin="0,0,10,0" />
-                                        <Button x:Name="AddBankAccountButton"
-                                                Click="AddBankAccountButton_Click"
-                                                Background="Transparent"
-                                                BorderThickness="0"
-                                                Cursor="Hand"
-                                                ToolTip="افزودن حساب جدید"
-                                                Focusable="False">
-                                            <Button.Template>
-                                                <ControlTemplate TargetType="Button">
-                                                    <ContentPresenter Content="{TemplateBinding Content}" />
-                                                </ControlTemplate>
-                                            </Button.Template>
-                                            <svg:SvgViewbox Width="18"
-                                                            Height="18"
-                                                            Source="/Assets/Icons/addAc.svg" />
-                                        </Button>
-                                        <Button x:Name="RemoveMainBankButton"
-                                                Click="RemoveMainBankButton_Click"
-                                                Background="Transparent"
-                                                BorderThickness="0"
-                                                Cursor="Hand"
-                                                Margin="2,0,0,0"
-                                                ToolTip="پاک کردن باکس"
-                                                Focusable="False">
-                                            <Button.Template>
-                                                <ControlTemplate TargetType="Button">
-                                                    <ContentPresenter Content="{TemplateBinding Content}" />
-                                                </ControlTemplate>
-                                            </Button.Template>
-                                            <svg:SvgViewbox Width="16"
-                                                            Height="16"
-                                                            Source="/Assets/Icons/trash.svg" />
-                                        </Button>
-                                    </StackPanel>
+                                                      HorizontalAlignment="Left" />
+
+                                        <!-- دکمه‌ها: می‌چسبن چپ -->
+                                        <StackPanel Grid.Column="1"
+                                                    Orientation="Horizontal"
+                                                    HorizontalAlignment="Left">
+                                            <Button x:Name="AddBankAccountButton"
+                                                    Click="AddBankAccountButton_Click"
+                                                    Background="Transparent"
+                                                    BorderThickness="0"
+                                                    Cursor="Hand"
+                                                    ToolTip="افزودن حساب جدید"
+                                                    Focusable="False">
+                                                <Button.Template>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <ContentPresenter Content="{TemplateBinding Content}" />
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                                <svg:SvgViewbox Width="18"
+                                                                Height="18"
+                                                                Source="/Assets/Icons/addAc.svg" />
+                                            </Button>
+                                            <Button x:Name="RemoveMainBankButton"
+                                                    Click="RemoveMainBankButton_Click"
+                                                    Background="Transparent"
+                                                    BorderThickness="0"
+                                                    Cursor="Hand"
+                                                    Margin="10,0,0,0"
+                                                    ToolTip="پاک کردن باکس"
+                                                    Focusable="False">
+                                                <Button.Template>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <ContentPresenter Content="{TemplateBinding Content}" />
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                                <svg:SvgViewbox Width="16"
+                                                                Height="16"
+                                                                Source="/Assets/Icons/trash.svg" />
+                                            </Button>
+                                        </StackPanel>
+                                    </Grid>
                                 </Grid>
 
                                 <!-- ردیف دوم: شماره کارت + شماره شبا + شماره حساب -->
-                                <Grid Margin="0,0,0,8">
+                                <Grid Margin="0,8,0,8">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="8" />
@@ -749,7 +760,7 @@
                                                             <ColumnDefinition Width="8" />
                                                             <ColumnDefinition Width="*" />
                                                             <ColumnDefinition Width="8" />
-                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="*" />
                                                         </Grid.ColumnDefinitions>
                                                         <StackPanel Grid.Column="0">
                                                             <TextBlock Text="نام بانک"
@@ -770,51 +781,61 @@
                                                                       SelectedValue="{Binding BankBranchId, Mode=TwoWay}"
                                                                       ItemContainerStyle="{StaticResource SearchableComboBoxItem}" />
                                                         </StackPanel>
-                                                        <StackPanel Grid.Column="4"
-                                                                    Orientation="Horizontal"
-                                                                    VerticalAlignment="Bottom"
-                                                                    HorizontalAlignment="Right"
-                                                                    Margin="0,0,0,12">
-                                                            <ToggleButton Content="حساب پیش فرض"
+                                                        <Grid Grid.Column="4"
+                                                              VerticalAlignment="Bottom"
+                                                              Margin="0,0,0,12">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="*" />
+                                                                <ColumnDefinition Width="Auto" />
+                                                            </Grid.ColumnDefinitions>
+
+                                                            <!-- حساب پیش‌فرض: می‌چسبه راست -->
+                                                            <ToggleButton Grid.Column="0"
+                                                                          Content="حساب پیش فرض"
                                                                           FlowDirection="LeftToRight"
                                                                           Style="{StaticResource StatusToggleButton}"
                                                                           IsChecked="{Binding IsDefault, Mode=TwoWay}"
                                                                           Checked="RowDefaultToggle_Checked"
-                                                                          Margin="0,0,10,0" />
-                                                            <Button Click="AddBankAccountFromRow_Click"
-                                                                    Background="Transparent"
-                                                                    BorderThickness="0"
-                                                                    Cursor="Hand"
-                                                                    Margin="2,0,0,0"
-                                                                    ToolTip="افزودن ردیف جدید"
-                                                                    Focusable="False">
-                                                                <Button.Template>
-                                                                    <ControlTemplate TargetType="Button">
-                                                                        <ContentPresenter Content="{TemplateBinding Content}" />
-                                                                    </ControlTemplate>
-                                                                </Button.Template>
-                                                                <svg:SvgViewbox Width="18"
-                                                                                Height="18"
-                                                                                Source="/Assets/Icons/addAc.svg" />
-                                                            </Button>
-                                                            <Button Click="RemoveBankAccount_Click"
-                                                                    Tag="{Binding}"
-                                                                    Background="Transparent"
-                                                                    BorderThickness="0"
-                                                                    Cursor="Hand"
-                                                                    Margin="2,0,0,0"
-                                                                    ToolTip="حذف"
-                                                                    Focusable="False">
-                                                                <Button.Template>
-                                                                    <ControlTemplate TargetType="Button">
-                                                                        <ContentPresenter Content="{TemplateBinding Content}" />
-                                                                    </ControlTemplate>
-                                                                </Button.Template>
-                                                                <svg:SvgViewbox Width="16"
-                                                                                Height="16"
-                                                                                Source="/Assets/Icons/trash.svg" />
-                                                            </Button>
-                                                        </StackPanel>
+                                                                          HorizontalAlignment="Left" />
+
+                                                            <!-- دکمه‌ها: می‌چسبن چپ -->
+                                                            <StackPanel Grid.Column="1"
+                                                                        Orientation="Horizontal"
+                                                                        HorizontalAlignment="Left">
+                                                                <Button Click="AddBankAccountFromRow_Click"
+                                                                        Background="Transparent"
+                                                                        BorderThickness="0"
+                                                                        Cursor="Hand"
+                                                                        ToolTip="افزودن ردیف جدید"
+                                                                        Focusable="False">
+                                                                    <Button.Template>
+                                                                        <ControlTemplate TargetType="Button">
+                                                                            <ContentPresenter Content="{TemplateBinding Content}" />
+                                                                        </ControlTemplate>
+                                                                    </Button.Template>
+                                                                    <svg:SvgViewbox Width="18"
+                                                                                    Height="18"
+                                                                                    Source="/Assets/Icons/addAc.svg" />
+                                                                </Button>
+                                                                <Button Click="RemoveBankAccount_Click"
+                                                                        Tag="{Binding}"
+                                                                        Background="Transparent"
+                                                                        BorderThickness="0"
+                                                                        Cursor="Hand"
+                                                                        Margin="10,0,0,0"
+                                                                        ToolTip="حذف"
+                                                                        Focusable="False">
+                                                                    <Button.Template>
+                                                                        <ControlTemplate TargetType="Button">
+                                                                            <ContentPresenter Content="{TemplateBinding Content}" />
+                                                                        </ControlTemplate>
+                                                                    </Button.Template>
+                                                                    <svg:SvgViewbox Width="16"
+                                                                                    Height="16"
+                                                                                    Source="/Assets/Icons/trash.svg" />
+                                                                </Button>
+                                                            </StackPanel>
+                                                        </Grid>
                                                     </Grid>
 
                                                     <!-- ردیف دوم هر آیتم: شماره کارت + شبا + حساب -->
