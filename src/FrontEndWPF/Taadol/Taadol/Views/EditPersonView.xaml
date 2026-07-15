@@ -163,6 +163,7 @@
                             Orientation="Horizontal">
                     <controls:CustomOutlinedButton Text="ویرایش"
                                                    Width="111"
+                                                   Margin="0,0,5,0"
                                                    Height="44"
                                                    Command="{Binding SaveCommand}">
                         <controls:CustomOutlinedButton.Icon>

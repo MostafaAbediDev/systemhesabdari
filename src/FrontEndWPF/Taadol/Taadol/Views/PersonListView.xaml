@@ -16,7 +16,7 @@
 
     <UserControl.Resources>
 
-        <Style x:Key="FilterTabStyle"
+        <Style x:Key="FilterTabStyle2"
                TargetType="RadioButton">
             <Setter Property="FontFamily"
                     Value="{StaticResource IRANSans}" />
@@ -444,7 +444,7 @@
             <Border Grid.Row="2"
                     Background="Transparent"
                     ClipToBounds="False"
-                    Padding="15,0">
+                    Padding="15,5">
 
 
                 <Grid x:Name="DataGridContainer">
@@ -491,320 +491,351 @@
                     </Grid.Resources>
 
 
-                    <DataGrid x:Name="PersonsDataGrid"
-                              CanUserSortColumns="False"
-                              AutoGenerateColumns="False"
-                              MinHeight="496"
-                              HeadersVisibility="Column"
-                              GridLinesVisibility="All"
-                              VerticalGridLinesBrush="#CCD0D9"
-                              HorizontalGridLinesBrush="#CCD0D9"
-                              RowHeight="30"
-                              Background="White"
-                              BorderBrush="#CCD0D9"
-                              BorderThickness="1"
-                              SnapsToDevicePixels="True"
-                              CanUserAddRows="False"
-                              CanUserDeleteRows="False"
-                              CanUserResizeRows="False"
-                              SelectionMode="Single"
-                              AlternationCount="2"
-                              IsReadOnly="True"
-                              ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                              ScrollViewer.VerticalScrollBarVisibility="Hidden"
-                              FontFamily="{StaticResource IRANSans}"
-                              SelectionChanged="PersonsDataGrid_SelectionChanged"
-                              MouseDoubleClick="PersonsDataGrid_MouseDoubleClick">
+                    <!-- ═══════════════════════════════════════════════════════════
+     DataGrid اصلی — لیست اشخاص
+     ═══════════════════════════════════════════════════════════ -->
+                    <Border Background="White"
+                            BorderBrush="#E5E7EB"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            ClipToBounds="True">
 
-                        <DataGrid.Resources>
-
-                            <Style x:Key="BaseTextColumnStyle"
-                                   TargetType="TextBlock">
-                                <Setter Property="FontFamily"
-                                        Value="{StaticResource IRANSans}" />
-                                <Setter Property="HorizontalAlignment"
-                                        Value="Center" />
-                                <Setter Property="VerticalAlignment"
-                                        Value="Center" />
-                                <Setter Property="Foreground"
-                                        Value="#5C5C5C" />
-                            </Style>
+                       
+                        <DataGrid x:Name="PersonsDataGrid"
+                                  CanUserSortColumns="False"
+                                  AutoGenerateColumns="False"
+                                  MinHeight="496"
+                                 
+                                  HeadersVisibility="Column"
+                                  GridLinesVisibility="All"
+                                  VerticalGridLinesBrush="#E5E7EB"
+                                  HorizontalGridLinesBrush="#E5E7EB"
+                                  RowHeight="36"
+                                  Background="White"
+                                  BorderBrush="#E5E7EB"
+                                  BorderThickness="1"
+                                 
+                                  SnapsToDevicePixels="True"
+                                  CanUserAddRows="False"
+                                  CanUserDeleteRows="False"
+                                  CanUserResizeRows="False"
+                                  SelectionMode="Extended"
+                                  AlternationCount="2"
+                                  IsReadOnly="True"
+                                  ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                  ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                                  FontFamily="{StaticResource IRANSans}"
+                                  SelectionChanged="PersonsDataGrid_SelectionChanged"
+                                  MouseDoubleClick="PersonsDataGrid_MouseDoubleClick">
 
 
-                            <Style x:Key="LtrTextColumnStyle"
-                                   TargetType="TextBlock"
-                                   BasedOn="{StaticResource BaseTextColumnStyle}">
-                                <Setter Property="FlowDirection"
-                                        Value="LeftToRight" />
-                            </Style>
+                            <DataGrid.Resources>
 
+                                <!-- استایل متن ستون‌ها -->
+                                <Style x:Key="BaseTextColumnStyle"
+                                       TargetType="TextBlock">
+                                    <Setter Property="FontFamily"
+                                            Value="{StaticResource IRANSans}" />
+                                    <Setter Property="FontSize"
+                                            Value="13" />
+                                    <Setter Property="HorizontalAlignment"
+                                            Value="Center" />
+                                    <Setter Property="VerticalAlignment"
+                                            Value="Center" />
+                                    <Setter Property="Foreground"
+                                            Value="#374151" />
+                                </Style>
 
-                            <Style x:Key="RowNumberColumnStyle"
-                                   TargetType="TextBlock"
-                                   BasedOn="{StaticResource BaseTextColumnStyle}">
-                                <Setter Property="Foreground"
-                                        Value="#94A3B8" />
-                                <Setter Property="FontWeight"
-                                        Value="SemiBold" />
-                            </Style>
+                                <Style x:Key="LtrTextColumnStyle"
+                                       TargetType="TextBlock"
+                                       BasedOn="{StaticResource BaseTextColumnStyle}">
+                                    <Setter Property="FlowDirection"
+                                            Value="LeftToRight" />
+                                </Style>
 
+                                <Style x:Key="RowNumberColumnStyle"
+                                       TargetType="TextBlock"
+                                       BasedOn="{StaticResource BaseTextColumnStyle}">
+                                    <Setter Property="Foreground"
+                                            Value="#9CA3AF" />
+                                    <Setter Property="FontWeight"
+                                            Value="SemiBold" />
+                                </Style>
 
-                            <Style x:Key="FullNameColumnStyle"
-                                   TargetType="TextBlock"
-                                   BasedOn="{StaticResource BaseTextColumnStyle}">
-                                <Setter Property="Foreground"
-                                        Value="#5C5C5C" />
-                                <Setter Property="FontWeight"
-                                        Value="SemiBold" />
-                            </Style>
+                                <Style x:Key="FullNameColumnStyle"
+                                       TargetType="TextBlock"
+                                       BasedOn="{StaticResource BaseTextColumnStyle}">
+                                    <Setter Property="HorizontalAlignment"
+                                            Value="Right" />
+                                    <Setter Property="FontWeight"
+                                            Value="Medium" />
+                                    <Setter Property="Foreground"
+                                            Value="#1F2937" />
+                                </Style>
 
-
-                            <Style TargetType="DataGridColumnHeader">
-                                <Setter Property="Tag"
-                                        Value="True" />
-
-                                <Setter Property="Background"
-                                        Value="#E9F0FF" />
-                                <Setter Property="Foreground"
-                                        Value="#0D2159" />
-                                <Setter Property="FontSize"
-                                        Value="12.5" />
-                                <Setter Property="FontWeight"
-                                        Value="Bold" />
-                                <Setter Property="FontFamily"
-                                        Value="{StaticResource IRANSans}" />
-                                <Setter Property="Padding"
-                                        Value="10,0" />
-                                <Setter Property="BorderBrush"
-                                        Value="#BED1FF" />
-                                <Setter Property="BorderThickness"
-                                        Value="1,2,1,2" />
-                                <Setter Property="HorizontalContentAlignment"
-                                        Value="Center" />
-                                <Setter Property="Height"
-                                        Value="46" />
-
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="DataGridColumnHeader">
-                                            <Border Background="{TemplateBinding Background}"
-                                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                                    Padding="{TemplateBinding Padding}">
-
-                                                <Grid>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                    </Grid.ColumnDefinitions>
-
-                                                    <ContentPresenter Grid.Column="0"
-                                                                      VerticalAlignment="Center"
+                                <!-- ═══ استایل هدر (سرستون) ═══ -->
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="Background"
+                                            Value="#FFFFFF" />
+                                    <Setter Property="Foreground"
+                                            Value="#1F2937" />
+                                    <Setter Property="FontSize"
+                                            Value="13" />
+                                    <Setter Property="FontWeight"
+                                            Value="SemiBold" />
+                                    <Setter Property="FontFamily"
+                                            Value="{StaticResource IRANSans}" />
+                                    <Setter Property="Padding"
+                                            Value="10,0" />
+                                    <Setter Property="BorderBrush"
+                                            Value="#E5E7EB" />
+                                    <Setter Property="BorderThickness"
+                                            Value="0,0,0,0" />
+                                    <Setter Property="HorizontalContentAlignment"
+                                            Value="Center" />
+                                    <Setter Property="VerticalContentAlignment"
+                                            Value="Center" />
+                                    <Setter Property="Height"
+                                            Value="44" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="DataGridColumnHeader">
+                                                <Border Background="{TemplateBinding Background}"
+                                                        BorderBrush="#E5E7EB"
+                                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                                        Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter VerticalAlignment="Center"
                                                                       HorizontalAlignment="Center" />
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
 
-                                                    <svg:SvgViewbox x:Name="FilterIcon"
-                                                                    Width="13"
-                                                                    Height="13"
-                                                                    Grid.Column="1"
-                                                                    Source="/Assets/Icons/filter-search.svg"
-                                                                    VerticalAlignment="Center" />
-                                                </Grid>
-                                            </Border>
+                                <!-- ═══ استایل سلول ═══ -->
+                                <Style TargetType="DataGridCell">
+                                    <Setter Property="Background"
+                                            Value="Transparent" />
+                                    <Setter Property="Foreground"
+                                            Value="#374151" />
+                                    <Setter Property="FontSize"
+                                            Value="13" />
+                                    <Setter Property="BorderThickness"
+                                            Value="0" />
+                                    <Setter Property="Padding"
+                                            Value="8,0" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="DataGridCell">
+                                                <Border Background="{TemplateBinding Background}"
+                                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                                        Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter VerticalAlignment="Center"
+                                                                      HorizontalAlignment="Center" />
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsSelected"
+                                                 Value="True">
+                                            <Setter Property="Background"
+                                                    Value="Transparent" />
+                                            <Setter Property="Foreground"
+                                                    Value="#1F2937" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
 
-                                            <ControlTemplate.Triggers>
-                                                <Trigger Property="Tag"
-                                                         Value="False">
-                                                    <Setter TargetName="FilterIcon"
-                                                            Property="Visibility"
-                                                            Value="Collapsed" />
-                                                </Trigger>
-                                            </ControlTemplate.Triggers>
+                                <!-- ═══ استایل ردیف ═══ -->
+                                <Style TargetType="DataGridRow">
+                                    <Setter Property="Background"
+                                            Value="#FFFFFF" />
+                                    <Setter Property="Cursor"
+                                            Value="Hand" />
+                                    <Setter Property="BorderBrush"
+                                            Value="Transparent" />
+                                    <Setter Property="BorderThickness"
+                                            Value="0" />
+                                    <Setter Property="Height"
+                                            Value="36" />
 
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-
-
-
-
-                            <Style TargetType="DataGridCell">
-                                <Setter Property="Background"
-                                        Value="Transparent" />
-                                <Setter Property="Foreground"
-                                        Value="#5C5C5C" />
-                                <Setter Property="FontSize"
-                                        Value="12.5" />
-                                <Setter Property="BorderThickness"
-                                        Value="0" />
-                                <Setter Property="Padding"
-                                        Value="8,0" />
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="DataGridCell">
-                                            <Border Background="{TemplateBinding Background}"
-                                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                                    Padding="{TemplateBinding Padding}">
-                                                <ContentPresenter VerticalAlignment="Center"
-                                                                  HorizontalAlignment="Center" />
-                                            </Border>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                                <Style.Triggers>
-                                    <Trigger Property="IsSelected"
-                                             Value="True">
-                                        <Setter Property="Background"
-                                                Value="#E8F2FF" />
-                                        <Setter Property="Foreground"
-                                                Value="#2667FF" />
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-
-                            <Style TargetType="DataGridRow">
-                                <Setter Property="Background"
-                                        Value="#FFFFFF" />
-                                <Setter Property="Cursor"
-                                        Value="Hand" />
-                                <Style.Triggers>
-                                    <Trigger Property="AlternationIndex"
-                                             Value="1">
-                                        <Setter Property="Background"
-                                                Value="#E5E7EC" />
-                                    </Trigger>
-                                    <Trigger Property="IsMouseOver"
-                                             Value="True">
-                                        <Setter Property="Background"
-                                                Value="#F0F5FF" />
-                                    </Trigger>
-                                    <Trigger Property="IsSelected"
-                                             Value="True">
-                                        <Setter Property="Background"
-                                                Value="#E8F2FF" />
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-
-                        </DataGrid.Resources>
+                                    <Setter Property="ClipToBounds"
+                                            Value="True" />
+                                    <Setter Property="SnapsToDevicePixels"
+                                            Value="True" />
+                                    <Setter Property="UseLayoutRounding"
+                                            Value="True" />
 
 
-                        <DataGrid.Columns>
-                            <DataGridTemplateColumn Header=""
-                                                    Width="60">
-                                <DataGridTemplateColumn.HeaderStyle>
-                                    <Style TargetType="DataGridColumnHeader"
-                                           BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
-                                        <Setter Property="Tag"
-                                                Value="False" />
-                                        <Setter Property="HorizontalContentAlignment"
-                                                Value="Center" />
-                                    </Style>
-                                </DataGridTemplateColumn.HeaderStyle>
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Border x:Name="CheckBoxBorder"
-                                                Width="22"
-                                                Height="22"
-                                                BorderThickness="2"
-                                                CornerRadius="4"
-                                                Cursor="Hand"
-                                                HorizontalAlignment="Center"
-                                                VerticalAlignment="Center"
-                                                MouseLeftButtonUp="CheckBoxBorder_MouseLeftButtonUp">
+                                    <EventSetter Event="PreviewMouseLeftButtonDown"
+                                                 Handler="DataGridRow_PreviewMouseLeftButtonDown" />
+                                    <EventSetter Event="MouseLeftButtonDown"
+                                                 Handler="DataGridRow_MouseLeftButtonDown" />
+                                    <Style.Triggers>
+                                        <Trigger Property="AlternationIndex"
+                                                 Value="1">
+                                            <Setter Property="Background"
+                                                    Value="#F8FAFC" />
+                                        </Trigger>
+                                        <Trigger Property="IsMouseOver"
+                                                 Value="True">
+                                            <Setter Property="Background"
+                                                    Value="#F0F5FF" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
 
-                                            <Border.Style>
-                                                <Style TargetType="Border">
-                                                    <Setter Property="Background"
-                                                            Value="White" />
-                                                    <Setter Property="BorderBrush"
-                                                            Value="#CBD5E1" />
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding IsSelected}"
-                                                                     Value="True">
-                                                            <Setter Property="Background"
-                                                                    Value="White" />
-                                                            <Setter Property="BorderBrush"
-                                                                    Value="#2ECC71" />
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding IsEmpty}"
-                                                                     Value="True">
-                                                            <Setter Property="Visibility"
-                                                                    Value="Collapsed" />
-                                                        </DataTrigger>
-                                                        <Trigger Property="IsMouseOver"
-                                                                 Value="True">
-                                                            <Setter Property="Background"
-                                                                    Value="#F0F5FF" />
-                                                            <Setter Property="BorderBrush"
-                                                                    Value="#2ECC71" />
-                                                        </Trigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Border.Style>
+                            </DataGrid.Resources>
 
-                                            <svg:SvgViewbox x:Name="CheckMark"
-                                                            Width="10"
-                                                            Height="10"
-                                                            Source="/Assets/Icons/Line.svg"
-                                                            FlowDirection="LeftToRight"
-                                                            HorizontalAlignment="Center"
-                                                            VerticalAlignment="Center">
-                                                <svg:SvgViewbox.Style>
-                                                    <Style TargetType="svg:SvgViewbox">
-                                                        <Setter Property="Visibility"
-                                                                Value="Collapsed" />
+                            <DataGrid.Columns>
+
+                                <!-- 1️⃣ چک‌باکس -->
+                                <DataGridTemplateColumn Header=""
+                                                        Width="55">
+                                    <DataGridTemplateColumn.HeaderStyle>
+                                        <Style TargetType="DataGridColumnHeader"
+                                               BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                                            <Setter Property="BorderThickness"
+                                                    Value="0,0,1,2" />
+                                            <Setter Property="BorderBrush"
+                                                    Value="#E0E7FF" />
+                                        </Style>
+                                    </DataGridTemplateColumn.HeaderStyle>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border x:Name="CheckBoxBorder"
+                                                    Width="20"
+                                                    Height="20"
+                                                    CornerRadius="5"
+                                                    Cursor="Hand"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"
+                                                    MouseLeftButtonUp="CheckBoxBorder_MouseLeftButtonUp">
+                                                <Border.Style>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="Background"
+                                                                Value="#FFFFFF" />
+                                                        <Setter Property="BorderBrush"
+                                                                Value="#CBD5E1" />
+                                                        <Setter Property="BorderThickness"
+                                                                Value="1.5" />
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding IsSelected}"
                                                                          Value="True">
-                                                                <Setter Property="Visibility"
-                                                                        Value="Visible" />
+                                                                <Setter Property="Background"
+                                                                        Value="#2667FF" />
+                                                                <Setter Property="BorderBrush"
+                                                                        Value="#2667FF" />
                                                             </DataTrigger>
+                                                            <DataTrigger Binding="{Binding IsEmpty}"
+                                                                         Value="True">
+                                                                <Setter Property="Visibility"
+                                                                        Value="Collapsed" />
+                                                            </DataTrigger>
+                                                            <Trigger Property="IsMouseOver"
+                                                                     Value="True">
+                                                                <Setter Property="BorderBrush"
+                                                                        Value="#2667FF" />
+                                                            </Trigger>
                                                         </Style.Triggers>
                                                     </Style>
-                                                </svg:SvgViewbox.Style>
-                                            </svg:SvgViewbox>
-                                        </Border>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
+                                                </Border.Style>
+                                                <svg:SvgViewbox x:Name="CheckMark"
+                                                                Width="12"
+                                                                Height="12"
+                                                                Source="/Assets/Icons/Line.svg"
+                                                                FlowDirection="LeftToRight"
+                                                                HorizontalAlignment="Center"
+                                                                VerticalAlignment="Center">
+                                                    <svg:SvgViewbox.Style>
+                                                        <Style TargetType="svg:SvgViewbox">
+                                                            <Setter Property="Visibility"
+                                                                    Value="Collapsed" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsSelected}"
+                                                                             Value="True">
+                                                                    <Setter Property="Visibility"
+                                                                            Value="Visible" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </svg:SvgViewbox.Style>
+                                                </svg:SvgViewbox>
+                                            </Border>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
 
-                            <DataGridTextColumn Header="#"
-                                                Width="50"
-                                                Binding="{Binding RowNumberDisplay}"
-                                                ElementStyle="{StaticResource RowNumberColumnStyle}">
+                                <!-- 2️⃣ ردیف (#) -->
+                                <DataGridTextColumn Header="#"
+                                                    Width="50"
+                                                    Binding="{Binding RowNumberDisplay}"
+                                                    ElementStyle="{StaticResource RowNumberColumnStyle}">
+                                    <DataGridTextColumn.HeaderStyle>
+                                        <Style TargetType="DataGridColumnHeader"
+                                               BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                                            <Setter Property="BorderThickness"
+                                                    Value="0,0,1,2" />
+                                            <Setter Property="BorderBrush"
+                                                    Value="#E0E7FF" />
+                                        </Style>
+                                    </DataGridTextColumn.HeaderStyle>
+                                </DataGridTextColumn>
 
-                                <DataGridTextColumn.HeaderStyle>
-                                    <Style TargetType="DataGridColumnHeader"
-                                           BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
-                                        <Setter Property="Tag"
-                                                Value="False" />
-                                    </Style>
-                                </DataGridTextColumn.HeaderStyle>
+                                <!-- 3️⃣ کد یکتا -->
+                                <DataGridTextColumn Header="کد یکتا"
+                                                    Width="100"
+                                                    Binding="{Binding Code}"
+                                                    ElementStyle="{StaticResource BaseTextColumnStyle}">
+                                    <DataGridTextColumn.HeaderStyle>
+                                        <Style TargetType="DataGridColumnHeader"
+                                               BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                                            <Setter Property="BorderThickness"
+                                                    Value="0,0,1,2" />
+                                            <Setter Property="BorderBrush"
+                                                    Value="#E0E7FF" />
+                                        </Style>
+                                    </DataGridTextColumn.HeaderStyle>
+                                </DataGridTextColumn>
 
-                            </DataGridTextColumn>
+                                <!-- 4️⃣ نام کامل / شرکت -->
+                                <DataGridTextColumn Header="نام کامل / شرکت"
+                                                    Width="180"
+                                                    Binding="{Binding FullName}"
+                                                    ElementStyle="{StaticResource FullNameColumnStyle}">
+                                    <DataGridTextColumn.HeaderStyle>
+                                        <Style TargetType="DataGridColumnHeader"
+                                               BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                                            <Setter Property="BorderThickness"
+                                                    Value="0,0,1,2" />
+                                            <Setter Property="BorderBrush"
+                                                    Value="#E0E7FF" />
+                                        </Style>
+                                    </DataGridTextColumn.HeaderStyle>
+                                </DataGridTextColumn>
 
-                            <DataGridTextColumn Header="کد"
-                                                Width="85"
-                                                Binding="{Binding Code}"
-                                                ElementStyle="{StaticResource BaseTextColumnStyle}" />
-                            <DataGridTextColumn Header="دسته بندی"
-                                                Width="120"
-                                                Binding="{Binding Category}"
-                                                ElementStyle="{StaticResource BaseTextColumnStyle}" />
-
-                            <!-- ستون وضعیت با آیکون فیلتر -->
-                            <DataGridTemplateColumn Width="110">
-                                <DataGridTemplateColumn.HeaderTemplate>
-                                    <DataTemplate>
-                                        <Border Padding="6,0">
+                                <!-- 5️⃣ وضعیت (با فیلتر) -->
+                                <DataGridTemplateColumn Width="100">
+                                    <DataGridTemplateColumn.HeaderStyle>
+                                        <Style TargetType="DataGridColumnHeader"
+                                               BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                                            <Setter Property="BorderThickness"
+                                                    Value="0,0,1,2" />
+                                            <Setter Property="BorderBrush"
+                                                    Value="#E0E7FF" />
+                                        </Style>
+                                    </DataGridTemplateColumn.HeaderStyle>
+                                    <DataGridTemplateColumn.HeaderTemplate>
+                                        <DataTemplate>
                                             <StackPanel Orientation="Horizontal"
-                                                        VerticalAlignment="Center">
+                                                        VerticalAlignment="Center"
+                                                        HorizontalAlignment="Center">
                                                 <TextBlock Text="وضعیت"
                                                            FontFamily="{StaticResource IRANSans}"
-                                                           FontSize="12"
-                                                           FontWeight="Medium"
+                                                           FontSize="13"
+                                                           FontWeight="SemiBold"
                                                            Foreground="#1F2937"
                                                            VerticalAlignment="Center" />
                                                 <Button Click="StatusFilter_Click"
@@ -836,130 +867,108 @@
                                                     </Button.Template>
                                                 </Button>
                                             </StackPanel>
-                                        </Border>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.HeaderTemplate>
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Border Padding="8,3"
-                                                CornerRadius="5"
-                                                HorizontalAlignment="Center"
-                                                Visibility="{Binding StatusVisibility}">
-                                            <Border.Style>
-                                                <Style TargetType="Border">
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding Status}"
-                                                                     Value="غیرفعال">
-                                                            <Setter Property="Background"
-                                                                    Value="#FEE2E2" />
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding Status}"
-                                                                     Value="فعال">
-                                                            <Setter Property="Background"
-                                                                    Value="#DCFCE7" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Border.Style>
-                                            <TextBlock Text="{Binding Status}"
-                                                       FontSize="11"
-                                                       FontWeight="Medium"
-                                                       FontFamily="{StaticResource IRANSans}">
-                                                <TextBlock.Style>
-                                                    <Style TargetType="TextBlock">
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.HeaderTemplate>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border Padding="8,4"
+                                                    CornerRadius="6"
+                                                    HorizontalAlignment="Center"
+                                                    Visibility="{Binding StatusVisibility}">
+                                                <Border.Style>
+                                                    <Style TargetType="Border">
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding Status}"
                                                                          Value="غیرفعال">
-                                                                <Setter Property="Foreground"
-                                                                        Value="#991B1B" />
+                                                                <Setter Property="Background"
+                                                                        Value="#FEE2E2" />
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding Status}"
                                                                          Value="فعال">
-                                                                <Setter Property="Foreground"
-                                                                        Value="#166534" />
+                                                                <Setter Property="Background"
+                                                                        Value="#DCFCE7" />
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
-                                                </TextBlock.Style>
-                                            </TextBlock>
-                                        </Border>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-
-                            <DataGridTextColumn Header="نام و نام خانوادگی"
-                                                Width="160"
-                                                Binding="{Binding FullName}"
-                                                ElementStyle="{StaticResource FullNameColumnStyle}" />
-                            <DataGridTextColumn Header="شرکت"
-                                                Width="160"
-                                                Binding="{Binding Company}"
-                                                ElementStyle="{StaticResource BaseTextColumnStyle}" />
-
-                            <!-- ستون استان با آیکون فیلتر -->
-                            <DataGridTemplateColumn Width="130">
-                                <DataGridTemplateColumn.HeaderTemplate>
-                                    <DataTemplate>
-                                        <Border Padding="6,0">
-                                            <StackPanel Orientation="Horizontal"
-                                                        VerticalAlignment="Center">
-                                                <TextBlock Text="استان"
-                                                           FontFamily="{StaticResource IRANSans}"
-                                                           FontSize="12"
+                                                </Border.Style>
+                                                <TextBlock Text="{Binding Status}"
+                                                           FontSize="11.5"
                                                            FontWeight="Medium"
-                                                           Foreground="#1F2937"
-                                                           VerticalAlignment="Center" />
-                                                <Button Click="ProvinceFilter_Click"
-                                                        Background="Transparent"
-                                                        BorderThickness="0"
-                                                        Cursor="Hand"
-                                                        Padding="2"
-                                                        VerticalAlignment="Center"
-                                                        Margin="4,0,0,0">
-                                                    <Button.Template>
-                                                        <ControlTemplate TargetType="Button">
-                                                            <Border x:Name="bd"
-                                                                    Background="Transparent"
-                                                                    Padding="2">
-                                                                <svg:SvgViewbox Width="12"
-                                                                                Height="12"
-                                                                                Source="/Assets/Icons/filter-search.svg"
-                                                                                VerticalAlignment="Center" />
-                                                            </Border>
-                                                            <ControlTemplate.Triggers>
-                                                                <Trigger Property="IsMouseOver"
-                                                                         Value="True">
-                                                                    <Setter TargetName="bd"
-                                                                            Property="Background"
-                                                                            Value="#F3F4F6" />
-                                                                </Trigger>
-                                                            </ControlTemplate.Triggers>
-                                                        </ControlTemplate>
-                                                    </Button.Template>
-                                                </Button>
-                                            </StackPanel>
-                                        </Border>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.HeaderTemplate>
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding Province}"
-                                                   Style="{StaticResource BaseTextColumnStyle}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
+                                                           FontFamily="{StaticResource IRANSans}">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Status}"
+                                                                             Value="غیرفعال">
+                                                                    <Setter Property="Foreground"
+                                                                            Value="#991B1B" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Status}"
+                                                                             Value="فعال">
+                                                                    <Setter Property="Foreground"
+                                                                            Value="#166534" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </Border>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
 
-                            <!-- ستون شهر با آیکون فیلتر -->
-                            <DataGridTemplateColumn Width="120">
-                                <DataGridTemplateColumn.HeaderTemplate>
-                                    <DataTemplate>
-                                        <Border Padding="6,0">
+                                <!-- 6️⃣ نوع (حقیقی/حقوقی) -->
+                                <DataGridTextColumn Header="نوع"
+                                                    Width="90"
+                                                    Binding="{Binding LegalStatus}"
+                                                    ElementStyle="{StaticResource BaseTextColumnStyle}">
+                                    <DataGridTextColumn.HeaderStyle>
+                                        <Style TargetType="DataGridColumnHeader"
+                                               BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                                            <Setter Property="BorderThickness"
+                                                    Value="0,0,1,2" />
+                                            <Setter Property="BorderBrush"
+                                                    Value="#E0E7FF" />
+                                        </Style>
+                                    </DataGridTextColumn.HeaderStyle>
+                                </DataGridTextColumn>
+
+                                <!-- 7️⃣ موبایل -->
+                                <DataGridTextColumn Header="موبایل"
+                                                    Width="130"
+                                                    Binding="{Binding Mobile}"
+                                                    ElementStyle="{StaticResource LtrTextColumnStyle}">
+                                    <DataGridTextColumn.HeaderStyle>
+                                        <Style TargetType="DataGridColumnHeader"
+                                               BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                                            <Setter Property="BorderThickness"
+                                                    Value="0,0,1,2" />
+                                            <Setter Property="BorderBrush"
+                                                    Value="#E0E7FF" />
+                                        </Style>
+                                    </DataGridTextColumn.HeaderStyle>
+                                </DataGridTextColumn>
+
+                                <!-- 8️⃣ شهر (با فیلتر) -->
+                                <DataGridTemplateColumn Width="120">
+                                    <DataGridTemplateColumn.HeaderStyle>
+                                        <Style TargetType="DataGridColumnHeader"
+                                               BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                                            <Setter Property="BorderThickness"
+                                                    Value="0,0,1,2" />
+                                            <Setter Property="BorderBrush"
+                                                    Value="#E0E7FF" />
+                                        </Style>
+                                    </DataGridTemplateColumn.HeaderStyle>
+                                    <DataGridTemplateColumn.HeaderTemplate>
+                                        <DataTemplate>
                                             <StackPanel Orientation="Horizontal"
-                                                        VerticalAlignment="Center">
+                                                        VerticalAlignment="Center"
+                                                        HorizontalAlignment="Center">
                                                 <TextBlock Text="شهر"
                                                            FontFamily="{StaticResource IRANSans}"
-                                                           FontSize="12"
-                                                           FontWeight="Medium"
+                                                           FontSize="13"
+                                                           FontWeight="SemiBold"
                                                            Foreground="#1F2937"
                                                            VerticalAlignment="Center" />
                                                 <Button Click="CityFilter_Click"
@@ -991,133 +1000,136 @@
                                                     </Button.Template>
                                                 </Button>
                                             </StackPanel>
-                                        </Border>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.HeaderTemplate>
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding City}"
-                                                   Style="{StaticResource BaseTextColumnStyle}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="تلفن"
-                                                Width="120"
-                                                Binding="{Binding Phone}"
-                                                ElementStyle="{StaticResource LtrTextColumnStyle}">
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.HeaderTemplate>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding City}"
+                                                       Style="{StaticResource BaseTextColumnStyle}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
 
-                                <DataGridTextColumn.HeaderStyle>
-                                    <Style TargetType="DataGridColumnHeader"
-                                           BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
-                                        <Setter Property="Tag"
-                                                Value="False" />
-                                    </Style>
-                                </DataGridTextColumn.HeaderStyle>
+                                <!-- 9️⃣ آخرین تراکنش -->
+                                <DataGridTemplateColumn Header="آخرین تراکنش"
+                                                        Width="130">
+                                    <DataGridTemplateColumn.HeaderStyle>
+                                        <Style TargetType="DataGridColumnHeader"
+                                               BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                                            <Setter Property="BorderThickness"
+                                                    Value="0,0,1,2" />
+                                            <Setter Property="BorderBrush"
+                                                    Value="#E0E7FF" />
+                                        </Style>
+                                    </DataGridTemplateColumn.HeaderStyle>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Vertical"
+                                                        HorizontalAlignment="Center"
+                                                        VerticalAlignment="Center"
+                                                        Visibility="{Binding AccountStatusVisibility}">
+                                                <TextBlock Text="{Binding TransactionType}"
+                                                           FontSize="12"
+                                                           FontWeight="Medium"
+                                                           Foreground="#374151"
+                                                           FontFamily="{StaticResource IRANSans}"
+                                                           HorizontalAlignment="Center" />
+                                                <TextBlock Text="{Binding TransactionDate}"
+                                                           FontSize="11"
+                                                           Foreground="#94A3B8"
+                                                           FontFamily="{StaticResource IRANSans}"
+                                                           FlowDirection="LeftToRight"
+                                                           Margin="0,2,0,0"
+                                                           HorizontalAlignment="Center" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
 
-                            </DataGridTextColumn>
+                                <!-- 🔟 وضعیت حساب -->
+                                <DataGridTemplateColumn Header="مانده / وضعیت حساب"
+                                                        Width="150">
+                                    <DataGridTemplateColumn.HeaderStyle>
+                                        <Style TargetType="DataGridColumnHeader"
+                                               BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                                            <Setter Property="BorderThickness"
+                                                    Value="0,0,0,2" />
+                                            <Setter Property="BorderBrush"
+                                                    Value="#E0E7FF" />
+                                        </Style>
+                                    </DataGridTemplateColumn.HeaderStyle>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Vertical"
+                                                        HorizontalAlignment="Center"
+                                                        VerticalAlignment="Center"
+                                                        Visibility="{Binding AccountStatusVisibility}">
 
-                            <DataGridTextColumn Header="موبایل"
-                                                Width="130"
-                                                Binding="{Binding Mobile}"
-                                                ElementStyle="{StaticResource LtrTextColumnStyle}">
+                                                <TextBlock Text="{Binding AccountStatus}"
+                                                           FontSize="12"
+                                                           FontWeight="Bold"
+                                                           FontFamily="{StaticResource IRANSans}"
+                                                           HorizontalAlignment="Center">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding AccountStatus}"
+                                                                             Value="بدهکار">
+                                                                    <Setter Property="Foreground"
+                                                                            Value="#166534" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding AccountStatus}"
+                                                                             Value="بستانکار">
+                                                                    <Setter Property="Foreground"
+                                                                            Value="#991B1B" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding AccountStatus}"
+                                                                             Value="تسویه">
+                                                                    <Setter Property="Foreground"
+                                                                            Value="#64748B" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
 
-                                <DataGridTextColumn.HeaderStyle>
-                                    <Style TargetType="DataGridColumnHeader"
-                                           BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
-                                        <Setter Property="Tag"
-                                                Value="False" />
-                                    </Style>
-                                </DataGridTextColumn.HeaderStyle>
+                                                <TextBlock Text="{Binding BalanceDisplay}"
+                                                           FontSize="12"
+                                                           FontWeight="SemiBold"
+                                                           FontFamily="{StaticResource IRANSans}"
+                                                           FlowDirection="LeftToRight"
+                                                           Margin="0,2,0,0"
+                                                           HorizontalAlignment="Center">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding AccountStatus}"
+                                                                             Value="بدهکار">
+                                                                    <Setter Property="Foreground"
+                                                                            Value="#166534" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding AccountStatus}"
+                                                                             Value="بستانکار">
+                                                                    <Setter Property="Foreground"
+                                                                            Value="#991B1B" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding AccountStatus}"
+                                                                             Value="تسویه">
+                                                                    <Setter Property="Foreground"
+                                                                            Value="#64748B" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
 
-                            </DataGridTextColumn>
-
-                            <DataGridTextColumn Header="شناسه ملی"
-                                                Width="130"
-                                                Binding="{Binding NationalId}"
-                                                ElementStyle="{StaticResource BaseTextColumnStyle}">
-
-                                <DataGridTextColumn.HeaderStyle>
-                                    <Style TargetType="DataGridColumnHeader"
-                                           BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
-                                        <Setter Property="Tag"
-                                                Value="False" />
-                                    </Style>
-                                </DataGridTextColumn.HeaderStyle>
-
-                            </DataGridTextColumn>
-
-                            <DataGridTextColumn Header="شناسه اقتصادی"
-                                                Width="130"
-                                                Binding="{Binding EconomicId}"
-                                                ElementStyle="{StaticResource BaseTextColumnStyle}">
-
-                                <DataGridTextColumn.HeaderStyle>
-                                    <Style TargetType="DataGridColumnHeader"
-                                           BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
-                                        <Setter Property="Tag"
-                                                Value="False" />
-                                    </Style>
-                                </DataGridTextColumn.HeaderStyle>
-
-                            </DataGridTextColumn>
-
-
-                            <DataGridTemplateColumn Header="وضعیت حساب"
-                                                    Width="110">
-
-                                <DataGridTemplateColumn.HeaderStyle>
-                                    <Style TargetType="DataGridColumnHeader"
-                                           BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
-                                        <Setter Property="Tag"
-                                                Value="False" />
-                                    </Style>
-                                </DataGridTemplateColumn.HeaderStyle>
-
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Border Padding="8,3"
-                                                CornerRadius="10"
-                                                HorizontalAlignment="Center"
-                                                Visibility="{Binding AccountStatusVisibility}">
-
-                                            <Border.Style>
-                                                <Style TargetType="Border">
-                                                    <Setter Property="Background"
-                                                            Value="Transparent" />
-
-                                                    <Style.Triggers>
-
-                                                        <DataTrigger Binding="{Binding AccountStatus}"
-                                                                     Value="بدهکار">
-
-                                                        </DataTrigger>
-
-                                                        <DataTrigger Binding="{Binding AccountStatus}"
-                                                                     Value="بستانکار">
-
-                                                        </DataTrigger>
-
-                                                        <DataTrigger Binding="{Binding AccountStatus}"
-                                                                     Value="تسویه">
-
-                                                        </DataTrigger>
-
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Border.Style>
-
-                                            <TextBlock Text="{Binding AccountStatus}"
-                                                       FontSize="11"
-                                                       FontWeight="Medium"
-                                                       FontFamily="{StaticResource IRANSans}" />
-                                        </Border>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-
-                            </DataGridTemplateColumn>
-
-                        </DataGrid.Columns>
-                    </DataGrid>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
                     <Border x:Name="LoadingOverlay"
                             Background="#B8F8FAFC"
                             Visibility="Collapsed"
@@ -1468,7 +1480,7 @@
                                         </Trigger>
                                     </ControlTemplate.Triggers>
                                 </ControlTemplate>
-                            </Button.Template>
+                            </Button.Template> a
                         </Button>
                     </StackPanel>
                 </Grid>

@@ -174,7 +174,14 @@ namespace Taadol.Views
                             Mobile = mobile,
                             NationalId = string.IsNullOrWhiteSpace(p.NationalCode) ? "—" : p.NationalCode,
                             EconomicId = string.IsNullOrWhiteSpace(p.EconomicCode) ? "—" : p.EconomicCode,
+
+                            // ★ اینها رو باید بعداً از سرویس تراکنش/حساب واقعی پر کنی
+                            TransactionType = "—",
+                            TransactionDate = "—",
                             AccountStatus = "—",
+                            BalanceDisplay = "—",
+
+                            IsLegal = p.IsLegal,
                             PersonType = p.PersonType,
                             IsEmpty = false
                         };
@@ -314,6 +321,8 @@ namespace Taadol.Views
                 PersonsDataGrid.ItemsSource = FilteredPersons;
 
             BuildPaginationButtons();
+
+            Dispatcher.BeginInvoke(new Action(() => UpdateRowBorders()), System.Windows.Threading.DispatcherPriority.Loaded);
         }
 
         private void BuildPaginationButtons()
@@ -532,14 +541,56 @@ namespace Taadol.Views
                 "عملیات", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        private void CheckBoxBorder_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void CheckBoxBorder_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (sender is System.Windows.FrameworkElement fe && fe.DataContext is PersonItem item)
+            if (sender is FrameworkElement fe && fe.DataContext is PersonItem item)
             {
                 item.IsSelected = !item.IsSelected;
+                UpdateRowBorders();
+                e.Handled = true;
             }
         }
 
+        private void UpdateRowBorders()
+        {
+            var items = PersonsDataGrid.Items;
+            for (int i = 0; i < items.Count; i++)
+            {
+                var row = PersonsDataGrid.ItemContainerGenerator.ContainerFromIndex(i) as System.Windows.Controls.DataGridRow;
+                if (row == null) continue;
+
+                var item = items[i] as PersonItem;
+                if (item == null || item.IsEmpty)
+                {
+                    row.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.White);
+                    row.BorderBrush = System.Windows.Media.Brushes.Transparent;
+                    row.BorderThickness = new Thickness(0);
+                    continue;
+                }
+
+                bool isAlt = row.AlternationIndex == 1;
+
+                // آیا ردیف قبلی هم انتخاب شده؟ (برای جلوگیری از دوبل شدن خط بین دو ردیف انتخاب‌شده‌ی پشت‌سرهم)
+                bool prevSelected = (i > 0) && items[i - 1] is PersonItem prev && prev.IsSelected;
+
+                if (!item.IsSelected)
+                {
+                    row.Background = new System.Windows.Media.SolidColorBrush(isAlt
+                        ? (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#F8FAFC")
+                        : System.Windows.Media.Colors.White);
+                    row.BorderBrush = System.Windows.Media.Brushes.Transparent;
+                    row.BorderThickness = new Thickness(0);
+                }
+                else
+                {
+                    row.Background = new System.Windows.Media.SolidColorBrush(
+                        (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#EFF6FF"));
+                    row.BorderBrush = new System.Windows.Media.SolidColorBrush(
+                        (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#2667FF"));
+                    row.BorderThickness = new Thickness(0, prevSelected ? 0 : 2, 0, 2);
+                }
+            }
+        }
         private void BtnNextPage_Click(object sender, RoutedEventArgs e)
         {
             if (_currentPage < _totalPages)
@@ -569,7 +620,14 @@ namespace Taadol.Views
             }
         }
 
-        private void PersonsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e) { }
+        private void PersonsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // جلوگیری از انتخاب خودکار توسط DataGrid
+            if (PersonsDataGrid.SelectedItem != null)
+            {
+                PersonsDataGrid.SelectedItem = null;
+            }
+        }
 
         private void PersonsDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
@@ -579,7 +637,31 @@ namespace Taadol.Views
                 mainWindow?.NavigateToEditPerson(item.Id);
             }
         }
-
+        private void DataGridRow_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            // فقط اگر کلیک داخل چک‌باکس بود، اجازه بده
+            if (!IsInsideCheckBox(e.OriginalSource as DependencyObject))
+            {
+                e.Handled = true;
+            }
+        }
+        private void DataGridRow_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (!IsInsideCheckBox(e.OriginalSource as DependencyObject))
+            {
+                e.Handled = true;
+            }
+        }
+        private bool IsInsideCheckBox(DependencyObject element)
+        {
+            while (element != null)
+            {
+                if (element is FrameworkElement fe && fe.Name == "CheckBoxBorder")
+                    return true;
+                element = System.Windows.Media.VisualTreeHelper.GetParent(element);
+            }
+            return false;
+        }
         // ======================================================
         //  Popup Filter Handlers (وضعیت / استان / شهر)
         //  همه‌ی منطق پاپ‌آپ داخل FilterPopupControl قرار داره.
@@ -735,9 +817,12 @@ namespace Taadol.Views
             get => _rowNumber;
             set
             {
-                _rowNumber = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RowNumber)));
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RowNumberDisplay)));
+                if (_rowNumber != value)
+                {
+                    _rowNumber = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RowNumber)));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RowNumberDisplay)));
+                }
             }
         }
 
@@ -746,8 +831,11 @@ namespace Taadol.Views
             get => _isSelected;
             set
             {
-                _isSelected = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsSelected)));
+                if (_isSelected != value)
+                {
+                    _isSelected = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsSelected)));
+                }
             }
         }
 
@@ -755,11 +843,9 @@ namespace Taadol.Views
         public string Category { get; set; }
         public string Status { get; set; }
         public string Nickname { get; set; }
-
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string FullNameText { get; set; }
-
         public string Company { get; set; }
         public string Province { get; set; }
         public string City { get; set; }
@@ -770,6 +856,14 @@ namespace Taadol.Views
         public string AccountStatus { get; set; }
         public string PersonType { get; set; }
         public bool IsEmpty { get; set; }
+
+        // ★ فیلدهای جدید برای ستون‌های جدید گرید
+        public string LastTransaction { get; set; } = "—";
+        public bool IsLegal { get; set; }
+        public string LegalStatus => IsLegal ? "حقوقی" : "حقیقی";
+        public string TransactionType { get; set; } = "—";
+        public string TransactionDate { get; set; } = "—";
+        public string BalanceDisplay { get; set; } = "—";
 
         public string FullName =>
             IsEmpty ? "" : !string.IsNullOrWhiteSpace(FullNameText)
