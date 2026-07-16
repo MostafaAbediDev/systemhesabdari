@@ -35,6 +35,7 @@
     <None Remove="Assets\Icons\edit.svg" />
     <None Remove="Assets\Icons\editblue.svg" />
     <None Remove="Assets\Icons\filter-search.svg" />
+    <None Remove="Assets\Icons\Filter.svg" />
     <None Remove="Assets\Icons\Leftsquare.svg" />
     <None Remove="Assets\Icons\Line.svg" />
     <None Remove="Assets\Icons\LOGO.svg" />
@@ -160,6 +161,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Icons\filter-search.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\Filter.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Icons\Leftsquare.svg">

@@ -17,107 +17,99 @@
     <UserControl.Resources>
 
         <Style x:Key="FilterTabStyle2"
-               TargetType="RadioButton">
+               TargetType="ToggleButton">
             <Setter Property="FontFamily"
                     Value="{StaticResource IRANSans}" />
             <Setter Property="FontSize"
                     Value="13" />
             <Setter Property="Foreground"
-                    Value="#64748B" />
+                    Value="#0D2159" />
+            <Setter Property="Background"
+                    Value="White" />
+            <Setter Property="BorderBrush"
+                    Value="#E5E7EB" />
+            <Setter Property="BorderThickness"
+                    Value="1" />
+            <Setter Property="Padding"
+                    Value="14,10" />
+            <Setter Property="Margin"
+                    Value="0,0,8,0" />
             <Setter Property="Cursor"
                     Value="Hand" />
-            <Setter Property="Margin"
-                    Value="0" />
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="RadioButton">
-                        <Border x:Name="bd"
-                                Background="Transparent"
-                                BorderThickness="0,0,0,2.5"
-                                BorderBrush="Transparent"
-                                Padding="22,11"
-                                SnapsToDevicePixels="True">
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="Root"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
                             <StackPanel Orientation="Horizontal"
-                                        HorizontalAlignment="Center">
-
-                                <Border x:Name="checkIcon"
+                                        FlowDirection="RightToLeft"
+                                        VerticalAlignment="Center">
+                                <Border x:Name="CloseBorder"
                                         Width="18"
                                         Height="18"
-                                        CornerRadius="4"
-                                        Background="#22C55E"
-                                        Margin="0,0,7,0"
+                                        CornerRadius="9"
+                                        Background="Transparent"
+                                        Margin="0,1,0,0"
                                         VerticalAlignment="Center"
-                                        Visibility="Collapsed">
-                                    <TextBlock Text="✓"
-                                               Foreground="White"
-                                               FontSize="11"
-                                               FontWeight="Bold"
+                                        Visibility="Collapsed"
+                                        Cursor="Hand">
+                                    <TextBlock x:Name="CloseText"
+                                               Text="&#x2715;"
+                                               FontSize="9"
+                                               Foreground="#C1121F"
                                                FontFamily="{StaticResource IRANSans}"
                                                HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"
-                                               Margin="0,-1,0,0" />
+                                               VerticalAlignment="Center" />
                                 </Border>
 
-                                <TextBlock x:Name="txt"
+                                <TextBlock x:Name="TitleText"
                                            Text="{TemplateBinding Content}"
                                            VerticalAlignment="Center"
-                                           FontWeight="Medium"
-                                           FontFamily="{StaticResource IRANSans}" />
+                                           FontWeight="Regular"
+                                           FontFamily="{StaticResource IRANSans}"
+                                           Foreground="#0D2159" />
 
-                                <Border x:Name="countBorder"
-                                        Background="#F1F5F9"
-                                        CornerRadius="8"
-                                        Padding="8,3"
-                                        Margin="10,0,0,0"
-                                        VerticalAlignment="Center">
-                                    <TextBlock x:Name="countText"
-                                               Text="{TemplateBinding Tag}"
-                                               FontSize="11"
-                                               Foreground="#94A3B8"
-                                               FontFamily="{StaticResource IRANSans}" />
-                                </Border>
-
-
-                                <Border x:Name="separator"
-                                        Width="1"
-                                        Height="20"
-                                        Background="#E2E8F0"
-                                        Margin="22,0,0,0"
-                                        VerticalAlignment="Center" />
+                                <TextBlock x:Name="CountText"
+                                           Text="{TemplateBinding Tag}"
+                                           FontSize="11"
+                                           Foreground="#94A3B8"
+                                           FontFamily="{StaticResource IRANSans}"
+                                           VerticalAlignment="Center"
+                                           Margin="4,0,0,0" />
                             </StackPanel>
                         </Border>
 
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsChecked"
                                      Value="True">
-                                <Setter TargetName="txt"
-                                        Property="Foreground"
-                                        Value="#1E40AF" />
-                                <Setter TargetName="txt"
-                                        Property="FontWeight"
-                                        Value="Bold" />
-                                <Setter TargetName="bd"
+                                <Setter TargetName="Root"
+                                        Property="Background"
+                                        Value="#EFF6FF" />
+                                <Setter TargetName="Root"
                                         Property="BorderBrush"
-                                        Value="#3B82F6" />
-                                <Setter TargetName="bd"
-                                        Property="Background"
-                                        Value="#F0F7FF" />
-                                <Setter TargetName="countBorder"
-                                        Property="Background"
-                                        Value="#DBEAFE" />
-                                <Setter TargetName="countText"
+                                        Value="#2667FF" />
+                                <Setter TargetName="TitleText"
                                         Property="Foreground"
-                                        Value="#2563EB" />
-                                <Setter TargetName="checkIcon"
+                                        Value="#2667FF" />
+                                <Setter TargetName="CountText"
+                                        Property="Foreground"
+                                        Value="#2667FF" />
+                                <Setter TargetName="CloseBorder"
                                         Property="Visibility"
                                         Value="Visible" />
                             </Trigger>
+
                             <Trigger Property="IsMouseOver"
                                      Value="True">
-                                <Setter TargetName="bd"
+                                <Setter TargetName="Root"
                                         Property="Background"
                                         Value="#F8FAFC" />
                             </Trigger>
+
                             <MultiTrigger>
                                 <MultiTrigger.Conditions>
                                     <Condition Property="IsChecked"
@@ -125,10 +117,21 @@
                                     <Condition Property="IsMouseOver"
                                                Value="True" />
                                 </MultiTrigger.Conditions>
-                                <Setter TargetName="bd"
+                                <Setter TargetName="Root"
                                         Property="Background"
-                                        Value="#E8F1FF" />
+                                        Value="#E0EDFF" />
                             </MultiTrigger>
+
+                            <Trigger SourceName="CloseBorder"
+                                     Property="IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="CloseBorder"
+                                        Property="Background"
+                                        Value="#FEE2E2" />
+                                <Setter TargetName="CloseText"
+                                        Property="Foreground"
+                                        Value="#C1121F" />
+                            </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
@@ -395,34 +398,30 @@
                             VerticalAlignment="Center">
 
 
-                    <RadioButton x:Name="tabAll"
-                                 Style="{StaticResource FilterTabStyle2}"
-                                 GroupName="PersonFilter"
-                                 Content="همه اشخاص"
-                                 Tag="۱۲۵ نفر"
-                                 IsChecked="True"
-                                 Checked="FilterTab_Checked" />
+                    <ToggleButton x:Name="tabAll"
+                                  Style="{StaticResource FilterTabStyle2}"
+                                  Content="همه اشخاص"
+                                  Tag=""
+                                  IsChecked="True"
+                                  Click="FilterTab_Click" />
 
-                    <RadioButton x:Name="tabCustomers"
-                                 Style="{StaticResource FilterTabStyle2}"
-                                 GroupName="PersonFilter"
-                                 Content="مشتریان"
-                                 Tag="۱۰۰ نفر"
-                                 Checked="FilterTab_Checked" />
+                    <ToggleButton x:Name="tabCustomers"
+                                  Style="{StaticResource FilterTabStyle2}"
+                                  Content="مشتریان"
+                                  Tag=""
+                                  Click="FilterTab_Click" />
 
-                    <RadioButton x:Name="tabSuppliers"
-                                 Style="{StaticResource FilterTabStyle2}"
-                                 GroupName="PersonFilter"
-                                 Content="تامین کنندگان"
-                                 Tag="۱۵ نفر"
-                                 Checked="FilterTab_Checked" />
+                    <ToggleButton x:Name="tabSuppliers"
+                                  Style="{StaticResource FilterTabStyle2}"
+                                  Content="تامین کنندگان"
+                                  Tag=""
+                                  Click="FilterTab_Click" />
 
-                    <RadioButton x:Name="tabPersonnel"
-                                 Style="{StaticResource FilterTabStyle2}"
-                                 GroupName="PersonFilter"
-                                 Content="پرسنل و کارکنان"
-                                 Tag="۱۰ نفر"
-                                 Checked="FilterTab_Checked" />
+                    <ToggleButton x:Name="tabPersonnel"
+                                  Style="{StaticResource FilterTabStyle2}"
+                                  Content="پرسنل و کارکنان"
+                                  Tag=""
+                                  Click="FilterTab_Click" />
 
 
 
@@ -503,19 +502,20 @@
                        
                         <DataGrid x:Name="PersonsDataGrid"
                                   CanUserSortColumns="False"
+                                  SnapsToDevicePixels="True"
+                                  UseLayoutRounding="True"
                                   AutoGenerateColumns="False"
                                   MinHeight="496"
-                                 
+                                  
                                   HeadersVisibility="Column"
-                                  GridLinesVisibility="All"
+                                  GridLinesVisibility="Vertical"
                                   VerticalGridLinesBrush="#E5E7EB"
-                                  HorizontalGridLinesBrush="#E5E7EB"
+                                  HorizontalGridLinesBrush="Transparent"
                                   RowHeight="36"
                                   Background="White"
                                   BorderBrush="#E5E7EB"
                                   BorderThickness="1"
-                                 
-                                  SnapsToDevicePixels="True"
+                                  
                                   CanUserAddRows="False"
                                   CanUserDeleteRows="False"
                                   CanUserResizeRows="False"
@@ -651,39 +651,45 @@
                                 <!-- ═══ استایل ردیف ═══ -->
                                 <Style TargetType="DataGridRow">
                                     <Setter Property="Background"
-                                            Value="#FFFFFF" />
+                                            Value="White" />
                                     <Setter Property="Cursor"
                                             Value="Hand" />
-                                    <Setter Property="BorderBrush"
-                                            Value="Transparent" />
-                                    <Setter Property="BorderThickness"
-                                            Value="0" />
                                     <Setter Property="Height"
                                             Value="36" />
-
-                                    <Setter Property="ClipToBounds"
-                                            Value="True" />
+                                    <Setter Property="Focusable"
+                                            Value="False" />
                                     <Setter Property="SnapsToDevicePixels"
                                             Value="True" />
                                     <Setter Property="UseLayoutRounding"
                                             Value="True" />
 
-
                                     <EventSetter Event="PreviewMouseLeftButtonDown"
                                                  Handler="DataGridRow_PreviewMouseLeftButtonDown" />
                                     <EventSetter Event="MouseLeftButtonDown"
                                                  Handler="DataGridRow_MouseLeftButtonDown" />
+
                                     <Style.Triggers>
                                         <Trigger Property="AlternationIndex"
                                                  Value="1">
                                             <Setter Property="Background"
-                                                    Value="#F8FAFC" />
+                                                    Value="#F8F8F8" />
                                         </Trigger>
+
+                                        <!-- هاور: از همون رنگی که برای انتخاب استفاده می‌کردیم -->
                                         <Trigger Property="IsMouseOver"
                                                  Value="True">
                                             <Setter Property="Background"
-                                                    Value="#F0F5FF" />
+                                                    Value="#EFF6FF" />
                                         </Trigger>
+
+                                        <!-- ردیف‌های خالی همیشه سفید بمونن -->
+                                        <DataTrigger Binding="{Binding IsEmpty}"
+                                                     Value="True">
+                                            <Setter Property="Background"
+                                                    Value="White" />
+                                            <Setter Property="Cursor"
+                                                    Value="Arrow" />
+                                        </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
 
@@ -743,9 +749,9 @@
                                                     </Style>
                                                 </Border.Style>
                                                 <svg:SvgViewbox x:Name="CheckMark"
-                                                                Width="12"
-                                                                Height="12"
-                                                                Source="/Assets/Icons/Line.svg"
+                                                                Width="18"
+                                                                Height="18"
+                                                                Source="/Assets/Icons/Check.svg"
                                                                 FlowDirection="LeftToRight"
                                                                 HorizontalAlignment="Center"
                                                                 VerticalAlignment="Center">
@@ -844,7 +850,7 @@
                                                         Cursor="Hand"
                                                         Padding="2"
                                                         VerticalAlignment="Center"
-                                                        Margin="4,0,0,0">
+                                                        Margin="8,0,0,0">
                                                     <Button.Template>
                                                         <ControlTemplate TargetType="Button">
                                                             <Border x:Name="bd"
@@ -852,7 +858,7 @@
                                                                     Padding="2">
                                                                 <svg:SvgViewbox Width="12"
                                                                                 Height="12"
-                                                                                Source="/Assets/Icons/filter-search.svg"
+                                                                                Source="/Assets/Icons/Filter.svg"
                                                                                 VerticalAlignment="Center" />
                                                             </Border>
                                                             <ControlTemplate.Triggers>
@@ -881,12 +887,12 @@
                                                             <DataTrigger Binding="{Binding Status}"
                                                                          Value="غیرفعال">
                                                                 <Setter Property="Background"
-                                                                        Value="#FEE2E2" />
+                                                                        Value="#E5E7EC" />
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding Status}"
                                                                          Value="فعال">
                                                                 <Setter Property="Background"
-                                                                        Value="#DCFCE7" />
+                                                                        Value="#1A00D86F" />
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
@@ -901,12 +907,12 @@
                                                                 <DataTrigger Binding="{Binding Status}"
                                                                              Value="غیرفعال">
                                                                     <Setter Property="Foreground"
-                                                                            Value="#991B1B" />
+                                                                            Value="#66718E" />
                                                                 </DataTrigger>
                                                                 <DataTrigger Binding="{Binding Status}"
                                                                              Value="فعال">
                                                                     <Setter Property="Foreground"
-                                                                            Value="#166534" />
+                                                                            Value="#22C55E" />
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
@@ -917,12 +923,9 @@
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
-                                <!-- 6️⃣ نوع (حقیقی/حقوقی) -->
-                                <DataGridTextColumn Header="نوع"
-                                                    Width="90"
-                                                    Binding="{Binding LegalStatus}"
-                                                    ElementStyle="{StaticResource BaseTextColumnStyle}">
-                                    <DataGridTextColumn.HeaderStyle>
+                                <!-- 6️⃣ نوع (حقیقی/حقوقی) با فیلتر -->
+                                <DataGridTemplateColumn Width="90">
+                                    <DataGridTemplateColumn.HeaderStyle>
                                         <Style TargetType="DataGridColumnHeader"
                                                BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
                                             <Setter Property="BorderThickness"
@@ -930,8 +933,56 @@
                                             <Setter Property="BorderBrush"
                                                     Value="#E0E7FF" />
                                         </Style>
-                                    </DataGridTextColumn.HeaderStyle>
-                                </DataGridTextColumn>
+                                    </DataGridTemplateColumn.HeaderStyle>
+                                    <DataGridTemplateColumn.HeaderTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal"
+                                                        VerticalAlignment="Center"
+                                                        HorizontalAlignment="Center">
+                                                <TextBlock Text="نوع"
+                                                           FontFamily="{StaticResource IRANSans}"
+                                                           FontSize="13"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#1F2937"
+                                                           VerticalAlignment="Center" />
+                                                <Button Click="LegalStatusFilter_Click"
+                                                        Background="Transparent"
+                                                        BorderThickness="0"
+                                                        Cursor="Hand"
+                                                        Padding="2"
+                                                        VerticalAlignment="Center"
+                                                        Margin="8,0,0,0">
+                                                    <Button.Template>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Border x:Name="bd"
+                                                                    Background="Transparent"
+                                                                    Padding="2">
+                                                                <svg:SvgViewbox Width="12"
+                                                                                Height="12"
+                                                                                Source="/Assets/Icons/Filter.svg"
+                                                                                VerticalAlignment="Center" />
+                                                            </Border>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsMouseOver"
+                                                                         Value="True">
+                                                                    <Setter TargetName="bd"
+                                                                            Property="Background"
+                                                                            Value="#F3F4F6" />
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Button.Template>
+                                                </Button>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.HeaderTemplate>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding LegalStatus}"
+                                                       Style="{StaticResource BaseTextColumnStyle}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
 
                                 <!-- 7️⃣ موبایل -->
                                 <DataGridTextColumn Header="موبایل"
@@ -977,7 +1028,7 @@
                                                         Cursor="Hand"
                                                         Padding="2"
                                                         VerticalAlignment="Center"
-                                                        Margin="4,0,0,0">
+                                                        Margin="8,0,0,0">
                                                     <Button.Template>
                                                         <ControlTemplate TargetType="Button">
                                                             <Border x:Name="bd"
@@ -985,7 +1036,7 @@
                                                                     Padding="2">
                                                                 <svg:SvgViewbox Width="12"
                                                                                 Height="12"
-                                                                                Source="/Assets/Icons/filter-search.svg"
+                                                                                Source="/Assets/Icons/Filter.svg"
                                                                                 VerticalAlignment="Center" />
                                                             </Border>
                                                             <ControlTemplate.Triggers>
@@ -1046,9 +1097,8 @@
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
-                                <!-- 🔟 وضعیت حساب -->
-                                <DataGridTemplateColumn Header="مانده / وضعیت حساب"
-                                                        Width="150">
+                                <!-- 🔟 وضعیت حساب با فیلتر -->
+                                <DataGridTemplateColumn Width="190">
                                     <DataGridTemplateColumn.HeaderStyle>
                                         <Style TargetType="DataGridColumnHeader"
                                                BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
@@ -1058,6 +1108,48 @@
                                                     Value="#E0E7FF" />
                                         </Style>
                                     </DataGridTemplateColumn.HeaderStyle>
+                                    <DataGridTemplateColumn.HeaderTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal"
+                                                        VerticalAlignment="Center"
+                                                        HorizontalAlignment="Center">
+                                                <TextBlock Text="مانده / وضعیت حساب"
+                                                           FontFamily="{StaticResource IRANSans}"
+                                                           FontSize="13"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#1F2937"
+                                                           VerticalAlignment="Center" />
+                                                <Button Click="AccountStatusFilter_Click"
+                                                        Background="Transparent"
+                                                        BorderThickness="0"
+                                                        Cursor="Hand"
+                                                        Padding="2"
+                                                        VerticalAlignment="Center"
+                                                        Margin="8,0,0,0">
+                                                    <Button.Template>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Border x:Name="bd"
+                                                                    Background="Transparent"
+                                                                    Padding="2">
+                                                                <svg:SvgViewbox Width="12"
+                                                                                Height="12"
+                                                                                Source="/Assets/Icons/Filter.svg"
+                                                                                VerticalAlignment="Center" />
+                                                            </Border>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsMouseOver"
+                                                                         Value="True">
+                                                                    <Setter TargetName="bd"
+                                                                            Property="Background"
+                                                                            Value="#F3F4F6" />
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Button.Template>
+                                                </Button>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.HeaderTemplate>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Vertical"

@@ -368,148 +368,120 @@
 
 
     <Style x:Key="FilterTabStyle2"
-           TargetType="RadioButton">
+           TargetType="ToggleButton">
         <Setter Property="FontFamily"
                 Value="{StaticResource IRANSans}" />
         <Setter Property="FontSize"
-                Value="12" />
-        <Setter Property="Width"
-                Value="215" />
+                Value="13" />
         <Setter Property="Foreground"
-                Value="#2563EB" />
+                Value="#0D2159" />
         <Setter Property="Background"
-                Value="Transparent" />
+                Value="White" />
         <Setter Property="BorderBrush"
-                Value="Transparent" />
+                Value="#E5E7EB" />
         <Setter Property="BorderThickness"
-                Value="0" />
+                Value="1" />
         <Setter Property="Padding"
-                Value="16,10" />
+                Value="14,10" />
         <Setter Property="Margin"
-                Value="0,0,4,0" />
+                Value="0,0,8,0" />
         <Setter Property="Cursor"
                 Value="Hand" />
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="RadioButton">
+                <ControlTemplate TargetType="ToggleButton">
                     <Border x:Name="Root"
-                            Background="Transparent"
-                            CornerRadius="8"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="4"
                             Padding="{TemplateBinding Padding}">
-                        <Grid VerticalAlignment="Center">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal"
+                                    FlowDirection="RightToLeft"
+                                    VerticalAlignment="Center">
+                            <Border x:Name="CloseBorder"
+                                    Width="18"
+                                    Height="18"
+                                    CornerRadius="9"
+                                    Background="Transparent"
+                                    Margin="0,1,0,0"
+                                    VerticalAlignment="Center"
+                                    Visibility="Collapsed"
+                                    Cursor="Hand">
+                                <TextBlock x:Name="CloseText"
+                                           Text="&#x2715;"
+                                           FontSize="9"
+                                           Foreground="#C1121F"
+                                           FontFamily="{StaticResource IRANSans}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                            </Border>
 
-                            
-                            <StackPanel Grid.Column="0"
-                                        Orientation="Horizontal"
-                                        HorizontalAlignment="Right">
-                                <Border x:Name="CheckBoxBorder"
-                                        Width="20"
-                                        Height="20"
-                                        BorderThickness="2"
-                                        BorderBrush="#2ECC71"
-                                        CornerRadius="4"
-                                        Background="White"
-                                        Padding="2"
-                                        Margin="0,0,6,0"
-                                        Visibility="Collapsed">
-                                    <svg:SvgViewbox x:Name="CheckMark"
-                                                    Width="8"
-                                                    Height="8"
-                                                    Source="/Assets/Icons/Line.svg"
-                                                    FlowDirection="LeftToRight"
-                                                    HorizontalAlignment="Center"
-                                                    VerticalAlignment="Center" />
-                                </Border>
+                            <TextBlock x:Name="TitleText"
+                                       Text="{TemplateBinding Content}"
+                                       VerticalAlignment="Center"
+                                       FontWeight="Regular"
+                                       FontFamily="{StaticResource IRANSans}"
+                                       Foreground="#0D2159" />
 
-                                <TextBlock x:Name="TitleText"
-                                           Text="{TemplateBinding Content}"
-                                           Foreground="#2563EB"
-                                           FontWeight="Medium" />
-                            </StackPanel>
-
-                            
-                            <TextBlock Grid.Column="2"
-                                       x:Name="CountText"
+                            <TextBlock x:Name="CountText"
                                        Text="{TemplateBinding Tag}"
+                                       FontSize="11"
                                        Foreground="#94A3B8"
-                                       FontWeight="Normal"
-                                       HorizontalAlignment="Left" />
-                        </Grid>
+                                       FontFamily="{StaticResource IRANSans}"
+                                       VerticalAlignment="Center"
+                                       Margin="4,0,0,0" />
+                        </StackPanel>
                     </Border>
 
                     <ControlTemplate.Triggers>
-                        
                         <Trigger Property="IsChecked"
                                  Value="True">
                             <Setter TargetName="Root"
                                     Property="Background"
-                                    Value="Transparent" />
+                                    Value="#EFF6FF" />
                             <Setter TargetName="Root"
                                     Property="BorderBrush"
-                                    Value="#2563EB" />
-                            <Setter TargetName="Root"
-                                    Property="BorderThickness"
-                                    Value="1" />
-
+                                    Value="#2667FF" />
                             <Setter TargetName="TitleText"
                                     Property="Foreground"
-                                    Value="#2563EB" />
-                            <Setter TargetName="TitleText"
-                                    Property="FontWeight"
-                                    Value="Bold" />
+                                    Value="#2667FF" />
                             <Setter TargetName="CountText"
                                     Property="Foreground"
-                                    Value="#64748B" />
-
-                            
-                            <Setter TargetName="CheckBoxBorder"
+                                    Value="#2667FF" />
+                            <Setter TargetName="CloseBorder"
                                     Property="Visibility"
                                     Value="Visible" />
                         </Trigger>
-                        <Trigger Property="IsChecked"
-                                 Value="False">
-                            <Setter TargetName="Root"
-                                    Property="Background"
-                                    Value="Transparent" />
-                            <Setter TargetName="Root"
-                                    Property="BorderBrush"
-                                    Value="#E9F0FF" />
-                            <Setter TargetName="Root"
-                                    Property="BorderThickness"
-                                    Value="1" />
 
-                            <Setter TargetName="TitleText"
-                                    Property="Foreground"
-                                    Value="#2563EB" />
-                            <Setter TargetName="TitleText"
-                                    Property="FontWeight"
-                                    Value="Bold" />
-                            <Setter TargetName="CountText"
-                                    Property="Foreground"
-                                    Value="#64748B" />
-                        </Trigger>
-                        
                         <Trigger Property="IsMouseOver"
                                  Value="True">
                             <Setter TargetName="Root"
                                     Property="Background"
-                                    Value="#F4F7FF" />
+                                    Value="#F8FAFC" />
                         </Trigger>
 
-                        
-                        <Trigger Property="IsEnabled"
-                                 Value="False">
-                            <Setter TargetName="TitleText"
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsChecked"
+                                           Value="True" />
+                                <Condition Property="IsMouseOver"
+                                           Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="Root"
+                                    Property="Background"
+                                    Value="#E0EDFF" />
+                        </MultiTrigger>
+
+                        <Trigger SourceName="CloseBorder"
+                                 Property="IsMouseOver"
+                                 Value="True">
+                            <Setter TargetName="CloseBorder"
+                                    Property="Background"
+                                    Value="#FEE2E2" />
+                            <Setter TargetName="CloseText"
                                     Property="Foreground"
-                                    Value="#CBD5E1" />
-                            <Setter TargetName="CountText"
-                                    Property="Foreground"
-                                    Value="#E2E8F0" />
+                                    Value="#C1121F" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

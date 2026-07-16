@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Threading;
 
@@ -32,15 +33,18 @@ namespace Taadol.Views
         private int _pageSize = 15;
         private int _currentPage = 1;
         private int _totalPages = 1;
-        private string _currentFilter = "all";
         private bool _isLoadedOnce = false;
 
         // ===== Filter Selections =====
+        // فیلتر تب‌ها (چند انتخابه)
+        private readonly HashSet<string> _selectedTabs = new HashSet<string> { "all" };
         // برای فیلتر پاپ‌آپ: مقادیر انتخاب‌شده توسط کاربر
         // اگه خالی باشه = هیچ فیلتری اعمال نشده (همه نشون داده می‌شه)
         private readonly HashSet<string> _selectedStatuses = new HashSet<string>();
         private readonly HashSet<string> _selectedProvinces = new HashSet<string>();
         private readonly HashSet<string> _selectedCities = new HashSet<string>();
+        private readonly HashSet<string> _selectedLegalStatuses = new HashSet<string>();
+        private readonly HashSet<string> _selectedAccountStatuses = new HashSet<string>();
 
         public PersonListView()
         {
@@ -190,6 +194,7 @@ namespace Taadol.Views
 
                 AllPersons = new ObservableCollection<PersonItem>(items);
                 _currentPage = 1;
+                UpdateTabCounts();
                 ApplyFilters();
             }
             catch (Exception ex)
@@ -242,18 +247,19 @@ namespace Taadol.Views
 
             var query = AllPersons.AsEnumerable();
 
-            // فیلتر نوع شخص (تب‌های بالا)
-            switch (_currentFilter)
+            // فیلتر نوع شخص (تب‌های بالا - چند انتخابه)
+            if (!_selectedTabs.Contains("all"))
             {
-                case "customer":
-                    query = query.Where(p => p.PersonType != null && p.PersonType.Contains("مشتری"));
-                    break;
-                case "supplier":
-                    query = query.Where(p => p.PersonType != null && p.PersonType.Contains("تامین"));
-                    break;
-                case "personnel":
-                    query = query.Where(p => p.PersonType != null && p.PersonType.Contains("پرسنل"));
-                    break;
+                var tabFilters = new List<string>();
+                if (_selectedTabs.Contains("customer")) tabFilters.Add("مشتری");
+                if (_selectedTabs.Contains("supplier")) tabFilters.Add("تامین");
+                if (_selectedTabs.Contains("personnel")) tabFilters.Add("پرسنل");
+
+                if (tabFilters.Count > 0)
+                {
+                    query = query.Where(p => p.PersonType != null &&
+                        tabFilters.Any(f => p.PersonType.Contains(f)));
+                }
             }
 
             // فیلتر پاپ‌آپ وضعیت
@@ -272,6 +278,18 @@ namespace Taadol.Views
             if (_selectedCities.Count > 0)
             {
                 query = query.Where(p => p.City != null && p.City != "—" && _selectedCities.Contains(p.City));
+            }
+
+            // فیلتر پاپ‌آپ نوع
+            if (_selectedLegalStatuses.Count > 0)
+            {
+                query = query.Where(p => p.LegalStatus != null && _selectedLegalStatuses.Contains(p.LegalStatus));
+            }
+
+            // فیلتر پاپ‌آپ وضعیت حساب
+            if (_selectedAccountStatuses.Count > 0)
+            {
+                query = query.Where(p => p.AccountStatus != null && p.AccountStatus != "—" && _selectedAccountStatuses.Contains(p.AccountStatus));
             }
 
             var searchText = SearchBox?.Text?.Trim();
@@ -412,21 +430,77 @@ namespace Taadol.Views
         // ======================================================
         //  Event Handlers
         // ======================================================
-        private void FilterTab_Checked(object sender, RoutedEventArgs e)
+        private void FilterTab_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is RadioButton rb)
+            if (sender is not ToggleButton tb) return;
+
+            string tabName = GetTabName(tb);
+
+            if (tb.IsChecked == true)
             {
-                _currentFilter = "all";
-
-                if (rb == tabCustomers) _currentFilter = "customer";
-                else if (rb == tabSuppliers) _currentFilter = "supplier";
-                else if (rb == tabPersonnel) _currentFilter = "personnel";
-
-                _currentPage = 1;
-
-                if (AllPersons != null)
-                    ApplyFilters();
+                if (tabName == "all")
+                {
+                    // همه: بقیه رو خاموش کن
+                    _selectedTabs.Clear();
+                    _selectedTabs.Add("all");
+                    UpdateTabStates();
+                }
+                else
+                {
+                    // غیرفعال کردن "همه"
+                    _selectedTabs.Remove("all");
+                    tabAll.IsChecked = false;
+                    _selectedTabs.Add(tabName);
+                }
             }
+            else
+            {
+                // وقتی یکی خاموش میشه
+                _selectedTabs.Remove(tabName);
+
+                // اگه هیچ‌کدوم انتخاب نباشه، همه فعال بشه
+                if (_selectedTabs.Count == 0)
+                {
+                    _selectedTabs.Add("all");
+                    tabAll.IsChecked = true;
+                }
+            }
+
+            _currentPage = 1;
+            ApplyFilters();
+        }
+
+        private string GetTabName(ToggleButton tb)
+        {
+            if (tb == tabAll) return "all";
+            if (tb == tabCustomers) return "customer";
+            if (tb == tabSuppliers) return "supplier";
+            if (tb == tabPersonnel) return "personnel";
+            return "all";
+        }
+
+        private void UpdateTabStates()
+        {
+            tabAll.IsChecked = _selectedTabs.Contains("all");
+            tabCustomers.IsChecked = _selectedTabs.Contains("customer");
+            tabSuppliers.IsChecked = _selectedTabs.Contains("supplier");
+            tabPersonnel.IsChecked = _selectedTabs.Contains("personnel");
+        }
+
+        private void UpdateTabCounts()
+        {
+            if (AllPersons == null) return;
+
+            var validPersons = AllPersons.Where(p => !p.IsEmpty).ToList();
+            int total = validPersons.Count;
+            int customers = validPersons.Count(p => p.PersonType != null && p.PersonType.Contains("مشتری"));
+            int suppliers = validPersons.Count(p => p.PersonType != null && p.PersonType.Contains("تامین"));
+            int personnel = validPersons.Count(p => p.PersonType != null && p.PersonType.Contains("پرسنل"));
+
+            tabAll.Tag = $"( {ToPersianNumber(total)} )";
+            tabCustomers.Tag = $"( {ToPersianNumber(customers)} )";
+            tabSuppliers.Tag = $"( {ToPersianNumber(suppliers)} )";
+            tabPersonnel.Tag = $"( {ToPersianNumber(personnel)} )";
         }
 
         private async void BtnDelete_Click(object sender, RoutedEventArgs e)
@@ -554,6 +628,10 @@ namespace Taadol.Views
         private void UpdateRowBorders()
         {
             var items = PersonsDataGrid.Items;
+            var blue = new System.Windows.Media.SolidColorBrush(
+                (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#2667FF"));
+            var transparent = System.Windows.Media.Brushes.Transparent;
+
             for (int i = 0; i < items.Count; i++)
             {
                 var row = PersonsDataGrid.ItemContainerGenerator.ContainerFromIndex(i) as System.Windows.Controls.DataGridRow;
@@ -562,32 +640,22 @@ namespace Taadol.Views
                 var item = items[i] as PersonItem;
                 if (item == null || item.IsEmpty)
                 {
-                    row.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.White);
-                    row.BorderBrush = System.Windows.Media.Brushes.Transparent;
+                    row.BorderBrush = transparent;
                     row.BorderThickness = new Thickness(0);
                     continue;
                 }
 
-                bool isAlt = row.AlternationIndex == 1;
+                bool prevSelected = (i > 0) && items[i - 1] is PersonItem prev && !prev.IsEmpty && prev.IsSelected;
 
-                // آیا ردیف قبلی هم انتخاب شده؟ (برای جلوگیری از دوبل شدن خط بین دو ردیف انتخاب‌شده‌ی پشت‌سرهم)
-                bool prevSelected = (i > 0) && items[i - 1] is PersonItem prev && prev.IsSelected;
-
-                if (!item.IsSelected)
+                if (item.IsSelected)
                 {
-                    row.Background = new System.Windows.Media.SolidColorBrush(isAlt
-                        ? (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#F8FAFC")
-                        : System.Windows.Media.Colors.White);
-                    row.BorderBrush = System.Windows.Media.Brushes.Transparent;
-                    row.BorderThickness = new Thickness(0);
+                    row.BorderBrush = blue;
+                    row.BorderThickness = new Thickness(0, prevSelected ? 0 : 1, 0, 1);
                 }
                 else
                 {
-                    row.Background = new System.Windows.Media.SolidColorBrush(
-                        (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#EFF6FF"));
-                    row.BorderBrush = new System.Windows.Media.SolidColorBrush(
-                        (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#2667FF"));
-                    row.BorderThickness = new Thickness(0, prevSelected ? 0 : 2, 0, 2);
+                    row.BorderBrush = transparent;
+                    row.BorderThickness = new Thickness(0);
                 }
             }
         }
@@ -650,6 +718,24 @@ namespace Taadol.Views
             if (!IsInsideCheckBox(e.OriginalSource as DependencyObject))
             {
                 e.Handled = true;
+            }
+        }
+
+        private void DataGridRow_MouseEnter(object sender, MouseEventArgs e)
+        {
+            if (sender is System.Windows.Controls.DataGridRow row && row.DataContext is PersonItem item && !item.IsEmpty)
+            {
+                row.Background = new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#EFF6FF"));
+            }
+        }
+
+        private void DataGridRow_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (sender is System.Windows.Controls.DataGridRow row && row.DataContext is PersonItem item && !item.IsEmpty)
+            {
+                bool isAlt = row.AlternationIndex == 1;
+                var bgColor = isAlt ? (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#F8F8F8") : System.Windows.Media.Colors.White;
+                row.Background = new System.Windows.Media.SolidColorBrush(bgColor);
             }
         }
         private bool IsInsideCheckBox(DependencyObject element)
@@ -734,6 +820,51 @@ namespace Taadol.Views
                 {
                     _selectedCities.Clear();
                     foreach (var r in result) _selectedCities.Add(r);
+                    _currentPage = 1;
+                    ApplyFilters();
+                });
+        }
+
+        /// <summary>کلیک روی آیکون فیلتر نوع</summary>
+        private void LegalStatusFilter_Click(object sender, RoutedEventArgs e)
+        {
+            ShowFilterPopup(
+                anchor: sender as Button,
+                title: "فیلتر نوع",
+                options: new List<string> { "حقیقی", "حقوقی" },
+                selected: _selectedLegalStatuses,
+                showSearch: false,
+                immediateApply: true,
+                onSelectionChanged: result =>
+                {
+                    _selectedLegalStatuses.Clear();
+                    foreach (var r in result) _selectedLegalStatuses.Add(r);
+                    _currentPage = 1;
+                    ApplyFilters();
+                });
+        }
+
+        /// <summary>کلیک روی آیکون فیلتر وضعیت حساب</summary>
+        private void AccountStatusFilter_Click(object sender, RoutedEventArgs e)
+        {
+            var options = AllPersons?
+                .Select(p => p.AccountStatus)
+                .Where(x => !string.IsNullOrWhiteSpace(x) && x != "—")
+                .Distinct()
+                .OrderBy(x => x)
+                .ToList() ?? new List<string>();
+
+            ShowFilterPopup(
+                anchor: sender as Button,
+                title: "فیلتر وضعیت حساب",
+                options: options,
+                selected: _selectedAccountStatuses,
+                showSearch: false,
+                immediateApply: true,
+                onSelectionChanged: result =>
+                {
+                    _selectedAccountStatuses.Clear();
+                    foreach (var r in result) _selectedAccountStatuses.Add(r);
                     _currentPage = 1;
                     ApplyFilters();
                 });
@@ -860,7 +991,7 @@ namespace Taadol.Views
         // ★ فیلدهای جدید برای ستون‌های جدید گرید
         public string LastTransaction { get; set; } = "—";
         public bool IsLegal { get; set; }
-        public string LegalStatus => IsLegal ? "حقوقی" : "حقیقی";
+        public string LegalStatus => IsEmpty ? "" : IsLegal ? "حقوقی" : "حقیقی";
         public string TransactionType { get; set; } = "—";
         public string TransactionDate { get; set; } = "—";
         public string BalanceDisplay { get; set; } = "—";

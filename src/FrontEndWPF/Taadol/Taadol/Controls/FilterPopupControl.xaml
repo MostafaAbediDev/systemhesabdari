@@ -307,7 +307,7 @@
                           Content="همه"
                           Checked="SelectAllToggle_Checked"
                           Unchecked="SelectAllToggle_Unchecked"
-                          Margin="2,0,2,4" />
+                          Margin="2,1,2,1" />
 
             <!-- ===== لیست چک‌باکس‌ها ===== -->
             <ScrollViewer MaxHeight="240"
