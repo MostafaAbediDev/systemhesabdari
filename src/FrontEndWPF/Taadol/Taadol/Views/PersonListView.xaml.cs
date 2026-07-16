@@ -615,6 +615,16 @@ namespace Taadol.Views
                 "عملیات", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
+        private void BtnPrint_Click(object sender, RoutedEventArgs e)
+        {
+        }
+
+        private void BtnRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            _isLoadedOnce = false;
+            _ = LoadDataAsync();
+        }
+
         private void CheckBoxBorder_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             if (sender is FrameworkElement fe && fe.DataContext is PersonItem item)

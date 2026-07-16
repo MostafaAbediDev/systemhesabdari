@@ -1,4 +1,7 @@
 ﻿using _0_FrameWork.Domain;
+using AccountManagement.Domain.Account.AccountAgg;
+using AccountManagement.Domain.Account.AccountingDocumentAgg;
+using PersonManagement.Domain.Person.PersonAgg;
 
 namespace AccountManagement.Domain.Account.AccountingEntrieAgg
 {
@@ -11,9 +14,9 @@ namespace AccountManagement.Domain.Account.AccountingEntrieAgg
         public long AccountingDocumentId { get; private set; }
         public long AccountId { get; private set; }
         public long? PersonId { get; private set; }
-        //public AccountingDocuments AccountingDocument { get; private set; }
-        //public Accounts Account { get; private set; }
-        //public Persons Person { get; private set; }
+        public AccountingDocuments AccountingDocument { get; private set; }
+        public Accounts Account { get; private set; }
+        public Persons Person { get; private set; }
 
         public AccountingEntries(decimal debit, decimal credit, string description, int lineNumber)
         {
