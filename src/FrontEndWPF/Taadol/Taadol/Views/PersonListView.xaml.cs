@@ -631,6 +631,7 @@ namespace Taadol.Views
             {
                 item.IsSelected = !item.IsSelected;
                 UpdateRowBorders();
+                UpdateDetailPanels();
                 e.Handled = true;
             }
         }
@@ -669,6 +670,91 @@ namespace Taadol.Views
                 }
             }
         }
+
+        private void UpdateDetailPanels()
+        {
+            var selectedItems = AllPersons?
+                .Where(p => p.IsSelected && !p.IsEmpty)
+                .ToList() ?? new List<PersonItem>();
+
+            SelectedCountText.Text = $"({selectedItems.Count})";
+
+            var existingIds = DetailPanelsStack.Children
+                .OfType<Taadol.Controls.PersonDetailPanel>()
+                .Select(p => p.PersonId)
+                .ToHashSet();
+
+            var currentIds = selectedItems.Select(p => p.Id).ToHashSet();
+
+            var toRemove = DetailPanelsStack.Children
+                .OfType<Taadol.Controls.PersonDetailPanel>()
+                .Where(p => !currentIds.Contains(p.PersonId))
+                .ToList();
+
+            foreach (var panel in toRemove)
+                DetailPanelsStack.Children.Remove(panel);
+
+            foreach (var item in selectedItems.Where(p => !existingIds.Contains(p.Id)))
+            {
+                var panel = new Taadol.Controls.PersonDetailPanel();
+
+                var personType = item.IsLegal ? "حقوقی" : "حقیقی";
+                var category = item.Category ?? "";
+                var balance = item.BalanceDisplay ?? "—";
+                var balanceStatus = item.AccountStatus ?? "";
+                var phone = !string.IsNullOrEmpty(item.Phone) && !string.IsNullOrEmpty(item.Mobile)
+                    ? $"{item.Phone} / {item.Mobile}"
+                    : !string.IsNullOrEmpty(item.Mobile) ? item.Mobile
+                    : item.Phone ?? "";
+                var city = !string.IsNullOrEmpty(item.Province) && !string.IsNullOrEmpty(item.City)
+                    ? $"{item.Province} / {item.City}"
+                    : !string.IsNullOrEmpty(item.Province) ? item.Province
+                    : item.City ?? "";
+                var nationalId = item.NationalId ?? "";
+
+                panel.LoadData(
+                    item.Id,
+                    item.FullName,
+                    personType,
+                    category,
+                    nationalId,
+                    phone,
+                    "",
+                    city,
+                    "",
+                    balance,
+                    balanceStatus,
+                    item.Status == "فعال");
+
+                panel.CloseRequested += DetailPanel_CloseRequested;
+                panel.EditRequested += DetailPanel_EditRequested;
+                panel.DeleteRequested += DetailPanel_DeleteRequested;
+
+                DetailPanelsStack.Children.Insert(0, panel);
+            }
+        }
+
+        private void DetailPanel_CloseRequested(object sender, long personId)
+        {
+            var item = AllPersons?.FirstOrDefault(p => p.Id == personId);
+            if (item != null)
+            {
+                item.IsSelected = false;
+                UpdateRowBorders();
+                UpdateDetailPanels();
+            }
+        }
+
+        private void DetailPanel_EditRequested(object sender, long personId)
+        {
+            var mainWindow = Window.GetWindow(this) as MainWindow;
+            mainWindow?.NavigateToEditPerson(personId);
+        }
+
+        private void DetailPanel_DeleteRequested(object sender, long personId)
+        {
+        }
+
         private void BtnNextPage_Click(object sender, RoutedEventArgs e)
         {
             if (_currentPage < _totalPages)

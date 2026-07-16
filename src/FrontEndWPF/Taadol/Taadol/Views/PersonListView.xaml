@@ -225,150 +225,194 @@
                     BorderThickness="0,2,0,0"
                     Background="#FAFCFF"
                     Padding="12,8">
-                <StackPanel Orientation="Horizontal"
-                            FlowDirection="LeftToRight"
-                            HorizontalAlignment="Left"
-                            VerticalAlignment="Center">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
 
-                    <ToggleButton x:Name="tabAll"
-                                  Style="{StaticResource FilterTabStyle2}"
-                                  Content="همه اشخاص"
-                                  Tag=""
-                                  IsChecked="True"
-                                  Click="FilterTab_Click" />
+                    <!-- سمت راست: عنوان پنل -->
+                    <StackPanel Grid.Column="0"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center"
+                                Margin="0,0,12,0">
+                        <TextBlock Text="اطلاعات انتخاب شده"
+                                   FontSize="13"
+                                   FontWeight="SemiBold"
+                                   Foreground="#001242"
+                                   VerticalAlignment="Center" />
+                        <Border x:Name="SelectedCountBadge"
+                                Background="#2563EB"
+                                CornerRadius="10"
+                                Padding="8,2"
+                                Margin="8,0,0,0"
+                                VerticalAlignment="Center">
+                            <TextBlock x:Name="SelectedCountText"
+                                       Text="(۰)"
+                                       FontSize="11"
+                                       FontWeight="Medium"
+                                       Foreground="White"
+                                       VerticalAlignment="Center" />
+                        </Border>
+                    </StackPanel>
 
-                    <ToggleButton x:Name="tabCustomers"
-                                  Style="{StaticResource FilterTabStyle2}"
-                                  Content="مشتریان"
-                                  Tag=""
-                                  Click="FilterTab_Click" />
+                    <!-- سمت چپ: فیلترها + سرچ‌باکس -->
+                    <StackPanel Grid.Column="2"
+                                Orientation="Horizontal"
+                                FlowDirection="LeftToRight"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Right">
 
-                    <ToggleButton x:Name="tabSuppliers"
-                                  Style="{StaticResource FilterTabStyle2}"
-                                  Content="تامین کنندگان"
-                                  Tag=""
-                                  Click="FilterTab_Click" />
+                        <ToggleButton x:Name="tabAll"
+                                      Style="{StaticResource FilterTabStyle2}"
+                                      Content="همه اشخاص"
+                                      Tag=""
+                                      IsChecked="True"
+                                      Click="FilterTab_Click" />
 
-                    <ToggleButton x:Name="tabPersonnel"
-                                  Style="{StaticResource FilterTabStyle2}"
-                                  Content="پرسنل و کارکنان"
-                                  Tag=""
-                                  Click="FilterTab_Click" />
+                        <ToggleButton x:Name="tabCustomers"
+                                      Style="{StaticResource FilterTabStyle2}"
+                                      Content="مشتریان"
+                                      Tag=""
+                                      Click="FilterTab_Click" />
 
-                  
+                        <ToggleButton x:Name="tabSuppliers"
+                                      Style="{StaticResource FilterTabStyle2}"
+                                      Content="تامین کنندگان"
+                                      Tag=""
+                                      Click="FilterTab_Click" />
 
-                    <Border Background="#FFFFFF"
-                            BorderBrush="#E5E7EB"
-                            BorderThickness="1"
-                            CornerRadius="8"
-                            Margin="4,0,0,0"
-                            Height="38"
-                            Padding="12,0"
-                            VerticalAlignment="Center">
-                        <StackPanel Orientation="Horizontal"
-                                    VerticalAlignment="Center">
-                            <svg:SvgViewbox Width="14"
-                                            Height="14"
-                                            Source="/Assets/Icons/search.svg"
-                                            VerticalAlignment="Center"
-                                            />
-                            <Border Width="1"
-                                    Height="14"
-                                    Background="#BED1FF"
-                                    Margin="8,0"
-                                    VerticalAlignment="Center" />
-                            <Grid VerticalAlignment="Center"
-                                  Margin="8,0,0,0"
-                                  Width="220"
-                                  Height="36">
-                                <TextBlock Text="جستجو در نام ، شماره موبایل"
-                                           FontSize="13"
-                                           Foreground="#94A3B8"
-                                           FontFamily="{StaticResource IRANSans}"
-                                           FontWeight="Regular"
-                                           FlowDirection="RightToLeft"
-                                           VerticalAlignment="Center"
-                                           IsHitTestVisible="False"
-                                           Panel.ZIndex="1">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Visibility"
-                                                    Value="Collapsed" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Text, ElementName=SearchBox}"
-                                                             Value="">
-                                                    <Setter Property="Visibility"
-                                                            Value="Visible" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
+                        <ToggleButton x:Name="tabPersonnel"
+                                      Style="{StaticResource FilterTabStyle2}"
+                                      Content="پرسنل و کارکنان"
+                                      Tag=""
+                                      Click="FilterTab_Click" />
 
-                                <TextBox x:Name="SearchBox"
-                                         Width="220"
-                                         Height="36"
-                                         FontSize="13"
-                                         Foreground="#1F2937"
-                                         CaretBrush="#3B82F6"
-                                         Background="Transparent"
-                                         BorderThickness="0"
-                                         Padding="0,2"
-                                         VerticalAlignment="Center"
-                                         VerticalContentAlignment="Center"
-                                         FlowDirection="RightToLeft"
-                                         FontFamily="{StaticResource IRANSans}"
-                                         FontWeight="Regular"
-                                         TextAlignment="Left">
-                                    <TextBox.Resources>
-                                        <Style TargetType="Border">
-                                            <Setter Property="CornerRadius"
-                                                    Value="4" />
-                                        </Style>
-                                    </TextBox.Resources>
-                                    <TextBox.Style>
-                                        <Style TargetType="TextBox">
-                                            <Setter Property="Template">
-                                                <Setter.Value>
-                                                    <ControlTemplate TargetType="TextBox">
-                                                        <Border Background="{TemplateBinding Background}"
-                                                                BorderThickness="0"
-                                                                CornerRadius="4">
-                                                            <ScrollViewer x:Name="PART_ContentHost"
-                                                                          Focusable="False"
-                                                                          HorizontalScrollBarVisibility="Hidden"
-                                                                          VerticalScrollBarVisibility="Hidden" />
-                                                        </Border>
-                                                    </ControlTemplate>
-                                                </Setter.Value>
-                                            </Setter>
-                                        </Style>
-                                    </TextBox.Style>
-                                </TextBox>
-                            </Grid>
-                        </StackPanel>
-                    </Border>
+                        <Border Background="#FFFFFF"
+                                BorderBrush="#E5E7EB"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Margin="4,0,0,0"
+                                Height="38"
+                                Padding="12,0"
+                                VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal"
+                                        VerticalAlignment="Center">
+                                <svg:SvgViewbox Width="14"
+                                                Height="14"
+                                                Source="/Assets/Icons/search.svg"
+                                                VerticalAlignment="Center" />
+                                <Border Width="1"
+                                        Height="14"
+                                        Background="#BED1FF"
+                                        Margin="8,0"
+                                        VerticalAlignment="Center" />
+                                <Grid VerticalAlignment="Center"
+                                      Margin="8,0,0,0"
+                                      Width="220"
+                                      Height="36">
+                                    <TextBlock Text="جستجو در نام ، شماره موبایل"
+                                               FontSize="13"
+                                               Foreground="#94A3B8"
+                                               FontFamily="{StaticResource IRANSans}"
+                                               FontWeight="Regular"
+                                               FlowDirection="RightToLeft"
+                                               VerticalAlignment="Center"
+                                               IsHitTestVisible="False"
+                                               Panel.ZIndex="1">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility"
+                                                        Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Text, ElementName=SearchBox}"
+                                                                 Value="">
+                                                        <Setter Property="Visibility"
+                                                                Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
 
-                   
-
-
-
-
-
-
-
-
-
-
-
-                </StackPanel>
+                                    <TextBox x:Name="SearchBox"
+                                             Width="220"
+                                             Height="36"
+                                             FontSize="13"
+                                             Foreground="#1F2937"
+                                             CaretBrush="#3B82F6"
+                                             Background="Transparent"
+                                             BorderThickness="0"
+                                             Padding="0,2"
+                                             VerticalAlignment="Center"
+                                             VerticalContentAlignment="Center"
+                                             FlowDirection="RightToLeft"
+                                             FontFamily="{StaticResource IRANSans}"
+                                             FontWeight="Regular"
+                                             TextAlignment="Left">
+                                        <TextBox.Resources>
+                                            <Style TargetType="Border">
+                                                <Setter Property="CornerRadius"
+                                                        Value="4" />
+                                            </Style>
+                                        </TextBox.Resources>
+                                        <TextBox.Style>
+                                            <Style TargetType="TextBox">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="TextBox">
+                                                            <Border Background="{TemplateBinding Background}"
+                                                                    BorderThickness="0"
+                                                                    CornerRadius="4">
+                                                                <ScrollViewer x:Name="PART_ContentHost"
+                                                                              Focusable="False"
+                                                                              HorizontalScrollBarVisibility="Hidden"
+                                                                              VerticalScrollBarVisibility="Hidden" />
+                                                            </Border>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </TextBox.Style>
+                                    </TextBox>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Grid>
             </Border>
 
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
+                <!-- ═══ پنل سمت راست — اطلاعات اشخاص انتخاب شده ═══ -->
+                <Border x:Name="DetailPanelContainer"
+                        Grid.Column="0"
+                        Width="320"
+                        MaxHeight="700"
+                        Margin="0,0,0,0"
+                        Padding="12,5"
+                        Visibility="Visible">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled">
+                        <StackPanel x:Name="DetailPanelsStack" />
+                    </ScrollViewer>
+                </Border>
 
+                <!-- دیوایدر عمودی -->
+                <Border Grid.Column="1"
+                        Width="1"
+                        Background="#E5E7EB"
+                        Margin="0,5"
+                        VerticalAlignment="Stretch" />
 
-
-            <Border Grid.Row="2"
+            <!-- ═══ DataGrid Container ═══ -->
+            <Border Grid.Column="2"
                     Background="Transparent"
                     ClipToBounds="False"
                     Padding="15,5">
@@ -1358,6 +1402,7 @@
 
                 </Grid>
             </Border>
+            </Grid>
 
 
 
