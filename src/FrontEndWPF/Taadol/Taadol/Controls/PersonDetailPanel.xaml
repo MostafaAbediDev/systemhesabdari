@@ -8,15 +8,22 @@
              FontFamily="{StaticResource IRANSans}"
              d:DesignWidth="320">
 
+    <UserControl.Resources>
+        <!-- استایل اسکرول از Styles.xaml استفاده می‌شود -->
+    </UserControl.Resources>
+
     <Border x:Name="RootBorder"
             Background="White"
             BorderBrush="#E5E7EB"
             BorderThickness="1"
             CornerRadius="6"
-            Margin="0,0,0,8">
+            Margin="0,0,5,8"
+            Padding="0,8,0,8"
+            PreviewMouseWheel="RootBorder_PreviewMouseWheel">
 
         <Grid>
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
@@ -27,7 +34,7 @@
                     BorderBrush="#E5E7EB"
                     BorderThickness="0,0,0,1"
                     CornerRadius="5,5,0,0"
-                    Padding="10,8">
+                    Padding="8,6">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -43,86 +50,42 @@
                             Padding="3"
                             VerticalAlignment="Center"
                             MouseLeftButtonDown="CloseIcon_Click">
-                        <svg:SvgViewbox Width="11"
-                                         Height="11"
+                        <svg:SvgViewbox Width="11" Height="11"
                                          Source="/Assets/Icons/close.svg" />
                     </Border>
 
-                    <!-- Divider 1 -->
-                    <Border Grid.Column="1"
-                            Width="1"
-                            Height="16"
-                            Background="#E5E7EB"
-                            Margin="8,0"
-                            VerticalAlignment="Center" />
+                    <!-- Divider -->
+                    <Border Grid.Column="1" Width="1" Height="16"
+                            Background="#E5E7EB" Margin="8,0" VerticalAlignment="Center" />
 
-                    <!-- Name + Active Badge -->
-                    <StackPanel Grid.Column="2"
-                                Orientation="Horizontal"
-                                VerticalAlignment="Center">
+                    <!-- Name + Badge -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
                         <TextBlock x:Name="PersonNameText"
-                                   FontSize="12"
-                                   FontWeight="Bold"
-                                   Foreground="#001242"
-                                   VerticalAlignment="Center"
-                                   TextTrimming="CharacterEllipsis" />
-
-                        <Border x:Name="PersonTypeBadge"
-                                CornerRadius="4"
-                                Padding="5,1"
-                                Margin="6,0,0,0"
-                                VerticalAlignment="Center"
-                                Visibility="Collapsed">
-                            <TextBlock x:Name="PersonTypeText"
-                                       FontSize="9"
-                                       FontWeight="Medium"
-                                       VerticalAlignment="Center" />
-                        </Border>
-
+                                   FontSize="13" FontWeight="Bold" Foreground="#0D2159"
+                                   VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
                         <Border x:Name="ActiveStatusBadge"
-                                CornerRadius="4"
-                                Padding="5,1"
-                                Margin="4,0,0,0"
+                                CornerRadius="4" Padding="6,2" Margin="6,0,0,0"
                                 VerticalAlignment="Center">
-                            <TextBlock x:Name="ActiveStatusText"
-                                       FontSize="9"
-                                       FontWeight="Medium"
-                                       VerticalAlignment="Center" />
+                            <TextBlock x:Name="ActiveStatusText" FontSize="10"
+                                       FontWeight="Medium" VerticalAlignment="Center" />
                         </Border>
                     </StackPanel>
 
-                    <!-- Delete + Edit + Divider + Collapse -->
-                    <StackPanel Grid.Column="3"
-                                Orientation="Horizontal"
-                                VerticalAlignment="Center"
-                                Margin="4,0,0,0">
-
-                        <Border Cursor="Hand"
-                                Background="Transparent"
-                                Padding="3"
-                                MouseLeftButtonDown="DeleteIcon_Click">
-                            <svg:SvgViewbox Width="12"
-                                             Height="12"
-                                             Source="/Assets/Icons/trash.svg" />
-                        </Border>
-
-                        <Border Cursor="Hand"
-                                Background="Transparent"
-                                Padding="3"
+                    <!-- Edit + Delete + Divider + Collapse -->
+                    <StackPanel Grid.Column="3" Orientation="Horizontal"
+                                VerticalAlignment="Center" Margin="4,0,0,0">
+                        <Border Cursor="Hand" Background="Transparent" Padding="3"
                                 MouseLeftButtonDown="EditIcon_Click">
-                            <svg:SvgViewbox Width="12"
-                                             Height="12"
+                            <svg:SvgViewbox Width="13" Height="13"
                                              Source="/Assets/Icons/editblue.svg" />
                         </Border>
-
-                        <!-- Divider 2 -->
-                        <Border Width="1"
-                                Height="16"
-                                Background="#E5E7EB"
-                                Margin="6,0"
-                                VerticalAlignment="Center" />
-
-                        <!-- Collapse Toggle -->
+                        <Border Cursor="Hand" Background="Transparent" Padding="3"
+                                Margin="2,0,0,0" MouseLeftButtonDown="DeleteIcon_Click">
+                            <svg:SvgViewbox Width="13" Height="13"
+                                             Source="/Assets/Icons/trash.svg" />
+                        </Border>
+                        <Border Width="1" Height="16" Background="#E5E7EB"
+                                Margin="6,0" VerticalAlignment="Center" />
                         <Border x:Name="CollapseBorder"
                                 Cursor="Hand"
                                 Background="Transparent"
@@ -130,153 +93,230 @@
                                 VerticalAlignment="Center"
                                 MouseLeftButtonDown="CollapseBorder_MouseLeftButtonDown">
                             <svg:SvgViewbox x:Name="CollapseIcon"
-                                             Width="10"
-                                             Height="10"
-                                             Source="/Assets/Icons/ArrowUP.svg" />
+                                            Width="10"
+                                            Height="10"
+                                            Source="/Assets/Icons/ArrowUP.svg"
+                                            RenderTransformOrigin="0.5,0.5">
+                                <svg:SvgViewbox.RenderTransform>
+                                    <RotateTransform x:Name="CollapseIconRotate"
+                                                     Angle="0" />
+                                </svg:SvgViewbox.RenderTransform>
+                            </svg:SvgViewbox>
                         </Border>
                     </StackPanel>
                 </Grid>
             </Border>
 
-            <!-- ═══ Animated Content Wrapper ═══ -->
-            <Border x:Name="AnimatedContentBorder"
-                    Grid.Row="1"
-                    ClipToBounds="True">
-                <StackPanel>
-                    <!-- ═══ Tabs ═══ -->
+            <!-- ═══ Animated Content ═══ -->
+            <Border x:Name="AnimatedContentBorder" Grid.Row="1" ClipToBounds="True">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!-- ═══ Tabs (Underline Style) ═══ -->
                     <Border x:Name="TabsBorder"
+                            Grid.Row="0"
                             BorderBrush="#E5E7EB"
                             BorderThickness="0,0,0,1"
-                            Padding="8,6">
-                        <StackPanel Orientation="Horizontal">
-                            <Border x:Name="TabBasicInfo"
-                                    Cursor="Hand"
-                                    Padding="12,6"
-                                    CornerRadius="6"
-                                    Background="#2563EB"
-                                    BorderBrush="#2563EB"
-                                    BorderThickness="1"
-                                    Margin="0,0,4,0"
-                                    MouseLeftButtonDown="TabBasicInfo_Click">
-                                <TextBlock x:Name="TabBasicInfoText"
-                                           Text="اطلاعات پایه"
-                                           FontSize="11"
-                                           FontWeight="Medium"
-                                           Foreground="White" />
-                            </Border>
+                            Padding="0,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
 
-                            <Border x:Name="TabBankAccounts"
-                                    Cursor="Hand"
-                                    Padding="12,6"
-                                    CornerRadius="6"
-                                    Background="Transparent"
-                                    BorderBrush="#E5E7EB"
-                                    BorderThickness="1"
-                                    Margin="0,0,4,0"
-                                    MouseLeftButtonDown="TabBankAccounts_Click">
-                                <TextBlock x:Name="TabBankAccountsText"
-                                           Text="حساب‌های بانکی"
-                                           FontSize="11"
-                                           Foreground="#6B7280"
-                                           VerticalAlignment="Center" />
-                            </Border>
+                            <RadioButton Grid.Column="0"
+                                         Content="اطلاعات پایه"
+                                         Style="{StaticResource ModernTabButton}"
+                                         HorizontalAlignment="Stretch"
+                                         HorizontalContentAlignment="Center"
+                                         Height="32" Width="Auto"
+                                         Padding="0,4"
+                                         FontSize="10"
+                                         Margin="0"
+                                         IsChecked="True"
+                                         GroupName="PersonTabs"
+                                         x:Name="TabBasicInfo"
+                                         Checked="TabBasicInfo_Checked" />
 
-                            <Border x:Name="TabHistory"
-                                    Cursor="Hand"
-                                    Padding="12,6"
-                                    CornerRadius="6"
-                                    Background="Transparent"
-                                    BorderBrush="#E5E7EB"
-                                    BorderThickness="1"
-                                    MouseLeftButtonDown="TabHistory_Click">
-                                <TextBlock x:Name="TabHistoryText"
-                                           Text="تاریخچه"
-                                           FontSize="11"
-                                           Foreground="#6B7280"
-                                           VerticalAlignment="Center" />
-                            </Border>
-                        </StackPanel>
+                            <RadioButton Grid.Column="1"
+                                         Content="حساب های بانکی"
+                                         Style="{StaticResource ModernTabButton}"
+                                         HorizontalAlignment="Stretch"
+                                         HorizontalContentAlignment="Center"
+                                         Height="32" Width="Auto"
+                                         Padding="0,4"
+                                         FontSize="10"
+                                         Margin="0"
+                                         GroupName="PersonTabs"
+                                         x:Name="TabBankAccounts"
+                                         Checked="TabBankAccounts_Checked" />
+
+                            <RadioButton Grid.Column="2"
+                                         Content="تاریخچه"
+                                         Style="{StaticResource ModernTabButton}"
+                                         HorizontalAlignment="Stretch"
+                                         HorizontalContentAlignment="Center"
+                                         Height="32" Width="Auto"
+                                         Padding="0,4"
+                                         FontSize="10"
+                                         Margin="0"
+                                         GroupName="PersonTabs"
+                                         x:Name="TabHistory"
+                                         Checked="TabHistory_Checked" />
+                        </Grid>
                     </Border>
 
                     <!-- ═══ Content ═══ -->
-                    <ScrollViewer x:Name="ContentScroll"
-                                  VerticalScrollBarVisibility="Auto"
-                                  Padding="12,10">
-                        <StackPanel x:Name="ContentPanel">
-                            <StackPanel x:Name="BasicInfoPanel"
-                                        Visibility="Visible">
-                                <Grid Margin="0,0,0,8">
+                    <ScrollViewer x:Name="ContentScroll" Grid.Row="1"
+                                  Style="{StaticResource MinimalScrollViewer}"
+                                  VerticalScrollBarVisibility="Hidden"
+                                  Padding="0">
+                        <StackPanel x:Name="ContentPanel" Margin="14,12,14,12">
+                            <StackPanel x:Name="BasicInfoPanel">
+                                <Grid>
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" MinWidth="100" />
+                                        <ColumnDefinition Width="Auto" MinWidth="90" />
+                                        <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column="0" Text="دسته‌بندی" FontSize="12" Foreground="#6B7280" VerticalAlignment="Center" />
-                                    <TextBlock x:Name="CategoryText" Grid.Column="1" FontSize="12" FontWeight="Medium" Foreground="#1F2937" VerticalAlignment="Center" />
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <!-- Row 0: دسته‌بندی -->
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="دسته‌بندی"
+                                               FontSize="12" FontWeight="SemiBold"
+                                               Foreground="#1F2937" VerticalAlignment="Center"
+                                               Margin="0,0,0,12" />
+                                    <Border Grid.Row="0" Grid.Column="1" Width="2" Height="16"
+                                            Background="#BED1FF" Margin="0,0,10,12"
+                                            VerticalAlignment="Center" />
+                                    <TextBlock x:Name="CategoryText" Grid.Row="0" Grid.Column="2"
+                                               FontSize="12" FontWeight="Medium"
+                                               Foreground="#0D2159" VerticalAlignment="Center"
+                                               Margin="0,0,0,12" />
+
+                                    <!-- Row 1: شناسه / کد ملی -->
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="شناسه / کد ملی"
+                                               FontSize="12" FontWeight="SemiBold"
+                                               Foreground="#1F2937" VerticalAlignment="Center"
+                                               Margin="0,0,0,12" />
+                                    <Border Grid.Row="1" Grid.Column="1" Width="2" Height="16"
+                                            Background="#BED1FF" Margin="0,0,10,12"
+                                            VerticalAlignment="Center" />
+                                    <TextBlock x:Name="NationalIdText" Grid.Row="1" Grid.Column="2"
+                                               FontSize="12" FontWeight="Medium"
+                                               Foreground="#0D2159" VerticalAlignment="Center"
+                                               Margin="0,0,0,12" />
+
+                                    <!-- Row 2: تلفن / موبایل -->
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="تلفن / موبایل"
+                                               FontSize="12" FontWeight="SemiBold"
+                                               Foreground="#1F2937" VerticalAlignment="Center"
+                                               Margin="0,0,0,12" />
+                                    <Border Grid.Row="2" Grid.Column="1" Width="2" Height="16"
+                                            Background="#BED1FF" Margin="0,0,10,12"
+                                            VerticalAlignment="Center" />
+                                    <TextBlock x:Name="PhoneText" Grid.Row="2" Grid.Column="2"
+                                               FontSize="12" FontWeight="Medium"
+                                               Foreground="#0D2159" VerticalAlignment="Center"
+                                               Margin="0,0,0,12" />
+
+                                    <!-- Row 3: ایمیل -->
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="ایمیل"
+                                               FontSize="12" FontWeight="SemiBold"
+                                               Foreground="#1F2937" VerticalAlignment="Center"
+                                               Margin="0,0,0,12" />
+                                    <Border Grid.Row="3" Grid.Column="1" Width="2" Height="16"
+                                            Background="#BED1FF" Margin="0,0,10,12"
+                                            VerticalAlignment="Center" />
+                                    <TextBlock x:Name="EmailText" Grid.Row="3" Grid.Column="2"
+                                               FontSize="12" FontWeight="Medium"
+                                               Foreground="#0D2159" VerticalAlignment="Center"
+                                               TextWrapping="Wrap" Margin="0,0,0,12" />
+
+                                    <!-- Row 4: استان / شهر -->
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="استان / شهر"
+                                               FontSize="12" FontWeight="SemiBold"
+                                               Foreground="#1F2937" VerticalAlignment="Center"
+                                               Margin="0,0,0,12" />
+                                    <Border Grid.Row="4" Grid.Column="1" Width="2" Height="16"
+                                            Background="#BED1FF" Margin="0,0,10,12"
+                                            VerticalAlignment="Center" />
+                                    <TextBlock x:Name="CityText" Grid.Row="4" Grid.Column="2"
+                                               FontSize="12" FontWeight="Medium"
+                                               Foreground="#0D2159" VerticalAlignment="Center"
+                                               Margin="0,0,0,12" />
+
+                                    <!-- Row 5: آدرس / کدپستی -->
+                                    <TextBlock Grid.Row="5" Grid.Column="0" Text="آدرس / کدپستی"
+                                               FontSize="12" FontWeight="SemiBold"
+                                               Foreground="#1F2937" VerticalAlignment="Center"
+                                               Margin="0,0,0,0" />
+                                    <Border Grid.Row="5" Grid.Column="1" Width="2" Height="16"
+                                            Background="#BED1FF" Margin="0,0,10,0"
+                                            VerticalAlignment="Center" />
+                                    <TextBlock x:Name="AddressText" Grid.Row="5" Grid.Column="2"
+                                               FontSize="12" FontWeight="Medium"
+                                               Foreground="#0D2159" VerticalAlignment="Center"
+                                               TextWrapping="Wrap" />
                                 </Grid>
-                                <Grid Margin="0,0,0,8">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" MinWidth="100" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column="0" Text="شناسه / کد ملی" FontSize="12" Foreground="#6B7280" VerticalAlignment="Center" />
-                                    <TextBlock x:Name="NationalIdText" Grid.Column="1" FontSize="12" FontWeight="Medium" Foreground="#1F2937" VerticalAlignment="Center" />
-                                </Grid>
-                                <Grid Margin="0,0,0,8">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" MinWidth="100" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column="0" Text="تلفن / موبایل" FontSize="12" Foreground="#6B7280" VerticalAlignment="Center" />
-                                    <TextBlock x:Name="PhoneText" Grid.Column="1" FontSize="12" FontWeight="Medium" Foreground="#1F2937" VerticalAlignment="Center" />
-                                </Grid>
-                                <Grid Margin="0,0,0,8">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" MinWidth="100" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column="0" Text="ایمیل" FontSize="12" Foreground="#6B7280" VerticalAlignment="Center" />
-                                    <TextBlock x:Name="EmailText" Grid.Column="1" FontSize="12" FontWeight="Medium" Foreground="#1F2937" TextWrapping="Wrap" VerticalAlignment="Center" />
-                                </Grid>
-                                <Grid Margin="0,0,0,8">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" MinWidth="100" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column="0" Text="استان / شهر" FontSize="12" Foreground="#6B7280" VerticalAlignment="Center" />
-                                    <TextBlock x:Name="CityText" Grid.Column="1" FontSize="12" FontWeight="Medium" Foreground="#1F2937" VerticalAlignment="Center" />
-                                </Grid>
-                                <Grid Margin="0,0,0,8">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" MinWidth="100" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column="0" Text="آدرس / کدپستی" FontSize="12" Foreground="#6B7280" VerticalAlignment="Center" />
-                                    <TextBlock x:Name="AddressText" Grid.Column="1" FontSize="12" FontWeight="Medium" Foreground="#1F2937" TextWrapping="Wrap" VerticalAlignment="Center" />
-                                </Grid>
-                                <Border Background="#F9FAFB" CornerRadius="4" Padding="10,8" Margin="0,4,0,0">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" MinWidth="100" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Column="0" Text="مانده حساب" FontSize="12" Foreground="#6B7280" VerticalAlignment="Center" />
-                                        <TextBlock x:Name="BalanceText" Grid.Column="1" FontSize="12" FontWeight="Bold" Foreground="#1F2937" VerticalAlignment="Center" />
-                                        <Border x:Name="BalanceStatusBadge" Grid.Column="2" CornerRadius="4" Padding="8,3" VerticalAlignment="Center">
-                                            <TextBlock x:Name="BalanceStatusText" FontSize="11" FontWeight="Medium" VerticalAlignment="Center" />
-                                        </Border>
-                                    </Grid>
-                                </Border>
                             </StackPanel>
+
                             <StackPanel x:Name="BankAccountsPanel" Visibility="Collapsed">
-                                <TextBlock Text="حساب‌های بانکی" FontSize="13" Foreground="#6B7280" HorizontalAlignment="Center" Margin="0,20,0,0" />
+                                <TextBlock Text="حساب‌های بانکی" FontSize="13"
+                                           Foreground="#6B7280" HorizontalAlignment="Center"
+                                           Margin="0,20,0,0" />
                             </StackPanel>
+
                             <StackPanel x:Name="HistoryPanel" Visibility="Collapsed">
-                                <TextBlock Text="تاریخچه" FontSize="13" Foreground="#6B7280" HorizontalAlignment="Center" Margin="0,20,0,0" />
+                                <TextBlock Text="تاریخچه" FontSize="13"
+                                           Foreground="#6B7280" HorizontalAlignment="Center"
+                                           Margin="0,20,0,0" />
                             </StackPanel>
                         </StackPanel>
                     </ScrollViewer>
-                </StackPanel>
+
+                    <!-- ═══ مانده حساب ═══ -->
+                    <Border x:Name="BalanceSectionBorder" Grid.Row="2"
+                            BorderBrush="#E5E7EB" BorderThickness="0,1,0,0"
+                            Padding="0,10,0,0" Margin="0,8,0,0">
+                        <Grid Margin="14,0,14,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" MinWidth="90" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="مانده حساب"
+                                       FontSize="12" FontWeight="SemiBold"
+                                       Foreground="#1F2937" VerticalAlignment="Center" />
+                            <Border Grid.Column="1" Width="2" Height="16"
+                                    Background="#BED1FF" Margin="0,0,10,0"
+                                    VerticalAlignment="Center" />
+                            <TextBlock x:Name="BalanceStatusText" Grid.Column="2"
+                                       FontSize="12" FontWeight="Medium"
+                                       VerticalAlignment="Center" Margin="0,0,10,0" />
+                            <Border Grid.Column="3" Width="2" Height="16"
+                                    Background="#BED1FF" Margin="0,0,10,0"
+                                    VerticalAlignment="Center" />
+                            <TextBlock x:Name="BalanceText" Grid.Column="4"
+                                       FontSize="12" FontWeight="Medium"
+                                       VerticalAlignment="Center" />
+                        </Grid>
+                    </Border>
+                </Grid>
             </Border>
 
         </Grid>

@@ -12,12 +12,15 @@ namespace Taadol.Controls
         private bool _isExpanded = true;
         private long _personId;
 
-        private static readonly SolidColorBrush BlueBrush = new(Color.FromRgb(0x25, 0x63, 0xEB));
-        private static readonly SolidColorBrush GrayBrush = new(Color.FromRgb(0x6B, 0x72, 0x80));
-        private static readonly SolidColorBrush BorderGrayBrush = new(Color.FromRgb(0xE5, 0xE7, 0xEB));
         private static readonly SolidColorBrush WhiteBrush = Brushes.White;
 
         private const double AnimationDuration = 250;
+        private const double OpenDuration = 380;
+        private const double CloseDuration = 300;
+
+        private static readonly SolidColorBrush BlueBrush = new(Color.FromRgb(0x25, 0x63, 0xEB));
+        private static readonly SolidColorBrush GrayBrush = new(Color.FromRgb(0x6B, 0x72, 0x80));
+        private static readonly SolidColorBrush ActiveGrayBrush = new(Color.FromRgb(0x4B, 0x52, 0x63)); // کنتراست بیشتر
 
         public long PersonId
         {
@@ -32,12 +35,19 @@ namespace Taadol.Controls
         public PersonDetailPanel()
         {
             InitializeComponent();
-            Loaded += PersonDetailPanel_Loaded;
+            Loaded += (_, _) => AnimatedContentBorder.MaxHeight = 1000;
         }
 
-        private void PersonDetailPanel_Loaded(object sender, RoutedEventArgs e)
+        private void RootBorder_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            AnimatedContentBorder.MaxHeight = 1000;
+            if (ContentScroll == null) return;
+
+            if (e.Delta > 0)
+                ContentScroll.LineUp();
+            else
+                ContentScroll.LineDown();
+
+            e.Handled = true;
         }
 
         public void LoadData(long id, string name, string personType,
@@ -47,7 +57,6 @@ namespace Taadol.Controls
         {
             _personId = id;
             PersonNameText.Text = name;
-            PersonTypeText.Text = personType;
             CategoryText.Text = category;
             NationalIdText.Text = nationalId;
             PhoneText.Text = phone;
@@ -58,39 +67,20 @@ namespace Taadol.Controls
 
             if (!string.IsNullOrEmpty(balanceStatus) && balanceStatus != "تسویه")
             {
-                BalanceStatusBadge.Background = new SolidColorBrush(Color.FromRgb(0xFE, 0xF2, 0xF2));
                 BalanceStatusText.Text = balanceStatus;
                 BalanceStatusText.Foreground = new SolidColorBrush(Color.FromRgb(0xDC, 0x26, 0x26));
+                BalanceText.Foreground = new SolidColorBrush(Color.FromRgb(0xDC, 0x26, 0x26));
             }
             else
             {
-                BalanceStatusBadge.Background = new SolidColorBrush(Color.FromRgb(0xF0, 0xFD, 0xF4));
                 BalanceStatusText.Text = "تسویه";
                 BalanceStatusText.Foreground = new SolidColorBrush(Color.FromRgb(0x16, 0xA3, 0x4A));
-            }
-
-            if (!string.IsNullOrEmpty(personType))
-            {
-                if (personType.Contains("مشتری"))
-                {
-                    PersonTypeBadge.Background = new SolidColorBrush(Color.FromRgb(0xEF, 0xF6, 0xFF));
-                    PersonTypeText.Foreground = new SolidColorBrush(Color.FromRgb(0x25, 0x63, 0xEB));
-                }
-                else if (personType.Contains("تامین"))
-                {
-                    PersonTypeBadge.Background = new SolidColorBrush(Color.FromRgb(0xF0, 0xFD, 0xF4));
-                    PersonTypeText.Foreground = new SolidColorBrush(Color.FromRgb(0x16, 0xA3, 0x4A));
-                }
-                else
-                {
-                    PersonTypeBadge.Background = new SolidColorBrush(Color.FromRgb(0xF9, 0xFA, 0xFB));
-                    PersonTypeText.Foreground = new SolidColorBrush(Color.FromRgb(0x6B, 0x72, 0x80));
-                }
+                BalanceText.Foreground = new SolidColorBrush(Color.FromRgb(0x16, 0xA3, 0x4A));
             }
 
             if (isActive)
             {
-                ActiveStatusBadge.Background = new SolidColorBrush(Color.FromRgb(0xF0, 0xFD, 0xF4));
+                ActiveStatusBadge.Background = new SolidColorBrush(Color.FromRgb(0xEC, 0xFD, 0xF5));
                 ActiveStatusText.Text = "فعال";
                 ActiveStatusText.Foreground = new SolidColorBrush(Color.FromRgb(0x16, 0xA3, 0x4A));
             }
@@ -106,91 +96,96 @@ namespace Taadol.Controls
         {
             _isExpanded = !_isExpanded;
 
-            var anim = new DoubleAnimation
+            double duration = _isExpanded ? OpenDuration : CloseDuration;
+            var ease = new CubicEase { EasingMode = EasingMode.EaseInOut };
+
+            // ── Height animation ──
+            var heightAnim = new DoubleAnimation
             {
-                Duration = TimeSpan.FromMilliseconds(AnimationDuration),
-                EasingFunction = new CubicEase { EasingMode = EasingMode.EaseInOut }
+                Duration = TimeSpan.FromMilliseconds(duration),
+                EasingFunction = ease
+            };
+
+            // ── Opacity animation ──
+            var opacityAnim = new DoubleAnimation
+            {
+                Duration = TimeSpan.FromMilliseconds(duration * 0.6),
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
+            };
+
+            // ── Rotate animation (arrow icon) ──
+            var rotateAnim = new DoubleAnimation
+            {
+                Duration = TimeSpan.FromMilliseconds(duration * 0.8),
+                EasingFunction = new BackEase { EasingMode = EasingMode.EaseInOut, Amplitude = 0.3 }
             };
 
             if (_isExpanded)
             {
-                anim.To = 1000;
-                CollapseIcon.Source = new Uri("/Assets/Icons/ArrowUP.svg", UriKind.Relative);
-                RootBorder.CornerRadius = new CornerRadius(5, 5, 0, 0);
+                heightAnim.To = 800;
+                opacityAnim.To = 1;
+                rotateAnim.To = 0;
             }
             else
             {
-                anim.To = 0;
-                CollapseIcon.Source = new Uri("/Assets/Icons/arrowDowN.svg", UriKind.Relative);
-                RootBorder.CornerRadius = new CornerRadius(5);
+                heightAnim.To = 0;
+                opacityAnim.To = 0;
+                rotateAnim.To = 180;
             }
 
-            AnimatedContentBorder.BeginAnimation(MaxHeightProperty, anim);
+            AnimatedContentBorder.BeginAnimation(MaxHeightProperty, heightAnim);
+            AnimatedContentBorder.BeginAnimation(OpacityProperty, opacityAnim);
+            CollapseIconRotate.BeginAnimation(RotateTransform.AngleProperty, rotateAnim);
         }
 
         private void EditIcon_Click(object sender, MouseButtonEventArgs e)
-        {
-            EditRequested?.Invoke(this, _personId);
-        }
+            => EditRequested?.Invoke(this, _personId);
 
         private void DeleteIcon_Click(object sender, MouseButtonEventArgs e)
-        {
-            DeleteRequested?.Invoke(this, _personId);
-        }
+            => DeleteRequested?.Invoke(this, _personId);
 
         private void CloseIcon_Click(object sender, MouseButtonEventArgs e)
-        {
-            CloseRequested?.Invoke(this, _personId);
-        }
+            => CloseRequested?.Invoke(this, _personId);
 
         private void SelectTab(Border activeTab, TextBlock activeText,
-            Border inactiveTab1, TextBlock inactiveText1,
-            Border inactiveTab2, TextBlock inactiveText2)
+     Border inactiveTab1, TextBlock inactiveText1,
+     Border inactiveTab2, TextBlock inactiveText2)
         {
-            activeTab.Background = BlueBrush;
             activeTab.BorderBrush = BlueBrush;
-            activeText.Foreground = WhiteBrush;
+            activeText.Foreground = BlueBrush;
+            activeText.FontWeight = FontWeights.Bold;
 
-            inactiveTab1.Background = Brushes.Transparent;
-            inactiveTab1.BorderBrush = BorderGrayBrush;
-            inactiveText1.Foreground = GrayBrush;
+            inactiveTab1.BorderBrush = Brushes.Transparent;
+            inactiveText1.Foreground = ActiveGrayBrush;
+            inactiveText1.FontWeight = FontWeights.Medium;
 
-            inactiveTab2.Background = Brushes.Transparent;
-            inactiveTab2.BorderBrush = BorderGrayBrush;
-            inactiveText2.Foreground = GrayBrush;
+            inactiveTab2.BorderBrush = Brushes.Transparent;
+            inactiveText2.Foreground = ActiveGrayBrush;
+            inactiveText2.FontWeight = FontWeights.Medium;
         }
-
-        private void TabBasicInfo_Click(object sender, MouseButtonEventArgs e)
+      
+        private void TabBasicInfo_Checked(object sender, RoutedEventArgs e)
         {
+            if (BasicInfoPanel == null) return;
             BasicInfoPanel.Visibility = Visibility.Visible;
             BankAccountsPanel.Visibility = Visibility.Collapsed;
             HistoryPanel.Visibility = Visibility.Collapsed;
-
-            SelectTab(TabBasicInfo, TabBasicInfoText,
-                      TabBankAccounts, TabBankAccountsText,
-                      TabHistory, TabHistoryText);
         }
-
-        private void TabBankAccounts_Click(object sender, MouseButtonEventArgs e)
+      
+        private void TabBankAccounts_Checked(object sender, RoutedEventArgs e)
         {
+            if (BasicInfoPanel == null) return;
             BasicInfoPanel.Visibility = Visibility.Collapsed;
             BankAccountsPanel.Visibility = Visibility.Visible;
             HistoryPanel.Visibility = Visibility.Collapsed;
-
-            SelectTab(TabBankAccounts, TabBankAccountsText,
-                      TabBasicInfo, TabBasicInfoText,
-                      TabHistory, TabHistoryText);
         }
-
-        private void TabHistory_Click(object sender, MouseButtonEventArgs e)
+        private void TabHistory_Checked(object sender, RoutedEventArgs e)
         {
+            if (BasicInfoPanel == null) return;
             BasicInfoPanel.Visibility = Visibility.Collapsed;
             BankAccountsPanel.Visibility = Visibility.Collapsed;
             HistoryPanel.Visibility = Visibility.Visible;
-
-            SelectTab(TabHistory, TabHistoryText,
-                      TabBasicInfo, TabBasicInfoText,
-                      TabBankAccounts, TabBankAccountsText);
         }
+       
     }
 }

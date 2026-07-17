@@ -625,6 +625,18 @@ namespace Taadol.Views
             _ = LoadDataAsync();
         }
 
+        private void DetailPanelContainer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (DetailPanelScroll == null) return;
+
+            if (e.Delta > 0)
+                DetailPanelScroll.LineUp();
+            else
+                DetailPanelScroll.LineDown();
+
+            e.Handled = true;
+        }
+
         private void CheckBoxBorder_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             if (sender is FrameworkElement fe && fe.DataContext is PersonItem item)

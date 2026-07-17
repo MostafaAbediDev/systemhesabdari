@@ -11,11 +11,13 @@
                                              PrimaryColor="Blue"
                                              SecondaryColor="Green" />
 
-
-
                 <ResourceDictionary Source="Themes/Styles.xaml" />
 
             </ResourceDictionary.MergedDictionaries>
+
+            <Style TargetType="Control">
+                <Setter Property="FontFamily" Value="{StaticResource IRANSans}" />
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
