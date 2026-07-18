@@ -10,7 +10,7 @@
              xmlns:System="http://schemas.microsoft.com/winfx/2009/xaml"
              mc:Ignorable="d"
              FlowDirection="RightToLeft"
-             Margin="24"
+             Margin="5"
              Padding="0"
              FontFamily="{StaticResource IRANSans}"
              Background="#FFFFFF">
@@ -41,7 +41,7 @@
 
     <Border Margin="0,16"
             Background="White"
-            CornerRadius="12"
+            CornerRadius="4"
             ClipToBounds="True">
 
         <Grid>
@@ -169,8 +169,8 @@
                     <Border x:Name="DetailPanelContainer"
                             Grid.Row="1"
                             Width="340"
-                            MaxHeight="700"
-                            Padding="10,8"
+                            MaxHeight="{Binding ActualHeight, ElementName=DataGridContainer}"
+                            Padding="10,0"
                             Visibility="Visible"
                             PreviewMouseWheel="DetailPanelContainer_PreviewMouseWheel">
                         <ScrollViewer x:Name="DetailPanelScroll"
@@ -360,16 +360,20 @@
                               Grid.Row="1">
                             <Border Background="White"
                                     BorderBrush="#E5E7EB"
-                                    Margin="10,0"
+                                    Margin="10,0,10,8"
                                     BorderThickness="1"
                                     CornerRadius="4"
+                                    SnapsToDevicePixels="True"
+                                    UseLayoutRounding="True"
                                     ClipToBounds="True">
-                                <DataGrid x:Name="PersonsDataGrid"
+                                <Border Margin="11,1,11,9"
+                                        ClipToBounds="True">
+
+                                    <DataGrid x:Name="PersonsDataGrid"
                                           CanUserSortColumns="False"
                                           SnapsToDevicePixels="True"
                                           UseLayoutRounding="True"
                                           AutoGenerateColumns="False"
-                                          MinHeight="496"
                                           HeadersVisibility="Column"
                                           GridLinesVisibility="Vertical"
                                           VerticalGridLinesBrush="#E5E7EB"
@@ -385,13 +389,15 @@
                   AlternationCount="2"
                   IsReadOnly="True"
                   ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                  ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto"
                   FontFamily="{StaticResource IRANSans}"
                   SelectionChanged="PersonsDataGrid_SelectionChanged"
                   MouseDoubleClick="PersonsDataGrid_MouseDoubleClick">
 
 
                                     <DataGrid.Resources>
+                                        <Style TargetType="ScrollBar"
+                                               BasedOn="{StaticResource MinimalScrollBar}" />
 
                                 <!-- استایل متن ستون‌ها -->
                                 <Style x:Key="BaseTextColumnStyle"
@@ -1083,8 +1089,9 @@
 
                             </DataGrid.Columns>
                         </DataGrid>
-                        
-                    </Border>
+                                </Border>
+
+                            </Border>
                     <Border x:Name="LoadingOverlay"
                             Background="#B8F8FAFC"
                             Visibility="Collapsed"
@@ -1288,140 +1295,209 @@
                     </Border>
                 </Grid>
                 <!-- ═══ صفحه‌بندی ═══ -->
-                <Border Grid.Row="2"
-                        Padding="5,5"
-                        Background="White"
-                        BorderBrush="#E9F0FF"
-                        BorderThickness="0,1,0,0">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
+                        <Border Grid.Row="2"
+                                Padding="5,5"
+                                Background="White"
+                                BorderBrush="#E9F0FF"
+                                BorderThickness="0,1,0,0">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
 
-                        <StackPanel Grid.Column="2"
-                                    Orientation="Horizontal"
-                                    VerticalAlignment="Center"
-                                    FlowDirection="LeftToRight">
+                                <StackPanel Grid.Column="0"
+                                            Orientation="Horizontal"
+                                            VerticalAlignment="Center"
+                                            FlowDirection="LeftToRight">
 
-                            <Button Width="34"
-                                    Height="34"
-                                    Margin="0,0,2,0"
-                                    Cursor="Hand"
-                                    Click="BtnPrevPage_Click">
-                                <Button.Template>
-                                    <ControlTemplate TargetType="Button">
-                                        <Border x:Name="bd"
-                                                Width="30"
-                                                Height="30"
-                                                Background="Transparent">
-                                            <svg:SvgViewbox FlowDirection="LeftToRight"
-                                                            Width="30"
-                                                            Height="30"
-                                                            Source="/Assets/Icons/Leftsquare.svg" />
-                                        </Border>
-                                        <ControlTemplate.Triggers>
-                                            <Trigger Property="IsMouseOver"
-                                                     Value="True">
-                                                <Setter TargetName="bd"
-                                                        Property="Background"
-                                                        Value="#F0F5FF" />
-                                            </Trigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </Button.Template>
-                            </Button>
+                                    <!-- دکمه‌ی قبلی (فلش) -->
+                                    <Button Width="26"
+                                            Height="26"
+                                            Margin="0,0,2,0"
+                                            Cursor="Hand"
+                                            Click="BtnPrevPage_Click">
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="bd"
+                                                        Width="26"
+                                                        Height="26"
+                                                        
+                                                        Background="White"
+                                                        BorderBrush="#E5E7EB"
+                                                        BorderThickness="1.5"
+                                                        CornerRadius="4">
+                                                    <svg:SvgViewbox x:Name="ToggleArrowIcon"
+                                                                    Width="7"
+                                                                    Height="11"
+                                                                    Source="/Assets/Icons/ArrowLeft.svg"
+                                                                    HorizontalAlignment="Center"
+                                                                    VerticalAlignment="Center"
+                                                                    RenderTransformOrigin="0.5,0.5">
+                                                        <svg:SvgViewbox.RenderTransform>
+                                                            <RotateTransform x:Name="ArrowRotation"
+                                                                             Angle="0" />
+                                                        </svg:SvgViewbox.RenderTransform>
+                                                    </svg:SvgViewbox>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver"
+                                                             Value="True">
+                                                        <Setter TargetName="bd"
+                                                                Property="Background"
+                                                                Value="#F5F7FA" />
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
 
-                            <ItemsControl x:Name="PageButtonsItemsControl">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <StackPanel Orientation="Horizontal" />
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
+                                    <!-- دکمه‌های شماره صفحه -->
+                                    <ItemsControl x:Name="PageButtonsItemsControl">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Horizontal" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
 
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Button Width="32"
-                                                Height="32"
-                                                Cursor="Hand"
-                                                Click="BtnPage_Click"
-                                                Tag="{Binding PageNumber}">
-                                            <Button.Template>
-                                                <ControlTemplate TargetType="Button">
-                                                    <Border x:Name="bd"
-                                                            Background="Transparent"
-                                                            CornerRadius="6">
-                                                        <TextBlock Text="{Binding PageNumberDisplay}"
-                                                                   FontSize="13"
-                                                                   FontFamily="{StaticResource IRANSans}"
-                                                                   HorizontalAlignment="Center"
-                                                                   VerticalAlignment="Center">
-                                                            <TextBlock.Style>
-                                                                <Style TargetType="TextBlock">
-                                                                    <Setter Property="Foreground"
-                                                                            Value="#94A3B8" />
-                                                                    <Setter Property="FontWeight"
-                                                                            Value="Normal" />
-                                                                    <Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding IsCurrent}"
-                                                                                     Value="True">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Button Width="26"
+                                                        Height="26"
+                                                        Margin="0,0,2,0"
+                                                        Cursor="Hand"
+                                                        Click="BtnPage_Click"
+                                                        Tag="{Binding PageNumber}">
+                                                    <Button.Template>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Border x:Name="bd"
+                                                                    Width="26"
+                                                                    Height="26"
+                                                                    Background="White"
+                                                                    BorderBrush="#E5E7EB"
+                                                                    BorderThickness="1.5"
+                                                                    CornerRadius="4">
+                                                                <TextBlock Text="{Binding PageNumberDisplay}"
+                                                                           FontSize="12"
+                                                                           FontFamily="{StaticResource IRANSans}"
+                                                                           HorizontalAlignment="Center"
+                                                                           VerticalAlignment="Center">
+                                                                    <TextBlock.Style>
+                                                                        <Style TargetType="TextBlock">
                                                                             <Setter Property="Foreground"
-                                                                                    Value="#001242" />
+                                                                                    Value="#94A3B8" />
                                                                             <Setter Property="FontWeight"
-                                                                                    Value="Bold" />
-                                                                        </DataTrigger>
-                                                                    </Style.Triggers>
-                                                                </Style>
-                                                            </TextBlock.Style>
-                                                        </TextBlock>
-                                                    </Border>
-                                                    <ControlTemplate.Triggers>
-                                                        <Trigger Property="IsMouseOver"
-                                                                 Value="True">
-                                                            <Setter TargetName="bd"
-                                                                    Property="Background"
-                                                                    Value="#F5F7FA" />
-                                                        </Trigger>
-                                                    </ControlTemplate.Triggers>
-                                                </ControlTemplate>
-                                            </Button.Template>
-                                        </Button>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
+                                                                                    Value="Normal" />
+                                                                            <Style.Triggers>
+                                                                                <DataTrigger Binding="{Binding IsCurrent}"
+                                                                                             Value="True">
+                                                                                    <Setter Property="Foreground"
+                                                                                            Value="#2563EB" />
+                                                                                    <Setter Property="FontWeight"
+                                                                                            Value="Bold" />
+                                                                                </DataTrigger>
+                                                                            </Style.Triggers>
+                                                                        </Style>
+                                                                    </TextBlock.Style>
+                                                                </TextBlock>
+                                                            </Border>
+                                                            <ControlTemplate.Triggers>
+                                                                <!-- «...» بدون قاب و بدون هاور -->
+                                                                <DataTrigger Binding="{Binding PageNumberDisplay}"
+                                                                             Value="...">
+                                                                    <Setter TargetName="bd"
+                                                                            Property="BorderBrush"
+                                                                            Value="Transparent" />
+                                                                    <Setter TargetName="bd"
+                                                                            Property="Background"
+                                                                            Value="Transparent" />
+                                                                </DataTrigger>
 
-                            <Button Width="34"
-                                    Height="34"
-                                    Margin="2,0,0,0"
-                                    Cursor="Hand"
-                                    Click="BtnNextPage_Click">
-                                <Button.Template>
-                                    <ControlTemplate TargetType="Button">
-                                        <Border x:Name="bd"
-                                                Width="30"
-                                                Height="30"
-                                                Background="Transparent">
-                                            <svg:SvgViewbox FlowDirection="LeftToRight"
-                                                            Width="30"
-                                                            Height="30"
-                                                            Source="/Assets/Icons/Rightsquare.svg" />
-                                        </Border>
-                                        <ControlTemplate.Triggers>
-                                            <Trigger Property="IsMouseOver"
-                                                     Value="True">
-                                                <Setter TargetName="bd"
-                                                        Property="Background"
-                                                        Value="#F0F5FF" />
-                                            </Trigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </Button.Template>
-                            </Button>
-                        </StackPanel>
+                                                                <Trigger Property="IsMouseOver"
+                                                                         Value="True">
+                                                                    <Setter TargetName="bd"
+                                                                            Property="Background"
+                                                                            Value="#F5F7FA" />
+                                                                </Trigger>
+
+                                                                <!-- صفحه‌ی فعلی: بردر و پس‌زمینه‌ی آبی روشن -->
+                                                                <DataTrigger Binding="{Binding IsCurrent}"
+                                                                             Value="True">
+                                                                    <Setter TargetName="bd"
+                                                                            Property="BorderBrush"
+                                                                            Value="#2563EB" />
+                                                                    <Setter TargetName="bd"
+                                                                            Property="Background"
+                                                                            Value="White" />
+                                                                </DataTrigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Button.Template>
+                                                </Button>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+
+                                    <!-- دکمه‌ی بعدی (فلش) -->
+                                    <Button Width="26"
+                                            Height="26"
+                                            Margin="0,0,0,0"
+                                            Cursor="Hand"
+                                            Click="BtnNextPage_Click">
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="bd"
+                                                        Width="26"
+                                                        Height="26"
+                                                        Background="White"
+                                                        BorderBrush="#E5E7EB"
+                                                        BorderThickness="1.5"
+                                                        CornerRadius="4">
+                                                    <svg:SvgViewbox x:Name="ToggleArrowIcon"
+                                                                    Width="7"
+                                                                    Height="11"
+                                                                    Source="/Assets/Icons/ArrowLeft.svg"
+                                                                    HorizontalAlignment="Center"
+                                                                    VerticalAlignment="Center"
+                                                                    RenderTransformOrigin="0.5,0.5">
+                                                        <svg:SvgViewbox.RenderTransform>
+                                                            <RotateTransform x:Name="ArrowRotation"
+                                                                             Angle="180" />
+                                                        </svg:SvgViewbox.RenderTransform>
+                                                    </svg:SvgViewbox>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver"
+                                                             Value="True">
+                                                        <Setter TargetName="bd"
+                                                                Property="Background"
+                                                                Value="#F5F7FA" />
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
+                                </StackPanel>
+
+                                <!-- ═══ نمایش X از Y مورد + انتخاب تعداد ردیف ═══ -->
+                                <StackPanel Grid.Column="2"
+                                            Orientation="Horizontal"
+                                            VerticalAlignment="Center"
+                                            Margin="8,0,0,0">
+                                    <TextBlock x:Name="PageInfoText"
+                                               FontSize="11"
+                                               Foreground="#6B7280"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,8,0" />
+
+                                    <controls:PageSizeSelector x:Name="PageSizeSelector"
+                                                                SelectionChanged="PageSizeSelector_SelectionChanged" />
+                                </StackPanel>
+
+                            </Grid>
+                        </Border>
                     </Grid>
-                </Border>
-            </Grid>
             </Border>
 
             <!-- ═══ Decorative Ellipses ═══ -->

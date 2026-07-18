@@ -9,18 +9,17 @@ namespace Taadol.Controls
 {
     public partial class PersonDetailPanel : UserControl
     {
-        private bool _isExpanded = true;
+        private bool _isExpanded;
         private long _personId;
 
-        private static readonly SolidColorBrush WhiteBrush = Brushes.White;
-
-        private const double AnimationDuration = 250;
         private const double OpenDuration = 380;
         private const double CloseDuration = 300;
 
         private static readonly SolidColorBrush BlueBrush = new(Color.FromRgb(0x25, 0x63, 0xEB));
-        private static readonly SolidColorBrush GrayBrush = new(Color.FromRgb(0x6B, 0x72, 0x80));
-        private static readonly SolidColorBrush ActiveGrayBrush = new(Color.FromRgb(0x4B, 0x52, 0x63)); // کنتراست بیشتر
+        private static readonly SolidColorBrush ActiveGrayBrush = new(Color.FromRgb(0x4B, 0x52, 0x63));
+
+        // پیش‌فرض: پنل به‌صورت بسته لود می‌شه (شبیه تصویر). اگه لازمه بازش بمونه، این رو true بذار.
+        public bool StartExpanded { get; set; } = true;
 
         public long PersonId
         {
@@ -35,7 +34,11 @@ namespace Taadol.Controls
         public PersonDetailPanel()
         {
             InitializeComponent();
-            Loaded += (_, _) => AnimatedContentBorder.MaxHeight = 1000;
+            Loaded += (_, _) =>
+            {
+                _isExpanded = StartExpanded;
+                ApplyExpandState(_isExpanded, animate: false);
+            };
         }
 
         private void RootBorder_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
@@ -95,47 +98,70 @@ namespace Taadol.Controls
         private void CollapseBorder_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             _isExpanded = !_isExpanded;
+            ApplyExpandState(_isExpanded, animate: true);
+        }
 
-            double duration = _isExpanded ? OpenDuration : CloseDuration;
+        /// <summary>
+        /// حالت باز/بسته رو اعمال می‌کنه. اگه animate=false باشه (مثلاً موقع لود اولیه)
+        /// مقادیر مستقیم و بدون انیمیشن ست می‌شن تا هیچ پرش/فلیکری دیده نشه
+        /// و پنل دقیقاً همون شکلِ نهاییِ بسته/باز رو از همون لحظه اول داشته باشه.
+        /// </summary>
+        private void ApplyExpandState(bool expanded, bool animate)
+        {
+            double heightTarget = expanded ? 800 : 0;
+            double opacityTarget = expanded ? 1 : 0;
+            double rotateTarget = expanded ? 0 : 180;
+
+            var balThickness = expanded ? new Thickness(0, 1, 0, 1) : new Thickness(0);
+            var balPadding = expanded ? new Thickness(0, 14, 0, 14) : new Thickness(0, 8, 0, 8);
+            var balMargin = expanded ? new Thickness(0, 12, 0, 0) : new Thickness(0, 6, 0, 0);
+
+            if (!animate)
+            {
+                AnimatedContentBorder.MaxHeight = heightTarget;
+                AnimatedContentBorder.Opacity = opacityTarget;
+                CollapseIconRotate.Angle = rotateTarget;
+                BalanceSectionBorder.BorderThickness = balThickness;
+                BalanceSectionBorder.Padding = balPadding;
+                BalanceSectionBorder.Margin = balMargin;
+                return;
+            }
+
+            double duration = expanded ? OpenDuration : CloseDuration;
             var ease = new CubicEase { EasingMode = EasingMode.EaseInOut };
 
-            // ── Height animation ──
             var heightAnim = new DoubleAnimation
             {
+                To = heightTarget,
                 Duration = TimeSpan.FromMilliseconds(duration),
                 EasingFunction = ease
             };
 
-            // ── Opacity animation ──
             var opacityAnim = new DoubleAnimation
             {
+                To = opacityTarget,
                 Duration = TimeSpan.FromMilliseconds(duration * 0.6),
                 EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
             };
 
-            // ── Rotate animation (arrow icon) ──
             var rotateAnim = new DoubleAnimation
             {
+                To = rotateTarget,
                 Duration = TimeSpan.FromMilliseconds(duration * 0.8),
                 EasingFunction = new BackEase { EasingMode = EasingMode.EaseInOut, Amplitude = 0.3 }
             };
 
-            if (_isExpanded)
-            {
-                heightAnim.To = 800;
-                opacityAnim.To = 1;
-                rotateAnim.To = 0;
-            }
-            else
-            {
-                heightAnim.To = 0;
-                opacityAnim.To = 0;
-                rotateAnim.To = 180;
-            }
+            var balTime = TimeSpan.FromMilliseconds(duration);
+            var thicknessAnim = new ThicknessAnimation(balThickness, balTime) { EasingFunction = ease };
+            var padAnim = new ThicknessAnimation(balPadding, balTime) { EasingFunction = ease };
+            var marAnim = new ThicknessAnimation(balMargin, balTime) { EasingFunction = ease };
 
             AnimatedContentBorder.BeginAnimation(MaxHeightProperty, heightAnim);
             AnimatedContentBorder.BeginAnimation(OpacityProperty, opacityAnim);
             CollapseIconRotate.BeginAnimation(RotateTransform.AngleProperty, rotateAnim);
+            BalanceSectionBorder.BeginAnimation(Border.BorderThicknessProperty, thicknessAnim);
+            BalanceSectionBorder.BeginAnimation(Border.PaddingProperty, padAnim);
+            BalanceSectionBorder.BeginAnimation(FrameworkElement.MarginProperty, marAnim);
         }
 
         private void EditIcon_Click(object sender, MouseButtonEventArgs e)
@@ -148,8 +174,8 @@ namespace Taadol.Controls
             => CloseRequested?.Invoke(this, _personId);
 
         private void SelectTab(Border activeTab, TextBlock activeText,
-     Border inactiveTab1, TextBlock inactiveText1,
-     Border inactiveTab2, TextBlock inactiveText2)
+             Border inactiveTab1, TextBlock inactiveText1,
+             Border inactiveTab2, TextBlock inactiveText2)
         {
             activeTab.BorderBrush = BlueBrush;
             activeText.Foreground = BlueBrush;
@@ -163,7 +189,7 @@ namespace Taadol.Controls
             inactiveText2.Foreground = ActiveGrayBrush;
             inactiveText2.FontWeight = FontWeights.Medium;
         }
-      
+
         private void TabBasicInfo_Checked(object sender, RoutedEventArgs e)
         {
             if (BasicInfoPanel == null) return;
@@ -171,7 +197,7 @@ namespace Taadol.Controls
             BankAccountsPanel.Visibility = Visibility.Collapsed;
             HistoryPanel.Visibility = Visibility.Collapsed;
         }
-      
+
         private void TabBankAccounts_Checked(object sender, RoutedEventArgs e)
         {
             if (BasicInfoPanel == null) return;
@@ -179,6 +205,7 @@ namespace Taadol.Controls
             BankAccountsPanel.Visibility = Visibility.Visible;
             HistoryPanel.Visibility = Visibility.Collapsed;
         }
+
         private void TabHistory_Checked(object sender, RoutedEventArgs e)
         {
             if (BasicInfoPanel == null) return;
@@ -186,6 +213,5 @@ namespace Taadol.Controls
             BankAccountsPanel.Visibility = Visibility.Collapsed;
             HistoryPanel.Visibility = Visibility.Visible;
         }
-       
     }
 }

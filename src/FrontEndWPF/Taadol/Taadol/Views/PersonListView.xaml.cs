@@ -33,6 +33,7 @@ namespace Taadol.Views
         private int _pageSize = 15;
         private int _currentPage = 1;
         private int _totalPages = 1;
+        private int _lastFilteredListCount = 0;
         private bool _isLoadedOnce = false;
 
         // ===== Filter Selections =====
@@ -308,6 +309,7 @@ namespace Taadol.Views
             }
 
             var filteredList = query.ToList();
+            _lastFilteredListCount = filteredList.Count;
 
             _totalPages = (int)Math.Ceiling(filteredList.Count / (double)_pageSize);
             if (_totalPages == 0) _totalPages = 1;
@@ -339,6 +341,7 @@ namespace Taadol.Views
                 PersonsDataGrid.ItemsSource = FilteredPersons;
 
             BuildPaginationButtons();
+            UpdatePageInfo();
 
             Dispatcher.BeginInvoke(new Action(() => UpdateRowBorders()), System.Windows.Threading.DispatcherPriority.Loaded);
         }
@@ -794,6 +797,25 @@ namespace Taadol.Views
                 _currentPage = pageNumber;
                 ApplyFilters();
             }
+        }
+
+        private void PageSizeSelector_SelectionChanged(object sender, int newSize)
+        {
+            _pageSize = newSize;
+            _currentPage = 1;
+            ApplyFilters();
+        }
+
+        private void UpdatePageInfo()
+        {
+            if (PageInfoText == null) return;
+            int currentPageCount = FilteredPersons.Count(p => !p.IsEmpty);
+            int totalCount = (int)Math.Ceiling(FilteredPersons.Count / (double)_pageSize) > 0
+                ? (FilteredPersons.Count - FilteredPersons.Count(p => p.IsEmpty)) + (FilteredPersons.Count(p => !p.IsEmpty) > 0 ? 0 : 0)
+                : 0;
+            // Use the filtered source count from the last ApplyFilters
+            int totalFiltered = _lastFilteredListCount;
+            PageInfoText.Text = $"نمایش {ToPersianNumber(currentPageCount)} از {ToPersianNumber(totalFiltered)} مورد";
         }
 
         private void PersonsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
