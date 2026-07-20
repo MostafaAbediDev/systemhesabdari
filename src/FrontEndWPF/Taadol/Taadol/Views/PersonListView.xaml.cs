@@ -342,6 +342,7 @@ namespace Taadol.Views
 
             BuildPaginationButtons();
             UpdatePageInfo();
+            UpdateSummaryBar();
 
             Dispatcher.BeginInvoke(new Action(() => UpdateRowBorders()), System.Windows.Threading.DispatcherPriority.Loaded);
         }
@@ -647,6 +648,7 @@ namespace Taadol.Views
                 item.IsSelected = !item.IsSelected;
                 UpdateRowBorders();
                 UpdateDetailPanels();
+                UpdateSummaryBar();
                 e.Handled = true;
             }
         }
@@ -757,6 +759,7 @@ namespace Taadol.Views
                 item.IsSelected = false;
                 UpdateRowBorders();
                 UpdateDetailPanels();
+                UpdateSummaryBar();
             }
         }
 
@@ -768,6 +771,45 @@ namespace Taadol.Views
 
         private void DetailPanel_DeleteRequested(object sender, long personId)
         {
+        }
+
+        private void UpdateSummaryBar()
+        {
+            if (AllPersons == null) return;
+
+            var validPersons = AllPersons.Where(p => !p.IsEmpty).ToList();
+            var selectedItems = validPersons.Where(p => p.IsSelected).ToList();
+
+            // جمع بدهکار / بستانکار
+            long totalDebit = 0;
+            long totalCredit = 0;
+            foreach (var p in validPersons)
+            {
+                if (long.TryParse(p.BalanceDisplay?.Replace(",", "").Replace("ریال", "").Trim(), out long bal))
+                {
+                    if (p.AccountStatus == "بدهکار")
+                        totalDebit += bal;
+                    else if (p.AccountStatus == "بستانکار")
+                        totalCredit += bal;
+                }
+            }
+
+            if (TotalDebitText != null)
+                TotalDebitText.Text = $"{ToPersianNumber((int)totalDebit)} ریال";
+            if (TotalCreditText != null)
+                TotalCreditText.Text = $"{ToPersianNumber((int)totalCredit)} ریال";
+            if (SelectedSummaryText != null)
+                SelectedSummaryText.Text = $"جمع اشخاص انتخاب شده ({ToPersianNumber(selectedItems.Count)})";
+            if (SelectedTotalText != null)
+            {
+                long selectedTotal = 0;
+                foreach (var p in selectedItems)
+                {
+                    if (long.TryParse(p.BalanceDisplay?.Replace(",", "").Replace("ریال", "").Trim(), out long bal))
+                        selectedTotal += bal;
+                }
+                SelectedTotalText.Text = $"{ToPersianNumber((int)selectedTotal)} ریال";
+            }
         }
 
         private void BtnNextPage_Click(object sender, RoutedEventArgs e)
