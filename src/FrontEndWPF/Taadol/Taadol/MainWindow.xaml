@@ -126,7 +126,7 @@
         <Border x:Name="MainContentBorder"
                
                 Grid.Row="1"
-                Padding="25,10,25,25"
+                Padding="5,10,25,25"
                 Grid.Column="1"
                 Background="#FFF8ED"
                 HorizontalAlignment="Stretch"

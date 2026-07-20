@@ -17,8 +17,8 @@
             BorderBrush="#E5E7EB"
             BorderThickness="1"
             CornerRadius="4"
-            Margin="0,0,5,8"
-            Padding="0,8,0,8"
+            Margin="0,5,5,8"
+            Padding="0,4,0,0"
             PreviewMouseWheel="RootBorder_PreviewMouseWheel">
 
         <Grid>
