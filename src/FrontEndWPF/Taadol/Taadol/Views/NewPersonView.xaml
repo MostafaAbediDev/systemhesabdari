@@ -6,7 +6,8 @@
              xmlns:controls="clr-namespace:Taadol.Controls"
              xmlns:svg="http://sharpvectors.codeplex.com/svgc/"
              FlowDirection="RightToLeft"
-             VerticalAlignment="Stretch"
+             VerticalAlignment="Center"
+             HorizontalAlignment="Center"
              Background="Transparent">
 
     <UserControl.Resources>

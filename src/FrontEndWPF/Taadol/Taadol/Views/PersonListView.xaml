@@ -225,7 +225,7 @@
                 <Border Grid.Column="1"
                         Width="1"
                         Background="#E5E7EB"
-                        Margin="0,0"
+                        Margin="1,0,5,0"
                         VerticalAlignment="Stretch" />
 
             <!-- ═══ DataGrid Container ═══ -->
@@ -1339,10 +1339,11 @@
                 </Grid>
 
                 <!-- ═══ نوار خلاصه زیر گرید ═══ -->
-                <Border Grid.Row="3"
+                <Border Grid.Row="2"
                         Background="#ffffff"
                                 BorderBrush="#E5E7EB"
                         BorderThickness="1"
+                        Height="53"
                         CornerRadius="4"
                         Margin="5,0,10,0"
                         Padding="16,8">
@@ -1412,7 +1413,7 @@
              
 
                 <!-- ═══ صفحه‌بندی ═══ -->
-                        <Border Grid.Row="2"
+                        <Border Grid.Row="3"
                                 Padding="5,5"
                                 Background="White"
                                 BorderBrush="#E9F0FF"

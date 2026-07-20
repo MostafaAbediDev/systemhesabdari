@@ -10,6 +10,7 @@ namespace Taadol.Models
         private string _cardNumber;
         private string _shebaNumber;
         private string _accountNumber;
+        private string _otherAccount;
         private bool _isDefault;
 
         public string BankName
@@ -40,6 +41,12 @@ namespace Taadol.Models
         {
             get => _accountNumber;
             set { _accountNumber = value; OnPropertyChanged(); }
+        }
+
+        public string OtherAccount
+        {
+            get => _otherAccount;
+            set { _otherAccount = value; OnPropertyChanged(); }
         }
 
         public bool IsDefault

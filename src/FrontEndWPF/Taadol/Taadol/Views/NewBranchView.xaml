@@ -6,6 +6,8 @@
              xmlns:controls="clr-namespace:Taadol.Controls"
              xmlns:svg="http://sharpvectors.codeplex.com/svgc/"
              FlowDirection="RightToLeft"
+             HorizontalAlignment="Center"
+             VerticalAlignment="Center"
              Background="Transparent">
 
 

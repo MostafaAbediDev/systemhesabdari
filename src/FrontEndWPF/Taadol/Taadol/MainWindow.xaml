@@ -126,11 +126,11 @@
         <Border x:Name="MainContentBorder"
                
                 Grid.Row="1"
-                Padding="5,10,25,25"
+                Padding="15,10,25,25"
                 Grid.Column="1"
                 Background="#FFF8ED"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
                 Visibility="Collapsed">
 
             <ContentControl x:Name="MainContent"

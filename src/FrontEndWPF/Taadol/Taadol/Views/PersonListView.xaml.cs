@@ -743,6 +743,25 @@ namespace Taadol.Views
                     balanceStatus,
                     item.Status == "فعال");
 
+                try
+                {
+                    using var scope = App.ServiceProvider.CreateScope();
+                    var bankApp = scope.ServiceProvider.GetRequiredService<IPersonBankApplication>();
+                    var banks = bankApp.GetByPersonId(item.Id) ?? new List<PersonBankViewModel>();
+                    var bankItems = banks.Select(b => new Taadol.Models.BankAccountItem
+                    {
+                        BankName = b.BankName ?? "—",
+                        BranchName = b.BankBranchName ?? "—",
+                        CardNumber = b.CardNumber ?? "—",
+                        ShebaNumber = b.Shaba ?? "—",
+                        AccountNumber = b.AccountNumber ?? "—",
+                        OtherAccount = "ندارد",
+                        IsDefault = b.IsDefault
+                    }).ToList();
+                    panel.LoadBankAccounts(bankItems);
+                }
+                catch { }
+
                 panel.CloseRequested += DetailPanel_CloseRequested;
                 panel.EditRequested += DetailPanel_EditRequested;
                 panel.DeleteRequested += DetailPanel_DeleteRequested;

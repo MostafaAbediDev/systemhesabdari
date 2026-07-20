@@ -10,7 +10,9 @@
         
              Padding="0"
              FontFamily="{StaticResource IRANSans}"
-             Background="Transparent">
+             Background="Transparent"
+             HorizontalAlignment="Center"
+             VerticalAlignment="Center">
 
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />

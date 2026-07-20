@@ -10,7 +10,9 @@
              Margin="24"
              FlowDirection="RightToLeft"
              FontFamily="{StaticResource IRANSans}"
-             Background="#FFFFFF">
+             Background="#FFFFFF"
+             HorizontalAlignment="Center"
+             VerticalAlignment="Center">
 
     <UserControl.Resources>
         

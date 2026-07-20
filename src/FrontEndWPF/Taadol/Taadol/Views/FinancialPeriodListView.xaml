@@ -3,7 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:Taadol.Controls"
              FlowDirection="RightToLeft"
-             Background="#F6F8FC">
+             Background="#F6F8FC"
+             HorizontalAlignment="Center"
+             VerticalAlignment="Center">
 
     <Grid>
 

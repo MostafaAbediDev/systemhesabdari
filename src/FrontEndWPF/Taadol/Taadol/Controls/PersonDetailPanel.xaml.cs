@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using Taadol.Models;
 
 namespace Taadol.Controls
 {
@@ -93,6 +95,18 @@ namespace Taadol.Controls
                 ActiveStatusText.Text = "غیرفعال";
                 ActiveStatusText.Foreground = new SolidColorBrush(Color.FromRgb(0xDC, 0x26, 0x26));
             }
+        }
+
+        public void LoadBankAccounts(List<BankAccountItem> accounts)
+        {
+            if (BankAccountsItems != null)
+                BankAccountsItems.ItemsSource = accounts;
+        }
+
+        public void LoadTransactions(List<TransactionItem> transactions)
+        {
+            if (TransactionsItems != null)
+                TransactionsItems.ItemsSource = transactions;
         }
 
         private void CollapseBorder_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
