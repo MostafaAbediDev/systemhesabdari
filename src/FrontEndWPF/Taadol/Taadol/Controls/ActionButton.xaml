@@ -5,13 +5,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:svg="http://sharpvectors.codeplex.com/svgc/"
              mc:Ignorable="d"
-             d:DesignHeight="40" d:DesignWidth="84"
+             d:DesignHeight="40" d:DesignWidth="94"
              x:Name="Root"
              Cursor="Hand">
 
     <Border x:Name="BtnBorder"
             Background="White"
             BorderThickness="1"
+            BorderBrush="#E9F0FF"
             CornerRadius="4"
             Padding="12,0"
             Height="40"

@@ -99,8 +99,23 @@ namespace Taadol.Controls
 
         public void LoadBankAccounts(List<BankAccountItem> accounts)
         {
-            if (BankAccountsItems != null)
-                BankAccountsItems.ItemsSource = accounts;
+            if (accounts == null || accounts.Count == 0)
+            {
+                BankAccountContentBorder.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            BankAccountContentBorder.Visibility = Visibility.Visible;
+
+            var defaultAccount = accounts.FirstOrDefault(a => a.IsDefault) ?? accounts[0];
+
+            BankNameText.Text = defaultAccount.BankName ?? "—";
+            BranchNameText.Text = defaultAccount.BranchName ?? "—";
+            CardNumberText.Text = defaultAccount.CardNumber ?? "—";
+            ShebaNumberText.Text = defaultAccount.ShebaNumber ?? "—";
+
+            var otherAccounts = accounts.Where(a => !a.IsDefault).ToList();
+            OtherAccountText.Text = otherAccounts.Count > 0 ? "دارد" : "ندارد";
         }
 
         public void LoadTransactions(List<TransactionItem> transactions)

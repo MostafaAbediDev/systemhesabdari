@@ -274,84 +274,69 @@
                             </StackPanel>
 
                             <StackPanel x:Name="BankAccountsPanel" Visibility="Collapsed">
-                                <ItemsControl x:Name="BankAccountsItems">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Grid Margin="0,0,0,10">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto" MinWidth="90" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                    <ColumnDefinition Width="*" />
-                                                </Grid.ColumnDefinitions>
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="Auto" />
-                                                    <RowDefinition Height="Auto" />
-                                                    <RowDefinition Height="Auto" />
-                                                    <RowDefinition Height="Auto" />
-                                                    <RowDefinition Height="Auto" />
-                                                    <RowDefinition Height="Auto" />
-                                                </Grid.RowDefinitions>
+                                <Border x:Name="BankAccountContentBorder">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" MinWidth="90" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
 
-                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="نام بانک"
-                                                           FontSize="12" FontWeight="SemiBold" Foreground="#1F2937"
-                                                           VerticalAlignment="Center" Margin="0,0,0,10" />
-                                                <Border Grid.Row="0" Grid.Column="1" Width="2" Height="16"
-                                                        Background="#BED1FF" Margin="0,0,10,10" VerticalAlignment="Center" />
-                                                <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding BankName}"
-                                                           FontSize="12" FontWeight="Medium" Foreground="#0D2159"
-                                                           VerticalAlignment="Center" Margin="0,0,0,10" />
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="نام بانک"
+                                                   FontSize="12" FontWeight="SemiBold" Foreground="#1F2937"
+                                                   VerticalAlignment="Center" Margin="0,0,0,10" />
+                                        <Border Grid.Row="0" Grid.Column="1" Width="2" Height="16"
+                                                Background="#BED1FF" Margin="0,0,10,10" VerticalAlignment="Center" />
+                                        <TextBlock x:Name="BankNameText" Grid.Row="0" Grid.Column="2"
+                                                   FontSize="12" FontWeight="Medium" Foreground="#0D2159"
+                                                   VerticalAlignment="Center" Margin="0,0,0,10" />
 
-                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="نام شعبه"
-                                                           FontSize="12" FontWeight="SemiBold" Foreground="#1F2937"
-                                                           VerticalAlignment="Center" Margin="0,0,0,10" />
-                                                <Border Grid.Row="1" Grid.Column="1" Width="2" Height="16"
-                                                        Background="#BED1FF" Margin="0,0,10,10" VerticalAlignment="Center" />
-                                                <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding BranchName}"
-                                                           FontSize="12" FontWeight="Medium" Foreground="#0D2159"
-                                                           VerticalAlignment="Center" Margin="0,0,0,10" />
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="نام شعبه"
+                                                   FontSize="12" FontWeight="SemiBold" Foreground="#1F2937"
+                                                   VerticalAlignment="Center" Margin="0,0,0,10" />
+                                        <Border Grid.Row="1" Grid.Column="1" Width="2" Height="16"
+                                                Background="#BED1FF" Margin="0,0,10,10" VerticalAlignment="Center" />
+                                        <TextBlock x:Name="BranchNameText" Grid.Row="1" Grid.Column="2"
+                                                   FontSize="12" FontWeight="Medium" Foreground="#0D2159"
+                                                   VerticalAlignment="Center" Margin="0,0,0,10" />
 
-                                                <TextBlock Grid.Row="2" Grid.Column="0" Text="شماره کارت"
-                                                           FontSize="12" FontWeight="SemiBold" Foreground="#1F2937"
-                                                           VerticalAlignment="Center" Margin="0,0,0,10" />
-                                                <Border Grid.Row="2" Grid.Column="1" Width="2" Height="16"
-                                                        Background="#BED1FF" Margin="0,0,10,10" VerticalAlignment="Center" />
-                                                <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding CardNumber}"
-                                                           FontSize="12" FontWeight="Medium" Foreground="#0D2159"
-                                                           VerticalAlignment="Center" FlowDirection="LeftToRight"
-                                                           Margin="0,0,0,10" />
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="شماره کارت"
+                                                   FontSize="12" FontWeight="SemiBold" Foreground="#1F2937"
+                                                   VerticalAlignment="Center" Margin="0,0,0,10" />
+                                        <Border Grid.Row="2" Grid.Column="1" Width="2" Height="16"
+                                                Background="#BED1FF" Margin="0,0,10,10" VerticalAlignment="Center" />
+                                        <TextBlock x:Name="CardNumberText" Grid.Row="2" Grid.Column="2"
+                                                   FontSize="12" FontWeight="Medium" Foreground="#0D2159"
+                                                   VerticalAlignment="Center" FlowDirection="LeftToRight"
+                                                   Margin="0,0,0,10" />
 
-                                                <TextBlock Grid.Row="3" Grid.Column="0" Text="شماره شبا"
-                                                           FontSize="12" FontWeight="SemiBold" Foreground="#1F2937"
-                                                           VerticalAlignment="Center" Margin="0,0,0,10" />
-                                                <Border Grid.Row="3" Grid.Column="1" Width="2" Height="16"
-                                                        Background="#BED1FF" Margin="0,0,10,10" VerticalAlignment="Center" />
-                                                <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding ShebaNumber}"
-                                                           FontSize="12" FontWeight="Medium" Foreground="#0D2159"
-                                                           VerticalAlignment="Center" FlowDirection="LeftToRight"
-                                                           Margin="0,0,0,10" />
+                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="شماره شبا"
+                                                   FontSize="12" FontWeight="SemiBold" Foreground="#1F2937"
+                                                   VerticalAlignment="Center" Margin="0,0,0,10" />
+                                        <Border Grid.Row="3" Grid.Column="1" Width="2" Height="16"
+                                                Background="#BED1FF" Margin="0,0,10,10" VerticalAlignment="Center" />
+                                        <TextBlock x:Name="ShebaNumberText" Grid.Row="3" Grid.Column="2"
+                                                   FontSize="12" FontWeight="Medium" Foreground="#0D2159"
+                                                   VerticalAlignment="Center" FlowDirection="LeftToRight"
+                                                   Margin="0,0,0,10" />
 
-                                                <TextBlock Grid.Row="4" Grid.Column="0" Text="شماره کارت"
-                                                           FontSize="12" FontWeight="SemiBold" Foreground="#1F2937"
-                                                           VerticalAlignment="Center" Margin="0,0,0,10" />
-                                                <Border Grid.Row="4" Grid.Column="1" Width="2" Height="16"
-                                                        Background="#BED1FF" Margin="0,0,10,10" VerticalAlignment="Center" />
-                                                <TextBlock Grid.Row="4" Grid.Column="2" Text="{Binding CardNumber}"
-                                                           FontSize="12" FontWeight="Medium" Foreground="#0D2159"
-                                                           VerticalAlignment="Center" FlowDirection="LeftToRight"
-                                                           Margin="0,0,0,10" />
-
-                                                <TextBlock Grid.Row="5" Grid.Column="0" Text="حساب دیگر"
-                                                           FontSize="12" FontWeight="SemiBold" Foreground="#1F2937"
-                                                           VerticalAlignment="Center" />
-                                                <Border Grid.Row="5" Grid.Column="1" Width="2" Height="16"
-                                                        Background="#BED1FF" Margin="0,0,10,0" VerticalAlignment="Center" />
-                                                <TextBlock Grid.Row="5" Grid.Column="2" Text="{Binding OtherAccount}"
-                                                           FontSize="12" FontWeight="Medium" Foreground="#0D2159"
-                                                           VerticalAlignment="Center" />
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
+                                        <TextBlock Grid.Row="4" Grid.Column="0" Text="حساب دیگر"
+                                                   FontSize="12" FontWeight="SemiBold" Foreground="#1F2937"
+                                                   VerticalAlignment="Center" />
+                                        <Border Grid.Row="4" Grid.Column="1" Width="2" Height="16"
+                                                Background="#BED1FF" Margin="0,0,10,0" VerticalAlignment="Center" />
+                                        <TextBlock x:Name="OtherAccountText" Grid.Row="4" Grid.Column="2"
+                                                   FontSize="12" FontWeight="Medium" Foreground="#0D2159"
+                                                   VerticalAlignment="Center" />
+                                    </Grid>
+                                </Border>
                             </StackPanel>
 
                             <StackPanel x:Name="HistoryPanel" Visibility="Collapsed">

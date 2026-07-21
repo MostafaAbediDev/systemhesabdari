@@ -57,8 +57,16 @@ namespace Taadol.Views
                 _currentPage = 1;
                 ApplyFilters();
             };
+            DataGridBorder.SizeChanged += DataGridBorder_SizeChanged;
 
             Loaded += PersonListView_Loaded;
+        }
+        private void DataGridBorder_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (DataGridClipGeometry != null && e.NewSize.Width > 0 && e.NewSize.Height > 0)
+            {
+                DataGridClipGeometry.Rect = new Rect(0, 0, e.NewSize.Width, e.NewSize.Height);
+            }
         }
 
         // ======================================================
@@ -344,7 +352,11 @@ namespace Taadol.Views
             UpdatePageInfo();
             UpdateSummaryBar();
 
-            Dispatcher.BeginInvoke(new Action(() => UpdateRowBorders()), System.Windows.Threading.DispatcherPriority.Loaded);
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                UpdateRowBorders();
+                AdjustDataGridHeight();
+            }), System.Windows.Threading.DispatcherPriority.Loaded);
         }
 
         private void BuildPaginationButtons()
@@ -652,7 +664,54 @@ namespace Taadol.Views
                 e.Handled = true;
             }
         }
+        private void AdjustDataGridHeight()
+        {
+            if (PersonsDataGrid == null || PersonsDataGrid.Items == null)
+                return;
 
+            const double headerHeight = 44;
+            const double rowHeight = 36;
+
+            // فقط ردیف‌های واقعی رو بشمار، نه پدینگ خالی
+            int itemCount = PersonsDataGrid.Items
+                .OfType<PersonItem>()
+                .Count(p => !p.IsEmpty);
+
+            double requiredDataGridHeight = headerHeight + (itemCount * rowHeight);
+
+            double totalHeight = RootBorder.ActualHeight;
+            double usedHeight = HeaderBorder.ActualHeight + FooterBorder.ActualHeight;
+            double availableHeight = Math.Max(totalHeight - usedHeight, headerHeight);
+
+            double otherComponentsHeight = 0;
+            if (FilterBarBorder != null) otherComponentsHeight += FilterBarBorder.ActualHeight;
+            if (SummaryBorder != null) otherComponentsHeight += SummaryBorder.ActualHeight;
+            if (PaginationBorder != null) otherComponentsHeight += PaginationBorder.ActualHeight;
+
+            double maxAllowedHeight = Math.Max(availableHeight - otherComponentsHeight, headerHeight);
+
+            if (requiredDataGridHeight <= maxAllowedHeight)
+            {
+                // داده کمه → گرید جمع بشه، بدون فضای خالی زیرش
+                PersonsDataGrid.Height = requiredDataGridHeight;
+                PersonsDataGrid.MaxHeight = requiredDataGridHeight;
+            }
+            else
+            {
+                // داده زیاده → کل فضای موجود پر بشه و اسکرول فعال شه
+                PersonsDataGrid.Height = maxAllowedHeight;
+                PersonsDataGrid.MaxHeight = maxAllowedHeight;
+            }
+        }
+        private void RootBorder_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            Dispatcher.BeginInvoke(new Action(() => AdjustDataGridHeight()), DispatcherPriority.Background);
+        }
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            // با تأخیر تا Layout کامل شود
+            Dispatcher.BeginInvoke(new Action(() => AdjustDataGridHeight()), DispatcherPriority.Background);
+        }
         private void UpdateRowBorders()
         {
             var items = PersonsDataGrid.Items;
@@ -788,8 +847,50 @@ namespace Taadol.Views
             mainWindow?.NavigateToEditPerson(personId);
         }
 
-        private void DetailPanel_DeleteRequested(object sender, long personId)
+        private async void DetailPanel_DeleteRequested(object sender, long personId)
         {
+            var item = AllPersons?.FirstOrDefault(p => p.Id == personId && !p.IsEmpty);
+            if (item == null) return;
+
+            var result = MessageBox.Show(
+                $"آیا از حذف «{item.FullName}» مطمئن هستید؟",
+                "حذف شخص",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning,
+                MessageBoxResult.No);
+
+            if (result != MessageBoxResult.Yes) return;
+
+            try
+            {
+                using var scope = App.ServiceProvider.CreateScope();
+                var personApp = scope.ServiceProvider.GetRequiredService<IPersonApplication>();
+                var op = personApp.Remove(item.Id);
+                if (!op.IsSucceeded)
+                {
+                    MessageBox.Show("خطا در حذف: " + op.Message, "خطا",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("خطا در حذف: " + ex.Message, "خطا",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            var panelToRemove = DetailPanelsStack.Children
+                .OfType<Taadol.Controls.PersonDetailPanel>()
+                .FirstOrDefault(p => p.PersonId == personId);
+            if (panelToRemove != null)
+                DetailPanelsStack.Children.Remove(panelToRemove);
+
+            _isLoadedOnce = false;
+            await LoadDataAsync();
+
+            MessageBox.Show("عملیات حذف انجام شد.", "موفق",
+                MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void UpdateSummaryBar()
@@ -1121,6 +1222,16 @@ namespace Taadol.Views
                 depth++;
             }
             return sb.ToString();
+        }
+
+        private void ActionButton_Loaded(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void ActionButton_Loaded_1(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 

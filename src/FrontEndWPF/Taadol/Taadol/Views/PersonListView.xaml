@@ -10,6 +10,7 @@
              xmlns:System="http://schemas.microsoft.com/winfx/2009/xaml"
              mc:Ignorable="d"
              FlowDirection="RightToLeft"
+             Loaded="UserControl_Loaded"
              Margin="5"
              Padding="0"
              FontFamily="{StaticResource IRANSans}"
@@ -39,7 +40,9 @@
 
     </UserControl.Resources>
 
-    <Border Margin="0,4"
+    <Border x:Name="RootBorder"
+            Margin="0,4"
+            SizeChanged="RootBorder_SizeChanged"
             Background="White"
             CornerRadius="4"
             ClipToBounds="True">
@@ -52,6 +55,7 @@
             </Grid.RowDefinitions>
 
             <Border Grid.Row="0"
+                    x:Name="HeaderBorder"
                     BorderBrush="#E5E7EB"
                     BorderThickness="0,0,0,1"
                     Padding="0,12"
@@ -86,17 +90,18 @@
 
                         <controls:ActionButton Text="حذف"
                                                TextColor="#DC2626"
-                                               BorderColor="#FECACA"
+                                               BorderColor="#E9F0FF"
                                                IconPath="/Assets/Icons/trash.svg"
                                                Margin="10,0,0,0"
                                                Click="BtnDelete_Click" />
 
                         <controls:ActionButton Text="چاپ"
                                                TextColor="#2563EB"
-                                               BorderColor="#BFDBFE"
-                                               IconPath="/Assets/Icons/rep.svg"
+                                               BorderColor="#E9F0FF"
+                                               IconPath="/Assets/Icons/printer.svg"
                                                Margin="6,0,0,0"
-                                               Click="BtnPrint_Click" />
+                                               Click="BtnPrint_Click"
+                                               Loaded="ActionButton_Loaded" />
 
                         <controls:ActionButton Text="Excel"
                                                TextColor="#374151"
@@ -110,10 +115,11 @@
 
                         <controls:ActionButton Text="بروزرسانی"
                                                TextColor="#2563EB"
-                                               BorderColor="#BFDBFE"
-                                               IconPath="/Assets/Icons/rep.svg"
+                                               IconPath="/Assets/Icons/arrow-reload-horizontal-2.svg"
                                                Margin="6,0,0,0"
-                                               Click="BtnRefresh_Click" />
+                                               
+                                               Click="BtnRefresh_Click"
+                                               Loaded="ActionButton_Loaded_1" />
 
                         <!-- X بستن -->
                         <Border Cursor="Hand"
@@ -154,7 +160,7 @@
                                             Width="20"
                                             Height="20"
                                             Margin="0,0,6,0"
-                                            Source="/Assets/Icons/profile_u.svg"
+                                            Source="/Assets/Icons/user_blue.svg"
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center" />
                             <TextBlock Text="اشخاص انتخاب شده"
@@ -205,12 +211,13 @@
                         <StackPanel Orientation="Horizontal"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Center">
-                            <TextBlock Text="+"
-                                       FontSize="16"
-                                       FontWeight="Regular"
-                                       Foreground="White"
-                                       VerticalAlignment="Center"
-                                       Margin="0,0,6,0" />
+                            <svg:SvgViewbox 
+                                            Width="15"
+                                            Height="15"
+                                            Margin="0,0,12,0"
+                                            Source="/Assets/Icons/plus_LINE.svg"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center" />
                             <TextBlock Text="شخص جدید"
                                        FontSize="13"
                                        FontWeight="Regular"
@@ -231,31 +238,31 @@
             <!-- ═══ DataGrid Container ═══ -->
             <Border Grid.Column="2"
                     Background="Transparent"
-                    ClipToBounds="False">
+                        VerticalAlignment="Top"
+                        ClipToBounds="False">
 
-                <Grid>
+                <Grid x:Name="DataGridInnerGrid">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
                     <!-- ═══ Filter Tabs + Search ═══ -->
                     <Border Grid.Row="0"
-                            BorderBrush="Red"
+                                x:Name="FilterBarBorder"
+                                BorderBrush="Red"
                             BorderThickness="0,0,0,0"
                             Background="#FAFCFF"
-                            Padding="4,6">
-                        <Grid>
+                            Padding="8,6">
+                        <Grid Grid.IsSharedSizeScope="True">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="FilterTab" />
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="FilterTab" />
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="FilterTab" />
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="FilterTab" />
                             </Grid.ColumnDefinitions>
 
                             <ToggleButton x:Name="tabAll"
@@ -289,7 +296,6 @@
                                           Style="{StaticResource FilterTabStyle2}"
                                           Content="پرسنل و کارکنان"
                                           Tag=""
-                                          Margin="0,0,6,0"
                                           HorizontalAlignment="Stretch"
                                           Click="FilterTab_Click" />
 
@@ -400,18 +406,22 @@
                     <!-- ═══ DataGrid ═══ -->
                         <Grid x:Name="DataGridContainer"
                               Grid.Row="1">
-                            <Border Background="White"
+                            <Border x:Name="DataGridBorder"
+                                    Background="White"
                                     BorderBrush="#E5E7EB"
                                     Margin="5,0,10,8"
                                     BorderThickness="1,1,1,1"
                                     CornerRadius="4"
                                     SnapsToDevicePixels="True"
-                                    UseLayoutRounding="True"
-                                    ClipToBounds="True">
-                                <Border Margin="0,1,0,0"
-                                        ClipToBounds="True">
-
-                                    <DataGrid x:Name="PersonsDataGrid"
+                                    UseLayoutRounding="True">
+                                <Border.Clip>
+                                    <RectangleGeometry x:Name="DataGridClipGeometry"
+                                                       RadiusX="4"
+                                                       RadiusY="4" />
+                                </Border.Clip>
+                                <DataGrid x:Name="PersonsDataGrid"
+                                          VerticalAlignment="Top"
+                                          MaxHeight="{Binding ActualHeight, ElementName=DataGridBorder}"
                                           CanUserSortColumns="False"
                                           SnapsToDevicePixels="True"
                                           UseLayoutRounding="True"
@@ -422,17 +432,17 @@
                                           HorizontalGridLinesBrush="Transparent"
                                           RowHeight="36"
                                           Background="White"
-                                          BorderBrush="Transparent"   
-                                    BorderThickness="0"
-                                              Margin="0,0,-1,0"
-                                              CanUserAddRows="False"
-                  CanUserDeleteRows="False"
-                  CanUserResizeRows="False"
-                  SelectionMode="Extended"
-                  AlternationCount="2"
-                  IsReadOnly="True"
-                  ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                  ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                                          BorderBrush="Transparent"
+                                          BorderThickness="0,0,0,0"
+                                          Margin="0,0,-1,0"
+                                          CanUserAddRows="False"
+                                          CanUserDeleteRows="False"
+                                          CanUserResizeRows="False"
+                                          SelectionMode="Extended"
+                                          AlternationCount="2"
+                                          IsReadOnly="True"
+                                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                          ScrollViewer.VerticalScrollBarVisibility="Auto"
                   FontFamily="{StaticResource IRANSans}"
                   SelectionChanged="PersonsDataGrid_SelectionChanged"
                   MouseDoubleClick="PersonsDataGrid_MouseDoubleClick">
@@ -513,7 +523,7 @@
                                             <ControlTemplate TargetType="DataGridColumnHeader">
                                                 <Border Background="{TemplateBinding Background}"
                                                         BorderBrush="#E5E7EB"
-                                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                                        BorderThickness="0,0,1,1"
                                                         Padding="{TemplateBinding Padding}">
                                                     <ContentPresenter VerticalAlignment="Center"
                                                                       HorizontalAlignment="Center" />
@@ -1024,7 +1034,7 @@
                                             <StackPanel Orientation="Horizontal"
                                                         VerticalAlignment="Center"
                                                         HorizontalAlignment="Center">
-                                                <TextBlock Text="ویژگی حساب"
+                                                <TextBlock Text="مانده / وضعیت حساب"
                                                            FontFamily="{StaticResource IRANSans}"
                                                            FontSize="13"
                                                            FontWeight="SemiBold"
@@ -1132,8 +1142,6 @@
 
                             </DataGrid.Columns>
                         </DataGrid>
-                                </Border>
-
                             </Border>
                     <Border x:Name="LoadingOverlay"
                             Background="#B8F8FAFC"
@@ -1342,10 +1350,11 @@
                 <Border Grid.Row="2"
                         Background="#ffffff"
                                 BorderBrush="#E5E7EB"
-                        BorderThickness="1"
+                                x:Name="SummaryBorder"
+                                BorderThickness="1"
                         Height="53"
                         CornerRadius="4"
-                        Margin="5,0,10,0"
+                        Margin="5,0,10,2"
                         Padding="16,8">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -1357,12 +1366,12 @@
                         <!-- جمع بدهکار -->
                         <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                             <TextBlock Text="جمع بدهکار"
-                                       FontSize="12" FontWeight="SemiBold"
+                                       FontSize="14" FontWeight="SemiBold"
                                        Foreground="#1F2937"
                                        VerticalAlignment="Center" />
                            
                             <TextBlock x:Name="TotalDebitText"
-                                       FontSize="12" FontWeight="Medium"
+                                               FontSize="14" FontWeight="Medium"
                                        Foreground="#DC2626"
                                                Margin="8,0"
                                                VerticalAlignment="Center" />
@@ -1372,11 +1381,11 @@
                         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center"
                                     Margin="30,0">
                             <TextBlock Text="جمع بستانکار"
-                                       FontSize="12" FontWeight="SemiBold"
+                                               FontSize="14" FontWeight="SemiBold"
                                        Foreground="#1F2937"
                                        VerticalAlignment="Center" />
                             <TextBlock x:Name="TotalCreditText"
-                                       FontSize="12" FontWeight="Medium"
+                                               FontSize="14" FontWeight="Medium"
                                                Margin="8,0"
                                                Foreground="#16A34A"
                                        VerticalAlignment="Center" />
@@ -1391,12 +1400,12 @@
                         <!-- جمع اشخاص انتخاب شده -->
                         <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
                             <TextBlock x:Name="SelectedSummaryText"
-                                       FontSize="12" FontWeight="SemiBold"
+                                               FontSize="14" FontWeight="SemiBold"
                                        Foreground="#1F2937"
                                        VerticalAlignment="Center" />
                                   
                             <TextBlock x:Name="SelectedTotalText"
-                                       FontSize="12" FontWeight="Medium"
+                                               FontSize="14" FontWeight="Medium"
                                        Foreground="#2563EB"
                                        Margin="8,0"
                                        VerticalAlignment="Center" />
@@ -1417,6 +1426,7 @@
                                 Padding="5,5"
                                 Background="White"
                                 BorderBrush="#E9F0FF"
+                                x:Name="PaginationBorder"
                                 BorderThickness="0,0,0,0">
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -1628,12 +1638,13 @@
             <Border Grid.Row="2"
                     Background="#FAFCFF"
                     BorderBrush="#E5E7EB"
+                    x:Name="FooterBorder"
                     BorderThickness="0,1,0,0"
                     Padding="16,6">
                 <StackPanel Orientation="Horizontal"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Center">
-                    <TextBlock FontSize="12"
+                    <TextBlock FontSize="14"
                                Foreground="#6B7280"
                                FontFamily="{StaticResource IRANSans}"
                                VerticalAlignment="Center">
@@ -1648,7 +1659,7 @@
                             Background="#D1D5DB"
                             Margin="16,0"
                             VerticalAlignment="Center" />
-                    <TextBlock FontSize="12"
+                    <TextBlock FontSize="14"
                                Foreground="#6B7280"
                                FontFamily="{StaticResource IRANSans}"
                                VerticalAlignment="Center">
@@ -1663,7 +1674,7 @@
                             Background="#D1D5DB"
                             Margin="16,0"
                             VerticalAlignment="Center" />
-                    <TextBlock FontSize="12"
+                    <TextBlock FontSize="14"
                                Foreground="#6B7280"
                                FontFamily="{StaticResource IRANSans}"
                                VerticalAlignment="Center">
@@ -1678,7 +1689,7 @@
                             Background="#D1D5DB"
                             Margin="16,0"
                             VerticalAlignment="Center" />
-                    <TextBlock FontSize="12"
+                    <TextBlock FontSize="14"
                                Foreground="#6B7280"
                                FontFamily="{StaticResource IRANSans}"
                                VerticalAlignment="Center">
@@ -1693,7 +1704,7 @@
                             Background="#D1D5DB"
                             Margin="16,0"
                             VerticalAlignment="Center" />
-                    <TextBlock FontSize="12"
+                    <TextBlock FontSize="14"
                                Foreground="#6B7280"
                                FontFamily="{StaticResource IRANSans}"
                                VerticalAlignment="Center">

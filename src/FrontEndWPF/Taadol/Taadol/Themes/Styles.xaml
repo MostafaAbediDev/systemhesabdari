@@ -384,9 +384,7 @@
         <!-- افزایش Padding برای پهن‌تر شدن -->
         <Setter Property="Padding"
                 Value="22,10" />
-        <!-- اضافه کردن MinWidth برای اطمینان از حداقل عرض -->
-        <Setter Property="MinWidth"
-                Value="90" />
+
         <Setter Property="Margin"
                 Value="2,0,2,0" />
         <Setter Property="Cursor"
@@ -402,6 +400,7 @@
                             Padding="{TemplateBinding Padding}">
                         <StackPanel Orientation="Horizontal"
                                     FlowDirection="RightToLeft"
+                                    HorizontalAlignment="Center"
                                     VerticalAlignment="Center">
                             <Border x:Name="CloseBorder"
                                     Width="18"
@@ -410,7 +409,7 @@
                                     Background="Transparent"
                                     Margin="0,1,0,0"
                                     VerticalAlignment="Center"
-                                    Visibility="Collapsed"
+                                    Opacity="0"
                                     Cursor="Hand">
                                 <TextBlock x:Name="CloseText"
                                            Text="&#x2715;"
@@ -454,8 +453,8 @@
                                     Property="Foreground"
                                     Value="#2667FF" />
                             <Setter TargetName="CloseBorder"
-                                    Property="Visibility"
-                                    Value="Visible" />
+                                    Property="Opacity"
+                                    Value="1" />
                         </Trigger>
 
                         <Trigger Property="IsMouseOver"
