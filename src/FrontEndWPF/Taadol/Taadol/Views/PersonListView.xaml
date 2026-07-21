@@ -278,7 +278,7 @@
                             <ToggleButton x:Name="tabCustomers"
                                           Grid.Column="2"
                                           Style="{StaticResource FilterTabStyle2}"
-                                          Content="مشتریان"
+                                          Content="مشتری"
                                           Tag=""
                                           HorizontalAlignment="Stretch"
                                           Click="FilterTab_Click" />
@@ -286,7 +286,7 @@
                             <ToggleButton x:Name="tabSuppliers"
                                           Grid.Column="3"
                                           Style="{StaticResource FilterTabStyle2}"
-                                          Content="تامین کنندگان"
+                                          Content="تامین کننده"
                                           Tag=""
                                           HorizontalAlignment="Stretch"
                                           Click="FilterTab_Click" />
@@ -294,7 +294,7 @@
                             <ToggleButton x:Name="tabPersonnel"
                                           Grid.Column="4"
                                           Style="{StaticResource FilterTabStyle2}"
-                                          Content="پرسنل و کارکنان"
+                                          Content="پرسنل"
                                           Tag=""
                                           HorizontalAlignment="Stretch"
                                           Click="FilterTab_Click" />

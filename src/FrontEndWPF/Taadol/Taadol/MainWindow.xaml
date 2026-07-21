@@ -129,8 +129,8 @@
                 Padding="15,10,25,25"
                 Grid.Column="1"
                 Background="#FFF8ED"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
                 Visibility="Collapsed">
 
             <ContentControl x:Name="MainContent"

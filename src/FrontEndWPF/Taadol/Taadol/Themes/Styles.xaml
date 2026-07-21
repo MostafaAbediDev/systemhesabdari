@@ -430,7 +430,7 @@
                             <TextBlock x:Name="CountText"
                                        Text="{TemplateBinding Tag}"
                                        FontSize="11"
-                                       Foreground="#94A3B8"
+                                       Foreground="#0D2159"
                                        FontFamily="{StaticResource IRANSans}"
                                        VerticalAlignment="Center"
                                        Margin="4,0,0,0" />
