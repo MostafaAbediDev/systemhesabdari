@@ -147,12 +147,11 @@
             </Border>
         </DataTemplate>
     </UserControl.Resources>
-   
+
     <Border CornerRadius="12"
             ClipToBounds="False"
             Background="#ffffff"
-            VerticalAlignment="Stretch"
-         >
+            VerticalAlignment="Stretch">
 
         <Grid VerticalAlignment="Stretch">
             <Grid.RowDefinitions>
@@ -276,7 +275,6 @@
                                 <ComboBox x:Name="BranchCombo"
                                           Style="{StaticResource SearchableComboBox}"
                                           Tag="جستجو..."
-                                         
                                           ItemsSource="{Binding Branches}"
                                           DisplayMemberPath="Title"
                                           SelectedValuePath="Id"
@@ -489,15 +487,15 @@
                                                       Checked="PersonTypeToggle_Checked"
                                                       Margin="0,0,8,0" />
                                         <ToggleButton x:Name="PersonTypePersonnel"
-                                                       Content="پرسنل"
-                                                       Tag="2"
-                                                       FlowDirection="LeftToRight"
-                                                       Style="{StaticResource StatusToggleButton}"
-                                                       IsChecked="False"
-                                                       Checked="PersonTypeToggle_Checked"
-                                                       Unchecked="PersonTypeToggle_Checked"
-                                                       Margin="0,0,8,0" />
-                                      
+                                                      Content="پرسنل"
+                                                      Tag="2"
+                                                      FlowDirection="LeftToRight"
+                                                      Style="{StaticResource StatusToggleButton}"
+                                                      IsChecked="False"
+                                                      Checked="PersonTypeToggle_Checked"
+                                                      Unchecked="PersonTypeToggle_Checked"
+                                                      Margin="0,0,8,0" />
+
                                     </StackPanel>
                                 </Grid>
                             </StackPanel>
@@ -516,10 +514,10 @@
                                 Margin="0,0,10,0"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Top">
-                        <controls:ImagePickerControl x:Name="PersonImagePicker"   
-                            ImageSelected="OnImageSelected"
-                             ImageRemoved="OnImageRemoved"
-                             Loaded="ImagePickerControl_Loaded" />
+                        <controls:ImagePickerControl x:Name="PersonImagePicker"
+                                                     ImageSelected="OnImageSelected"
+                                                     ImageRemoved="OnImageRemoved"
+                                                     Loaded="ImagePickerControl_Loaded" />
                     </StackPanel>
                 </Grid>
             </Border>
@@ -566,16 +564,15 @@
                          Panel.ZIndex="2" />
             </Grid>
 
-            <!-- ═══ ردیف 3: تب بار (ثابت، اسکرول نمی‌شه) ═══ -->
             <StackPanel Grid.Row="3"
                         Margin="12,0,0,0"
                         HorizontalAlignment="Left">
-                <Border CornerRadius="12"
-                        BorderThickness="1.5"
-                        BorderBrush="#BED1FF"
+                <Border CornerRadius="0"
+                        BorderThickness="0,0,0,2"
+                        BorderBrush="#E5E7EB"
                         Background="#F8FAFF"
-                        Padding="4"
-                        Margin="0,0,0,10" 
+                        Padding="0"
+                        Margin="0,0,0,0"
                         HorizontalAlignment="Center">
                     <StackPanel Orientation="Horizontal">
                         <RadioButton Content="تماس و آدرس"
@@ -610,13 +607,10 @@
                           VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Disabled">
                 <Border Style="{StaticResource CardPanel}">
-                    <Grid
-                        Margin="12,0,12,0"
-                        >
+                    <Grid Margin="12,0,12,0">
 
                         <!-- تب: تماس و آدرس -->
                         <StackPanel x:Name="PricingContent"
-                                    
                                     Visibility="Collapsed">
                             <Grid>
                                 <Grid.ColumnDefinitions>

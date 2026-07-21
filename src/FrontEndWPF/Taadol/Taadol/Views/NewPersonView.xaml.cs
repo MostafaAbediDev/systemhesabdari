@@ -632,8 +632,8 @@ namespace Taadol.Views
                 IsCodeAutomatic = false,
                 ManualCode = ManualCode,
                 PersonCategoryId = _selectedPersonCategoryId
-           
-        };
+
+            };
 
             try
             {
@@ -848,7 +848,7 @@ namespace Taadol.Views
             }
             if (!IsCodeAutomatic && string.IsNullOrWhiteSpace(ManualCode))
             {
-                    MessageBox.Show("شناسه یکتای دستی را وارد کنید یا حالت اتوماتیک را فعال کنید.", "شناسه یکتا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("شناسه یکتای دستی را وارد کنید یا حالت اتوماتیک را فعال کنید.", "شناسه یکتا", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return false;
             }
 
@@ -1260,13 +1260,13 @@ namespace Taadol.Views
             var defaultRows = BankAccounts.Where(r => r.IsDefault).ToList();
             if (defaultRows.Count > 0)
             {
-           var result = MessageBox.Show("فقط یک حساب می‌تواند پیش‌فرض باشد. آیا پیش‌فرض قبلی لغو شود؟", "تغییر حساب پیش‌فرض", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                var result = MessageBox.Show("فقط یک حساب می‌تواند پیش‌فرض باشد. آیا پیش‌فرض قبلی لغو شود؟", "تغییر حساب پیش‌فرض", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
-           if (result == MessageBoxResult.Yes)
-           {
-               foreach (var row in defaultRows)
-                   row.IsDefault = false;
-           }
+                if (result == MessageBoxResult.Yes)
+                {
+                    foreach (var row in defaultRows)
+                        row.IsDefault = false;
+                }
                 else
                 {
                     MainBankIsDefault = false;
@@ -1293,9 +1293,9 @@ namespace Taadol.Views
 
             if (otherRows.Count > 0 || hasMainDefault)
             {
-           var result = MessageBox.Show("فقط یک حساب می‌تواند پیش‌فرض باشد. آیا پیش‌فرض قبلی لغو شود؟", "تغییر حساب پیش‌فرض", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                var result = MessageBox.Show("فقط یک حساب می‌تواند پیش‌فرض باشد. آیا پیش‌فرض قبلی لغو شود؟", "تغییر حساب پیش‌فرض", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
-           if (result == MessageBoxResult.Yes)
+                if (result == MessageBoxResult.Yes)
                 {
                     if (hasMainDefault)
                         MainBankIsDefault = false;
@@ -1371,6 +1371,52 @@ namespace Taadol.Views
         private void TextBox_TextChanged_3(object sender, TextChangedEventArgs e) { }
         private void Button_Click(object sender, RoutedEventArgs e) { }
         private void ToggleSwitchControl_SelectionChanged(object sender, bool e) { }
+
+        // ======================================================
+        //  Close & Clear
+        // ======================================================
+        private void CloseButton_Click(object sender, MouseButtonEventArgs e)
+        {
+            var mainWindow = Window.GetWindow(this) as MainWindow;
+            mainWindow?.CloseModal();
+        }
+
+        private void ClearButton_Click(object sender, RoutedEventArgs e)
+        {
+            var result = MessageBox.Show(
+                "آیا از پاک کردن فرم مطمئن هستید؟",
+                "پاک کردن",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning,
+                MessageBoxResult.No);
+
+            if (result != MessageBoxResult.Yes) return;
+
+            FirstName = "";
+            LastName = "";
+            NationalCode = "";
+            Phone = "";
+            Mobile = "";
+            Email = "";
+            Address = "";
+            PostalCode = "";
+            CompanyName = "";
+            EconomicCode = "";
+            RegistrationNumber = "";
+            ContactFirstName = "";
+            ContactLastName = "";
+            ManualCode = "";
+            IsActive = true;
+            _selectedImagePath = null;
+            PersonImagePicker.ImagePath = null;
+            CategorySearch?.ClearSelection();
+            BankAccounts?.Clear();
+            MainBankName = "";
+            MainCardNumber = "";
+            MainShaba = "";
+            MainAccountNumber = "";
+            MainBankIsDefault = false;
+        }
 
         // ======================================================
         //  INotifyPropertyChanged
