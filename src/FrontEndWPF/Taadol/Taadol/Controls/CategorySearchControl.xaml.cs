@@ -55,9 +55,6 @@ namespace Taadol.Controls
 
         private static void OnMainIconChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var control = d as CategorySearchControl;
-            if (control?.MainIcon != null && e.NewValue is string newPath)
-                control.MainIcon.Source = new Uri(newPath, UriKind.Relative);
         }
 
         public CategorySearchControl()
@@ -398,6 +395,11 @@ namespace Taadol.Controls
          new PropertyMetadata("دسته بندی اشخاص"));
         public event Action<CategoryItem> RootCategoryAdded;
 
+        private void AddButtonBorder_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            AddRootButton_Click(sender, e);
+        }
+
         private async void AddRootButton_Click(object sender, RoutedEventArgs e)
         {
             if (PersonTypeId <= 0)
@@ -510,6 +512,20 @@ namespace Taadol.Controls
             get => (string)GetValue(HeaderTextProperty);
             set => SetValue(HeaderTextProperty, value);
         }
+
+        public static readonly DependencyProperty IsRequiredProperty =
+            DependencyProperty.Register(
+                nameof(IsRequired),
+                typeof(bool),
+                typeof(CategorySearchControl),
+                new PropertyMetadata(false));
+
+        public bool IsRequired
+        {
+            get => (bool)GetValue(IsRequiredProperty);
+            set => SetValue(IsRequiredProperty, value);
+        }
+
         private void AnimatePopupOut(Action onComplete)
         {
             var container = PopupContainer;
@@ -550,14 +566,6 @@ namespace Taadol.Controls
 
         private void RotateArrow(double angle)
         {
-            var animation = new DoubleAnimation
-            {
-                To = angle,
-                Duration = TimeSpan.FromMilliseconds(260),
-                EasingFunction = new CubicEase { EasingMode = EasingMode.EaseInOut }
-            };
-
-            ArrowRotation.BeginAnimation(RotateTransform.AngleProperty, animation);
         }
 
         // ==================== Search ====================

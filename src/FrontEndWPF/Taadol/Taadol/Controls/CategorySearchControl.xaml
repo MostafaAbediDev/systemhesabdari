@@ -795,6 +795,8 @@
             </Setter>
         </Style>
 
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+
     </UserControl.Resources>
 
     <Grid x:Name="RootGrid">
@@ -802,35 +804,33 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
-        <Grid Margin="0,0,0,5" Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-
-            <TextBlock Grid.Column="0"
-                       Text="{Binding HeaderText, RelativeSource={RelativeSource AncestorType=UserControl}}"
+        <StackPanel Grid.Row="0" Margin="0,0,0,5" Orientation="Horizontal" VerticalAlignment="Center">
+            <StackPanel.Style>
+                <Style TargetType="StackPanel">
+                    <Setter Property="Visibility" Value="Visible" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding HeaderText, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </StackPanel.Style>
+            <TextBlock Text="{Binding HeaderText, RelativeSource={RelativeSource AncestorType=UserControl}}"
                        Style="{StaticResource FormLabel}"
                        VerticalAlignment="Center" />
-
-            <Button Grid.Column="1"
-                    Style="{StaticResource LightAddButton}"
-                    Width="35"
-                    Height="35"
-                    Background="#E9F0FF"
-                    BorderBrush="Transparent"
-                    Click="AddRootButton_Click">
-                <svg:SvgViewbox Width="13"
-                                Height="13"
-                                Source="/Assets/Icons/add-square.svg"
-                                VerticalAlignment="Center" />
-            </Button>
-        </Grid>
+            <TextBlock Text=" *"
+                       Foreground="#DC2626"
+                       FontWeight="Bold"
+                       FontSize="16"
+                       FontFamily="{StaticResource IRANSans}"
+                       VerticalAlignment="Center"
+                       Visibility="{Binding IsRequired, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibilityConverter}}" />
+        </StackPanel>
 
         <Border Background="White"
                 Grid.Row="1"
-                CornerRadius="12"
-                BorderBrush="#D4E1FF"
+                CornerRadius="4"
+                BorderBrush="#E5E7EB"
                 BorderThickness="1"
                 Cursor="Hand"
                 x:Name="MainBorder"
@@ -838,51 +838,52 @@
 
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <Border Grid.Column="0"
-                        Width="36"
-                        Height="36"
-                        Margin="4,4,8,4"
-                        CornerRadius="10"
-                        Background="#F0F5FF">
-                    <svg:SvgViewbox x:Name="MainIcon"
-                                    Width="20"
-                                    Height="20"
-                                    Source="/Assets/Icons/profile_u.svg"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center" />
-                </Border>
-
                 <TextBlock x:Name="SelectedText"
-                           Grid.Column="1"
-                           Text="یک دسته جستجو کنید..."
+                           Grid.Column="0"
+                           Text="جستجو"
                            FontSize="13"
                            Foreground="#737791"
                            FontFamily="{StaticResource IRANSans}"
                            VerticalAlignment="Center"
-                           HorizontalAlignment="Left" />
+                           HorizontalAlignment="Left"
+                           Margin="12,0,0,0" />
+
+                <svg:SvgViewbox Grid.Column="1"
+                                Width="14"
+                                Height="14"
+                                Source="/Assets/Icons/ArrowUp.svg"
+                                VerticalAlignment="Center"
+                                Margin="0,0,8,0" />
 
                 <Border Grid.Column="2"
-                        Width="32"
-                        Height="32"
-                        Margin="0,0,4,0"
-                        CornerRadius="8">
-                    <svg:SvgViewbox x:Name="ArrowIcon"
-                                    Width="12"
+                        Width="1"
+                        Height="27"
+                        Background="#E5E7EB"
+                        VerticalAlignment="Center"
+                        Margin="8,0,8,0" />
+
+                <Border Grid.Column="3"
+                        Width="36"
+                        Height="36"
+                        Margin="4"
+                        CornerRadius="4"
+                        BorderBrush="#2667FF"
+                        BorderThickness="1"
+                        Background="White"
+                        x:Name="AddButtonBorder"
+                        MouseLeftButtonDown="AddButtonBorder_MouseLeftButtonDown"
+                        Cursor="Hand">
+                    <svg:SvgViewbox Width="12"
                                     Height="12"
-                                    Source="/Assets/Icons/Arrow.svg"
+                                    Source="/Assets/Icons/add-square.svg"
                                     HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    RenderTransformOrigin="0.5,0.5">
-                        <svg:SvgViewbox.RenderTransform>
-                            <RotateTransform x:Name="ArrowRotation"
-                                             Angle="0" />
-                        </svg:SvgViewbox.RenderTransform>
-                    </svg:SvgViewbox>
+                                    VerticalAlignment="Center" />
                 </Border>
             </Grid>
         </Border>

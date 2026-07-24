@@ -302,7 +302,17 @@ namespace Taadol.Views
             Loaded += OnLoaded;
             CategorySearch.CategorySelected += OnCategorySelected;
         }
-
+        private void OnToggled(object sender, RoutedEventArgs e)
+        {
+            // sender همان کنترل ActiveToggleControl است
+            var toggle = sender as ActiveToggleControl;
+            if (toggle != null)
+            {
+                bool currentState = toggle.IsChecked;
+                // اقدامات مورد نظر شما
+                MessageBox.Show($"وضعیت جدید: {(currentState ? "روشن" : "خاموش")}");
+            }
+        }
         private void OnCategorySelected(CategorySearchControl.CategoryItem category)
         {
             _selectedPersonCategoryId = category.Id;

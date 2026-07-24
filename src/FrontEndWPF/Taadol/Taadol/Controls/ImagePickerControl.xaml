@@ -11,16 +11,21 @@
     <Border x:Name="ImageBorder"
             Width="141"
             Height="136"
-            Padding="5"
-            CornerRadius="12"
-            BorderThickness="1.5"
-            BorderBrush="#BED1FF"
-            Background="#F8FAFF"
+            CornerRadius="4"
+            BorderThickness="0"
+            Background="White"
             ClipToBounds="True"
             HorizontalAlignment="Center"
             VerticalAlignment="Top">
 
         <Grid>
+            <Rectangle x:Name="DashedBorder"
+                       RadiusX="4" RadiusY="4"
+                       Stroke="#BED1FF"
+                       StrokeThickness="1.5"
+                       StrokeDashArray="6,3"
+                       Fill="Transparent"
+                       IsHitTestVisible="False" />
 
             <Image x:Name="PreviewImage"
                    Stretch="Uniform"
@@ -29,12 +34,9 @@
                    ClipToBounds="True"
                    VerticalAlignment="Stretch" />
 
-
-
             <StackPanel x:Name="PlaceholderPanel"
                         VerticalAlignment="Center"
-                        HorizontalAlignment="Center"
-                   >
+                        HorizontalAlignment="Center">
                 <svg:SvgViewbox x:Name="PlaceholderIcon"
                                 Width="48"
                                 Height="48"
@@ -42,51 +44,33 @@
               
             </StackPanel>
 
-            <Grid FlowDirection="RightToLeft">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto" />
-                    <ColumnDefinition Width="*" />
-
-                </Grid.ColumnDefinitions>
-                <Border x:Name="ActionButton"
-                        Grid.Column="0"
-                        Height="28"
-                        Width="28"
-                        CornerRadius="8"
-                        BorderThickness="0.8,0.8,0.8,2"
-                        Cursor="Hand"
-                        VerticalAlignment="Bottom"
-                        HorizontalAlignment="Center"
-                        BorderBrush="#BED1FF"
-                        Background="#FFFFFF"
-                        MouseLeftButtonUp="ActionButton_Click"
-                        MouseEnter="ActionButton_MouseEnter"
-                        MouseLeave="ActionButton_MouseLeave">
-
-                    <Border.Effect>
-                        <DropShadowEffect BlurRadius="8"
-                                          ShadowDepth="2"
-                                          Direction="270"
-                                          Color="#000000"
-                                          Opacity="0.08" />
-                    </Border.Effect>
-
-                    <StackPanel Orientation="Horizontal"
-                                VerticalAlignment="Center"
+            <Border x:Name="ActionButton"
+                    Height="28"
+                    Width="28"
+                    CornerRadius="4"
+                    BorderThickness="1"
+                    BorderBrush="#2667FF"
+                    Background="#FFFFFF"
+                    VerticalAlignment="Bottom"
+                    HorizontalAlignment="Right"
+                    Margin="0,0,8,8"
+                    Cursor="Hand"
+                    MouseLeftButtonUp="ActionButton_Click"
+                    MouseEnter="ActionButton_MouseEnter"
+                    MouseLeave="ActionButton_MouseLeave">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="8"
+                                      ShadowDepth="2"
+                                      Direction="270"
+                                      Color="#000000"
+                                      Opacity="0.08" />
+                </Border.Effect>
+                <svg:SvgViewbox x:Name="ButtonIcon"
+                                Width="12"
+                                Height="12"
                                 HorizontalAlignment="Center"
-                                Margin="0,0">
-
-                        <svg:SvgViewbox x:Name="ButtonIcon"
-                                        Width="12"
-                                        Height="12"
-                                        VerticalAlignment="Center"
-                                        Margin="0,0,0,0" />
-
-
-                    </StackPanel>
-                </Border>
-            </Grid>
-
+                                VerticalAlignment="Center" />
+            </Border>
         </Grid>
     </Border>
 

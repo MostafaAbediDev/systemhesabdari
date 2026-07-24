@@ -7,7 +7,7 @@
                 Background="White"
                 BorderBrush="#E8E8E8"
                 BorderThickness="1"
-                CornerRadius="8"
+                CornerRadius="4"
                 Height="45">
             <Grid>
                 <Grid.ColumnDefinitions>

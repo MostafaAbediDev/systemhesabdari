@@ -300,6 +300,24 @@ namespace Taadol.Controls
             var newBrush = new SolidColorBrush(current);              border.BorderBrush = newBrush;
             newBrush.BeginAnimation(SolidColorBrush.ColorProperty,
                 new ColorAnimation(to, dur));
+
+            AnimateDashedBorderStroke(to, duration);
+        }
+
+        private void AnimateDashedBorderStroke(Color to, TimeSpan? duration = null)
+        {
+            if (DashedBorder == null) return;
+
+            var dur = new Duration(duration ?? TimeSpan.FromSeconds(0.22));
+
+            Color current = Colors.Transparent;
+            if (DashedBorder.Stroke is SolidColorBrush existing)
+                current = existing.Color;
+
+            var newBrush = new SolidColorBrush(current);
+            DashedBorder.Stroke = newBrush;
+            newBrush.BeginAnimation(SolidColorBrush.ColorProperty,
+                new ColorAnimation(to, dur));
         }
 
                 private void AnimateTextColor(TextBlock tb, Color to, TimeSpan? duration = null)
