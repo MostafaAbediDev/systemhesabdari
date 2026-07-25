@@ -5,12 +5,15 @@
              xmlns:vm="clr-namespace:Taadol.ViewModels"
              xmlns:controls="clr-namespace:Taadol.Controls"
              xmlns:svg="http://sharpvectors.codeplex.com/svgc/"
+             xmlns:local="clr-namespace:Taadol.Views"
              FlowDirection="RightToLeft"
              VerticalAlignment="Center"
              HorizontalAlignment="Center"
              Background="Transparent">
 
     <UserControl.Resources>
+        <local:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
+
         <Style x:Key="FormLabel"
                TargetType="TextBlock"
                BasedOn="{StaticResource FormLabel}">
@@ -731,10 +734,16 @@
                             </Grid>
                         </StackPanel>
 
-                        <!-- تب: حساب های بانکی -->
+                        <!-- ═══ تب: حساب های بانکی — متد جدید ═══ -->
                         <StackPanel x:Name="InventoryContent"
                                     Visibility="Visible">
+
+                            <!-- فرم ورود اطلاعات حساب -->
                             <Grid Margin="0,8,0,8">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="8" />
@@ -742,13 +751,15 @@
                                     <ColumnDefinition Width="8" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <StackPanel Grid.Column="0">
+
+                                <!-- ردیف اول: نام بانک + نام شعبه + شماره کارت -->
+                                <StackPanel Grid.Row="0" Grid.Column="0">
                                     <TextBlock Style="{StaticResource FormLabel}"><Run Text="نام بانک"/><Run Text=" *" Foreground="#DC2626"/></TextBlock>
-                                    <controls:ModernPersianTextBox HorizontalAlignment="Stretch"
-                                                                   Text="{Binding MainBankName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                    <controls:ModernPersianTextBox x:Name="BankNameInput"
+                                                                   HorizontalAlignment="Stretch"
                                                                    Placeholder="ملت" />
                                 </StackPanel>
-                                <StackPanel Grid.Column="2">
+                                <StackPanel Grid.Row="0" Grid.Column="2">
                                     <TextBlock Text="نام شعبه"
                                                Style="{StaticResource FormLabel}" />
                                     <ComboBox x:Name="BankBranchCombo"
@@ -761,104 +772,406 @@
                                               SelectedValue="{Binding SelectedBankBranchId, Mode=TwoWay}"
                                               ItemContainerStyle="{StaticResource SearchableComboBoxItem}" />
                                 </StackPanel>
-                                <Grid Grid.Column="4"
-                                      VerticalAlignment="Bottom"
-                                      Margin="0,0,0,12">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Row="0" Grid.Column="4">
+                                    <TextBlock Style="{StaticResource FormLabel}"><Run Text="شماره کارت"/><Run Text=" *" Foreground="#DC2626"/></TextBlock>
+                                    <controls:ModernPersianTextBox x:Name="CardNumberInput"
+                                                                   HorizontalAlignment="Stretch"
+                                                                   FlowDirection="LeftToRight"
+                                                                   Placeholder="**** **** **** ****" />
+                                </StackPanel>
 
-                                    <!-- حساب پیش‌فرض: می‌چسبه راست -->
-                                    <ToggleButton x:Name="MainBankDefaultToggle"
-                                                  Grid.Column="0"
+                                <!-- ردیف دوم: شماره شبا + شماره حساب + حساب پیش فرض -->
+                                <StackPanel Grid.Row="1" Grid.Column="0">
+                                    <TextBlock Style="{StaticResource FormLabel}"><Run Text="شماره شبا"/><Run Text=" *" Foreground="#DC2626"/></TextBlock>
+                                    <controls:ModernPersianTextBox x:Name="ShabaInput"
+                                                                   HorizontalAlignment="Stretch"
+                                                                   FlowDirection="LeftToRight"
+                                                                   Placeholder="IR" />
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Grid.Column="2">
+                                    <TextBlock Style="{StaticResource FormLabel}"><Run Text="شماره حساب"/><Run Text=" *" Foreground="#DC2626"/></TextBlock>
+                                    <controls:ModernPersianTextBox x:Name="AccountNumberInput"
+                                                                   HorizontalAlignment="Stretch"
+                                                                   FlowDirection="LeftToRight"
+                                                                   Placeholder="456" />
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Grid.Column="4"
+                                            VerticalAlignment="Bottom"
+                                            Margin="0,0,0,4">
+                                    <ToggleButton x:Name="DefaultAccountToggle"
                                                   Content="حساب پیش فرض"
                                                   FlowDirection="LeftToRight"
                                                   Style="{StaticResource StatusToggleButton}"
-                                                  IsChecked="{Binding MainBankIsDefault, Mode=TwoWay}"
-                                                  Checked="MainDefaultToggle_Checked"
-                                                  HorizontalAlignment="Left" />
+                                                  IsChecked="True" />
+                                </StackPanel>
+                            </Grid>
 
-                                    <!-- دکمه‌ها: می‌چسبن چپ -->
-                                    <StackPanel Grid.Column="1"
-                                                Orientation="Horizontal"
-                                                HorizontalAlignment="Left">
-                                        <Button x:Name="AddBankAccountButton"
-                                                Click="AddBankAccountButton_Click"
-                                                Background="Transparent"
-                                                BorderThickness="0"
-                                                Cursor="Hand"
-                                                ToolTip="انتقال به لیست و خالی کردن باکس"
-                                                Focusable="False">
-                                            <Button.Template>
-                                                <ControlTemplate TargetType="Button">
-                                                    <ContentPresenter Content="{TemplateBinding Content}" />
-                                                </ControlTemplate>
-                                            </Button.Template>
-                                            <svg:SvgViewbox Width="18"
-                                                            Height="18"
-                                                            Source="/Assets/Icons/addAc.svg" />
-                                        </Button>
-                                        <Button x:Name="RemoveMainBankButton"
-                                                Click="RemoveMainBankButton_Click"
-                                                Background="Transparent"
-                                                BorderThickness="0"
-                                                Cursor="Hand"
-                                                Margin="10,0,0,0"
-                                                ToolTip="پاک کردن باکس بالایی"
-                                                Focusable="False">
-                                            <Button.Template>
-                                                <ControlTemplate TargetType="Button">
-                                                    <ContentPresenter Content="{TemplateBinding Content}" />
-                                                </ControlTemplate>
-                                            </Button.Template>
-                                            <svg:SvgViewbox Width="16"
-                                                            Height="16"
-                                                            Source="/Assets/Icons/trash.svg" />
-                                        </Button>
+                            <!-- دکمه افزودن -->
+                            <Border CornerRadius="4"
+                                    BorderBrush="#2667FF"
+                                    BorderThickness="1"
+                                    HorizontalAlignment="Left"
+                                    Margin="0,4,0,12"
+                                    Cursor="Hand"
+                                    Background="Transparent">
+                                <Button x:Name="AddBankToTableButton"
+                                        Click="AddBankToTableButton_Click"
+                                        Padding="16,8"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        Cursor="Hand">
+                                    <Button.Style>
+                                        <Style TargetType="Button">
+                                            <Setter Property="Background"
+                                                    Value="Transparent" />
+                                            <Setter Property="BorderThickness"
+                                                    Value="0" />
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <ContentPresenter Content="{TemplateBinding Content}"
+                                                                          Margin="{TemplateBinding Padding}"
+                                                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                            <!-- حذف VisualState‌های پیش‌فرض -->
+                                            <Style.Triggers>
+                                                <Trigger Property="IsMouseOver"
+                                                         Value="True">
+                                                    <Setter Property="Background"
+                                                            Value="Transparent" />
+                                                </Trigger>
+                                                <Trigger Property="IsPressed"
+                                                         Value="True">
+                                                    <Setter Property="Background"
+                                                            Value="Transparent" />
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="+"
+                                                   FontFamily="{StaticResource IRANSans}"
+                                                   FontSize="16"
+                                                   FontWeight="Bold"
+                                                   Foreground="#2667FF"
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,0,8,0" />
+                                        <TextBlock Text="افزودن به حساب های بانکی"
+                                                   FontSize="13"
+                                                   FontWeight="Medium"
+                                                   Foreground="#2667FF"
+                                                   FontFamily="{StaticResource IRANSans}"
+                                                   VerticalAlignment="Center" />
                                     </StackPanel>
-                                </Grid>
-                            </Grid>
+                                </Button>
+                            </Border>
 
-                            <!-- ردیف دوم: شماره کارت + شماره شبا + شماره حساب -->
-                            <Grid Margin="0,8,0,8">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="8" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="8" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Grid.Column="0">
-                                    <TextBlock Style="{StaticResource FormLabel}"><Run Text="شماره کارت"/><Run Text=" *" Foreground="#DC2626"/></TextBlock>
-                                    <controls:ModernPersianTextBox HorizontalAlignment="Stretch"
-                                                                   FlowDirection="LeftToRight"
-                                                                   Text="{Binding MainCardNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                                   Placeholder="**** **** **** ****" />
-                                </StackPanel>
-                                <StackPanel Grid.Column="2">
-                                    <TextBlock Style="{StaticResource FormLabel}"><Run Text="شماره شبا"/><Run Text=" *" Foreground="#DC2626"/></TextBlock>
-                                    <controls:ModernPersianTextBox HorizontalAlignment="Stretch"
-                                                                   FlowDirection="LeftToRight"
-                                                                   Text="{Binding MainShaba, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                                   Placeholder="IR" />
-                                </StackPanel>
-                                <StackPanel Grid.Column="4">
-                                    <TextBlock Style="{StaticResource FormLabel}"><Run Text="شماره حساب"/><Run Text=" *" Foreground="#DC2626"/></TextBlock>
-                                    <controls:ModernPersianTextBox HorizontalAlignment="Stretch"
-                                                                   FlowDirection="LeftToRight"
-                                                                   Text="{Binding MainAccountNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                                   Placeholder="456" />
-                                </StackPanel>
-                            </Grid>
-                            <!-- حساب‌های بانکی اضافه‌شده -->
-                            <ItemsControl x:Name="AdditionalBankAccountsPanel"
-                                          Margin="0,10,0,0"
-                                          ItemsSource="{Binding BankAccounts}">
-                                <ItemsControl.ItemTemplate>
-                                    <StaticResource ResourceKey="BankAccountTemplate" />
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
+                            <!-- جدول حساب‌های بانکی -->
+                            <Border BorderBrush="#E5E7EB"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    ClipToBounds="True"
+                                    Margin="0,0,0,8"
+                                    Visibility="{Binding BankAccounts.Count, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource CountToVisibilityConverter}}">
+                                <Grid FlowDirection="RightToLeft">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+
+                                    <!-- ============ هدر جدول ============ -->
+                                    <Grid Grid.Row="0"
+                                          Background="Transparent"
+                                          Height="44">
+                                        <Grid.ColumnDefinitions>
+                                            <!-- # -->
+                                            <ColumnDefinition Width="35" />
+                                            <ColumnDefinition Width="1" />
+                                            <!-- نام بانک -->
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="1" />
+                                            <!-- نام شعبه -->
+                                            <ColumnDefinition Width="2*" />
+                                            <ColumnDefinition Width="1" />
+                                            <!-- شماره کارت -->
+                                            <ColumnDefinition Width="150" />
+                                            <ColumnDefinition Width="1" />
+                                            <!-- شماره شبا -->
+                                            <ColumnDefinition Width="200" />
+                                            <ColumnDefinition Width="1" />
+                                            <!-- شماره حساب -->
+                                            <ColumnDefinition Width="110" />
+                                            <ColumnDefinition Width="1" />
+                                            <!-- پیش فرض -->
+                                            <ColumnDefinition Width="70" />
+                                            <ColumnDefinition Width="1" />
+                                            <!-- عملیات -->
+                                            <ColumnDefinition Width="60" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- عناوین -->
+                                        <TextBlock Grid.Column="0"
+                                                   Text="#"
+                                                   FontFamily="{StaticResource IRANSans}"
+                                                   FontSize="13"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#1F2937"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="2"
+                                                   Text="نام بانک"
+                                                   FontFamily="{StaticResource IRANSans}"
+                                                   FontSize="13"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#1F2937"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="4"
+                                                   Text="نام شعبه"
+                                                   FontFamily="{StaticResource IRANSans}"
+                                                   FontSize="13"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#1F2937"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="6"
+                                                   Text="شماره کارت"
+                                                   FontFamily="{StaticResource IRANSans}"
+                                                   FontSize="13"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#1F2937"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="8"
+                                                   Text="شماره شبا"
+                                                   FontFamily="{StaticResource IRANSans}"
+                                                   FontSize="13"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#1F2937"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="10"
+                                                   Text="شماره حساب"
+                                                   FontFamily="{StaticResource IRANSans}"
+                                                   FontSize="13"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#1F2937"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="12"
+                                                   Text="پیش فرض"
+                                                   FontFamily="{StaticResource IRANSans}"
+                                                   FontSize="13"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#1F2937"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="14"
+                                                   Text="عملیات"
+                                                   FontFamily="{StaticResource IRANSans}"
+                                                   FontSize="13"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#1F2937"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+
+                                        <!-- خطوط عمودی جداکننده -->
+                                        <Border Grid.Column="1" Background="#E5E7EB" />
+                                        <Border Grid.Column="3" Background="#E5E7EB" />
+                                        <Border Grid.Column="5" Background="#E5E7EB" />
+                                        <Border Grid.Column="7" Background="#E5E7EB" />
+                                        <Border Grid.Column="9" Background="#E5E7EB" />
+                                        <Border Grid.Column="11" Background="#E5E7EB" />
+                                        <Border Grid.Column="13" Background="#E5E7EB" />
+
+                                        <!-- خط افقی زیر هدر -->
+                                        <Border Grid.ColumnSpan="15"
+                                                BorderBrush="#E5E7EB"
+                                                BorderThickness="0,0,0,1"
+                                                VerticalAlignment="Bottom" />
+                                    </Grid>
+
+                                    <!-- ============ ردیف‌های داده ============ -->
+                                    <ItemsControl Grid.Row="1"
+                                                  ItemsSource="{Binding BankAccounts}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border BorderBrush="#E5E7EB"
+                                                        BorderThickness="0,0,0,1">
+                                                <Grid Background="White"
+                                                      Height="36">
+                                                    <Grid.ColumnDefinitions>
+                                                        <!-- # -->
+                                                        <ColumnDefinition Width="35" />
+                                                        <ColumnDefinition Width="1" />
+                                                        <!-- نام بانک -->
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="1" />
+                                                        <!-- نام شعبه -->
+                                                        <ColumnDefinition Width="2*" />
+                                                        <ColumnDefinition Width="1" />
+                                                        <!-- شماره کارت -->
+                                                        <ColumnDefinition Width="150" />
+                                                        <ColumnDefinition Width="1" />
+                                                        <!-- شماره شبا -->
+                                                        <ColumnDefinition Width="200" />
+                                                        <ColumnDefinition Width="1" />
+                                                        <!-- شماره حساب -->
+                                                        <ColumnDefinition Width="110" />
+                                                        <ColumnDefinition Width="1" />
+                                                        <!-- پیش فرض -->
+                                                        <ColumnDefinition Width="70" />
+                                                        <ColumnDefinition Width="1" />
+                                                        <!-- عملیات -->
+                                                        <ColumnDefinition Width="60" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <!-- # -->
+                                                    <TextBlock Grid.Column="0"
+                                                               Text="{Binding Index}"
+                                                               FontFamily="{StaticResource IRANSans}"
+                                                               FontSize="13"
+                                                               FontWeight="SemiBold"
+                                                               Foreground="#9CA3AF"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center" />
+
+                                                    <Border Grid.Column="1" Background="#E5E7EB" />
+
+                                                    <!-- نام بانک -->
+                                                    <TextBlock Grid.Column="2"
+                                                               Text="{Binding BankName}"
+                                                               FontFamily="{StaticResource IRANSans}"
+                                                               FontSize="13"
+                                                               Foreground="#374151"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center" />
+
+                                                    <Border Grid.Column="3" Background="#E5E7EB" />
+
+                                                    <!-- نام شعبه -->
+                                                    <TextBlock Grid.Column="4"
+                                                               Text="{Binding BranchName}"
+                                                               FontFamily="{StaticResource IRANSans}"
+                                                               FontSize="13"
+                                                               Foreground="#374151"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center" />
+
+                                                    <Border Grid.Column="5" Background="#E5E7EB" />
+
+                                                    <!-- شماره کارت -->
+                                                    <TextBlock Grid.Column="6"
+                                                               Text="{Binding CardNumber}"
+                                                               FontFamily="{StaticResource IRANSans}"
+                                                               FontSize="13"
+                                                               Foreground="#374151"
+                                                               FlowDirection="LeftToRight"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center" />
+
+                                                    <Border Grid.Column="7" Background="#E5E7EB" />
+
+                                                    <!-- شماره شبا -->
+                                                    <TextBlock Grid.Column="8"
+                                                               Text="{Binding Shaba}"
+                                                               FontFamily="{StaticResource IRANSans}"
+                                                               FontSize="13"
+                                                               Foreground="#374151"
+                                                               FlowDirection="LeftToRight"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center" />
+
+                                                    <Border Grid.Column="9" Background="#E5E7EB" />
+
+                                                    <!-- شماره حساب -->
+                                                    <TextBlock Grid.Column="10"
+                                                               Text="{Binding AccountNumber}"
+                                                               FontFamily="{StaticResource IRANSans}"
+                                                               FontSize="13"
+                                                               Foreground="#374151"
+                                                               FlowDirection="LeftToRight"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center" />
+
+                                                    <Border Grid.Column="11" Background="#E5E7EB" />
+
+                                                    <!-- پیش فرض (چک‌باکس فقط خواندنی) -->
+                                                    <Border Grid.Column="12"
+                                                            Width="16"
+                                                            Height="16"
+                                                            CornerRadius="4"
+                                                            HorizontalAlignment="Center"
+                                                            VerticalAlignment="Center">
+                                                        <Border.Style>
+                                                            <Style TargetType="Border">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsDefault}" Value="True">
+                                                                        <Setter Property="Visibility" Value="Visible" />
+                                                                        <Setter Property="Background" Value="#2667FF" />
+                                                                        <Setter Property="BorderBrush" Value="#2667FF" />
+                                                                        <Setter Property="BorderThickness" Value="1.5" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Border.Style>
+                                                        <svg:SvgViewbox Width="14" Height="14"
+                                                                        Source="/Assets/Icons/Check.svg"
+                                                                        FlowDirection="LeftToRight"
+                                                                        HorizontalAlignment="Center"
+                                                                        VerticalAlignment="Center">
+                                                            <svg:SvgViewbox.Style>
+                                                                <Style TargetType="svg:SvgViewbox">
+                                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding IsDefault}" Value="True">
+                                                                            <Setter Property="Visibility" Value="Visible" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </svg:SvgViewbox.Style>
+                                                        </svg:SvgViewbox>
+                                                    </Border>
+
+                                                    <Border Grid.Column="13" Background="#E5E7EB" />
+
+                                                    <!-- عملیات -->
+                                                    <StackPanel Grid.Column="14"
+                                                                Orientation="Horizontal"
+                                                                HorizontalAlignment="Center"
+                                                                VerticalAlignment="Center">
+                                                        <Button Tag="{Binding}"
+                                                                Click="EditBankAccount_Click"
+                                                                Background="Transparent"
+                                                                BorderThickness="0"
+                                                                Cursor="Hand"
+                                                                ToolTip="ویرایش"
+                                                                Padding="4">
+                                                            <svg:SvgViewbox Width="14" Height="14"
+                                                                            Source="/Assets/Icons/edit.svg" />
+                                                        </Button>
+                                                        <Button Tag="{Binding}"
+                                                                Click="RemoveBankAccountFromTable_Click"
+                                                                Background="Transparent"
+                                                                BorderThickness="0"
+                                                                Cursor="Hand"
+                                                                ToolTip="حذف"
+                                                                Padding="4">
+                                                            <svg:SvgViewbox Width="14" Height="14"
+                                                                            Source="/Assets/Icons/trash.svg" />
+                                                        </Button>
+                                                    </StackPanel>
+                                                </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Grid>
+                            </Border>
                         </StackPanel>
 
                         <!-- تب: مالیات -->

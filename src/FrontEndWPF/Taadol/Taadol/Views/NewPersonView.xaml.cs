@@ -24,6 +24,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Globalization;
+using System.Windows.Data;
 using Taadol.Controls;
 namespace Taadol.Views
 {
@@ -301,6 +303,14 @@ namespace Taadol.Views
 
             Loaded += OnLoaded;
             CategorySearch.CategorySelected += OnCategorySelected;
+
+            ShabaInput.Text = "IR";
+            DependencyPropertyDescriptor
+                .FromProperty(TextBox.TextProperty, typeof(TextBox))
+                .AddValueChanged(ShabaInput.PART_TextBox, (s, ev) => ShabaInput_TextChanged());
+            DependencyPropertyDescriptor
+                .FromProperty(TextBox.TextProperty, typeof(TextBox))
+                .AddValueChanged(CardNumberInput.PART_TextBox, (s, ev) => CardNumberInput_TextChanged());
         }
         private void OnToggled(object sender, RoutedEventArgs e)
         {
@@ -1260,6 +1270,186 @@ namespace Taadol.Views
                 BankAccounts.Remove(row);
         }
 
+        private void AddBankToTableButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(BankNameInput.Text))
+            {
+                MessageBox.Show("لطفاً نام بانک را وارد کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(CardNumberInput.Text) && string.IsNullOrWhiteSpace(ShabaInput.Text))
+            {
+                MessageBox.Show("لطفاً حداقل شماره کارت یا شماره شبا را وارد کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            bool wantsDefault = DefaultAccountToggle.IsChecked == true;
+
+            if (wantsDefault && BankAccounts.Any(r => r.IsDefault))
+            {
+                var result = MessageBox.Show(
+                    "قابلیت پیش‌فرض فقط برای یک حساب فعال است. آیا از تغییر حساب پیش‌فرض مطمئن هستید؟",
+                    "تغییر حساب پیش‌فرض",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
+
+                if (result != MessageBoxResult.Yes)
+                    return;
+            }
+
+            var branchName = "";
+            if (BankBranchCombo.SelectedItem is BankBranchViewModel branch)
+                branchName = branch.BranchName ?? "";
+
+            if (wantsDefault)
+            {
+                foreach (var row in BankAccounts.Where(r => r.IsDefault))
+                    row.IsDefault = false;
+            }
+
+            BankAccounts.Add(new BankAccountRow
+            {
+                BankBranchId = SelectedBankBranchId,
+                BankName = BankNameInput.Text ?? "",
+                BranchName = branchName,
+                CardNumber = CardNumberInput.Text ?? "",
+                Shaba = ShabaInput.Text ?? "",
+                AccountNumber = AccountNumberInput.Text ?? "",
+                IsDefault = wantsDefault
+            });
+
+            ReindexBankAccounts();
+            ClearBankForm();
+        }
+
+        private void EditBankAccount_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is BankAccountRow row)
+            {
+                BankNameInput.Text = row.BankName;
+                CardNumberInput.Text = row.CardNumber;
+                var shaba = row.Shaba ?? "";
+                ShabaInput.Text = shaba.StartsWith("IR") ? shaba : "IR" + shaba;
+                AccountNumberInput.Text = row.AccountNumber;
+                DefaultAccountToggle.IsChecked = row.IsDefault;
+                SelectedBankBranchId = row.BankBranchId;
+
+                BankAccounts.Remove(row);
+                ReindexBankAccounts();
+            }
+        }
+
+        private void RemoveBankAccountFromTable_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is BankAccountRow row)
+            {
+                BankAccounts.Remove(row);
+                ReindexBankAccounts();
+            }
+        }
+
+        private void ReindexBankAccounts()
+        {
+            for (int i = 0; i < BankAccounts.Count; i++)
+                BankAccounts[i].Index = i + 1;
+        }
+
+        private void ClearBankForm()
+        {
+            BankNameInput.Text = "";
+            CardNumberInput.Text = "";
+            ShabaInput.Text = "IR";
+            AccountNumberInput.Text = "";
+            DefaultAccountToggle.IsChecked = false;
+            SelectedBankBranchId = 0;
+            BankBranchCombo.SelectedIndex = -1;
+        }
+
+        private void ShabaInput_TextChanged()
+        {
+            if (_isUpdatingShaba) return;
+            var text = ShabaInput.PART_TextBox.Text;
+            if (text == null) return;
+            if (!text.StartsWith("IR"))
+            {
+                _isUpdatingShaba = true;
+                var clean = text.Replace("IR", "").TrimStart();
+                ShabaInput.Text = "IR" + clean;
+                ShabaInput.PART_TextBox.CaretIndex = ShabaInput.Text.Length;
+                _isUpdatingShaba = false;
+            }
+        }
+        private bool _isUpdatingShaba;
+
+        private void CardNumberInput_TextChanged()
+        {
+            if (_isUpdatingCard) return;
+            var text = CardNumberInput.PART_TextBox.Text ?? "";
+
+            int caret = CardNumberInput.PART_TextBox.CaretIndex;
+            int digitsBefore = CountDigits(text, caret);
+
+            var normalized = text
+                .Replace("۰", "0").Replace("۱", "1").Replace("۲", "2").Replace("۳", "3").Replace("۴", "4")
+                .Replace("۵", "5").Replace("۶", "6").Replace("۷", "7").Replace("۸", "8").Replace("۹", "9");
+
+            var digits = new string(normalized.Where(char.IsDigit).Take(16).ToArray());
+            var formatted = string.Join(" ", Enumerable.Range(0, (digits.Length + 3) / 4)
+                .Select(i => digits.Substring(i * 4, Math.Min(4, digits.Length - i * 4))));
+
+            if (text != formatted)
+            {
+                _isUpdatingCard = true;
+                CardNumberInput.Text = formatted;
+                CardNumberInput.PART_TextBox.CaretIndex = FindCaretPosition(formatted, digitsBefore);
+                _isUpdatingCard = false;
+            }
+        }
+
+        private static bool IsDigitChar(char c)
+            => char.IsDigit(c) || (c >= '۰' && c <= '۹');
+
+        private static int CountDigits(string text, int upToIndex)
+        {
+            int count = 0;
+            int limit = Math.Min(upToIndex, text.Length);
+            for (int i = 0; i < limit; i++)
+                if (IsDigitChar(text[i]))
+                    count++;
+            return count;
+        }
+
+        private static int FindCaretPosition(string formatted, int digitIndex)
+        {
+            if (digitIndex <= 0) return 0;
+            int seen = 0;
+            for (int i = 0; i < formatted.Length; i++)
+            {
+                if (IsDigitChar(formatted[i]))
+                {
+                    seen++;
+                    if (seen == digitIndex)
+                        return i + 1;
+                }
+            }
+            return formatted.Length;
+        }
+        private bool _isUpdatingCard;
+
+        private void DefaultCheckBox_Click(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is FrameworkElement fe && fe.DataContext is BankAccountRow row)
+            {
+                row.IsDefault = !row.IsDefault;
+
+                if (row.IsDefault)
+                {
+                    foreach (var other in BankAccounts.Where(r => r != row && r.IsDefault))
+                        other.IsDefault = false;
+                }
+            }
+        }
+
         private bool _isUpdatingDefault;
 
         private void MainDefaultToggle_Checked(object sender, RoutedEventArgs e)
@@ -1451,6 +1641,9 @@ namespace Taadol.Views
         private string _shaba = "";
         private string _accountNumber = "";
         private bool _isDefault;
+        private int _index;
+
+        public int Index { get => _index; set { _index = value; OnPC(); } }
 
         /// <summary>شناسه‌ی شعبه بانک انتخاب‌شده برای این ردیف (per-row)</summary>
         public long BankBranchId
@@ -1469,6 +1662,15 @@ namespace Taadol.Views
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPC([CallerMemberName] string n = null)
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(n));
+    }
+
+    public class CountToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+            => value is int count && count > 0 ? Visibility.Visible : Visibility.Collapsed;
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            => throw new NotImplementedException();
     }
 
     // نکته: BranchComboItem قبلاً در NewFinancialPeriodView.xaml.cs تعریف شده و در اینجا reuse می‌شود.
