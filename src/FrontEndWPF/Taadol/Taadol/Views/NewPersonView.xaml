@@ -269,7 +269,7 @@
                             <controls:ToggleSwitch2Control x:Name="CodeModeToggle"
                                                            Grid.Row="0" Grid.Column="0"
                                                            HorizontalAlignment="Right"
-                                                           Margin="0,0,0,0"
+                                                           Margin="0,0,0,5"
                                                            FirstLabel="دستی"
                                                            SecondLabel="خودکار"
                                                            IsFirstSelected="False"
@@ -338,7 +338,7 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="نوع شخص"
                                            Style="{StaticResource FormLabel}" />
-                                <controls:ToggleSwitchControl x:Name="LegalTypeToggle"
+                                <controls:ToggleSwitch2Control x:Name="LegalTypeToggle"
                                                               FirstLabel="حقیقی"
                                                               SecondLabel="حقوقی"
                                                               IsFirstSelected="True"
@@ -466,7 +466,7 @@
                                     CornerRadius="4"
                                     BorderBrush="#E5E7EB"
                                     BorderThickness="1"
-                                    Padding="10,10"
+                                    Padding="10,7"
                                     VerticalAlignment="Bottom"
                                     Background="White">
                                 <StackPanel Orientation="Horizontal">
@@ -584,7 +584,7 @@
                 <Border CornerRadius="0"
                         BorderThickness="0,0,0,2"
                         BorderBrush="#E5E7EB"
-                        Background="#F8FAFF"
+                        Background="#ffffff"
                         Padding="0"
                         Margin="0,0,0,0"
                         HorizontalAlignment="Center">
@@ -626,113 +626,147 @@
                         <!-- تب: تماس و آدرس -->
                         <StackPanel x:Name="PricingContent"
                                     Visibility="Collapsed">
+
+                            <!-- ردیف اول: کد پستی - ایمیل - موبایل - شماره تلفن (از راست به چپ) -->
+                            <Grid Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions>
+                                    <!-- ستون‌ها از چپ به راست -->
+                                    <ColumnDefinition Width="Auto" />
+                                    <!-- ستون 0: شماره تلفن (چپ‌ترین) -->
+                                    <ColumnDefinition Width="16" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <!-- ستون 2: موبایل -->
+                                    <ColumnDefinition Width="16" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <!-- ستون 4: ایمیل -->
+                                    <ColumnDefinition Width="16" />
+                                    <ColumnDefinition Width="Auto" />
+                                    
+                                    
+                                    
+                                    <!-- ستون 6: کد پستی (راست‌ترین) -->
+                                </Grid.ColumnDefinitions>
+
+                                <!-- شماره تلفن (چپ‌ترین) -->
+                                <StackPanel Grid.Column="0"
+                                            HorizontalAlignment="Left">
+                                    <TextBlock Style="{StaticResource FormLabel}">
+                <Run Text="شماره تلفن" /><Run Text=" *"
+                                              Foreground="#DC2626" />
+                                    </TextBlock>
+                                    <controls:ModernPersianTextBox Width="200"
+                                                                   HorizontalAlignment="Left"
+                                                                   FlowDirection="LeftToRight"
+                                                                   Text="{Binding Phone, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                   Placeholder="071" />
+                                </StackPanel>
+
+                                <!-- موبایل -->
+                                <StackPanel Grid.Column="2"
+                                            HorizontalAlignment="Left">
+                                    <TextBlock Style="{StaticResource FormLabel}">
+                <Run Text="موبایل" /><Run Text=" *"
+                                          Foreground="#DC2626" />
+                                    </TextBlock>
+                                    <controls:ModernPersianTextBox Width="200"
+                                                                   HorizontalAlignment="Left"
+                                                                   FlowDirection="LeftToRight"
+                                                                   Text="{Binding Mobile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                   Placeholder="091" />
+                                </StackPanel>
+
+                                <!-- ایمیل -->
+                                <StackPanel Grid.Column="4"
+                                            HorizontalAlignment="Left">
+                                    <TextBlock Text="ایمیل"
+                                               Style="{StaticResource FormLabel}" />
+                                    <controls:ModernPersianTextBox Width="200"
+                                                                   HorizontalAlignment="Left"
+                                                                   FlowDirection="LeftToRight"
+                                                                   Text="{Binding Email, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                   Placeholder="example@mail.com" />
+                                </StackPanel>
+
+                                <!-- کد پستی (راست‌ترین) -->
+                                <StackPanel Grid.Column="6"
+                                            HorizontalAlignment="Left">
+                                    <TextBlock Text="کد پستی"
+                                               Style="{StaticResource FormLabel}" />
+                                    <controls:ModernPersianTextBox Width="200"
+                                                                   HorizontalAlignment="Left"
+                                                                   FlowDirection="LeftToRight"
+                                                                   Text="{Binding PostalCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                   Placeholder="" />
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- ردیف دوم: آدرس (کشیده) - شهرستان - استان (از راست به چپ) -->
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
+                                    <!-- ستون 0: آدرس (راست‌ترین و کشیده) -->
                                     <ColumnDefinition Width="16" />
                                     <ColumnDefinition Width="Auto" />
+                                    <!-- ستون 2: شهرستان -->
+                                    <ColumnDefinition Width="16" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="19" />
+
+                                    <!-- ستون 4: استان (چپ‌ترین) -->
                                 </Grid.ColumnDefinitions>
 
-                                <StackPanel Grid.Column="0">
-                                    <Grid Margin="0,0,0,16">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="8" />
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="8" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-                                        <StackPanel Grid.Column="0">
-                                            <TextBlock Style="{StaticResource FormLabel}"><Run Text="شماره تلفن"/><Run Text=" *" Foreground="#DC2626"/></TextBlock>
-                                            <controls:ModernPersianTextBox Width="200"
-                                                                           FlowDirection="LeftToRight"
-                                                                           Text="{Binding Phone, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                                           Placeholder="071" />
-                                        </StackPanel>
-                                        <StackPanel Grid.Column="2">
-                                            <TextBlock Style="{StaticResource FormLabel}"><Run Text="استان"/><Run Text=" *" Foreground="#DC2626"/></TextBlock>
-                                            <ComboBox x:Name="ProvinceCombo"
-                                                      Style="{StaticResource SearchableComboBox}"
-                                                      Tag="جستجو"
-                                                      Width="200"
-                                                      HorizontalAlignment="Left"
-                                                      ItemsSource="{Binding Provinces}"
-                                                      DisplayMemberPath="Title"
-                                                      SelectedValuePath="Id"
-                                                      SelectedValue="{Binding SelectedProvinceId, Mode=TwoWay}"
-                                                      ItemContainerStyle="{StaticResource SearchableComboBoxItem}" />
-                                        </StackPanel>
-                                        <StackPanel Grid.Column="4">
-                                            <TextBlock Text="کد پستی"
-                                                       Style="{StaticResource FormLabel}" />
-                                            <controls:ModernPersianTextBox Width="200"
-                                                                           Text="{Binding PostalCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                                           Placeholder="" />
-                                        </StackPanel>
-                                    </Grid>
-
-                                    <Grid Margin="0,0,0,16">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="8" />
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="8" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-                                        <StackPanel Grid.Column="0">
-                                            <TextBlock Style="{StaticResource FormLabel}"><Run Text="موبایل"/><Run Text=" *" Foreground="#DC2626"/></TextBlock>
-                                            <controls:ModernPersianTextBox Width="200"
-                                                                           FlowDirection="LeftToRight"
-                                                                           Text="{Binding Mobile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                                           Placeholder="091" />
-                                        </StackPanel>
-                                        <StackPanel Grid.Column="2">
-                                            <TextBlock Style="{StaticResource FormLabel}"><Run Text="شهرستان"/><Run Text=" *" Foreground="#DC2626"/></TextBlock>
-                                            <ComboBox x:Name="CityCombo"
-                                                      Style="{StaticResource SearchableComboBox}"
-                                                      Tag="جستجو..."
-                                                      Width="200"
-                                                      HorizontalAlignment="Left"
-                                                      ItemsSource="{Binding Cities}"
-                                                      DisplayMemberPath="Title"
-                                                      SelectedValuePath="Id"
-                                                      SelectedValue="{Binding SelectedCityId, Mode=TwoWay}"
-                                                      ItemContainerStyle="{StaticResource SearchableComboBoxItem}" />
-                                        </StackPanel>
-                                        <StackPanel Grid.Column="4">
-                                            <TextBlock Text="ایمیل"
-                                                       Style="{StaticResource FormLabel}" />
-                                            <controls:ModernPersianTextBox Width="200"
-                                                                           FlowDirection="LeftToRight"
-                                                                           Text="{Binding Email, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                                           Placeholder="example@mail.com" />
-                                        </StackPanel>
-                                    </Grid>
+                                <!-- آدرس (کشیده، راست‌ترین) -->
+                                <StackPanel Grid.Column="4"
+                                            HorizontalAlignment="Stretch">
+                                    <TextBlock Text="آدرس"
+                                               Style="{StaticResource FormLabel}"
+                                               HorizontalAlignment="Left" />
+                                    <controls:ModernPersianTextBox HorizontalAlignment="Stretch"
+                                                                   Text="{Binding Address, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                   Placeholder="" />
                                 </StackPanel>
 
-                                <Border Grid.Column="2"
-                                        Width="208"
-                                        BorderThickness="0"
-                                        CornerRadius="6"
-                                        Padding="0"
-                                        VerticalAlignment="Stretch">
-                                    <StackPanel>
-                                        <TextBlock Text="آدرس"
-                                                   Style="{StaticResource FormLabel}"
-                                                   Margin="0,0,0,8" />
-                                        <TextBox Text="{Binding Address, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                 Style="{StaticResource ModernPersianTextBox}"
-                                                 TextWrapping="Wrap"
-                                                 AcceptsReturn="True"
-                                                 Height="130"
-                                                 VerticalAlignment="Top"
-                                                 VerticalContentAlignment="Top"
-                                                 Padding="4,4,4,4"
-                                                 materialDesign:HintAssist.Hint="آدرس را وارد کنید..." />
-                                    </StackPanel>
-                                </Border>
+                                <!-- شهرستان -->
+                                <StackPanel Grid.Column="0"
+                                            HorizontalAlignment="Left">
+                                    <TextBlock Style="{StaticResource FormLabel}">
+                <Run Text="شهرستان" /><Run Text=" *"
+                                           Foreground="#DC2626" />
+                                    </TextBlock>
+                                    <ComboBox x:Name="CityCombo"
+                                              Style="{StaticResource SearchableComboBox}"
+                                              Tag="جستجو..."
+                                              Width="200"
+                                              HorizontalAlignment="Left"
+                                              ItemsSource="{Binding Cities}"
+                                              DisplayMemberPath="Title"
+                                              SelectedValuePath="Id"
+                                              SelectedValue="{Binding SelectedCityId, Mode=TwoWay}"
+                                              ItemContainerStyle="{StaticResource SearchableComboBoxItem}" />
+                                </StackPanel>
+
+                                <!-- استان -->
+                                <StackPanel Grid.Column="2"
+                                            HorizontalAlignment="Left">
+                                    <TextBlock Style="{StaticResource FormLabel}">
+                <Run Text="استان" /><Run Text=" *"
+                                         Foreground="#DC2626" />
+                                    </TextBlock>
+                                    <ComboBox x:Name="ProvinceCombo"
+                                              Style="{StaticResource SearchableComboBox}"
+                                              Tag="جستجو"
+                                              Width="200"
+                                              HorizontalAlignment="Left"
+                                              ItemsSource="{Binding Provinces}"
+                                              DisplayMemberPath="Title"
+                                              SelectedValuePath="Id"
+                                              SelectedValue="{Binding SelectedProvinceId, Mode=TwoWay}"
+                                              ItemContainerStyle="{StaticResource SearchableComboBoxItem}" />
+                                </StackPanel>
                             </Grid>
                         </StackPanel>
+
+
 
                         <!-- ═══ تب: حساب های بانکی — متد جدید ═══ -->
                         <StackPanel x:Name="InventoryContent"
@@ -750,16 +784,21 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="8" />
                                     <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="8" />
+                                    <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
 
-                                <!-- ردیف اول: نام بانک + نام شعبه + شماره کارت -->
-                                <StackPanel Grid.Row="0" Grid.Column="0">
-                                    <TextBlock Style="{StaticResource FormLabel}"><Run Text="نام بانک"/><Run Text=" *" Foreground="#DC2626"/></TextBlock>
+                                <!-- ردیف اول: نام بانک + نام شعبه + شماره کارت + حساب پیش‌فرض -->
+                                <StackPanel Grid.Row="0"
+                                            Grid.Column="0">
+                                    <TextBlock Style="{StaticResource FormLabel}"><Run Text="نام بانک" /><Run Text=" *"
+                                                                                                              Foreground="#DC2626" /></TextBlock>
                                     <controls:ModernPersianTextBox x:Name="BankNameInput"
                                                                    HorizontalAlignment="Stretch"
                                                                    Placeholder="ملت" />
                                 </StackPanel>
-                                <StackPanel Grid.Row="0" Grid.Column="2">
+                                <StackPanel Grid.Row="0"
+                                            Grid.Column="2">
                                     <TextBlock Text="نام شعبه"
                                                Style="{StaticResource FormLabel}" />
                                     <ComboBox x:Name="BankBranchCombo"
@@ -772,30 +811,17 @@
                                               SelectedValue="{Binding SelectedBankBranchId, Mode=TwoWay}"
                                               ItemContainerStyle="{StaticResource SearchableComboBoxItem}" />
                                 </StackPanel>
-                                <StackPanel Grid.Row="0" Grid.Column="4">
-                                    <TextBlock Style="{StaticResource FormLabel}"><Run Text="شماره کارت"/><Run Text=" *" Foreground="#DC2626"/></TextBlock>
+                                <StackPanel Grid.Row="0"
+                                            Grid.Column="4">
+                                    <TextBlock Style="{StaticResource FormLabel}"><Run Text="شماره کارت" /><Run Text=" *"
+                                                                                                                Foreground="#DC2626" /></TextBlock>
                                     <controls:ModernPersianTextBox x:Name="CardNumberInput"
                                                                    HorizontalAlignment="Stretch"
                                                                    FlowDirection="LeftToRight"
                                                                    Placeholder="**** **** **** ****" />
                                 </StackPanel>
-
-                                <!-- ردیف دوم: شماره شبا + شماره حساب + حساب پیش فرض -->
-                                <StackPanel Grid.Row="1" Grid.Column="0">
-                                    <TextBlock Style="{StaticResource FormLabel}"><Run Text="شماره شبا"/><Run Text=" *" Foreground="#DC2626"/></TextBlock>
-                                    <controls:ModernPersianTextBox x:Name="ShabaInput"
-                                                                   HorizontalAlignment="Stretch"
-                                                                   FlowDirection="LeftToRight"
-                                                                   Placeholder="IR" />
-                                </StackPanel>
-                                <StackPanel Grid.Row="1" Grid.Column="2">
-                                    <TextBlock Style="{StaticResource FormLabel}"><Run Text="شماره حساب"/><Run Text=" *" Foreground="#DC2626"/></TextBlock>
-                                    <controls:ModernPersianTextBox x:Name="AccountNumberInput"
-                                                                   HorizontalAlignment="Stretch"
-                                                                   FlowDirection="LeftToRight"
-                                                                   Placeholder="456" />
-                                </StackPanel>
-                                <StackPanel Grid.Row="1" Grid.Column="4"
+                                <StackPanel Grid.Row="0"
+                                            Grid.Column="6"
                                             VerticalAlignment="Bottom"
                                             Margin="0,0,0,4">
                                     <ToggleButton x:Name="DefaultAccountToggle"
@@ -804,70 +830,63 @@
                                                   Style="{StaticResource StatusToggleButton}"
                                                   IsChecked="True" />
                                 </StackPanel>
+
+                                <!-- ردیف دوم: شماره حساب + شماره شبا + دکمه افزودن -->
+                                <StackPanel Grid.Row="1"
+                                            Grid.Column="0">
+                                    <TextBlock Style="{StaticResource FormLabel}"><Run Text="شماره حساب" /><Run Text=" *"
+                                                                                                                Foreground="#DC2626" /></TextBlock>
+                                    <controls:ModernPersianTextBox x:Name="AccountNumberInput"
+                                                                   HorizontalAlignment="Stretch"
+                                                                   FlowDirection="LeftToRight"
+                                                                   Placeholder="456" />
+                                </StackPanel>
+                                <StackPanel Grid.Row="1"
+                                            Grid.Column="2">
+                                    <TextBlock Style="{StaticResource FormLabel}"><Run Text="شماره شبا" /><Run Text=" *"
+                                                                                                               Foreground="#DC2626" /></TextBlock>
+                                    <controls:ModernPersianTextBox x:Name="ShabaInput"
+                                                                   HorizontalAlignment="Stretch"
+                                                                   FlowDirection="LeftToRight"
+                                                                   Placeholder="IR" />
+                                </StackPanel>
+
+                                <!-- دکمه افزودن، داخل خود گرید، چسبیده به چپ -->
+                                <Border Grid.Row="1"
+                                        Grid.Column="0"
+                                        Grid.ColumnSpan="7"
+                                        CornerRadius="4"
+                                        BorderBrush="#2667FF"
+                                        BorderThickness="1"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Bottom"
+                                        Cursor="Hand"
+                                        Background="Transparent">
+                                    <Button x:Name="AddBankToTableButton"
+                                            Click="AddBankToTableButton_Click"
+                                            Padding="16,8"
+                                            Background="Transparent"
+                                            BorderThickness="0">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="+"
+                                                       FontFamily="{StaticResource IRANSans}"
+                                                       FontSize="16"
+                                                       FontWeight="Bold"
+                                                       Foreground="#2667FF"
+                                                       VerticalAlignment="Center"
+                                                       Margin="0,0,8,0" />
+                                            <TextBlock Text="افزودن به حساب های بانکی"
+                                                       FontSize="13"
+                                                       FontWeight="Medium"
+                                                       Foreground="#2667FF"
+                                                       FontFamily="{StaticResource IRANSans}"
+                                                       VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </Button>
+                                </Border>
                             </Grid>
 
-                            <!-- دکمه افزودن -->
-                            <Border CornerRadius="4"
-                                    BorderBrush="#2667FF"
-                                    BorderThickness="1"
-                                    HorizontalAlignment="Left"
-                                    Margin="0,4,0,12"
-                                    Cursor="Hand"
-                                    Background="Transparent">
-                                <Button x:Name="AddBankToTableButton"
-                                        Click="AddBankToTableButton_Click"
-                                        Padding="16,8"
-                                        Background="Transparent"
-                                        BorderThickness="0"
-                                        Cursor="Hand">
-                                    <Button.Style>
-                                        <Style TargetType="Button">
-                                            <Setter Property="Background"
-                                                    Value="Transparent" />
-                                            <Setter Property="BorderThickness"
-                                                    Value="0" />
-                                            <Setter Property="Template">
-                                                <Setter.Value>
-                                                    <ControlTemplate TargetType="Button">
-                                                        <ContentPresenter Content="{TemplateBinding Content}"
-                                                                          Margin="{TemplateBinding Padding}"
-                                                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
-                                                    </ControlTemplate>
-                                                </Setter.Value>
-                                            </Setter>
-                                            <!-- حذف VisualState‌های پیش‌فرض -->
-                                            <Style.Triggers>
-                                                <Trigger Property="IsMouseOver"
-                                                         Value="True">
-                                                    <Setter Property="Background"
-                                                            Value="Transparent" />
-                                                </Trigger>
-                                                <Trigger Property="IsPressed"
-                                                         Value="True">
-                                                    <Setter Property="Background"
-                                                            Value="Transparent" />
-                                                </Trigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Button.Style>
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="+"
-                                                   FontFamily="{StaticResource IRANSans}"
-                                                   FontSize="16"
-                                                   FontWeight="Bold"
-                                                   Foreground="#2667FF"
-                                                   VerticalAlignment="Center"
-                                                   Margin="0,0,8,0" />
-                                        <TextBlock Text="افزودن به حساب های بانکی"
-                                                   FontSize="13"
-                                                   FontWeight="Medium"
-                                                   Foreground="#2667FF"
-                                                   FontFamily="{StaticResource IRANSans}"
-                                                   VerticalAlignment="Center" />
-                                    </StackPanel>
-                                </Button>
-                            </Border>
+
 
                             <!-- جدول حساب‌های بانکی -->
                             <Border BorderBrush="#E5E7EB"
