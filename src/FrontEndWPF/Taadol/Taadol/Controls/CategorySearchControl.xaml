@@ -881,7 +881,7 @@
                         Cursor="Hand">
                     <svg:SvgViewbox Width="12"
                                     Height="12"
-                                    Source="/Assets/Icons/add-square.svg"
+                                    Source="/Assets/Icons/add-square.svg"   
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Center" />
                 </Border>

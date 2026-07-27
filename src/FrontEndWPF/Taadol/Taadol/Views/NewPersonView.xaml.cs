@@ -3,6 +3,7 @@ using BankManagement.Application.Contracts.BankBranch;
 using CodeManagement.Application.Contracts.Code;
 using GeneralInfoManagement.Application.Contract.Branches;
 using GeneralInfoManagement.Application.Contract.City;
+using GeneralInfoManagement.Application.Contract.Picture;
 using GeneralInfoManagement.Application.Contract.Province;
 using GeneralInfoManagement.Domain.General.CityAgg;
 using GeneralInfoManagement.Domain.General.ProvinceAgg;
@@ -16,16 +17,17 @@ using PersonManagement.Application.Contract.Persons;
 using PersonManagement.Application.Contract.PersonTypes;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using GeneralInfoManagement.Application.Contract.Picture;
-using System.IO;
 using System.ComponentModel;
+using System.Globalization;
+using System.IO;
+
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Input;
-using System.Globalization;
 using System.Windows.Data;
+using System.Windows.Input;
+using System.Windows.Media;
 using Taadol.Controls;
 namespace Taadol.Views
 {
@@ -1525,7 +1527,16 @@ namespace Taadol.Views
             InventoryContent.Visibility = Visibility.Collapsed;
             TaxContent.Visibility = Visibility.Collapsed;
         }
+        private void TableContainerBorder_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            var border = (Border)sender;
+            double radius = border.CornerRadius.TopLeft; // چون همه گوشه‌ها 4 هستند
 
+            border.Clip = new RectangleGeometry(
+                new Rect(0, 0, border.ActualWidth, border.ActualHeight),
+                radius,
+                radius);
+        }
         private void TabInventory_Checked(object sender, RoutedEventArgs e)
         {
             if (TabPricing == null || TabTax == null) return;

@@ -1,9 +1,16 @@
 ﻿<UserControl x:Class="Taadol.Controls.ModernPersianTextBox"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:svg="http://sharpvectors.codeplex.com/svgc/">
 
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
         <Border x:Name="border"
+                Grid.Row="0"
                 Background="White"
                 BorderBrush="#E8E8E8"
                 BorderThickness="1"
@@ -56,7 +63,43 @@
                            VerticalAlignment="Center"
                            Margin="0,0,12,0"
                            Visibility="Collapsed" />
+
+                <!-- آیکون وضعیت ولیدیشن -->
+                <Border x:Name="ValidationIconBorder"
+                        Grid.Column="1"
+                        Width="22"
+                        Height="22"
+                        CornerRadius="11"
+                        VerticalAlignment="Center"
+                        Margin="0,0,10,0"
+                        Visibility="Collapsed">
+                    <Grid>
+                        <svg:SvgViewbox x:Name="WarningIcon"
+                                        Width="14"
+                                        Height="14"
+                                        Source="/Assets/Icons/warning.svg"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Visibility="Collapsed" />
+                        <svg:SvgViewbox x:Name="SuccessIcon"
+                                        Width="14"
+                                        Height="14"
+                                        Source="/Assets/Icons/Check.svg"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Visibility="Collapsed" />
+                    </Grid>
+                </Border>
             </Grid>
         </Border>
+
+        <!-- متن خطا -->
+        <TextBlock x:Name="ValidationText"
+                   Grid.Row="1"
+                   FontFamily="{StaticResource IRANSans}"
+                   FontSize="12"
+                   Margin="4,4,0,0"
+                   TextWrapping="Wrap"
+                   Visibility="Collapsed" />
     </Grid>
 </UserControl>

@@ -56,10 +56,9 @@ namespace Taadol.Controls
 
         private void UpdateVisual(bool animate)
         {
-            // مقدار 26 یعنی 3 پیکسل از راست فاصله دارد (متقارن با سمت چپ)
             double toX = IsChecked ? 26 : 0;
 
-            var bg = IsChecked
+            var targetBg = IsChecked
                 ? new SolidColorBrush(Color.FromRgb(0x22, 0xC5, 0x5E))
                 : new SolidColorBrush(Color.FromRgb(0xE5, 0xE7, 0xEB));
 
@@ -73,7 +72,7 @@ namespace Taadol.Controls
 
                 var bgAnim = new ColorAnimation
                 {
-                    To = bg.Color,
+                    To = targetBg.Color,
                     Duration = TimeSpan.FromMilliseconds(200)
                 };
                 ToggleBorder.Background.BeginAnimation(SolidColorBrush.ColorProperty, bgAnim);
@@ -81,7 +80,7 @@ namespace Taadol.Controls
             else
             {
                 KnobTransform.X = toX;
-                ToggleBorder.Background = bg;
+                ToggleBorder.Background = targetBg;
             }
         }
     }

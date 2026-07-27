@@ -76,10 +76,10 @@
                                         Source="/Assets/Icons/closeTHIN.svg"
                                         Margin="20,0,10,0" />
                         <TextBlock Text="لیست اشخاص"
-                                   FontSize="19"
+                                   FontSize="20"
                                    FontFamily="{StaticResource IRANSans}"
                                    FontWeight="Bold"
-                                   Foreground="#001242"
+                                   Foreground="#0D2159"
                                    VerticalAlignment="Center" />
                     </StackPanel>
 

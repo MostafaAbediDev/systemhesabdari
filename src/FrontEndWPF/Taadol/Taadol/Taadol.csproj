@@ -19,6 +19,7 @@
     <None Remove="Assets\Icons\arrowDowN.svg" />
     <None Remove="Assets\Icons\ArrowLeft.svg" />
     <None Remove="Assets\Icons\ArrowUP.svg" />
+    <None Remove="Assets\Icons\Black.svg" />
     <None Remove="Assets\Icons\box-add.svg" />
     <None Remove="Assets\Icons\briefcase.svg" />
     <None Remove="Assets\Icons\briefcase_u.svg" />
@@ -49,10 +50,12 @@
     <None Remove="Assets\Icons\newrepo.svg" />
     <None Remove="Assets\Icons\Plus.svg" />
     <None Remove="Assets\Icons\plus_LINE.svg" />
+    <None Remove="Assets\Icons\Plus_thin.svg" />
     <None Remove="Assets\Icons\printer.svg" />
     <None Remove="Assets\Icons\profile-circle.svg" />
     <None Remove="Assets\Icons\profile.svg" />
     <None Remove="Assets\Icons\profile_u.svg" />
+    <None Remove="Assets\Icons\redo.svg" />
     <None Remove="Assets\Icons\rep.svg" />
     <None Remove="Assets\Icons\rep_u.svg" />
     <None Remove="Assets\Icons\Rightsquare.svg" />
@@ -118,6 +121,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Icons\ArrowUP.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\Black.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Icons\box-add.svg">
@@ -210,6 +216,9 @@
     <Content Include="Assets\Icons\plus_LINE.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\Icons\Plus_thin.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\Icons\printer.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -220,6 +229,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Icons\profile_u.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\redo.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Icons\rep.svg">

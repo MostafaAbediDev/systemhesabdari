@@ -170,46 +170,25 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <!-- ═══ ردیف 0: هدر ═══ -->
             <Grid Grid.Row="0"
-                  Margin="10,15,10,12">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-
-                <StackPanel Grid.Column="0"
-                            Orientation="Horizontal"
+                  Margin="10,15,10,4">
+                <StackPanel Orientation="Horizontal"
                             VerticalAlignment="Center">
                     <svg:SvgViewbox FlowDirection="LeftToRight"
-                                    Width="14"
-                                    Height="14"
-                                    Source="/Assets/Icons/arrow-right.svg"
+                                    Width="16"
+                                    Height="16"
+                                    Source="/Assets/Icons/closeTHIN.svg"
                                     Margin="10,0,10,0" />
                     <TextBlock Text="مشخصات شخص جدید"
-                               FontSize="18"
+                               FontSize="20"
                                FontWeight="Bold"
                                FontFamily="{StaticResource IRANSans}"
-                               Foreground="{StaticResource PrimaryBrush}"
+                               Foreground="#0D2159"
                                VerticalAlignment="Center" />
-                </StackPanel>
-
-                <StackPanel Grid.Column="1"
-                            Orientation="Horizontal">
-                    <controls:CustomOutlinedButton Margin="0,0,12,0"
-                                                   Text="ثبت موقت">
-                        <controls:CustomOutlinedButton.Icon>
-                            <svg:SvgViewbox Source="/Assets/Icons/tempsave.svg"
-                                            Width="16"
-                                            Height="16" />
-                        </controls:CustomOutlinedButton.Icon>
-                    </controls:CustomOutlinedButton>
-                    <controls:IconButton ButtonText="ثبت"
-                                         IconSource="/Assets/Icons/save.svg"
-                                         ButtonCommand="{Binding SavePersonCommand}"
-                                         ButtonBackground="#2667FF" />
                 </StackPanel>
             </Grid>
 
@@ -253,7 +232,7 @@
                     <StackPanel Grid.Column="0"
                                 Margin="0,0,24,0">
 
-                        <Grid Margin="0,0,0,8">
+                        <Grid Margin="0,0,0,10">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="240" />
                                 <ColumnDefinition Width="400" />
@@ -335,7 +314,8 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition MaxHeight="625" />
                             </Grid.RowDefinitions>
-                            <StackPanel Orientation="Horizontal">
+                            <StackPanel Orientation="Horizontal"
+                                        Margin="0,5,0,10">
                                 <TextBlock Text="نوع شخص"
                                            Style="{StaticResource FormLabel}" />
                                 <controls:ToggleSwitch2Control x:Name="LegalTypeToggle"
@@ -347,7 +327,7 @@
                                                               SelectionChanged="LegalTypeToggle_SelectionChanged" />
                                 <Border Width="0.6"
                                         Height="27"
-                                        Margin="9,0,9,0"
+                                        Margin="20,0,9,0"
                                         Background="#BED1FF"
                                         VerticalAlignment="Center" />
                                 <controls:ActiveToggleControl x:Name="PersonActiveToggle"
@@ -358,7 +338,7 @@
                             </StackPanel>
                         </Grid>
 
-                        <Grid Margin="0,5,0,4">
+                        <Grid Margin="0,2,0,10">
       <Grid.ColumnDefinitions>
           <ColumnDefinition Width="1.5*" />
           <ColumnDefinition Width="8" />
@@ -418,7 +398,7 @@
                         <!-- ردیف دوم: نام و نام خانوادگی فرد رابط (فقط برای شخص حقوقی)
                              این فرد از طرف شرکت با ما در ارتباط خواهد بود. -->
                         <Grid x:Name="ContactPersonPanel"
-                              Margin="0,5,0,4"
+                              Margin="0,2,0,2"
                               Visibility="Collapsed">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="2*" />
@@ -440,7 +420,8 @@
                             </StackPanel>
                         </Grid>
 
-                        <Grid HorizontalAlignment="Left">
+                        <Grid HorizontalAlignment="Left"
+                              Margin="0,5,0,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="auto" />
                                 <ColumnDefinition Width="16" />
@@ -474,7 +455,7 @@
                                                   Content="مشتری"
                                                   Tag="1"
                                                   FlowDirection="LeftToRight"
-                                                  Style="{StaticResource StatusToggleButton}"
+                                                  Style="{StaticResource PersonTypeCheckBox}"
                                                   IsChecked="False"
                                                   Checked="PersonTypeToggle_Checked"
                                                   Margin="0,0,8,0" />
@@ -482,7 +463,7 @@
                                                   Content="تامین کننده"
                                                   Tag="3"
                                                   FlowDirection="LeftToRight"
-                                                  Style="{StaticResource StatusToggleButton}"
+                                                  Style="{StaticResource PersonTypeCheckBox}"
                                                   IsChecked="False"
                                                   Checked="PersonTypeToggle_Checked"
                                                   Margin="0,0,8,0" />
@@ -490,7 +471,7 @@
                                                   Content="هردو"
                                                   Tag="1"
                                                   FlowDirection="LeftToRight"
-                                                  Style="{StaticResource StatusToggleButton}"
+                                                  Style="{StaticResource PersonTypeCheckBox}"
                                                   IsChecked="False"
                                                   Checked="PersonTypeToggle_Checked"
                                                   Margin="0,0,8,0" />
@@ -498,7 +479,7 @@
                                                   Content="پرسنل"
                                                   Tag="2"
                                                   FlowDirection="LeftToRight"
-                                                  Style="{StaticResource StatusToggleButton}"
+                                                  Style="{StaticResource PersonTypeCheckBox}"
                                                   IsChecked="False"
                                                   Checked="PersonTypeToggle_Checked"
                                                   Unchecked="PersonTypeToggle_Checked"
@@ -625,7 +606,7 @@
 
                         <!-- تب: تماس و آدرس -->
                         <StackPanel x:Name="PricingContent"
-                                    Visibility="Collapsed">
+                                    Visibility="Visible">
 
                             <!-- ردیف اول: کد پستی - ایمیل - موبایل - شماره تلفن (از راست به چپ) -->
                             <Grid Margin="0,0,0,16">
@@ -770,7 +751,7 @@
 
                         <!-- ═══ تب: حساب های بانکی — متد جدید ═══ -->
                         <StackPanel x:Name="InventoryContent"
-                                    Visibility="Visible">
+                                    Visibility="Collapsed">
 
                             <!-- فرم ورود اطلاعات حساب -->
                             <Grid Margin="0,8,0,8">
@@ -790,6 +771,7 @@
 
                                 <!-- ردیف اول: نام بانک + نام شعبه + شماره کارت + حساب پیش‌فرض -->
                                 <StackPanel Grid.Row="0"
+                                            Margin="0,0,0,10"
                                             Grid.Column="0">
                                     <TextBlock Style="{StaticResource FormLabel}"><Run Text="نام بانک" /><Run Text=" *"
                                                                                                               Foreground="#DC2626" /></TextBlock>
@@ -818,12 +800,13 @@
                                     <controls:ModernPersianTextBox x:Name="CardNumberInput"
                                                                    HorizontalAlignment="Stretch"
                                                                    FlowDirection="LeftToRight"
+                                                                   Margin="0,0,0,0"
                                                                    Placeholder="**** **** **** ****" />
                                 </StackPanel>
                                 <StackPanel Grid.Row="0"
                                             Grid.Column="6"
                                             VerticalAlignment="Bottom"
-                                            Margin="0,0,0,4">
+                                            Margin="0,0,0,20">
                                     <ToggleButton x:Name="DefaultAccountToggle"
                                                   Content="حساب پیش فرض"
                                                   FlowDirection="LeftToRight"
@@ -833,6 +816,7 @@
 
                                 <!-- ردیف دوم: شماره حساب + شماره شبا + دکمه افزودن -->
                                 <StackPanel Grid.Row="1"
+                                            Margin="0,0,0,0"
                                             Grid.Column="0">
                                     <TextBlock Style="{StaticResource FormLabel}"><Run Text="شماره حساب" /><Run Text=" *"
                                                                                                                 Foreground="#DC2626" /></TextBlock>
@@ -853,6 +837,7 @@
 
                                 <!-- دکمه افزودن، داخل خود گرید، چسبیده به چپ -->
                                 <Border Grid.Row="1"
+                                        Margin="0,0,0,5"
                                         Grid.Column="0"
                                         Grid.ColumnSpan="7"
                                         CornerRadius="4"
@@ -868,13 +853,12 @@
                                             Background="Transparent"
                                             BorderThickness="0">
                                         <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="+"
-                                                       FontFamily="{StaticResource IRANSans}"
-                                                       FontSize="16"
-                                                       FontWeight="Bold"
-                                                       Foreground="#2667FF"
-                                                       VerticalAlignment="Center"
-                                                       Margin="0,0,8,0" />
+                                            <svg:SvgViewbox Width="8"
+                                                            Height="8"
+                                                            Margin="0,0,12,0"
+                                                            Source="Assets/Icons/Plus_thin.svg"
+                                                            HorizontalAlignment="Center"
+                                                            VerticalAlignment="Center" />
                                             <TextBlock Text="افزودن به حساب های بانکی"
                                                        FontSize="13"
                                                        FontWeight="Medium"
@@ -892,7 +876,8 @@
                             <Border BorderBrush="#E5E7EB"
                                     BorderThickness="1"
                                     CornerRadius="4"
-                                    ClipToBounds="True"
+                                    x:Name="TableContainerBorder"
+                                    SizeChanged="TableContainerBorder_SizeChanged"
                                     Margin="0,0,0,8"
                                     Visibility="{Binding BankAccounts.Count, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource CountToVisibilityConverter}}">
                                 <Grid FlowDirection="RightToLeft">
@@ -1019,7 +1004,7 @@
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
                                                 <Border BorderBrush="#E5E7EB"
-                                                        BorderThickness="0,0,0,1">
+                                                        BorderThickness="0,0,0,0">
                                                 <Grid Background="White"
                                                       Height="36">
                                                     <Grid.ColumnDefinitions>
@@ -1120,8 +1105,8 @@
 
                                                     <!-- پیش فرض (چک‌باکس فقط خواندنی) -->
                                                     <Border Grid.Column="12"
-                                                            Width="16"
-                                                            Height="16"
+                                                            Width="15"
+                                                            Height="15"
                                                             CornerRadius="4"
                                                             HorizontalAlignment="Center"
                                                             VerticalAlignment="Center">
@@ -1163,7 +1148,19 @@
                                                                 Orientation="Horizontal"
                                                                 HorizontalAlignment="Center"
                                                                 VerticalAlignment="Center">
-                                                        <Button Tag="{Binding}"
+
+                                                            <Button Tag="{Binding}"
+                                                                    Click="RemoveBankAccountFromTable_Click"
+                                                                    Background="Transparent"
+                                                                    BorderThickness="0"
+                                                                    Cursor="Hand"
+                                                                    ToolTip="حذف"
+                                                                    Padding="4">
+                                                                <svg:SvgViewbox Width="14"
+                                                                                Height="14"
+                                                                                Source="/Assets/Icons/trash.svg" />
+                                                            </Button>
+                                                            <Button Tag="{Binding}"
                                                                 Click="EditBankAccount_Click"
                                                                 Background="Transparent"
                                                                 BorderThickness="0"
@@ -1171,18 +1168,10 @@
                                                                 ToolTip="ویرایش"
                                                                 Padding="4">
                                                             <svg:SvgViewbox Width="14" Height="14"
-                                                                            Source="/Assets/Icons/edit.svg" />
+                                                                            FlowDirection="LeftToRight"
+                                                                                Source="/Assets/Icons/editblue.svg" />
                                                         </Button>
-                                                        <Button Tag="{Binding}"
-                                                                Click="RemoveBankAccountFromTable_Click"
-                                                                Background="Transparent"
-                                                                BorderThickness="0"
-                                                                Cursor="Hand"
-                                                                ToolTip="حذف"
-                                                                Padding="4">
-                                                            <svg:SvgViewbox Width="14" Height="14"
-                                                                            Source="/Assets/Icons/trash.svg" />
-                                                        </Button>
+                                                       
                                                     </StackPanel>
                                                 </Grid>
                                                 </Border>
@@ -1320,6 +1309,63 @@
                     </Grid>
                 </Border>
             </ScrollViewer>
+
+            <!-- ═══ ردیف 5: فوتر (دکمه‌ها) ═══ -->
+            <Border Grid.Row="5"
+                    BorderBrush="#E5E7EB"       
+                    BorderThickness="0,1,0,0"
+                    CornerRadius="0,0,12,12"
+                    Background="White">
+                <Grid Margin="16,10"
+                      FlowDirection="RightToLeft">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width=".40*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width=".30*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- سمت راست: ذخیره شخص -->
+                    <controls:IconButton Grid.Column="0"
+                                         ButtonText="ذخیره شخص"
+                                         IconSource="/Assets/Icons/save.svg"
+                                         ButtonCommand="{Binding SavePersonCommand}"
+                                         ButtonBackground="#2667FF"
+                                         CornerRadius="4" />
+
+                  
+
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal"
+                                Margin="0,0,20,0"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Right">
+                        <svg:SvgViewbox Source="/Assets/Icons/redo.svg"
+                                        Width="14"
+                                        Height="14"
+                                        FlowDirection="LeftToRight"
+                                        Margin="6,0,15,0" />
+                        <TextBlock Text="انصراف"
+                                   FontFamily="{StaticResource IRANSans}"
+                                   FontSize="14"
+                                   Foreground="#2667FF"
+                                   VerticalAlignment="Center" />
+                       
+                    </StackPanel>
+                    <!-- سمت چپ: ذخیره موقت -->
+                    <controls:CustomOutlinedButton Grid.Column="2"
+                                                   Text="ذخیره موقت"
+                                                   HorizontalAlignment="Stretch"
+                                                 
+                                                   BorderBrush="#2667FF"
+                                                   Foreground="#2667FF">
+                        <controls:CustomOutlinedButton.Icon>
+                            <svg:SvgViewbox Source="/Assets/Icons/Black.svg"
+                                            Width="16"
+                                            Height="16" />
+                        </controls:CustomOutlinedButton.Icon>
+                    </controls:CustomOutlinedButton>
+                </Grid>
+            </Border>
 
         </Grid>
     </Border>

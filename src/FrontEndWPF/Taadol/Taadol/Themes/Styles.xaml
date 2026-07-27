@@ -1201,7 +1201,7 @@
                 <ControlTemplate TargetType="ToggleButton">
                     <StackPanel Orientation="Horizontal"
                                 VerticalAlignment="Center">
-                        
+
                         <ContentPresenter Content="{TemplateBinding Content}"
                                           VerticalAlignment="Center"
                                           Margin="0,0,8,0">
@@ -1219,7 +1219,7 @@
                             </ContentPresenter.Resources>
                         </ContentPresenter>
 
-                        
+
                         <Border x:Name="CheckBoxBorder"
                                 Width="20"
                                 Height="20"
@@ -1228,7 +1228,7 @@
                                 CornerRadius="4"
                                 Background="White"
                                 Padding="2">
-                            
+
                             <svg:SvgViewbox x:Name="CheckMark"
                                             Width="8"
                                             Height="8"
@@ -1241,7 +1241,7 @@
                     </StackPanel>
 
                     <ControlTemplate.Triggers>
-                        
+
                         <Trigger Property="IsChecked"
                                  Value="True">
                             <Setter TargetName="CheckBoxBorder"
@@ -1255,13 +1255,13 @@
                                     Value="Visible" />
                         </Trigger>
 
-                        
+
                         <Trigger Property="IsChecked"
                                  Value="False">
                             <Setter TargetName="CheckBoxBorder"
                                     Property="BorderBrush"
                                     Value="#BDC3C7" />
-                            
+
                             <Setter TargetName="CheckBoxBorder"
                                     Property="Background"
                                     Value="White" />
@@ -1270,7 +1270,7 @@
                                     Value="Collapsed" />
                         </Trigger>
 
-                        
+
                         <Trigger Property="IsMouseOver"
                                  Value="True">
                             <Setter TargetName="CheckBoxBorder"
@@ -1282,6 +1282,69 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <Style x:Key="PersonTypeCheckBox"
+           TargetType="ToggleButton">
+        <Setter Property="Cursor"
+                Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <StackPanel Orientation="Horizontal"
+                                VerticalAlignment="Center">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          VerticalAlignment="Center"
+                                          Margin="0,0,10,0">
+                            <ContentPresenter.Resources>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="FontSize"
+                                            Value="16" />
+                                    <Setter Property="FontWeight"
+                                            Value="Medium" />
+                                    <Setter Property="FontFamily"
+                                            Value="{StaticResource IRANSans}" />
+                                    <Setter Property="Foreground"
+                                            Value="#2B3F6C" />
+                                </Style>
+                            </ContentPresenter.Resources>
+                        </ContentPresenter>
+                        <Border x:Name="CheckBoxBorder"
+                                Width="20"
+                                Height="20"
+                                CornerRadius="5"
+                                Background="White"
+                                BorderBrush="#CBD5E1"
+                                BorderThickness="1.5">
+                            <svg:SvgViewbox x:Name="CheckMark"
+                                            Width="18"
+                                            Height="18"
+                                            Source="/Assets/Icons/Check.svg"
+                                            FlowDirection="LeftToRight"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Visibility="Collapsed" />
+                        </Border>
+                    </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="CheckBoxBorder" Property="Background" Value="#2667FF" />
+                            <Setter TargetName="CheckBoxBorder" Property="BorderBrush" Value="#2667FF" />
+                            <Setter TargetName="CheckMark" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="False">
+                            <Setter TargetName="CheckBoxBorder" Property="Background" Value="#FFFFFF" />
+                            <Setter TargetName="CheckBoxBorder" Property="BorderBrush" Value="#CBD5E1" />
+                            <Setter TargetName="CheckMark" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="CheckBoxBorder" Property="BorderBrush" Value="#2667FF" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style x:Key="GreenRadioButtonStyle"
            TargetType="RadioButton">
         <Setter Property="Foreground"
