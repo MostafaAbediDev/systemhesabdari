@@ -847,26 +847,51 @@ namespace Taadol.Views
             }
             else
             {
+                bool hasError = false;
+
                 if (string.IsNullOrWhiteSpace(FirstName))
                 {
-                    MessageBox.Show("نام را وارد کنید.", "نام", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return false;
+                    FirstNameInput.ValidationState = Controls.ValidationState.Invalid;
+                    FirstNameInput.ValidationMessage = "نام را وارد کنید.";
+                    hasError = true;
                 }
+                else
+                {
+                    FirstNameInput.ValidationState = Controls.ValidationState.Valid;
+                    FirstNameInput.ValidationMessage = "";
+                }
+
                 if (string.IsNullOrWhiteSpace(LastName))
                 {
-                    MessageBox.Show("نام خانوادگی را وارد کنید.", "نام خانوادگی", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return false;
+                    LastNameInput.ValidationState = Controls.ValidationState.Invalid;
+                    LastNameInput.ValidationMessage = "نام خانوادگی را وارد کنید.";
+                    hasError = true;
                 }
+                else
+                {
+                    LastNameInput.ValidationState = Controls.ValidationState.Valid;
+                    LastNameInput.ValidationMessage = "";
+                }
+
                 if (string.IsNullOrWhiteSpace(NationalCode))
                 {
-                    MessageBox.Show("کد ملی را وارد کنید.", "کد ملی", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return false;
+                    NationalCodeInput.ValidationState = Controls.ValidationState.Invalid;
+                    NationalCodeInput.ValidationMessage = "کد ملی را وارد کنید.";
+                    hasError = true;
                 }
-                if (!IsValidNationalCode(NationalCode))
+                else if (!IsValidNationalCode(NationalCode))
                 {
-                    MessageBox.Show("کد ملی باید دقیقاً ۱۰ رقم باشد.", "کد ملی", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return false;
+                    NationalCodeInput.ValidationState = Controls.ValidationState.Invalid;
+                    NationalCodeInput.ValidationMessage = "کد ملی باید دقیقاً ۱۰ رقم باشد.";
+                    hasError = true;
                 }
+                else
+                {
+                    NationalCodeInput.ValidationState = Controls.ValidationState.Valid;
+                    NationalCodeInput.ValidationMessage = "";
+                }
+
+                if (hasError) return false;
             }
             if (!IsCodeAutomatic && string.IsNullOrWhiteSpace(ManualCode))
             {
@@ -1636,6 +1661,41 @@ namespace Taadol.Views
 
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+        private void ValidationField_TextChanged(object sender, RoutedEventArgs e)
+        {
+            if (sender is Controls.ModernPersianTextBox textBox)
+            {
+                string text = textBox.Text?.Trim() ?? "";
+
+                if (textBox == NationalCodeInput)
+                {
+                    if (IsValidNationalCode(text))
+                    {
+                        textBox.ValidationState = Controls.ValidationState.Valid;
+                        textBox.ValidationMessage = "";
+                    }
+                    else
+                    {
+                        textBox.ValidationState = Controls.ValidationState.None;
+                        textBox.ValidationMessage = "";
+                    }
+                }
+                else if (textBox == FirstNameInput || textBox == LastNameInput)
+                {
+                    if (!string.IsNullOrWhiteSpace(text))
+                    {
+                        textBox.ValidationState = Controls.ValidationState.Valid;
+                        textBox.ValidationMessage = "";
+                    }
+                    else
+                    {
+                        textBox.ValidationState = Controls.ValidationState.None;
+                        textBox.ValidationMessage = "";
+                    }
+                }
+            }
+        }
     }
 
     // ======================================================

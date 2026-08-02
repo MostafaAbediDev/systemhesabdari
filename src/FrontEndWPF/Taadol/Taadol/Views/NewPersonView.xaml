@@ -249,8 +249,8 @@
                                                            Grid.Row="0" Grid.Column="0"
                                                            HorizontalAlignment="Right"
                                                            Margin="0,0,0,5"
-                                                           FirstLabel="دستی"
-                                                           SecondLabel="خودکار"
+                                                           FirstLabel="خودکار"
+                                                           SecondLabel="دستی"
                                                            IsFirstSelected="False"
                                                            SelectionChanged="CodeModeToggle_SelectionChanged" />
 
@@ -350,21 +350,31 @@
                             <StackPanel Grid.Column="0"
                                         x:Name="FirstNamePanel">
                                 <TextBlock Style="{StaticResource FormLabel}"><Run Text="نام"/><Run Text=" *" Foreground="#DC2626"/></TextBlock>
-                                <controls:ModernPersianTextBox Text="{Binding FirstName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                               Placeholder="علی" />
+                                <controls:ModernPersianTextBox x:Name="FirstNameInput"
+                                                                 InputType="Letters"
+                                                                 Text="{Binding FirstName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                 Placeholder="علی"
+                                                                 TextChanged="ValidationField_TextChanged" />
                             </StackPanel>
                             <StackPanel Grid.Column="2"
                                         x:Name="LastNamePanel">
                                 <TextBlock Style="{StaticResource FormLabel}"><Run Text="نام خانوادگی"/><Run Text=" *" Foreground="#DC2626"/></TextBlock>
-                                <controls:ModernPersianTextBox Text="{Binding LastName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                               Placeholder="علوی" />
+                                <controls:ModernPersianTextBox x:Name="LastNameInput"
+                                                                 InputType="Letters"
+                                                                 Text="{Binding LastName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                 Placeholder="علوی"
+                                                                 TextChanged="ValidationField_TextChanged" />
                             </StackPanel>
                             <StackPanel Grid.Column="4"
                                         x:Name="NationalCodePanel">
                                 <TextBlock Style="{StaticResource FormLabel}"><Run Text="کد ملی"/><Run Text=" *" Foreground="#DC2626"/></TextBlock>
-                                <controls:ModernPersianTextBox FlowDirection="LeftToRight"
-                                                               Text="{Binding NationalCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                               Placeholder="2470545256" />
+                                <controls:ModernPersianTextBox x:Name="NationalCodeInput"
+                                                                  InputType="Number"
+                                                                  MaxLength="10"
+                                                                  FlowDirection="LeftToRight"
+                                                                  Text="{Binding NationalCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                  Placeholder="2470545256"
+                                                                  TextChanged="ValidationField_TextChanged" />
                             </StackPanel>
 
                             <StackPanel Grid.Column="0"
@@ -637,7 +647,8 @@
                                     </TextBlock>
                                     <controls:ModernPersianTextBox Width="200"
                                                                    HorizontalAlignment="Left"
-                                                                   FlowDirection="LeftToRight"
+                                                                   InputType="Number"
+                                                                   FlowDirection="RightToLeft"
                                                                    Text="{Binding Phone, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                                    Placeholder="071" />
                                 </StackPanel>
@@ -651,7 +662,9 @@
                                     </TextBlock>
                                     <controls:ModernPersianTextBox Width="200"
                                                                    HorizontalAlignment="Left"
-                                                                   FlowDirection="LeftToRight"
+                                                                   InputType="Number"
+                                                                   
+                                                                   FlowDirection="RightToLeft"
                                                                    Text="{Binding Mobile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                                    Placeholder="091" />
                                 </StackPanel>
@@ -663,7 +676,8 @@
                                                Style="{StaticResource FormLabel}" />
                                     <controls:ModernPersianTextBox Width="200"
                                                                    HorizontalAlignment="Left"
-                                                                   FlowDirection="LeftToRight"
+                                                                   InputType="Text"
+                                                                   FlowDirection="RightToLeft"
                                                                    Text="{Binding Email, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                                    Placeholder="example@mail.com" />
                                 </StackPanel>
@@ -1312,6 +1326,7 @@
 
             <!-- ═══ ردیف 5: فوتر (دکمه‌ها) ═══ -->
             <Border Grid.Row="5"
+                    Margin="0,5,0,0"
                     BorderBrush="#E5E7EB"       
                     BorderThickness="0,1,0,0"
                     CornerRadius="0,0,12,12"

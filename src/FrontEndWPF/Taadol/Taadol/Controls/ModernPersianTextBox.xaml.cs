@@ -22,6 +22,8 @@ namespace Taadol.Controls
 
     public partial class ModernPersianTextBox : UserControl
     {
+        public event RoutedEventHandler TextChanged;
+
         public static readonly DependencyProperty InputTypeProperty =
             DependencyProperty.Register(nameof(InputType), typeof(ModernTextBoxInputType), typeof(ModernPersianTextBox),
                 new PropertyMetadata(ModernTextBoxInputType.Text));
@@ -45,6 +47,10 @@ namespace Taadol.Controls
         public static readonly DependencyProperty ValidationMessageProperty =
             DependencyProperty.Register(nameof(ValidationMessage), typeof(string), typeof(ModernPersianTextBox),
                 new PropertyMetadata(string.Empty, OnValidationMessageChanged));
+
+        public static readonly DependencyProperty MaxLengthProperty =
+            DependencyProperty.Register(nameof(MaxLength), typeof(int), typeof(ModernPersianTextBox),
+                new PropertyMetadata(0, OnMaxLengthChanged));
 
         public ModernTextBoxInputType InputType
         {
@@ -82,12 +88,20 @@ namespace Taadol.Controls
             set => SetValue(ValidationMessageProperty, value);
         }
 
+        public int MaxLength
+        {
+            get => (int)GetValue(MaxLengthProperty);
+            set => SetValue(MaxLengthProperty, value);
+        }
+
         public ModernPersianTextBox()
         {
             InitializeComponent();
             UpdatePlaceholderVisibility();
             UpdateSuffixVisibility();
             DataObject.AddPastingHandler(PART_TextBox, OnPaste);
+            Loaded += (s, e) => UpdateIconAndTextDirection();
+            UpdateIconAndTextDirection();
         }
 
         private void PART_TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -160,6 +174,12 @@ namespace Taadol.Controls
                 ctrl.UpdateValidationVisual();
         }
 
+        private static void OnMaxLengthChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is ModernPersianTextBox ctrl && e.NewValue is int maxLen)
+                ctrl.PART_TextBox.MaxLength = maxLen;
+        }
+
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             int caret = PART_TextBox.CaretIndex;
@@ -172,6 +192,7 @@ namespace Taadol.Controls
 
             Text = PART_TextBox.Text;
             UpdatePlaceholderVisibility();
+            TextChanged?.Invoke(this, new RoutedEventArgs());
         }
 
         private void PART_TextBox_GotFocus(object sender, RoutedEventArgs e)
@@ -202,15 +223,73 @@ namespace Taadol.Controls
             SuffixText.Visibility = string.IsNullOrEmpty(Suffix) ? Visibility.Collapsed : Visibility.Visible;
         }
 
+        private void UpdateIconAndTextDirection()
+        {
+            PART_TextBox.FlowDirection = this.FlowDirection;
+            PlaceholderText.FlowDirection = this.FlowDirection;
+            ValidationText.FlowDirection = FlowDirection.RightToLeft;
+
+            bool isRtl = this.FlowDirection == FlowDirection.RightToLeft;
+
+            // Error always visual RIGHT (opposite of icon, fixed position)
+            if (isRtl)
+            {
+                ValidationText.HorizontalAlignment = HorizontalAlignment.Left;
+
+                if (InputType == ModernTextBoxInputType.Number)
+                {
+                    ValidationIconBorder.HorizontalAlignment = HorizontalAlignment.Left;
+                    ValidationIconBorder.Margin = new Thickness(10, 0, 0, 0);
+                    PART_TextBox.HorizontalContentAlignment = HorizontalAlignment.Right;
+                    PART_TextBox.Padding = new Thickness(12, 0, 36, 0);
+                    PlaceholderText.HorizontalAlignment = HorizontalAlignment.Right;
+                    PlaceholderText.Margin = new Thickness(0, 0, 16, 0);
+                }
+                else
+                {
+                    ValidationIconBorder.HorizontalAlignment = HorizontalAlignment.Right;
+                    ValidationIconBorder.Margin = new Thickness(0, 0, 10, 0);
+                    PART_TextBox.HorizontalContentAlignment = HorizontalAlignment.Left;
+                    PART_TextBox.Padding = new Thickness(16, 0, 12, 0);
+                    PlaceholderText.HorizontalAlignment = HorizontalAlignment.Left;
+                    PlaceholderText.Margin = new Thickness(16, 0, 0, 0);
+                }
+            }
+            else
+            {
+                ValidationText.HorizontalAlignment = HorizontalAlignment.Right;
+
+                if (InputType == ModernTextBoxInputType.Number)
+                {
+                    ValidationIconBorder.HorizontalAlignment = HorizontalAlignment.Left;
+                    ValidationIconBorder.Margin = new Thickness(10, 0, 0, 0);
+                    PART_TextBox.HorizontalContentAlignment = HorizontalAlignment.Left;
+                    PART_TextBox.Padding = new Thickness(42, 0, 12, 0);
+                    PlaceholderText.HorizontalAlignment = HorizontalAlignment.Left;
+                    PlaceholderText.Margin = new Thickness(42, 0, 0, 0);
+                }
+                else
+                {
+                    ValidationIconBorder.HorizontalAlignment = HorizontalAlignment.Right;
+                    ValidationIconBorder.Margin = new Thickness(0, 0, 10, 0);
+                    PART_TextBox.HorizontalContentAlignment = HorizontalAlignment.Right;
+                    PART_TextBox.Padding = new Thickness(12, 0, 36, 0);
+                    PlaceholderText.HorizontalAlignment = HorizontalAlignment.Right;
+                    PlaceholderText.Margin = new Thickness(0, 0, 16, 0);
+                }
+            }
+
+            SuffixText.HorizontalAlignment = HorizontalAlignment.Left;
+            SuffixText.Margin = new Thickness(10, 0, 0, 0);
+        }
+
         private void UpdateValidationVisual()
         {
             switch (ValidationState)
             {
                 case ValidationState.Valid:
-                    border.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981"));
-                    border.BorderThickness = new Thickness(1.5);
                     ValidationIconBorder.Visibility = Visibility.Visible;
-                    ValidationIconBorder.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#D1FAE5"));
+                    ValidationIconBorder.Background = Brushes.Transparent;
                     WarningIcon.Visibility = Visibility.Collapsed;
                     SuccessIcon.Visibility = Visibility.Visible;
                     ValidationText.Visibility = Visibility.Collapsed;
@@ -220,7 +299,7 @@ namespace Taadol.Controls
                     border.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#DC2626"));
                     border.BorderThickness = new Thickness(1.5);
                     ValidationIconBorder.Visibility = Visibility.Visible;
-                    ValidationIconBorder.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FEE2E2"));
+                    ValidationIconBorder.Background = Brushes.Transparent;
                     WarningIcon.Visibility = Visibility.Visible;
                     SuccessIcon.Visibility = Visibility.Collapsed;
                     if (!string.IsNullOrEmpty(ValidationMessage))

@@ -17,67 +17,63 @@
                 CornerRadius="4"
                 Height="45">
             <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-
                 <TextBox x:Name="PART_TextBox"
-                         Grid.Column="0"
                          FontFamily="{StaticResource IRANSans}"
                          FontSize="14"
                          Foreground="#2C3E50"
                          Background="Transparent"
                          BorderThickness="0"
-                         Padding="12,10"
+                         Padding="12,0"
                          VerticalContentAlignment="Center"
+                         HorizontalContentAlignment="Left"
+                         
                          TextChanged="TextBox_TextChanged"
                          PreviewTextInput="PART_TextBox_PreviewTextInput"
                          GotFocus="PART_TextBox_GotFocus"
                          LostFocus="PART_TextBox_LostFocus">
                     <TextBox.Template>
                         <ControlTemplate TargetType="TextBox">
-                            <ScrollViewer x:Name="PART_ContentHost"
-                                          Focusable="false"
-                                          HorizontalScrollBarVisibility="Hidden"
-                                          VerticalScrollBarVisibility="Hidden" />
+                            <Grid VerticalAlignment="Center">
+                                <ScrollViewer x:Name="PART_ContentHost"
+                                              Focusable="false"
+                                              VerticalAlignment="Center"
+                                              HorizontalScrollBarVisibility="Hidden"
+                                              VerticalScrollBarVisibility="Hidden" />
+                            </Grid>
                         </ControlTemplate>
                     </TextBox.Template>
                 </TextBox>
 
                 <TextBlock x:Name="PlaceholderText"
-                           Grid.Column="0"
                            Foreground="#BFBFBF"
                            FontFamily="{StaticResource IRANSans}"
                            FontSize="14"
                            VerticalAlignment="Center"
-                           Margin="16,12"
                            IsHitTestVisible="False"
                            Visibility="Visible" />
 
                 <TextBlock x:Name="SuffixText"
-                           Grid.Column="1"
                            Foreground="#7F8C8D"
                            FontFamily="{StaticResource IRANSans}"
-                           FontSize="14"
+
                            VerticalAlignment="Center"
                            Margin="0,0,12,0"
                            Visibility="Collapsed" />
 
-                <!-- آیکون وضعیت ولیدیشن -->
                 <Border x:Name="ValidationIconBorder"
-                        Grid.Column="1"
+                        HorizontalAlignment="Right"
                         Width="22"
                         Height="22"
-                        CornerRadius="11"
+                        CornerRadius="4"
                         VerticalAlignment="Center"
                         Margin="0,0,10,0"
+                        FlowDirection="LeftToRight"
                         Visibility="Collapsed">
                     <Grid>
                         <svg:SvgViewbox x:Name="WarningIcon"
                                         Width="14"
                                         Height="14"
-                                        Source="/Assets/Icons/warning.svg"
+                                        Source="/Assets/Icons/danger.svg"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Center"
                                         Visibility="Collapsed" />
@@ -93,12 +89,13 @@
             </Grid>
         </Border>
 
-        <!-- متن خطا -->
         <TextBlock x:Name="ValidationText"
                    Grid.Row="1"
                    FontFamily="{StaticResource IRANSans}"
                    FontSize="12"
                    Margin="4,4,0,0"
+                   FlowDirection="RightToLeft"
+                   HorizontalAlignment="Right"
                    TextWrapping="Wrap"
                    Visibility="Collapsed" />
     </Grid>
