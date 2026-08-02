@@ -10,7 +10,8 @@ namespace Taadol.Controls
     {
         Text,
         Number,
-        Letters
+        Letters,
+        Alphanumeric
     }
 
     public enum ValidationState
@@ -136,6 +137,9 @@ namespace Taadol.Controls
                 case ModernTextBoxInputType.Letters:
                     return Regex.IsMatch(input, @"^[\p{L}\s]+$");
 
+                case ModernTextBoxInputType.Alphanumeric:
+                    return Regex.IsMatch(input, @"^[a-zA-Z0-9]+$");
+
                 case ModernTextBoxInputType.Text:
                 default:
                     return true;
@@ -236,12 +240,12 @@ namespace Taadol.Controls
             {
                 ValidationText.HorizontalAlignment = HorizontalAlignment.Left;
 
-                if (InputType == ModernTextBoxInputType.Number)
+                if (InputType == ModernTextBoxInputType.Number || InputType == ModernTextBoxInputType.Alphanumeric)
                 {
                     ValidationIconBorder.HorizontalAlignment = HorizontalAlignment.Left;
                     ValidationIconBorder.Margin = new Thickness(10, 0, 0, 0);
                     PART_TextBox.HorizontalContentAlignment = HorizontalAlignment.Right;
-                    PART_TextBox.Padding = new Thickness(12, 0, 36, 0);
+                    PART_TextBox.Padding = new Thickness(12, 0, 16, 0);
                     PlaceholderText.HorizontalAlignment = HorizontalAlignment.Right;
                     PlaceholderText.Margin = new Thickness(0, 0, 16, 0);
                 }
@@ -259,23 +263,23 @@ namespace Taadol.Controls
             {
                 ValidationText.HorizontalAlignment = HorizontalAlignment.Right;
 
-                if (InputType == ModernTextBoxInputType.Number)
+                if (InputType == ModernTextBoxInputType.Number || InputType == ModernTextBoxInputType.Alphanumeric)
                 {
                     ValidationIconBorder.HorizontalAlignment = HorizontalAlignment.Left;
-                    ValidationIconBorder.Margin = new Thickness(10, 0, 0, 0);
+                    ValidationIconBorder.Margin = new Thickness(0, 0, 0, 0);
                     PART_TextBox.HorizontalContentAlignment = HorizontalAlignment.Left;
-                    PART_TextBox.Padding = new Thickness(42, 0, 12, 0);
+                    PART_TextBox.Padding = new Thickness(12, 0, 12, 0);
                     PlaceholderText.HorizontalAlignment = HorizontalAlignment.Left;
-                    PlaceholderText.Margin = new Thickness(42, 0, 0, 0);
+                    PlaceholderText.Margin = new Thickness(12, 0, 0, 0);
                 }
                 else
                 {
-                    ValidationIconBorder.HorizontalAlignment = HorizontalAlignment.Right;
+                    ValidationIconBorder.HorizontalAlignment = HorizontalAlignment.Left;
                     ValidationIconBorder.Margin = new Thickness(0, 0, 10, 0);
-                    PART_TextBox.HorizontalContentAlignment = HorizontalAlignment.Right;
-                    PART_TextBox.Padding = new Thickness(12, 0, 36, 0);
-                    PlaceholderText.HorizontalAlignment = HorizontalAlignment.Right;
-                    PlaceholderText.Margin = new Thickness(0, 0, 16, 0);
+                    PART_TextBox.HorizontalContentAlignment = HorizontalAlignment.Left;
+                    PART_TextBox.Padding = new Thickness(12, 0, 12, 0);
+                    PlaceholderText.HorizontalAlignment = HorizontalAlignment.Left;
+                    PlaceholderText.Margin = new Thickness(12, 0, 0, 0);
                 }
             }
 
@@ -285,6 +289,9 @@ namespace Taadol.Controls
 
         private void UpdateValidationVisual()
         {
+            bool isIconVisible = ValidationState != ValidationState.None;
+            UpdatePaddingForIcon(isIconVisible);
+
             switch (ValidationState)
             {
                 case ValidationState.Valid:
@@ -317,6 +324,40 @@ namespace Taadol.Controls
                     ValidationIconBorder.Visibility = Visibility.Collapsed;
                     ValidationText.Visibility = Visibility.Collapsed;
                     break;
+            }
+        }
+
+        private void UpdatePaddingForIcon(bool iconVisible)
+        {
+            if (InputType != ModernTextBoxInputType.Number) return;
+
+            bool isRtl = this.FlowDirection == FlowDirection.RightToLeft;
+
+            if (isRtl)
+            {
+                if (iconVisible)
+                {
+                    PART_TextBox.Padding = new Thickness(12, 0, 34, 0);
+                    PlaceholderText.Margin = new Thickness(0, 0, 34, 0);
+                }
+                else
+                {
+                    PART_TextBox.Padding = new Thickness(12, 0, 16, 0);
+                    PlaceholderText.Margin = new Thickness(0, 0, 16, 0);
+                }
+            }
+            else
+            {
+                if (iconVisible)
+                {
+                    PART_TextBox.Padding = new Thickness(34, 0, 12, 0);
+                    PlaceholderText.Margin = new Thickness(34, 0, 0, 0);
+                }
+                else
+                {
+                    PART_TextBox.Padding = new Thickness(12, 0, 12, 0);
+                    PlaceholderText.Margin = new Thickness(12, 0, 0, 0);
+                }
             }
         }
 

@@ -261,9 +261,12 @@
 
                             <controls:ModernPersianTextBox Grid.Row="1" Grid.Column="0"
                                                            x:Name="ManualCodeTextBox"
+                                                           InputType="Alphanumeric"
+                                                           FlowDirection="LeftToRight"
                                                            Text="{Binding ManualCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                            IsEnabled="False"
-                                                           Placeholder="1234" />
+                                                           Placeholder="1234"
+                                                           TextChanged="ValidationField_TextChanged" />
 
                             <Grid Grid.Row="1" Grid.Column="1"
                                   Margin="12,0,0,0">
@@ -645,9 +648,11 @@
                 <Run Text="شماره تلفن" /><Run Text=" *"
                                               Foreground="#DC2626" />
                                     </TextBlock>
-                                    <controls:ModernPersianTextBox Width="200"
+                                    <controls:ModernPersianTextBox x:Name="PhoneInput"
+                                                                   Width="200"
                                                                    HorizontalAlignment="Left"
                                                                    InputType="Number"
+                                                                   MaxLength="11"
                                                                    FlowDirection="RightToLeft"
                                                                    Text="{Binding Phone, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                                    Placeholder="071" />
@@ -660,10 +665,11 @@
                 <Run Text="موبایل" /><Run Text=" *"
                                           Foreground="#DC2626" />
                                     </TextBlock>
-                                    <controls:ModernPersianTextBox Width="200"
+                                    <controls:ModernPersianTextBox x:Name="MobileInput"
+                                                                   Width="200"
                                                                    HorizontalAlignment="Left"
                                                                    InputType="Number"
-                                                                   
+                                                                   MaxLength="11"
                                                                    FlowDirection="RightToLeft"
                                                                    Text="{Binding Mobile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                                    Placeholder="091" />
@@ -674,7 +680,8 @@
                                             HorizontalAlignment="Left">
                                     <TextBlock Text="ایمیل"
                                                Style="{StaticResource FormLabel}" />
-                                    <controls:ModernPersianTextBox Width="200"
+                                    <controls:ModernPersianTextBox x:Name="EmailInput"
+                                                                   Width="200"
                                                                    HorizontalAlignment="Left"
                                                                    InputType="Text"
                                                                    FlowDirection="RightToLeft"
@@ -689,9 +696,10 @@
                                                Style="{StaticResource FormLabel}" />
                                     <controls:ModernPersianTextBox Width="200"
                                                                    HorizontalAlignment="Left"
+                                                                   InputType="Number"
                                                                    FlowDirection="LeftToRight"
                                                                    Text="{Binding PostalCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                                   Placeholder="" />
+                                                                   Placeholder="1234567890" />
                                 </StackPanel>
                             </Grid>
 
@@ -813,6 +821,7 @@
                                                                                                                 Foreground="#DC2626" /></TextBlock>
                                     <controls:ModernPersianTextBox x:Name="CardNumberInput"
                                                                    HorizontalAlignment="Stretch"
+                                                                   InputType="Number"
                                                                    FlowDirection="LeftToRight"
                                                                    Margin="0,0,0,0"
                                                                    Placeholder="**** **** **** ****" />
@@ -836,6 +845,7 @@
                                                                                                                 Foreground="#DC2626" /></TextBlock>
                                     <controls:ModernPersianTextBox x:Name="AccountNumberInput"
                                                                    HorizontalAlignment="Stretch"
+                                                                   InputType="Number"
                                                                    FlowDirection="LeftToRight"
                                                                    Placeholder="456" />
                                 </StackPanel>
@@ -845,6 +855,8 @@
                                                                                                                Foreground="#DC2626" /></TextBlock>
                                     <controls:ModernPersianTextBox x:Name="ShabaInput"
                                                                    HorizontalAlignment="Stretch"
+                                                                   InputType="Number"
+                                                                   MaxLength="24"
                                                                    FlowDirection="LeftToRight"
                                                                    Placeholder="IR" />
                                 </StackPanel>
@@ -867,8 +879,8 @@
                                             Background="Transparent"
                                             BorderThickness="0">
                                         <StackPanel Orientation="Horizontal">
-                                            <svg:SvgViewbox Width="8"
-                                                            Height="8"
+                                            <svg:SvgViewbox Width="9"
+                                                            Height="9"
                                                             Margin="0,0,12,0"
                                                             Source="Assets/Icons/Plus_thin.svg"
                                                             HorizontalAlignment="Center"
@@ -1273,12 +1285,14 @@
                                 <StackPanel Grid.Column="2">
                                     <TextBlock Style="{StaticResource FormLabel}"><Run Text="کد پرسنلی"/><Run Text=" *" Foreground="#DC2626"/></TextBlock>
                                     <controls:ModernPersianTextBox Width="230"
+                                                                   InputType="Number"
                                                                    FlowDirection="LeftToRight"
                                                                    Placeholder="**** **** **** ****" />
                                 </StackPanel>
                                 <StackPanel Grid.Column="4">
                                     <TextBlock Style="{StaticResource FormLabel}"><Run Text="شماره بیمه"/><Run Text=" *" Foreground="#DC2626"/></TextBlock>
                                     <controls:ModernPersianTextBox Width="230"
+                                                                   InputType="Number"
                                                                    FlowDirection="LeftToRight"
                                                                    Placeholder="12345" />
                                 </StackPanel>
@@ -1295,6 +1309,7 @@
                                 <StackPanel Grid.Column="0">
                                     <TextBlock Style="{StaticResource FormLabel}"><Run Text="حقوق پایه"/><Run Text=" *" Foreground="#DC2626"/></TextBlock>
                                     <controls:ModernPersianTextBox Width="300"
+                                                                   InputType="Number"
                                                                    FlowDirection="LeftToRight"
                                                                    Placeholder="071" />
                                 </StackPanel>
@@ -1326,7 +1341,7 @@
 
             <!-- ═══ ردیف 5: فوتر (دکمه‌ها) ═══ -->
             <Border Grid.Row="5"
-                    Margin="0,5,0,0"
+                    Margin="0,10,0,0"
                     BorderBrush="#E5E7EB"       
                     BorderThickness="0,1,0,0"
                     CornerRadius="0,0,12,12"

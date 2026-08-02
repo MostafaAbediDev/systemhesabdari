@@ -1681,9 +1681,63 @@ namespace Taadol.Views
                         textBox.ValidationMessage = "";
                     }
                 }
+                else if (textBox == PhoneInput)
+                {
+                    string digits = new string(text.Where(char.IsDigit).ToArray());
+                    if (digits.Length == 8 || digits.Length == 11)
+                    {
+                        textBox.ValidationState = Controls.ValidationState.Valid;
+                        textBox.ValidationMessage = "";
+                    }
+                    else
+                    {
+                        textBox.ValidationState = Controls.ValidationState.None;
+                        textBox.ValidationMessage = "";
+                    }
+                }
+                else if (textBox == MobileInput)
+                {
+                    string digits = new string(text.Where(char.IsDigit).ToArray());
+                    if (digits.Length == 11)
+                    {
+                        textBox.ValidationState = Controls.ValidationState.Valid;
+                        textBox.ValidationMessage = "";
+                    }
+                    else
+                    {
+                        textBox.ValidationState = Controls.ValidationState.None;
+                        textBox.ValidationMessage = "";
+                    }
+                }
+                else if (textBox == EmailInput)
+                {
+                    if (!string.IsNullOrWhiteSpace(text) && IsValidEmail(text))
+                    {
+                        textBox.ValidationState = Controls.ValidationState.Valid;
+                        textBox.ValidationMessage = "";
+                    }
+                    else
+                    {
+                        textBox.ValidationState = Controls.ValidationState.None;
+                        textBox.ValidationMessage = "";
+                    }
+                }
                 else if (textBox == FirstNameInput || textBox == LastNameInput)
                 {
                     if (!string.IsNullOrWhiteSpace(text))
+                    {
+                        textBox.ValidationState = Controls.ValidationState.Valid;
+                        textBox.ValidationMessage = "";
+                    }
+                    else
+                    {
+                        textBox.ValidationState = Controls.ValidationState.None;
+                        textBox.ValidationMessage = "";
+                    }
+                }
+                else if (textBox == ManualCodeTextBox)
+                {
+                    if (!string.IsNullOrWhiteSpace(text) && text.All(c => char.IsLetterOrDigit(c) && c <= 127))
                     {
                         textBox.ValidationState = Controls.ValidationState.Valid;
                         textBox.ValidationMessage = "";

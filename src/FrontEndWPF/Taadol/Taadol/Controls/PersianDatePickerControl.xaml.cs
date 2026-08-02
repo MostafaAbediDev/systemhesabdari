@@ -55,9 +55,9 @@ namespace Taadol.Controls
             try
             {
                 var now = DateTime.Now;
-                PART_Year.Text = _pc.GetYear(now).ToString();
-                PART_Month.Text = _pc.GetMonth(now).ToString("D2");
-                PART_Day.Text = _pc.GetDayOfMonth(now).ToString("D2");
+                YearTextBox.Text = _pc.GetYear(now).ToString();
+                MonthTextBox.Text = _pc.GetMonth(now).ToString("D2");
+                DayTextBox.Text = _pc.GetDayOfMonth(now).ToString("D2");
             }
             finally
             {
@@ -69,21 +69,21 @@ namespace Taadol.Controls
         private void YearTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (!_isLoaded || _isUpdating) return;
-            FilterNumeric(PART_Year, 4);
+            FilterNumeric(YearTextBox, 4);
             TryUpdateDate();
         }
 
         private void MonthTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (!_isLoaded || _isUpdating) return;
-            FilterNumeric(PART_Month, 2);
+            FilterNumeric(MonthTextBox, 2);
             TryUpdateDate();
         }
 
         private void DayTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (!_isLoaded || _isUpdating) return;
-            FilterNumeric(PART_Day, 2);
+            FilterNumeric(DayTextBox, 2);
             TryUpdateDate();
         }
 
@@ -101,9 +101,9 @@ namespace Taadol.Controls
             int month = 0;
             int day = 0;
 
-            bool yearOk = int.TryParse(NormalizeDigits(PART_Year.Text), out year);
-            bool monthOk = int.TryParse(NormalizeDigits(PART_Month.Text), out month);
-            bool dayOk = int.TryParse(NormalizeDigits(PART_Day.Text), out day);
+            bool yearOk = int.TryParse(NormalizeDigits(YearTextBox.Text), out year);
+            bool monthOk = int.TryParse(NormalizeDigits(MonthTextBox.Text), out month);
+            bool dayOk = int.TryParse(NormalizeDigits(DayTextBox.Text), out day);
             if (!yearOk || !monthOk || !dayOk)
             {
                 SelectedDate = null;
