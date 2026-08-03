@@ -290,7 +290,7 @@ namespace Taadol.Views
             // سرویس تولید کد یکتا (از CodeManagement)
             _codeGeneratorService = App.ServiceProvider.GetRequiredService<ICodeGeneratorService>();
             _personCategoryApplication = App.ServiceProvider.GetRequiredService<IPersonCategoryApplication>();
-            SavePersonCommand = new RelayCommand(() => SavePerson());
+            SavePersonCommand = new RelayCommand(async () => await SavePersonAsync());
             DataContext = this;
 
             // مقداردهی اولیه شناسه یکتا در حالت اتوماتیک
@@ -437,7 +437,12 @@ namespace Taadol.Views
         {
             try
             {
-                var items = await Task.Run(() => _provinceRepository.GetProvincesForSelectList());
+                var items = await Task.Run(() =>
+                {
+                    using var scope = App.ServiceProvider.CreateScope();
+                    var repo = scope.ServiceProvider.GetRequiredService<IProvinceRepository>();
+                    return repo.GetProvincesForSelectList();
+                });
 
                 Provinces.Clear();
                 foreach (var p in items)
@@ -455,7 +460,12 @@ namespace Taadol.Views
 
             try
             {
-                var items = await Task.Run(() => _cityRepository.GetCitiesByProvince(provinceId));
+                var items = await Task.Run(() =>
+                {
+                    using var scope = App.ServiceProvider.CreateScope();
+                    var repo = scope.ServiceProvider.GetRequiredService<ICityRepository>();
+                    return repo.GetCitiesByProvince(provinceId);
+                });
 
                 Cities.Clear();
                 foreach (var c in items)
@@ -481,7 +491,12 @@ namespace Taadol.Views
 
             try
             {
-                var items = await Task.Run(() => _bankBranchApplication.GetBankBranches());
+                var items = await Task.Run(() =>
+                {
+                    using var scope = App.ServiceProvider.CreateScope();
+                    var app = scope.ServiceProvider.GetRequiredService<IBankBranchApplication>();
+                    return app.GetBankBranches();
+                });
 
                 BankBranches.Clear();
                 foreach (var b in items)
@@ -643,88 +658,185 @@ namespace Taadol.Views
         // ======================================================
         //  Save
         // ======================================================
-        private void SavePerson_Click(object sender, RoutedEventArgs e) => SavePerson();
+        private async void SavePerson_Click(object sender, RoutedEventArgs e) => await SavePersonAsync();
 
-        private void SavePerson(object obj = null)
+        private bool _isSaving;
+
+        private async Task SavePersonAsync()
         {
-            // 1) تأیید کاربر
-            var dialog = new CustomConfirmDialog();
-            if (dialog.ShowDialog() != true) return;
-
-            // 2) اعتبارسنجی
-            if (!ValidatePerson()) return;
-
-            // 3) ساخت Command (بدون IsActive — این فیلد در بک‌اند فعلی وجود نداره)
-            var command = new CreatePerson
-            {
-                FirstName = IsLegal ? CompanyName : FirstName,
-                LastName = IsLegal ? "" : LastName,
-                ContactFirstName = IsLegal ? (ContactFirstName ?? "") : "",
-                ContactLastName = IsLegal ? (ContactLastName ?? "") : "",
-                NationalCode = IsLegal ? null : NationalCode,
-                EconomicCode = IsLegal ? EconomicCode : null,
-                RegistrationNumber = IsLegal ? RegistrationNumber : null,
-                IsLegal = IsLegal,
-                PersonTypeId = SelectedPersonTypeId,
-                BranchId = SelectedBranchId,
-                CreditLimit = CreditLimit,
-                // ★ همیشه مقدار نمایش‌داده‌شده در TextBox را ذخیره کن.
-                // بک‌اند وقتی IsAutomatic=true باشه، ManualCode را نادیده می‌گیره و کد جدید تولید می‌کنه
-                // که باعث می‌شه کدی که کاربر می‌بینه با کدی که در DB ذخیره می‌شه فرق کنه.
-                // چون IsCodeAutomatic در DB اصلاً ذخیره نمی‌شه (فقط flag موقت بک‌اند هست)،
-                // ما IsAutomatic=false می‌فرستیم تا بک‌اند دقیقاً همون مقدار ManualCode را ذخیره کنه.
-                // این کار هم برای حالت اتوماتیک (که کد از قبل توسط CodeGenerator تولید شده)
-                // و هم حالت دستی (که کاربر خودش کد را تایپ کرده) درست کار می‌کنه.
-                IsCodeAutomatic = false,
-                ManualCode = ManualCode,
-                PersonCategoryId = _selectedPersonCategoryId
-
-            };
+            if (_isSaving) return;
+            _isSaving = true;
+            if (SaveButton != null) SaveButton.IsEnabled = false;
 
             try
             {
-                // Create
-                var personResult = _personApplication.Create(command);
-                long personIdForChildren = 0;
+                // 1) تأیید کاربر
+                var dialog = new CustomConfirmDialog();
+                if (dialog.ShowDialog() != true) return;
 
-                // ★ بعد از Create موفق، Id شخص جدید رو با Search پیدا کن
-                if (personResult.IsSucceeded)
+                // 2) اعتبارسنجی
+                if (!ValidatePerson()) return;
+
+                // 3) ذخیره تمام اطلاعات در یک Task.Run با Scope جداگانه
+            var isLegal = IsLegal;
+            var companyName = CompanyName;
+            var firstName = FirstName;
+            var lastName = LastName;
+            var contactFirstName = ContactFirstName;
+            var contactLastName = ContactLastName;
+            var nationalCode = NationalCode;
+            var economicCode = EconomicCode;
+            var registrationNumber = RegistrationNumber;
+            var selectedPersonTypeId = SelectedPersonTypeId;
+            var selectedBranchId = SelectedBranchId;
+            var manualCode = ManualCode;
+            var selectedPersonCategoryId = _selectedPersonCategoryId;
+            var isActive = IsActive;
+            var creditLimit = CreditLimit;
+            var contactPhone = Phone?.Trim();
+            var contactMobile = Mobile?.Trim();
+            var contactEmail = Email?.Trim();
+            var contactTypeNames = new Dictionary<string, long>(_contactTypeByName);
+            var addressText = Address;
+            var postalCode = PostalCode;
+            var selectedProvinceId = SelectedProvinceId;
+            var selectedCityId = SelectedCityId;
+            var mainShaba = MainShaba;
+            var mainCardNumber = MainCardNumber;
+            var mainBankBranchId = SelectedBankBranchId;
+            var mainBankName = MainBankName;
+            var mainAccountNumber = MainAccountNumber;
+            var mainBankIsDefault = MainBankIsDefault;
+            var bankAccountsSnapshot = BankAccounts.Select(r => new { r.BankBranchId, r.BankName, r.CardNumber, r.Shaba, r.AccountNumber, r.IsDefault }).ToList();
+
+            try
+            {
+                var saveResult = await Task.Run(() =>
                 {
-                    personIdForChildren = GetCreatedPersonId(command);
+                    using var scope = App.ServiceProvider.CreateScope();
+                    var sp = scope.ServiceProvider;
+                    var personApp = sp.GetRequiredService<IPersonApplication>();
+                    var contactApp = sp.GetRequiredService<IPersonContactApplication>();
+                    var addressApp = sp.GetRequiredService<IPersonAddressApplication>();
+                    var bankApp = sp.GetRequiredService<IPersonBankApplication>();
 
-                    if (personIdForChildren > 0)
+                    var command = new CreatePerson
                     {
-                        if (IsActive)
-                            _personApplication.Activate(personIdForChildren);
-                        else
-                            _personApplication.Deactivate(personIdForChildren);
+                        FirstName = isLegal ? companyName : firstName,
+                        LastName = isLegal ? "" : lastName,
+                        ContactFirstName = isLegal ? (contactFirstName ?? "") : "",
+                        ContactLastName = isLegal ? (contactLastName ?? "") : "",
+                        NationalCode = isLegal ? null : nationalCode,
+                        EconomicCode = isLegal ? economicCode : null,
+                        RegistrationNumber = isLegal ? registrationNumber : null,
+                        IsLegal = isLegal,
+                        PersonTypeId = selectedPersonTypeId,
+                        BranchId = selectedBranchId,
+                        CreditLimit = creditLimit,
+                        IsCodeAutomatic = false,
+                        ManualCode = manualCode,
+                        PersonCategoryId = selectedPersonCategoryId
+                    };
+
+                    var personResult = personApp.Create(command);
+                    long personIdForChildren = 0;
+
+                    if (personResult.IsSucceeded)
+                    {
+                        var code = command.IsLegal ? command.EconomicCode : command.NationalCode;
+                        var search = new PersonSearchModel { NationalCode = code };
+                        var list = personApp.Search(search);
+                        personIdForChildren = list?.OrderByDescending(x => x.Id).FirstOrDefault()?.Id ?? 0;
+
+                        if (personIdForChildren > 0)
+                        {
+                            if (isActive)
+                                personApp.Activate(personIdForChildren);
+                            else
+                                personApp.Deactivate(personIdForChildren);
+                        }
                     }
-                }
 
-                if (!personResult.IsSucceeded)
+                    if (!personResult.IsSucceeded)
+                        return (Success: false, Message: personResult.Message ?? "ثبت شخص ناموفق بود.", PersonId: 0L);
+
+                    if (personIdForChildren <= 0)
+                        return (Success: false, Message: "شخص ثبت شد ولی پیدا کردن شناسه‌ی او ناموفق بود. لطفاً مجدداً تلاش کنید.", PersonId: 0L);
+
+                    // SaveContacts
+                    if (!string.IsNullOrWhiteSpace(contactPhone) && contactTypeNames.TryGetValue("تلفن ثابت", out var phoneTypeId))
+                        contactApp.Create(new CreatePersonContact { PersonId = personIdForChildren, ContactTypeId = phoneTypeId, Value = contactPhone, Description = "", IsDefault = false });
+
+                    if (!string.IsNullOrWhiteSpace(contactMobile) && contactTypeNames.TryGetValue("موبایل", out var mobileTypeId))
+                        contactApp.Create(new CreatePersonContact { PersonId = personIdForChildren, ContactTypeId = mobileTypeId, Value = contactMobile, Description = "", IsDefault = true });
+
+                    if (!string.IsNullOrWhiteSpace(contactEmail) && contactTypeNames.TryGetValue("ایمیل", out var emailTypeId))
+                        contactApp.Create(new CreatePersonContact { PersonId = personIdForChildren, ContactTypeId = emailTypeId, Value = contactEmail, Description = "", IsDefault = false });
+
+                    // SaveAddress
+                    if (!string.IsNullOrWhiteSpace(addressText) || selectedProvinceId > 0 || selectedCityId > 0)
+                    {
+                        if (selectedProvinceId > 0 && selectedCityId > 0)
+                        {
+                            addressApp.Create(new CreatePersonAddress
+                            {
+                                PersonId = personIdForChildren,
+                                Title = "آدرس اصلی",
+                                Address = addressText ?? "",
+                                PostalCode = postalCode ?? "",
+                                ProvinceId = selectedProvinceId,
+                                CityId = selectedCityId,
+                                IsDefault = true
+                            });
+                        }
+                    }
+
+                    // SaveBanks — main account
+                    if (!string.IsNullOrWhiteSpace(mainShaba) || !string.IsNullOrWhiteSpace(mainCardNumber))
+                    {
+                        if (mainBankBranchId > 0)
+                        {
+                            bankApp.Create(new CreatePersonBank
+                            {
+                                PersonId = personIdForChildren,
+                                BankBranchId = mainBankBranchId,
+                                AccountNumber = mainAccountNumber ?? "",
+                                CardNumber = mainCardNumber ?? "",
+                                Shaba = mainShaba ?? "",
+                                IsDefault = mainBankIsDefault
+                            });
+                        }
+                    }
+
+                    // SaveBanks — grid accounts
+                    foreach (var row in bankAccountsSnapshot)
+                    {
+                        if (string.IsNullOrWhiteSpace(row.Shaba) && string.IsNullOrWhiteSpace(row.CardNumber))
+                            continue;
+                        if (row.BankBranchId <= 0) continue;
+                        bankApp.Create(new CreatePersonBank
+                        {
+                            PersonId = personIdForChildren,
+                            BankBranchId = row.BankBranchId,
+                            AccountNumber = row.AccountNumber ?? "",
+                            CardNumber = row.CardNumber ?? "",
+                            Shaba = row.Shaba ?? "",
+                            IsDefault = row.IsDefault
+                        });
+                    }
+
+                    return (Success: true, Message: "", PersonId: personIdForChildren);
+                });
+
+                if (!saveResult.Success)
                 {
-                    MessageBox.Show(
-                        string.IsNullOrWhiteSpace(personResult.Message) ? "ثبت شخص ناموفق بود." : personResult.Message, "خطا", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(saveResult.Message, "خطا", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
-                // 4) ذخیره موجودیت‌های فرزند (تماس/آدرس/بانک)
-                if (personIdForChildren > 0)
-                {
-                    SaveContacts(personIdForChildren);
-                    SaveAddress(personIdForChildren);
-                    SaveBanks(personIdForChildren);
-                    SavePersonPicture(personIdForChildren);  // ← جدید
-                }
-                else
-                {
-                    MessageBox.Show(
-                        "شخص ثبت شد ولی پیدا کردن شناسه‌ی او برای ذخیره‌ی تماس/آدرس/بانک ناموفق بود. لطفاً مجدداً تلاش کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
+                SavePersonPicture(saveResult.PersonId);
 
-                MessageBox.Show(
-                    "ثبت شخص با موفقیت انجام شد.", "موفقیت", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("ثبت شخص با موفقیت انجام شد.", "موفقیت", MessageBoxButton.OK, MessageBoxImage.Information);
 
                 ClearForm();
             }
@@ -741,8 +853,18 @@ namespace Taadol.Views
                 }
                 catch
                 {
-                    // اگه نتونست در فایل بنویسه، کاری نمی‌کنیم
                 }
+            }
+            finally
+            {
+                _isSaving = false;
+                if (SaveButton != null) SaveButton.IsEnabled = true;
+            }
+            }
+            finally
+            {
+                _isSaving = false;
+                if (SaveButton != null) SaveButton.IsEnabled = true;
             }
         }
         /// <summary>
@@ -960,8 +1082,17 @@ namespace Taadol.Views
         private static bool IsValidNationalCode(string code)
         {
             if (string.IsNullOrWhiteSpace(code)) return false;
-            code = code.Trim().Replace(" ", "");
-            return code.Length == 10 && code.All(char.IsDigit);
+            code = code.Trim().Replace(" ", "").Replace("-", "");
+            if (code.Length != 10 || !code.All(char.IsDigit)) return false;
+
+            int[] weights = { 10, 9, 8, 7, 6, 5, 4, 3, 2 };
+            int sum = 0;
+            for (int i = 0; i < 9; i++)
+                sum += (code[i] - '0') * weights[i];
+
+            int remainder = sum % 11;
+            int checkDigit = remainder < 2 ? remainder : 11 - remainder;
+            return checkDigit == (code[9] - '0');
         }
 
         private static bool IsValidMobile(string mobile)

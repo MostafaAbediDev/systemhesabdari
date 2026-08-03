@@ -937,9 +937,9 @@ namespace Taadol.Views
             }
 
             if (TotalDebitText != null)
-                TotalDebitText.Text = $"{ToPersianNumber((int)totalDebit)} ریال";
+                TotalDebitText.Text = $"{ToPersianNumber(totalDebit)} ریال";
             if (TotalCreditText != null)
-                TotalCreditText.Text = $"{ToPersianNumber((int)totalCredit)} ریال";
+                TotalCreditText.Text = $"{ToPersianNumber(totalCredit)} ریال";
             if (SelectedSummaryText != null)
                 SelectedSummaryText.Text = $"جمع اشخاص انتخاب شده ({ToPersianNumber(selectedItems.Count)})";
             if (SelectedTotalText != null)
@@ -950,7 +950,7 @@ namespace Taadol.Views
                     if (long.TryParse(p.BalanceDisplay?.Replace(",", "").Replace("ریال", "").Trim(), out long bal))
                         selectedTotal += bal;
                 }
-                SelectedTotalText.Text = $"{ToPersianNumber((int)selectedTotal)} ریال";
+                SelectedTotalText.Text = $"{ToPersianNumber(selectedTotal)} ریال";
             }
         }
 
@@ -1219,7 +1219,7 @@ namespace Taadol.Views
         // ======================================================
         //  Helpers
         // ======================================================
-        private string ToPersianNumber(int number)
+        private string ToPersianNumber(long number)
         {
             string[] persianDigits = { "۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹" };
             string result = "";
@@ -1227,6 +1227,8 @@ namespace Taadol.Views
                 result += persianDigits[int.Parse(c.ToString())];
             return result;
         }
+
+        private string ToPersianNumber(int number) => ToPersianNumber((long)number);
 
         private static string BuildFullExceptionMessage(Exception ex)
         {

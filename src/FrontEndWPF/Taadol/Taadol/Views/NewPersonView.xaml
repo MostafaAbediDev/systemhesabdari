@@ -1349,6 +1349,7 @@
 
                     <!-- سمت راست: ذخیره شخص -->
                     <controls:IconButton Grid.Column="0"
+                                         x:Name="SaveButton"
                                          ButtonText="ذخیره شخص"
                                          IconSource="/Assets/Icons/save.svg"
                                          ButtonCommand="{Binding SavePersonCommand}"

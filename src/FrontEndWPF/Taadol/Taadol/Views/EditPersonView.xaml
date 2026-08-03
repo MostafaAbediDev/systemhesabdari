@@ -1246,6 +1246,7 @@
 
                     <!-- سمت راست: ویرایش شخص -->
                     <controls:CustomOutlinedButton Grid.Column="0"
+                                                   x:Name="SaveButton"
                                                    Text="ویرایش"
                                                    Margin="0,0,5,0"
                                                    Height="44"

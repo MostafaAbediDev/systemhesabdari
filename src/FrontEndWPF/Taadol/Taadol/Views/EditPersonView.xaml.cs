@@ -263,7 +263,12 @@ namespace Taadol.Views
             if (provinceId <= 0) return;
             try
             {
-                var items = await Task.Run(() => _cityRepository.GetCitiesByProvince(provinceId));
+                var items = await Task.Run(() =>
+                {
+                    using var scope = App.ServiceProvider.CreateScope();
+                    var repo = scope.ServiceProvider.GetRequiredService<ICityRepository>();
+                    return repo.GetCitiesByProvince(provinceId);
+                });
                 Cities.Clear();
                 foreach (var c in items)
                     Cities.Add(c);
@@ -616,15 +621,23 @@ namespace Taadol.Views
             IsLegal = !isFirstSelected;
         }
 
+        private bool _isSaving;
+
         private async void SavePerson()
         {
-            var dialog = new CustomConfirmDialog();
-            if (dialog.ShowDialog() != true) return;
-
-            if (!ValidatePerson()) return;
+            if (_isSaving) return;
+            _isSaving = true;
+            if (SaveButton != null) SaveButton.IsEnabled = false;
 
             try
             {
+                var dialog = new CustomConfirmDialog();
+                if (dialog.ShowDialog() != true) return;
+
+                if (!ValidatePerson()) return;
+
+                try
+                {
                 var personId = _personId;
                 var isLegal = IsLegal;
                 var companyName = CompanyName;
@@ -756,8 +769,9 @@ namespace Taadol.Views
                     return;
                 }
 
-                BankAccounts.Clear();
                 MessageBox.Show("ویرایش شخص با موفقیت انجام شد.", "موفقیت", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                BankAccounts.Clear();
 
                 var mainWindow = Window.GetWindow(this) as MainWindow;
                 mainWindow?.CloseModal();
@@ -765,6 +779,17 @@ namespace Taadol.Views
             catch (Exception ex)
             {
                 MessageBox.Show("خطا در ویرایش: " + ex.Message, "خطا", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                _isSaving = false;
+                if (SaveButton != null) SaveButton.IsEnabled = true;
+            }
+            }
+            finally
+            {
+                _isSaving = false;
+                if (SaveButton != null) SaveButton.IsEnabled = true;
             }
         }
 
@@ -1185,8 +1210,77 @@ namespace Taadol.Views
                 if (string.IsNullOrWhiteSpace(FirstName)) { MessageBox.Show("نام را وارد کنید.", "نام", MessageBoxButton.OK, MessageBoxImage.Warning); return false; }
                 if (string.IsNullOrWhiteSpace(LastName)) { MessageBox.Show("نام خانوادگی را وارد کنید.", "نام خانوادگی", MessageBoxButton.OK, MessageBoxImage.Warning); return false; }
                 if (string.IsNullOrWhiteSpace(NationalCode)) { MessageBox.Show("کد ملی را وارد کنید.", "کد ملی", MessageBoxButton.OK, MessageBoxImage.Warning); return false; }
+                if (!IsValidNationalCode(NationalCode)) { MessageBox.Show("کد ملی باید دقیقاً ۱۰ رقم باشد.", "کد ملی", MessageBoxButton.OK, MessageBoxImage.Warning); return false; }
             }
+
+            if (!string.IsNullOrWhiteSpace(Mobile) && !IsValidMobile(Mobile))
+            {
+                MessageBox.Show("فرمت موبایل صحیح نیست. مثال صحیح: 09121234567", "فرمت موبایل", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+
+            if (!string.IsNullOrWhiteSpace(Email) && !IsValidEmail(Email))
+            {
+                MessageBox.Show("فرمت ایمیل صحیح نیست. مثال صحیح: name@example.com", "فرمت ایمیل", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+
+            if (!string.IsNullOrWhiteSpace(MainShaba) && !IsValidShaba(MainShaba))
+            {
+                MessageBox.Show("فرمت شبا صحیح نیست. باید با IR شروع و در مجموع ۲۶ کاراکتر باشد.", "فرمت شبا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+
             return true;
+        }
+
+        // ======================================================
+        //  Validation Helpers
+        // ======================================================
+        private static bool IsValidNationalCode(string code)
+        {
+            if (string.IsNullOrWhiteSpace(code)) return false;
+            code = code.Trim().Replace(" ", "").Replace("-", "");
+            if (code.Length != 10 || !code.All(char.IsDigit)) return false;
+
+            int[] weights = { 10, 9, 8, 7, 6, 5, 4, 3, 2 };
+            int sum = 0;
+            for (int i = 0; i < 9; i++)
+                sum += (code[i] - '0') * weights[i];
+
+            int remainder = sum % 11;
+            int checkDigit = remainder < 2 ? remainder : 11 - remainder;
+            return checkDigit == (code[9] - '0');
+        }
+
+        private static bool IsValidMobile(string mobile)
+        {
+            if (string.IsNullOrWhiteSpace(mobile)) return false;
+            mobile = mobile.Trim().Replace(" ", "").Replace("-", "");
+            if (mobile.StartsWith("+98")) mobile = "0" + mobile.Substring(3);
+            else if (mobile.StartsWith("0098")) mobile = "0" + mobile.Substring(4);
+            return mobile.Length == 11 && mobile.StartsWith("09") && mobile.All(char.IsDigit);
+        }
+
+        private static bool IsValidEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email)) return false;
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email.Trim());
+                return addr.Address == email.Trim();
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static bool IsValidShaba(string shaba)
+        {
+            if (string.IsNullOrWhiteSpace(shaba)) return false;
+            shaba = shaba.Trim().Replace(" ", "").ToUpper();
+            return shaba.StartsWith("IR") && shaba.Length == 26 && shaba.Substring(2).All(char.IsDigit);
         }
 
         private void OnImageSelected(object sender, RoutedEventArgs e) { }
