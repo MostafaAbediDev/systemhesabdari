@@ -32,7 +32,7 @@ namespace BankManagement.Infrastructure.EFCore.Repository
                 .ToList();
         }
 
-        public EditBankBranch GetDetails(long id)
+        public EditBankBranch GetDetails(long id) 
         {
             return _context.BankBranches
                 .Select(x => new EditBankBranch

@@ -98,21 +98,36 @@ namespace Taadol.Views
                     var sp = scope.ServiceProvider;
 
                     var personApp = sp.GetRequiredService<IPersonApplication>();
-                    var contactApp = sp.GetRequiredService<IPersonContactApplication>();
-                    var addressApp = sp.GetRequiredService<IPersonAddressApplication>();
-
                     var persons = personApp.GetPersons() ?? new List<PersonViewModel>();
 
-                    // کش از تماس‌ها و آدرس‌ها برای همه‌ی اشخاص (N+1 جلوگیری)
                     var personIds = persons.Select(p => p.Id).ToList();
+
                     var allContacts = new List<PersonContactViewModel>();
                     var allAddresses = new List<PersonAddressViewModel>();
 
-                    foreach (var pid in personIds)
-                    {
-                        try { allContacts.AddRange(contactApp.GetByPersonId(pid) ?? new List<PersonContactViewModel>()); } catch { }
-                        try { allAddresses.AddRange(addressApp.GetByPersonId(pid) ?? new List<PersonAddressViewModel>()); } catch { }
-                    }
+                    var contactTasks = personIds.Select(pid =>
+                        Task.Run(() =>
+                        {
+                            using var s = App.ServiceProvider.CreateScope();
+                            var app = s.ServiceProvider.GetRequiredService<IPersonContactApplication>();
+                            try { return app.GetByPersonId(pid) ?? new List<PersonContactViewModel>(); }
+                            catch { return new List<PersonContactViewModel>(); }
+                        })).ToList();
+
+                    var addressTasks = personIds.Select(pid =>
+                        Task.Run(() =>
+                        {
+                            using var s = App.ServiceProvider.CreateScope();
+                            var app = s.ServiceProvider.GetRequiredService<IPersonAddressApplication>();
+                            try { return app.GetByPersonId(pid) ?? new List<PersonAddressViewModel>(); }
+                            catch { return new List<PersonAddressViewModel>(); }
+                        })).ToList();
+
+                    Task.WaitAll(contactTasks.ToArray());
+                    Task.WaitAll(addressTasks.ToArray());
+
+                    foreach (var t in contactTasks) allContacts.AddRange(t.Result);
+                    foreach (var t in addressTasks) allAddresses.AddRange(t.Result);
 
                     // گروه‌بندی تماس‌ها بر اساس PersonId
                     var contactsByPerson = allContacts
@@ -553,18 +568,22 @@ namespace Taadol.Views
 
             try
             {
-                using var scope = App.ServiceProvider.CreateScope();
-                var personApp = scope.ServiceProvider.GetRequiredService<IPersonApplication>();
-
-                foreach (var item in selectedItems)
+                var idsToDelete = selectedItems.Select(p => p.Id).ToList();
+                await Task.Run(() =>
                 {
-                    var op = personApp.Remove(item.Id);
-                    if (!op.IsSucceeded)
+                    using var scope = App.ServiceProvider.CreateScope();
+                    var personApp = scope.ServiceProvider.GetRequiredService<IPersonApplication>();
+
+                    foreach (var id in idsToDelete)
                     {
-                        System.Diagnostics.Debug.WriteLine(
-                            $"Failed to delete person {item.Id}: {op.Message}");
+                        var op = personApp.Remove(id);
+                        if (!op.IsSucceeded)
+                        {
+                            System.Diagnostics.Debug.WriteLine(
+                                $"Failed to delete person {id}: {op.Message}");
+                        }
                     }
-                }
+                });
             }
             catch (Exception ex)
             {
@@ -747,7 +766,7 @@ namespace Taadol.Views
             }
         }
 
-        private void UpdateDetailPanels()
+        private async void UpdateDetailPanels()
         {
             var selectedItems = AllPersons?
                 .Where(p => p.IsSelected && !p.IsEmpty)
@@ -804,19 +823,22 @@ namespace Taadol.Views
 
                 try
                 {
-                    using var scope = App.ServiceProvider.CreateScope();
-                    var bankApp = scope.ServiceProvider.GetRequiredService<IPersonBankApplication>();
-                    var banks = bankApp.GetByPersonId(item.Id) ?? new List<PersonBankViewModel>();
-                    var bankItems = banks.Select(b => new Taadol.Models.BankAccountItem
+                    var bankItems = await Task.Run(() =>
                     {
-                        BankName = b.BankName ?? "—",
-                        BranchName = b.BankBranchName ?? "—",
-                        CardNumber = b.CardNumber ?? "—",
-                        ShebaNumber = b.Shaba ?? "—",
-                        AccountNumber = b.AccountNumber ?? "—",
-                        OtherAccount = "ندارد",
-                        IsDefault = b.IsDefault
-                    }).ToList();
+                        using var scope = App.ServiceProvider.CreateScope();
+                        var bankApp = scope.ServiceProvider.GetRequiredService<IPersonBankApplication>();
+                        var banks = bankApp.GetByPersonId(item.Id) ?? new List<PersonBankViewModel>();
+                        return banks.Select(b => new Taadol.Models.BankAccountItem
+                        {
+                            BankName = b.BankName ?? "—",
+                            BranchName = b.BankBranchName ?? "—",
+                            CardNumber = b.CardNumber ?? "—",
+                            ShebaNumber = b.Shaba ?? "—",
+                            AccountNumber = b.AccountNumber ?? "—",
+                            OtherAccount = "ندارد",
+                            IsDefault = b.IsDefault
+                        }).ToList();
+                    });
                     panel.LoadBankAccounts(bankItems);
                 }
                 catch { }

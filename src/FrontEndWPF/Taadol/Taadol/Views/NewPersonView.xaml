@@ -1022,7 +1022,7 @@
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
                                                 <Border BorderBrush="#E5E7EB"
-                                                        BorderThickness="0,0,0,0">
+                                                        BorderThickness="0,0,0,1">
                                                 <Grid Background="White"
                                                       Height="36">
                                                     <Grid.ColumnDefinitions>
@@ -1123,9 +1123,10 @@
 
                                                     <!-- پیش فرض (چک‌باکس فقط خواندنی) -->
                                                     <Border Grid.Column="12"
-                                                            Width="15"
-                                                            Height="15"
+                                                            Width="20"
+                                                            Height="20"
                                                             CornerRadius="4"
+                                                            BorderThickness="0"
                                                             HorizontalAlignment="Center"
                                                             VerticalAlignment="Center">
                                                         <Border.Style>
@@ -1136,21 +1137,18 @@
                                                                         <Setter Property="Visibility" Value="Visible" />
                                                                         <Setter Property="Background" Value="#2667FF" />
                                                                         <Setter Property="BorderBrush" Value="#2667FF" />
-                                                                        <Setter Property="BorderThickness" Value="1.5" />
                                                                     </DataTrigger>
                                                                 </Style.Triggers>
                                                             </Style>
                                                         </Border.Style>
-                                                        <Path Data="M 3,7 L 6,10 L 11,4"
-                                                              Stroke="White"
-                                                              StrokeThickness="1.5"
-                                                              StrokeLineJoin="Round"
-                                                              StrokeStartLineCap="Round"
-                                                              StrokeEndLineCap="Round"
-                                                              HorizontalAlignment="Center"
-                                                              VerticalAlignment="Center">
-                                                            <Path.Style>
-                                                                <Style TargetType="Path">
+                                                        <svg:SvgViewbox Width="8"
+                                                                        Height="8"
+                                                                        Source="/Assets/Icons/CHECK_w.svg"
+                                                                        FlowDirection="LeftToRight"
+                                                                        HorizontalAlignment="Center"
+                                                                        VerticalAlignment="Center">
+                                                            <svg:SvgViewbox.Style>
+                                                                <Style TargetType="svg:SvgViewbox">
                                                                     <Setter Property="Visibility" Value="Collapsed" />
                                                                     <Style.Triggers>
                                                                         <DataTrigger Binding="{Binding IsDefault}" Value="True">
@@ -1158,8 +1156,8 @@
                                                                         </DataTrigger>
                                                                     </Style.Triggers>
                                                                 </Style>
-                                                            </Path.Style>
-                                                        </Path>
+                                                            </svg:SvgViewbox.Style>
+                                                        </svg:SvgViewbox>
                                                     </Border>
 
                                                     <Border Grid.Column="13" Background="#E5E7EB" />

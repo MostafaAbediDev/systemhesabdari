@@ -635,63 +635,45 @@
                                             <Border x:Name="CheckBoxBorder"
                                                     Width="20"
                                                     Height="20"
-                                                    CornerRadius="5"
+                                                    CornerRadius="4"
                                                     Cursor="Hand"
+                                                    BorderThickness="1.5"
                                                     HorizontalAlignment="Center"
                                                     VerticalAlignment="Center"
                                                     PreviewMouseLeftButtonUp="CheckBoxBorder_MouseLeftButtonUp">
                                                 <Border.Style>
                                                     <Style TargetType="Border">
-                                                        <Setter Property="Background"
-                                                                Value="#FFFFFF" />
-                                                        <Setter Property="BorderBrush"
-                                                                Value="#CBD5E1" />
-                                                        <Setter Property="BorderThickness"
-                                                                Value="1.5" />
+                                                        <Setter Property="Background" Value="#FFFFFF" />
+                                                        <Setter Property="BorderBrush" Value="#CBD5E1" />
                                                         <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding IsSelected}"
-                                                                         Value="True">
-                                                                <Setter Property="Background"
-                                                                        Value="#2667FF" />
-                                                                <Setter Property="BorderBrush"
-                                                                        Value="#2667FF" />
+                                                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                                <Setter Property="Background" Value="#2667FF" />
+                                                                <Setter Property="BorderBrush" Value="#2667FF" />
                                                             </DataTrigger>
-                                                            <DataTrigger Binding="{Binding IsEmpty}"
-                                                                         Value="True">
-                                                                <Setter Property="Visibility"
-                                                                        Value="Collapsed" />
+                                                            <DataTrigger Binding="{Binding IsEmpty}" Value="True">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
                                                             </DataTrigger>
-                                                            <Trigger Property="IsMouseOver"
-                                                                     Value="True">
-                                                                <Setter Property="BorderBrush"
-                                                                        Value="#2667FF" />
-                                                            </Trigger>
                                                         </Style.Triggers>
                                                     </Style>
                                                 </Border.Style>
-<Path x:Name="CheckMark"
-                                                          Data="M 4,9 L 8,13 L 16,5"
-                                                          Stroke="White"
-                                                          StrokeThickness="2"
-                                                          StrokeLineJoin="Round"
-                                                          StrokeStartLineCap="Round"
-                                                          StrokeEndLineCap="Round"
-                                                          HorizontalAlignment="Center"
-                                                          VerticalAlignment="Center">
-                                                    <Path.Style>
-                                                        <Style TargetType="Path">
-                                                            <Setter Property="Visibility"
-                                                                    Value="Collapsed" />
+                                                <svg:SvgViewbox x:Name="CheckMark"
+                                                                Width="8"
+                                                                Height="8"
+                                                                Source="/Assets/Icons/CHECK_w.svg"
+                                                                FlowDirection="LeftToRight"
+                                                                HorizontalAlignment="Center"
+                                                                VerticalAlignment="Center">
+                                                    <svg:SvgViewbox.Style>
+                                                        <Style TargetType="svg:SvgViewbox">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
                                                             <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding IsSelected}"
-                                                                             Value="True">
-                                                                    <Setter Property="Visibility"
-                                                                            Value="Visible" />
+                                                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                                    <Setter Property="Visibility" Value="Visible" />
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
-                                                    </Path.Style>
-                                                </Path>
+                                                    </svg:SvgViewbox.Style>
+                                                </svg:SvgViewbox>
                                             </Border>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>

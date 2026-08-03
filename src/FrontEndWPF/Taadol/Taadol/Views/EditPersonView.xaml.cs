@@ -23,7 +23,6 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using Taadol.Controls;
-using GeneralInfoManagement.Application.Contract.Picture;
 
 namespace Taadol.Views
 {
@@ -137,6 +136,14 @@ namespace Taadol.Views
 
             Loaded += OnLoaded;
 
+            ShabaInput.Text = "IR";
+            DependencyPropertyDescriptor
+                .FromProperty(TextBox.TextProperty, typeof(TextBox))
+                .AddValueChanged(ShabaInput.PART_TextBox, (s, ev) => ShabaInput_TextChanged());
+            DependencyPropertyDescriptor
+                .FromProperty(TextBox.TextProperty, typeof(TextBox))
+                .AddValueChanged(CardNumberInput.PART_TextBox, (s, ev) => CardNumberInput_TextChanged());
+
             // Debug toast
             System.Diagnostics.Debug.WriteLine($"[DEBUG] EditPersonView constructor called for personId={personId}");
             ToastManager.Info($"EditPersonView created for ID: {personId}");
@@ -235,7 +242,12 @@ namespace Taadol.Views
         {
             try
             {
-                var items = await Task.Run(() => _provinceRepository.GetProvincesForSelectList());
+                var items = await Task.Run(() =>
+                {
+                    using var scope = App.ServiceProvider.CreateScope();
+                    var repo = scope.ServiceProvider.GetRequiredService<IProvinceRepository>();
+                    return repo.GetProvincesForSelectList();
+                });
                 Provinces.Clear();
                 foreach (var p in items)
                     Provinces.Add(p);
@@ -269,7 +281,12 @@ namespace Taadol.Views
             if (_bankBranchApplication == null) return;
             try
             {
-                var items = await Task.Run(() => _bankBranchApplication.GetBankBranches());
+                var items = await Task.Run(() =>
+                {
+                    using var scope = App.ServiceProvider.CreateScope();
+                    var app = scope.ServiceProvider.GetRequiredService<IBankBranchApplication>();
+                    return app.GetBankBranches();
+                });
                 BankBranches.Clear();
                 foreach (var b in items)
                     BankBranches.Add(b);
@@ -325,7 +342,15 @@ namespace Taadol.Views
         {
             try
             {
-                var details = _personApplication.GetDetails(_personId);
+                var personId = _personId;
+
+                var details = await Task.Run(() =>
+                {
+                    using var scope = App.ServiceProvider.CreateScope();
+                    var app = scope.ServiceProvider.GetRequiredService<IPersonApplication>();
+                    return app.GetDetails(personId);
+                });
+
                 if (details == null)
                 {
                     MessageBox.Show("شخص پیدا نشد.", "خطا", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -344,21 +369,28 @@ namespace Taadol.Views
                 ManualCode = details.ManualCode ?? details.CurrentCode ?? "";
                 SelectedBranchId = details.BranchId;
 
-                // ★ اگه PersonCategoryId داریم، اول اون رو نگه دار
                 _selectedPersonCategoryId = details.PersonCategoryId;
 
-                // ★ موقتاً SelectedPersonTypeId رو بدون LoadCategoriesAsync ست کن
-                // (جلوگیری از صدا زدن async که کامل نمی‌شه)
                 _selectedPersonTypeId = details.PersonTypeId;
                 OnPropertyChanged(nameof(SelectedPersonTypeId));
 
-                var personSearch = _personApplication.Search(new PersonSearchModel { NationalCode = details.NationalCode });
+                var personSearch = await Task.Run(() =>
+                {
+                    using var scope = App.ServiceProvider.CreateScope();
+                    var app = scope.ServiceProvider.GetRequiredService<IPersonApplication>();
+                    return app.Search(new PersonSearchModel { NationalCode = details.NationalCode });
+                });
                 var personVm = personSearch?.FirstOrDefault(x => x.Id == _personId);
                 IsActive = personVm?.IsActive ?? true;
 
                 UpdatePersonTypeToggleSelection();
 
-                var contacts = _personContactApplication.GetByPersonId(_personId) ?? new List<PersonContactViewModel>();
+                var contacts = await Task.Run(() =>
+                {
+                    using var scope = App.ServiceProvider.CreateScope();
+                    var app = scope.ServiceProvider.GetRequiredService<IPersonContactApplication>();
+                    return app.GetByPersonId(personId) ?? new List<PersonContactViewModel>();
+                });
                 foreach (var c in contacts)
                 {
                     if (c.ContactTypeTitle != null && c.ContactTypeTitle.Contains("موبایل") && !string.IsNullOrWhiteSpace(c.Value))
@@ -369,7 +401,12 @@ namespace Taadol.Views
                         Email = c.Value;
                 }
 
-                var addresses = _personAddressApplication.GetByPersonId(_personId) ?? new List<PersonAddressViewModel>();
+                var addresses = await Task.Run(() =>
+                {
+                    using var scope = App.ServiceProvider.CreateScope();
+                    var app = scope.ServiceProvider.GetRequiredService<IPersonAddressApplication>();
+                    return app.GetByPersonId(personId) ?? new List<PersonAddressViewModel>();
+                });
                 var addr = addresses.FirstOrDefault();
                 if (addr != null)
                 {
@@ -383,64 +420,76 @@ namespace Taadol.Views
 
                 try
                 {
-                    // ★ لود همه بانک‌های شخص از دیتابیس
-                    var banks = _personBankApplication.GetByPersonId(_personId) ?? new List<PersonBankViewModel>();
+                    var banks = await Task.Run(() =>
+                    {
+                        using var scope = App.ServiceProvider.CreateScope();
+                        var app = scope.ServiceProvider.GetRequiredService<IPersonBankApplication>();
+                        return app.GetByPersonId(personId) ?? new List<PersonBankViewModel>();
+                    });
                     System.Diagnostics.Debug.WriteLine($"🏦 LoadPersonData: loaded {banks.Count} bank(s)");
 
-                    if (banks.Count > 0)
+                    BankAccounts.Clear();
+                    foreach (var b in banks)
                     {
-                        // ★ اولین بانک (یا بانک پیش‌فرض) رو در فیلد اصلی قرار بده
-                        var mainBank = banks.FirstOrDefault(b => b.IsDefault) ?? banks[0];
-
-                        MainBankName = mainBank.BankName ?? "";
-                        MainCardNumber = mainBank.CardNumber ?? "";
-                        MainShaba = mainBank.Shaba ?? "";
-                        MainAccountNumber = mainBank.AccountNumber ?? "";
-                        MainBankIsDefault = mainBank.IsDefault;
-                        if (mainBank.BankBranchId > 0)
-                            SelectedBankBranchId = mainBank.BankBranchId;
-
-                        // ★ بقیه بانک‌ها رو در لیست BankAccounts قرار بده
-                        BankAccounts.Clear();
-                        foreach (var b in banks.Where(b => b.Id != mainBank.Id))
+                        BankAccounts.Add(new BankAccountRow
                         {
-                            BankAccounts.Add(new BankAccountRow
-                            {
-                                BankBranchId = b.BankBranchId,
-                                BankName = b.BankName ?? "",
-                                CardNumber = b.CardNumber ?? "",
-                                Shaba = b.Shaba ?? "",
-                                AccountNumber = b.AccountNumber ?? "",
-                                IsDefault = b.IsDefault
-                            });
-                        }
-
-                        System.Diagnostics.Debug.WriteLine($"🏦 LoadPersonData: main bank set, {BankAccounts.Count} additional bank(s) in list");
+                            BankBranchId = b.BankBranchId,
+                            BankName = b.BankName ?? "",
+                            BranchName = b.BankBranchName ?? "",
+                            CardNumber = b.CardNumber ?? "",
+                            Shaba = b.Shaba ?? "",
+                            AccountNumber = b.AccountNumber ?? "",
+                            IsDefault = b.IsDefault
+                        });
                     }
+
+                    System.Diagnostics.Debug.WriteLine($"🏦 LoadPersonData: {BankAccounts.Count} bank(s) added to grid");
+
+                    if (BankAccounts.Count >= 1 && !BankAccounts.Any(r => r.IsDefault))
+                        BankAccounts[0].IsDefault = true;
+
+                    ReindexBankAccounts();
+
+                    MainBankName = "";
+                    MainCardNumber = "";
+                    MainShaba = "IR";
+                    MainAccountNumber = "";
+                    MainBankIsDefault = false;
+                    SelectedBankBranchId = 0;
+                    if (BankNameInput != null) BankNameInput.Text = "";
+                    if (CardNumberInput != null) CardNumberInput.Text = "";
+                    if (ShabaInput != null) ShabaInput.Text = "IR";
+                    if (AccountNumberInput != null) AccountNumberInput.Text = "";
+                    if (DefaultAccountToggle != null) DefaultAccountToggle.IsChecked = false;
+
+                    if (BankBranchCombo != null)
+                        BankBranchCombo.SelectedIndex = -1;
                 }
                 catch (Exception bankEx)
                 {
                     System.Diagnostics.Debug.WriteLine("Bank load failed: " + bankEx.Message);
                 }
 
-                // ★ لود دسته‌بندی‌ها بعد از لود کامل داده‌ها
-                // (با await تا مطمئن بشیم کامل لود می‌شه)
                 if (SelectedPersonTypeId > 0)
                 {
                     System.Diagnostics.Debug.WriteLine($"📊 LoadPersonData: calling LoadCategoriesAsync for personTypeId={SelectedPersonTypeId}");
                     await LoadCategoriesAsync(SelectedPersonTypeId);
 
-                    // ★ اگه PersonCategoryId داریم، در CategorySearch انتخابش کن
                     if (_selectedPersonCategoryId.HasValue && _selectedPersonCategoryId.Value > 0 && CategorySearch != null)
                     {
                         System.Diagnostics.Debug.WriteLine($"📊 LoadPersonData: selecting category {_selectedPersonCategoryId.Value}");
                         CategorySearch.SelectCategoryById(_selectedPersonCategoryId.Value);
                     }
                 }
-                // ★ لود عکس شخص
+
                 try
                 {
-                    var pictures = _pictureApplication.GetByOwner(_personId, PictureOwnerTypeDTO.Person);
+                    var pictures = await Task.Run(() =>
+                    {
+                        using var scope = App.ServiceProvider.CreateScope();
+                        var app = scope.ServiceProvider.GetRequiredService<IPictureApplication>();
+                        return app.GetByOwner(personId, PictureOwnerTypeDTO.Person);
+                    });
                     var picture = pictures.FirstOrDefault();
                     if (picture != null && !string.IsNullOrWhiteSpace(picture.Url))
                     {
@@ -503,6 +552,28 @@ namespace Taadol.Views
             UpdatePersonnelSectionVisibility();
         }
 
+        private void PersonTypeToggle_Unchecked(object sender, RoutedEventArgs e)
+        {
+            var tb = sender as ToggleButton;
+            if (tb == null) return;
+
+            var buttons = new[] { PersonTypeCustomer, PersonTypeSupplier, PersonTypeBoth, PersonTypePersonnel };
+            bool anyChecked = false;
+            foreach (var b in buttons)
+            {
+                if (b != null && b.IsChecked == true)
+                {
+                    anyChecked = true;
+                    break;
+                }
+            }
+
+            if (!anyChecked)
+            {
+                tb.IsChecked = true;
+            }
+        }
+
         private void UncheckOtherPersonTypeToggles(ToggleButton keepChecked)
         {
             var buttons = new[] { PersonTypeCustomer, PersonTypeSupplier, PersonTypeBoth, PersonTypePersonnel };
@@ -554,42 +625,138 @@ namespace Taadol.Views
 
             try
             {
-                var command = new EditPerson
-                {
-                    Id = _personId,
-                    FirstName = IsLegal ? CompanyName : FirstName,
-                    LastName = IsLegal ? "" : LastName,
-                    ContactFirstName = IsLegal ? (ContactFirstName ?? "") : "",
-                    ContactLastName = IsLegal ? (ContactLastName ?? "") : "",
-                    NationalCode = IsLegal ? null : NationalCode,
-                    EconomicCode = IsLegal ? EconomicCode : null,
-                    RegistrationNumber = IsLegal ? RegistrationNumber : null,
-                    IsLegal = IsLegal,
-                    PersonTypeId = SelectedPersonTypeId,
-                    BranchId = SelectedBranchId,
-                    CreditLimit = 0,
-                    IsCodeAutomatic = false,
-                    ManualCode = ManualCode,
-                    PersonCategoryId = _selectedPersonCategoryId
-                };
+                var personId = _personId;
+                var isLegal = IsLegal;
+                var companyName = CompanyName;
+                var firstName = FirstName;
+                var lastName = LastName;
+                var contactFirstName = ContactFirstName;
+                var contactLastName = ContactLastName;
+                var nationalCode = NationalCode;
+                var economicCode = EconomicCode;
+                var registrationNumber = RegistrationNumber;
+                var selectedPersonTypeId = SelectedPersonTypeId;
+                var selectedBranchId = SelectedBranchId;
+                var manualCode = ManualCode;
+                var selectedPersonCategoryId = _selectedPersonCategoryId;
+                var isActive = IsActive;
 
-                var result = _personApplication.Edit(command);
-                if (!result.IsSucceeded)
+                var contactPhone = Phone?.Trim();
+                var contactMobile = Mobile?.Trim();
+                var contactEmail = Email?.Trim();
+                var contactTypeNames = new Dictionary<string, long>(_contactTypeByName);
+
+                var addressText = Address;
+                var postalCode = PostalCode;
+                var selectedProvinceId = SelectedProvinceId;
+                var selectedCityId = SelectedCityId;
+
+                var bankAccounts = BankAccounts.Select(r => new BankAccountRow
                 {
-                    MessageBox.Show(string.IsNullOrWhiteSpace(result.Message) ? "ویرایش ناموفق بود." : result.Message,
+                    BankBranchId = r.BankBranchId,
+                    BankName = r.BankName,
+                    CardNumber = r.CardNumber,
+                    Shaba = r.Shaba,
+                    AccountNumber = r.AccountNumber,
+                    IsDefault = r.IsDefault
+                }).ToList();
+
+                var saveResult = await Task.Run(() =>
+                {
+                    using var scope = App.ServiceProvider.CreateScope();
+                    var sp = scope.ServiceProvider;
+                    var personApp = sp.GetRequiredService<IPersonApplication>();
+                    var contactApp = sp.GetRequiredService<IPersonContactApplication>();
+                    var addressApp = sp.GetRequiredService<IPersonAddressApplication>();
+                    var bankApp = sp.GetRequiredService<IPersonBankApplication>();
+
+                    var command = new EditPerson
+                    {
+                        Id = personId,
+                        FirstName = isLegal ? companyName : firstName,
+                        LastName = isLegal ? "" : lastName,
+                        ContactFirstName = isLegal ? (contactFirstName ?? "") : "",
+                        ContactLastName = isLegal ? (contactLastName ?? "") : "",
+                        NationalCode = isLegal ? null : nationalCode,
+                        EconomicCode = isLegal ? economicCode : null,
+                        RegistrationNumber = isLegal ? registrationNumber : null,
+                        IsLegal = isLegal,
+                        PersonTypeId = selectedPersonTypeId,
+                        BranchId = selectedBranchId,
+                        CreditLimit = 0,
+                        IsCodeAutomatic = false,
+                        ManualCode = manualCode,
+                        PersonCategoryId = selectedPersonCategoryId
+                    };
+
+                    var result = personApp.Edit(command);
+                    if (!result.IsSucceeded)
+                        return result;
+
+                    if (isActive)
+                        personApp.Activate(personId);
+                    else
+                        personApp.Deactivate(personId);
+
+                    // SaveContacts
+                    var existingContacts = contactApp.GetByPersonId(personId) ?? new List<PersonContactViewModel>();
+                    foreach (var c in existingContacts)
+                        contactApp.Remove(c.Id);
+
+                    if (!string.IsNullOrWhiteSpace(contactPhone) && contactTypeNames.TryGetValue("تلفن ثابت", out var phoneTypeId))
+                        contactApp.Create(new CreatePersonContact { PersonId = personId, ContactTypeId = phoneTypeId, Value = contactPhone, Description = "", IsDefault = false });
+
+                    if (!string.IsNullOrWhiteSpace(contactMobile) && contactTypeNames.TryGetValue("موبایل", out var mobileTypeId))
+                        contactApp.Create(new CreatePersonContact { PersonId = personId, ContactTypeId = mobileTypeId, Value = contactMobile, Description = "", IsDefault = true });
+
+                    if (!string.IsNullOrWhiteSpace(contactEmail) && contactTypeNames.TryGetValue("ایمیل", out var emailTypeId))
+                        contactApp.Create(new CreatePersonContact { PersonId = personId, ContactTypeId = emailTypeId, Value = contactEmail, Description = "", IsDefault = false });
+
+                    // SaveAddress
+                    var existingAddresses = addressApp.GetByPersonId(personId) ?? new List<PersonAddressViewModel>();
+                    foreach (var a in existingAddresses)
+                        addressApp.Remove(a.Id);
+
+                    if (!string.IsNullOrWhiteSpace(addressText) || selectedProvinceId > 0 || selectedCityId > 0)
+                    {
+                        if (selectedProvinceId > 0 && selectedCityId > 0)
+                        {
+                            addressApp.Create(new CreatePersonAddress
+                            {
+                                PersonId = personId,
+                                Title = "آدرس اصلی",
+                                Address = addressText ?? "",
+                                PostalCode = postalCode ?? "",
+                                ProvinceId = selectedProvinceId,
+                                CityId = selectedCityId,
+                                IsDefault = true
+                            });
+                        }
+                    }
+
+                    // SaveBank — all accounts from grid only
+                    var existingBanks = bankApp.GetByPersonId(personId) ?? new List<PersonBankViewModel>();
+                    foreach (var b in existingBanks)
+                        bankApp.Remove(b.Id);
+
+                    foreach (var row in bankAccounts)
+                    {
+                        if (string.IsNullOrWhiteSpace(row.Shaba) && string.IsNullOrWhiteSpace(row.CardNumber))
+                            continue;
+                        TryCreateBankAccountScoped(bankApp, personId, row.BankBranchId, row.BankName, row.AccountNumber, row.CardNumber, row.Shaba, row.IsDefault);
+                    }
+
+                    return result;
+                });
+
+                if (!saveResult.IsSucceeded)
+                {
+                    MessageBox.Show(string.IsNullOrWhiteSpace(saveResult.Message) ? "ویرایش ناموفق بود." : saveResult.Message,
                         "خطا", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
-                if (IsActive)
-                    _personApplication.Activate(_personId);
-                else
-                    _personApplication.Deactivate(_personId);
-
-                SaveContacts(_personId);
-                SaveAddress(_personId);
-                SaveBank(_personId);
-
+                BankAccounts.Clear();
                 MessageBox.Show("ویرایش شخص با موفقیت انجام شد.", "موفقیت", MessageBoxButton.OK, MessageBoxImage.Information);
 
                 var mainWindow = Window.GetWindow(this) as MainWindow;
@@ -601,94 +768,25 @@ namespace Taadol.Views
             }
         }
 
-        private void SaveContacts(long personId)
+        private static void TryCreateBankAccountScoped(IPersonBankApplication bankApp, long personId, long bankBranchId, string bankName, string accountNumber, string cardNumber, string shaba, bool isDefault)
         {
-            var existing = _personContactApplication.GetByPersonId(personId) ?? new List<PersonContactViewModel>();
-            foreach (var c in existing)
-                _personContactApplication.Remove(c.Id);
-
-            if (!string.IsNullOrWhiteSpace(Phone) && _contactTypeByName.TryGetValue("تلفن ثابت", out var phoneTypeId))
-                _personContactApplication.Create(new CreatePersonContact { PersonId = personId, ContactTypeId = phoneTypeId, Value = Phone.Trim(), Description = "", IsDefault = false });
-
-            if (!string.IsNullOrWhiteSpace(Mobile) && _contactTypeByName.TryGetValue("موبایل", out var mobileTypeId))
-                _personContactApplication.Create(new CreatePersonContact { PersonId = personId, ContactTypeId = mobileTypeId, Value = Mobile.Trim(), Description = "", IsDefault = true });
-
-            if (!string.IsNullOrWhiteSpace(Email) && _contactTypeByName.TryGetValue("ایمیل", out var emailTypeId))
-                _personContactApplication.Create(new CreatePersonContact { PersonId = personId, ContactTypeId = emailTypeId, Value = Email.Trim(), Description = "", IsDefault = false });
-        }
-
-        private void SaveAddress(long personId)
-        {
-            var existing = _personAddressApplication.GetByPersonId(personId) ?? new List<PersonAddressViewModel>();
-            foreach (var a in existing)
-                _personAddressApplication.Remove(a.Id);
-
-            if (!string.IsNullOrWhiteSpace(Address) || SelectedProvinceId > 0 || SelectedCityId > 0)
-            {
-                if (SelectedProvinceId > 0 && SelectedCityId > 0)
-                {
-                    _personAddressApplication.Create(new CreatePersonAddress
-                    {
-                        PersonId = personId,
-                        Title = "آدرس اصلی",
-                        Address = Address ?? "",
-                        PostalCode = PostalCode ?? "",
-                        ProvinceId = SelectedProvinceId,
-                        CityId = SelectedCityId,
-                        IsDefault = true
-                    });
-                }
-            }
-        }
-
-        private void SaveBank(long personId)
-        {
-            System.Diagnostics.Debug.WriteLine($"🏦 SaveBank START — personId={personId}, MainShaba='{MainShaba}', BankAccounts.Count={BankAccounts.Count}");
-
-            // 1. حذف بانک‌های قبلی
+            if (bankBranchId <= 0) return;
             try
             {
-                var existing = _personBankApplication.GetByPersonId(personId) ?? new List<PersonBankViewModel>();
-                System.Diagnostics.Debug.WriteLine($"🏦 Found {existing.Count} existing bank(s) to remove");
-                foreach (var b in existing)
+                bankApp.Create(new CreatePersonBank
                 {
-                    System.Diagnostics.Debug.WriteLine($"🏦 Removing bank Id={b.Id}, Shaba='{b.Shaba}'");
-                    _personBankApplication.Remove(b.Id);
-                }
+                    PersonId = personId,
+                    BankBranchId = bankBranchId,
+                    AccountNumber = accountNumber ?? "",
+                    CardNumber = cardNumber ?? "",
+                    Shaba = shaba ?? "",
+                    IsDefault = isDefault
+                });
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"❌ Bank existing load failed: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"TryCreateBankAccountScoped exception: {ex.Message}");
             }
-
-            // 2. ذخیره حساب اصلی (اگه فیلد اصلی داده داره)
-            if (!string.IsNullOrWhiteSpace(MainShaba) || !string.IsNullOrWhiteSpace(MainCardNumber))
-            {
-                System.Diagnostics.Debug.WriteLine($"🏦 Saving MAIN account — Shaba='{MainShaba}', CardNumber='{MainCardNumber}'");
-                TryCreateBankAccount(personId, SelectedBankBranchId, MainBankName, MainAccountNumber, MainCardNumber, MainShaba, MainBankIsDefault);
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("🏦 Main account is empty, skipping");
-            }
-
-            // 3. ذخیره حساب‌های اضافه‌شده
-            int idx = 0;
-            foreach (var row in BankAccounts)
-            {
-                idx++;
-                if (string.IsNullOrWhiteSpace(row.Shaba) && string.IsNullOrWhiteSpace(row.CardNumber))
-                {
-                    System.Diagnostics.Debug.WriteLine($"🏦 Row #{idx} skipped — empty");
-                    continue;
-                }
-                System.Diagnostics.Debug.WriteLine($"🏦 Saving Row #{idx} — Shaba='{row.Shaba}', CardNumber='{row.CardNumber}'");
-                TryCreateBankAccount(personId, row.BankBranchId, row.BankName, row.AccountNumber, row.CardNumber, row.Shaba, row.IsDefault);
-            }
-
-            // 4. پاک کردن BankAccounts بعد از Save
-            BankAccounts.Clear();
-            System.Diagnostics.Debug.WriteLine("🏦 SaveBank END — BankAccounts cleared");
         }
 
         // ======================================================
@@ -803,6 +901,187 @@ namespace Taadol.Views
                 BankAccounts.Remove(row);
         }
 
+        private void AddBankToTableButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(BankNameInput.Text))
+            {
+                MessageBox.Show("لطفاً نام بانک را وارد کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            if (SelectedBankBranchId <= 0)
+            {
+                MessageBox.Show("لطفاً شعبه بانک را انتخاب کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(CardNumberInput.Text) && string.IsNullOrWhiteSpace(ShabaInput.Text))
+            {
+                MessageBox.Show("لطفاً حداقل شماره کارت یا شماره شبا را وارد کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            bool wantsDefault = DefaultAccountToggle.IsChecked == true;
+
+            if (wantsDefault && BankAccounts.Any(r => r.IsDefault))
+            {
+                var result = MessageBox.Show(
+                    "قابلیت پیش‌فرض فقط برای یک حساب فعال است. آیا از تغییر حساب پیش‌فرض مطمئن هستید؟",
+                    "تغییر حساب پیش‌فرض",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
+
+                if (result != MessageBoxResult.Yes)
+                    return;
+            }
+
+            var branchName = "";
+            if (BankBranchCombo.SelectedItem is BankBranchViewModel branch)
+                branchName = branch.BranchName ?? "";
+
+            if (wantsDefault)
+            {
+                foreach (var row in BankAccounts.Where(r => r.IsDefault))
+                    row.IsDefault = false;
+            }
+
+            BankAccounts.Add(new BankAccountRow
+            {
+                BankBranchId = SelectedBankBranchId,
+                BankName = BankNameInput.Text ?? "",
+                BranchName = branchName,
+                CardNumber = CardNumberInput.Text ?? "",
+                Shaba = ShabaInput.Text ?? "",
+                AccountNumber = AccountNumberInput.Text ?? "",
+                IsDefault = wantsDefault
+            });
+
+            // اگه فقط یک حساب داریم و هیچ حساب پیش‌فرض نیست، پیش‌فرض شود
+            if (!BankAccounts.Any(r => r.IsDefault) && !MainBankHasData())
+                BankAccounts[0].IsDefault = true;
+
+            ReindexBankAccounts();
+            ClearBankForm();
+        }
+
+        private void RemoveBankAccountFromTable_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is BankAccountRow row)
+            {
+                var result = MessageBox.Show("آیا از حذف این حساب بانکی مطمئن هستید؟", "تایید حذف", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (result != MessageBoxResult.Yes) return;
+
+                BankAccounts.Remove(row);
+                ReindexBankAccounts();
+            }
+        }
+
+        private void EditBankAccount_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is BankAccountRow row)
+            {
+                BankNameInput.Text = row.BankName;
+                CardNumberInput.Text = row.CardNumber;
+                var shaba = row.Shaba ?? "";
+                ShabaInput.Text = shaba.StartsWith("IR") ? shaba : "IR" + shaba;
+                AccountNumberInput.Text = row.AccountNumber;
+                DefaultAccountToggle.IsChecked = row.IsDefault;
+                SelectedBankBranchId = row.BankBranchId;
+
+                BankAccounts.Remove(row);
+                ReindexBankAccounts();
+            }
+        }
+
+        private void TableContainerBorder_SizeChanged(object sender, SizeChangedEventArgs e) { }
+
+        private static bool IsDigitChar(char c)
+            => char.IsDigit(c) || (c >= '۰' && c <= '۹');
+
+        private static int CountDigits(string text, int upToIndex)
+        {
+            int count = 0;
+            int limit = Math.Min(upToIndex, text.Length);
+            for (int i = 0; i < limit; i++)
+                if (IsDigitChar(text[i]))
+                    count++;
+            return count;
+        }
+
+        private static int FindCaretPosition(string formatted, int digitIndex)
+        {
+            int count = 0;
+            for (int i = 0; i < formatted.Length; i++)
+            {
+                if (IsDigitChar(formatted[i]))
+                {
+                    count++;
+                    if (count >= digitIndex)
+                        return i + 1;
+                }
+            }
+            return formatted.Length;
+        }
+
+        // فرمت‌بندی شماره کارت به صورت ۴ رقمی
+        private bool _isUpdatingCard;
+        private void CardNumberInput_TextChanged()
+        {
+            if (_isUpdatingCard) return;
+            var text = CardNumberInput.PART_TextBox.Text ?? "";
+
+            int caret = CardNumberInput.PART_TextBox.CaretIndex;
+            int digitsBefore = CountDigits(text, caret);
+
+            var normalized = text
+                .Replace("۰", "0").Replace("۱", "1").Replace("۲", "2").Replace("۳", "3").Replace("۴", "4")
+                .Replace("۵", "5").Replace("۶", "6").Replace("۷", "7").Replace("۸", "8").Replace("۹", "9");
+
+            var digits = new string(normalized.Where(char.IsDigit).Take(16).ToArray());
+            var formatted = string.Join(" ", Enumerable.Range(0, (digits.Length + 3) / 4)
+                .Select(i => digits.Substring(i * 4, Math.Min(4, digits.Length - i * 4))));
+
+            if (text != formatted)
+            {
+                _isUpdatingCard = true;
+                CardNumberInput.Text = formatted;
+                CardNumberInput.PART_TextBox.CaretIndex = FindCaretPosition(formatted, digitsBefore);
+                _isUpdatingCard = false;
+            }
+        }
+
+        // فرمت‌بندی شماره شبا با پیشوند IR
+        private bool _isUpdatingShaba;
+        private void ShabaInput_TextChanged()
+        {
+            if (_isUpdatingShaba) return;
+            var text = ShabaInput.PART_TextBox.Text;
+            if (text == null) return;
+            if (!text.StartsWith("IR"))
+            {
+                _isUpdatingShaba = true;
+                var clean = text.Replace("IR", "").TrimStart();
+                ShabaInput.Text = "IR" + clean;
+                ShabaInput.PART_TextBox.CaretIndex = ShabaInput.Text.Length;
+                _isUpdatingShaba = false;
+            }
+        }
+
+        private void ReindexBankAccounts()
+        {
+            for (int i = 0; i < BankAccounts.Count; i++)
+                BankAccounts[i].Index = i + 1;
+        }
+
+        private void ClearBankForm()
+        {
+            BankNameInput.Text = "";
+            CardNumberInput.Text = "";
+            ShabaInput.Text = "IR";
+            AccountNumberInput.Text = "";
+            DefaultAccountToggle.IsChecked = false;
+            SelectedBankBranchId = 0;
+            BankBranchCombo.SelectedIndex = -1;
+        }
+
         private bool _isUpdatingDefault;
 
         private void MainDefaultToggle_Checked(object sender, RoutedEventArgs e)
@@ -864,16 +1143,10 @@ namespace Taadol.Views
             _isUpdatingDefault = false;
         }
 
-        // ★ متد کمکی برای ساخت حساب بانکی
+        // ★ متد کمکی برای ساخت حساب بانکی (legacy - replaced by TryCreateBankAccountScoped in SavePerson)
         private void TryCreateBankAccount(long personId, long bankBranchId, string bankName, string accountNumber, string cardNumber, string shaba, bool isDefault)
         {
-            if (bankBranchId <= 0)
-            {
-                System.Diagnostics.Debug.WriteLine(
-                    "⚠️ Bank account not saved: BankBranch is required. " +
-                    $"BankBranchId = 0, BankName = {bankName}");
-                return;
-            }
+            if (bankBranchId <= 0) return;
 
             try
             {
@@ -920,9 +1193,16 @@ namespace Taadol.Views
         private void OnImageRemoved(object sender, RoutedEventArgs e) { }
         private void ImagePickerControl_Loaded(object sender, RoutedEventArgs e) { }
 
+        private void SavePerson_Click(object sender, RoutedEventArgs e) => SavePerson();
+
+        private void Cancel_Click(object sender, MouseButtonEventArgs e)
+        {
+            var mainWindow = Window.GetWindow(this) as MainWindow;
+            mainWindow?.CloseModal();
+        }
+
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-            // ★ دکمه ضربدر از XAML حذف شد، این متد برای امنیت نگه داشته شده
             var mainWindow = Window.GetWindow(this) as MainWindow;
             mainWindow?.CloseModal();
         }
@@ -983,8 +1263,9 @@ namespace Taadol.Views
             private string _shaba = "";
             private string _accountNumber = "";
             private bool _isDefault = false;
+            private int _index;
 
-            /// <summary>شناسه‌ی شعبه بانک انتخاب‌شده برای این ردیف</summary>
+            public int Index { get => _index; set { _index = value; OnPropertyChanged(); } }
             public long BankBranchId { get => _bankBranchId; set { _bankBranchId = value; OnPropertyChanged(); } }
             public string BankName { get => _bankName; set { _bankName = value; OnPropertyChanged(); } }
             public string BranchName { get => _branchName; set { _branchName = value; OnPropertyChanged(); } }
