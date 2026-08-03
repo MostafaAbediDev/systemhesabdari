@@ -669,15 +669,17 @@
                                                         </Style.Triggers>
                                                     </Style>
                                                 </Border.Style>
-                                                <svg:SvgViewbox x:Name="CheckMark"
-                                                                Width="18"
-                                                                Height="18"
-                                                                Source="/Assets/Icons/Check.svg"
-                                                                FlowDirection="LeftToRight"
-                                                                HorizontalAlignment="Center"
-                                                                VerticalAlignment="Center">
-                                                    <svg:SvgViewbox.Style>
-                                                        <Style TargetType="svg:SvgViewbox">
+<Path x:Name="CheckMark"
+                                                          Data="M 4,9 L 8,13 L 16,5"
+                                                          Stroke="White"
+                                                          StrokeThickness="2"
+                                                          StrokeLineJoin="Round"
+                                                          StrokeStartLineCap="Round"
+                                                          StrokeEndLineCap="Round"
+                                                          HorizontalAlignment="Center"
+                                                          VerticalAlignment="Center">
+                                                    <Path.Style>
+                                                        <Style TargetType="Path">
                                                             <Setter Property="Visibility"
                                                                     Value="Collapsed" />
                                                             <Style.Triggers>
@@ -688,8 +690,8 @@
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
-                                                    </svg:SvgViewbox.Style>
-                                                </svg:SvgViewbox>
+                                                    </Path.Style>
+                                                </Path>
                                             </Border>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>

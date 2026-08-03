@@ -749,7 +749,7 @@
                                                 <svg:SvgViewbox x:Name="Arrow"
                                                                 Width="11"
                                                                 Height="11"
-                                                                Source="/Assets/Icons/arrowDown.svg"
+                                                                Source="/Assets/Icons/ArrowUp.svg"
                                                                 VerticalAlignment="Center"
                                                                 HorizontalAlignment="Center"
                                                                 RenderTransformOrigin="0.5,0.5"
@@ -1311,14 +1311,14 @@
                         <Border x:Name="CheckBoxBorder"
                                 Width="20"
                                 Height="20"
-                                CornerRadius="5"
+                                CornerRadius="4"
                                 Background="White"
-                                BorderBrush="#CBD5E1"
-                                BorderThickness="1.5">
+                                BorderBrush="#E5E7EB"
+                                BorderThickness="1">
                             <svg:SvgViewbox x:Name="CheckMark"
-                                            Width="18"
-                                            Height="18"
-                                            Source="/Assets/Icons/Check.svg"
+                                            Width="8"
+                                            Height="8"
+                                            Source="/Assets/Icons/CHECK_w.svg"
                                             FlowDirection="LeftToRight"
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
@@ -1329,11 +1329,13 @@
                         <Trigger Property="IsChecked" Value="True">
                             <Setter TargetName="CheckBoxBorder" Property="Background" Value="#2667FF" />
                             <Setter TargetName="CheckBoxBorder" Property="BorderBrush" Value="#2667FF" />
+                            <Setter TargetName="CheckBoxBorder" Property="BorderThickness" Value="0" />
                             <Setter TargetName="CheckMark" Property="Visibility" Value="Visible" />
                         </Trigger>
                         <Trigger Property="IsChecked" Value="False">
                             <Setter TargetName="CheckBoxBorder" Property="Background" Value="#FFFFFF" />
                             <Setter TargetName="CheckBoxBorder" Property="BorderBrush" Value="#CBD5E1" />
+                            <Setter TargetName="CheckBoxBorder" Property="BorderThickness" Value="1.5" />
                             <Setter TargetName="CheckMark" Property="Visibility" Value="Collapsed" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">

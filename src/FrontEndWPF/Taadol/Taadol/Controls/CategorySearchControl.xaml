@@ -832,11 +832,12 @@
                 CornerRadius="4"
                 BorderBrush="#E5E7EB"
                 BorderThickness="1"
+                Height="40"
                 Cursor="Hand"
                 x:Name="MainBorder"
                 MouseLeftButtonUp="MainBorder_MouseLeftButtonUp">
 
-            <Grid>
+            <Grid VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
@@ -855,8 +856,8 @@
                            Margin="12,0,0,0" />
 
                 <svg:SvgViewbox Grid.Column="1"
-                                Width="14"
-                                Height="14"
+                                Width="11"
+                                Height="11"
                                 Source="/Assets/Icons/ArrowUp.svg"
                                 VerticalAlignment="Center"
                                 Margin="0,0,8,0" />
@@ -865,23 +866,23 @@
                         Width="1"
                         Height="27"
                         Background="#E5E7EB"
-                        VerticalAlignment="Center"
-                        Margin="8,0,8,0" />
+                        VerticalAlignment="Center"           
+                        Margin="8,0,7,0" />
 
-                <Border Grid.Column="3"
-                        Width="30"
-                        Height="30"
-                        Margin="4"
-                        CornerRadius="4"
+<Border Grid.Column="3"
+         Width="26"
+         Height="26"
+         Margin="0,0,6,0"
+         CornerRadius="4"
                         BorderBrush="#2667FF"
                         BorderThickness="1"
-                        Background="White"
-                        x:Name="AddButtonBorder"
-                        MouseLeftButtonDown="AddButtonBorder_MouseLeftButtonDown"
-                        Cursor="Hand">
-                    <svg:SvgViewbox Width="12"
-                                    Height="12"
-                                    Source="/Assets/Icons/add-square.svg"   
+         Background="White"
+         x:Name="AddButtonBorder"
+         MouseLeftButtonDown="AddButtonBorder_MouseLeftButtonDown"
+         Cursor="Hand">
+                    <svg:SvgViewbox Width="8"
+                                    Height="8"
+                                    Source="/Assets/Icons/Plus_thin.svg"   
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Center" />
                 </Border>

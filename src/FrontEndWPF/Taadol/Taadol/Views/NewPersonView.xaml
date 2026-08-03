@@ -32,9 +32,9 @@
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="8" />
+                            <ColumnDefinition Width="16" />
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="8" />
+                            <ColumnDefinition Width="16" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
@@ -123,9 +123,9 @@
                     <Grid Margin="0,10,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="8" />
+                            <ColumnDefinition Width="16" />
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="8" />
+                            <ColumnDefinition Width="16" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0">
@@ -175,15 +175,15 @@
 
             <!-- ═══ ردیف 0: هدر ═══ -->
             <Grid Grid.Row="0"
-                  Margin="10,15,10,4">
+                  Margin="10,15,10,10">
                 <StackPanel Orientation="Horizontal"
                             VerticalAlignment="Center">
                     <svg:SvgViewbox FlowDirection="LeftToRight"
-                                    Width="16"
-                                    Height="16"
+                                    Width="14"
+                                    Height="14"
                                     Source="/Assets/Icons/closeTHIN.svg"
                                     Margin="10,0,10,0" />
-                    <TextBlock Text="مشخصات شخص جدید"
+                    <TextBlock Text="شخص جدید"
                                FontSize="20"
                                FontWeight="Bold"
                                FontFamily="{StaticResource IRANSans}"
@@ -343,11 +343,11 @@
 
                         <Grid Margin="0,2,0,10">
       <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="1.5*" />
-          <ColumnDefinition Width="8" />
-          <ColumnDefinition Width="2*" />
-          <ColumnDefinition Width="8" />
-          <ColumnDefinition Width="1.5*" />
+          <ColumnDefinition Width="220" />
+          <ColumnDefinition Width="16" />
+          <ColumnDefinition Width="320" />
+          <ColumnDefinition Width="16" />
+          <ColumnDefinition Width="200" />
       </Grid.ColumnDefinitions>
 
                             <StackPanel Grid.Column="0"
@@ -415,7 +415,7 @@
                               Visibility="Collapsed">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="2*" />
-                                <ColumnDefinition Width="8" />
+                                <ColumnDefinition Width="16" />
                                 <ColumnDefinition Width="1.5*" />
                             </Grid.ColumnDefinitions>
 
@@ -469,8 +469,9 @@
                                                   Tag="1"
                                                   FlowDirection="LeftToRight"
                                                   Style="{StaticResource PersonTypeCheckBox}"
-                                                  IsChecked="False"
+                                                  IsChecked="True"
                                                   Checked="PersonTypeToggle_Checked"
+                                                  Unchecked="PersonTypeToggle_Unchecked"
                                                   Margin="0,0,8,0" />
                                     <ToggleButton x:Name="PersonTypeSupplier"
                                                   Content="تامین کننده"
@@ -479,6 +480,7 @@
                                                   Style="{StaticResource PersonTypeCheckBox}"
                                                   IsChecked="False"
                                                   Checked="PersonTypeToggle_Checked"
+                                                  Unchecked="PersonTypeToggle_Unchecked"
                                                   Margin="0,0,8,0" />
                                     <ToggleButton x:Name="PersonTypeBoth"
                                                   Content="هردو"
@@ -487,6 +489,7 @@
                                                   Style="{StaticResource PersonTypeCheckBox}"
                                                   IsChecked="False"
                                                   Checked="PersonTypeToggle_Checked"
+                                                  Unchecked="PersonTypeToggle_Unchecked"
                                                   Margin="0,0,8,0" />
                                     <ToggleButton x:Name="PersonTypePersonnel"
                                                   Content="پرسنل"
@@ -495,7 +498,7 @@
                                                   Style="{StaticResource PersonTypeCheckBox}"
                                                   IsChecked="False"
                                                   Checked="PersonTypeToggle_Checked"
-                                                  Unchecked="PersonTypeToggle_Checked"
+                                                  Unchecked="PersonTypeToggle_Unchecked"
                                                   Margin="0" />
                                 </StackPanel>
                             </Border>
@@ -623,23 +626,16 @@
 
                             <!-- ردیف اول: کد پستی - ایمیل - موبایل - شماره تلفن (از راست به چپ) -->
                             <Grid Margin="0,0,0,16">
-                                <Grid.ColumnDefinitions>
-                                    <!-- ستون‌ها از چپ به راست -->
-                                    <ColumnDefinition Width="Auto" />
-                                    <!-- ستون 0: شماره تلفن (چپ‌ترین) -->
-                                    <ColumnDefinition Width="16" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <!-- ستون 2: موبایل -->
-                                    <ColumnDefinition Width="16" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <!-- ستون 4: ایمیل -->
-                                    <ColumnDefinition Width="16" />
-                                    <ColumnDefinition Width="Auto" />
-                                    
-                                    
-                                    
-                                    <!-- ستون 6: کد پستی (راست‌ترین) -->
-                                </Grid.ColumnDefinitions>
+<Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="16" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="16" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="16" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="16" />
+                            </Grid.ColumnDefinitions>
 
                                 <!-- شماره تلفن (چپ‌ترین) -->
                                 <StackPanel Grid.Column="0"
@@ -675,21 +671,21 @@
                                                                    Placeholder="091" />
                                 </StackPanel>
 
-                                <!-- ایمیل -->
+<!-- ایمیل -->
                                 <StackPanel Grid.Column="4"
                                             HorizontalAlignment="Left">
                                     <TextBlock Text="ایمیل"
                                                Style="{StaticResource FormLabel}" />
-                                    <controls:ModernPersianTextBox x:Name="EmailInput"
-                                                                   Width="200"
-                                                                   HorizontalAlignment="Left"
-                                                                   InputType="Text"
-                                                                   FlowDirection="RightToLeft"
-                                                                   Text="{Binding Email, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                                   Placeholder="example@mail.com" />
+<controls:ModernPersianTextBox x:Name="EmailInput"
+                                                                    HorizontalAlignment="Left"
+                                                                    InputType="Email"
+                                                                    FlowDirection="LeftToRight"
+                                                                    Width="280"
+                                                                      Text="{Binding Email, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                      Placeholder="@gmail.com" />
                                 </StackPanel>
 
-                                <!-- کد پستی (راست‌ترین) -->
+                                <!-- کد پستی -->
                                 <StackPanel Grid.Column="6"
                                             HorizontalAlignment="Left">
                                     <TextBlock Text="کد پستی"
@@ -707,15 +703,11 @@
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
-                                    <!-- ستون 0: آدرس (راست‌ترین و کشیده) -->
                                     <ColumnDefinition Width="16" />
                                     <ColumnDefinition Width="Auto" />
-                                    <!-- ستون 2: شهرستان -->
                                     <ColumnDefinition Width="16" />
                                     <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="19" />
-
-                                    <!-- ستون 4: استان (چپ‌ترین) -->
+                                    <ColumnDefinition Width="16" />
                                 </Grid.ColumnDefinitions>
 
                                 <!-- آدرس (کشیده، راست‌ترین) -->
@@ -783,11 +775,11 @@
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="8" />
+                                    <ColumnDefinition Width="16" />
                                     <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="8" />
+                                    <ColumnDefinition Width="16" />
                                     <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="8" />
+                                    <ColumnDefinition Width="16" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
 
@@ -1149,13 +1141,16 @@
                                                                 </Style.Triggers>
                                                             </Style>
                                                         </Border.Style>
-                                                        <svg:SvgViewbox Width="14" Height="14"
-                                                                        Source="/Assets/Icons/Check.svg"
-                                                                        FlowDirection="LeftToRight"
-                                                                        HorizontalAlignment="Center"
-                                                                        VerticalAlignment="Center">
-                                                            <svg:SvgViewbox.Style>
-                                                                <Style TargetType="svg:SvgViewbox">
+                                                        <Path Data="M 3,7 L 6,10 L 11,4"
+                                                              Stroke="White"
+                                                              StrokeThickness="1.5"
+                                                              StrokeLineJoin="Round"
+                                                              StrokeStartLineCap="Round"
+                                                              StrokeEndLineCap="Round"
+                                                              HorizontalAlignment="Center"
+                                                              VerticalAlignment="Center">
+                                                            <Path.Style>
+                                                                <Style TargetType="Path">
                                                                     <Setter Property="Visibility" Value="Collapsed" />
                                                                     <Style.Triggers>
                                                                         <DataTrigger Binding="{Binding IsDefault}" Value="True">
@@ -1163,8 +1158,8 @@
                                                                         </DataTrigger>
                                                                     </Style.Triggers>
                                                                 </Style>
-                                                            </svg:SvgViewbox.Style>
-                                                        </svg:SvgViewbox>
+                                                            </Path.Style>
+                                                        </Path>
                                                     </Border>
 
                                                     <Border Grid.Column="13" Background="#E5E7EB" />
@@ -1301,9 +1296,9 @@
                             <Grid Margin="0,8,0,8">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="8" />
+                                    <ColumnDefinition Width="16" />
                                     <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="8" />
+                                    <ColumnDefinition Width="16" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0">

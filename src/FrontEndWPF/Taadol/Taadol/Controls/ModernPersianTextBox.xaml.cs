@@ -11,7 +11,8 @@ namespace Taadol.Controls
         Text,
         Number,
         Letters,
-        Alphanumeric
+        Alphanumeric,
+        Email
     }
 
     public enum ValidationState
@@ -140,6 +141,9 @@ namespace Taadol.Controls
                 case ModernTextBoxInputType.Alphanumeric:
                     return Regex.IsMatch(input, @"^[a-zA-Z0-9]+$");
 
+                case ModernTextBoxInputType.Email:
+                    return Regex.IsMatch(input, @"^[a-zA-Z0-9@._-]+$");
+
                 case ModernTextBoxInputType.Text:
                 default:
                     return true;
@@ -206,6 +210,12 @@ namespace Taadol.Controls
                 border.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2667FF"));
                 border.BorderThickness = new Thickness(1.5);
             }
+
+            var tb = sender as TextBox;
+            if (tb != null && string.IsNullOrEmpty(tb.Text))
+            {
+                tb.CaretIndex = 0;
+            }
         }
 
         private void PART_TextBox_LostFocus(object sender, RoutedEventArgs e)
@@ -240,7 +250,7 @@ namespace Taadol.Controls
             {
                 ValidationText.HorizontalAlignment = HorizontalAlignment.Left;
 
-                if (InputType == ModernTextBoxInputType.Number || InputType == ModernTextBoxInputType.Alphanumeric)
+                if (InputType == ModernTextBoxInputType.Number || InputType == ModernTextBoxInputType.Alphanumeric || InputType == ModernTextBoxInputType.Email)
                 {
                     ValidationIconBorder.HorizontalAlignment = HorizontalAlignment.Left;
                     ValidationIconBorder.Margin = new Thickness(10, 0, 0, 0);
@@ -263,10 +273,10 @@ namespace Taadol.Controls
             {
                 ValidationText.HorizontalAlignment = HorizontalAlignment.Right;
 
-                if (InputType == ModernTextBoxInputType.Number || InputType == ModernTextBoxInputType.Alphanumeric)
+                if (InputType == ModernTextBoxInputType.Number || InputType == ModernTextBoxInputType.Alphanumeric || InputType == ModernTextBoxInputType.Email)
                 {
                     ValidationIconBorder.HorizontalAlignment = HorizontalAlignment.Left;
-                    ValidationIconBorder.Margin = new Thickness(0, 0, 0, 0);
+                    ValidationIconBorder.Margin = new Thickness(8, 0, 0, 0);
                     PART_TextBox.HorizontalContentAlignment = HorizontalAlignment.Left;
                     PART_TextBox.Padding = new Thickness(12, 0, 12, 0);
                     PlaceholderText.HorizontalAlignment = HorizontalAlignment.Left;
@@ -274,12 +284,12 @@ namespace Taadol.Controls
                 }
                 else
                 {
-                    ValidationIconBorder.HorizontalAlignment = HorizontalAlignment.Left;
-                    ValidationIconBorder.Margin = new Thickness(0, 0, 10, 0);
-                    PART_TextBox.HorizontalContentAlignment = HorizontalAlignment.Left;
-                    PART_TextBox.Padding = new Thickness(12, 0, 12, 0);
-                    PlaceholderText.HorizontalAlignment = HorizontalAlignment.Left;
-                    PlaceholderText.Margin = new Thickness(12, 0, 0, 0);
+                    ValidationIconBorder.HorizontalAlignment = HorizontalAlignment.Right;
+                    ValidationIconBorder.Margin = new Thickness(0, 0, 4, 0);
+                    PART_TextBox.HorizontalContentAlignment = HorizontalAlignment.Right;
+                    PART_TextBox.Padding = new Thickness(12, 0, 16, 0);
+                    PlaceholderText.HorizontalAlignment = HorizontalAlignment.Right;
+                    PlaceholderText.Margin = new Thickness(0, 0, 16, 0);
                 }
             }
 

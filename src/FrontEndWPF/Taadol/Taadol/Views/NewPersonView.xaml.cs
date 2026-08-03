@@ -583,6 +583,30 @@ namespace Taadol.Views
             UpdatePersonnelTabVisibility();
         }
 
+        private void PersonTypeToggle_Unchecked(object sender, RoutedEventArgs e)
+        {
+            var tb = sender as ToggleButton;
+            if (tb == null) return;
+
+            // Check if any other toggle is still checked
+            var buttons = new[] { PersonTypeCustomer, PersonTypeSupplier, PersonTypeBoth, PersonTypePersonnel };
+            bool anyChecked = false;
+            foreach (var b in buttons)
+            {
+                if (b != null && b.IsChecked == true)
+                {
+                    anyChecked = true;
+                    break;
+                }
+            }
+
+            // If no toggle is checked, re-check the last one
+            if (!anyChecked)
+            {
+                tb.IsChecked = true;
+            }
+        }
+
         private void UpdatePersonnelTabVisibility()
         {
             if (TabTax == null) return;
