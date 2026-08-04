@@ -14,216 +14,116 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Threading;
+using Taadol.ViewModels;
 
 namespace Taadol.Views
 {
-    /// <summary>
-    /// فرم لیست اشخاص.
-    /// اطلاعات شخص + تماس‌ها (موبایل/تلفن) + آدرس (استان/شهر) رو به‌صورت یکپارچه نشون می‌ده.
-    /// دارای فیلترهای پاپ‌آپ روی ستون‌های وضعیت/استان/شهر.
-    /// الگوی async/scope از BranchListView برداشته شده.
-    /// </summary>
     public partial class PersonListView : UserControl
     {
-        // ===== Data Collections =====
-        public ObservableCollection<PersonItem> AllPersons { get; set; }
-        public ObservableCollection<PersonItem> FilteredPersons { get; set; }
-
-        // ===== State =====
-        private int _pageSize = 15;
-        private int _currentPage = 1;
-        private int _totalPages = 1;
-        private int _lastFilteredListCount = 0;
+        public PersonListViewModel ViewModel { get; }
         private bool _isLoadedOnce = false;
-
-        // ===== Filter Selections =====
-        // فیلتر تب‌ها (چند انتخابه)
-        private readonly HashSet<string> _selectedTabs = new HashSet<string> { "all" };
-        // برای فیلتر پاپ‌آپ: مقادیر انتخاب‌شده توسط کاربر
-        // اگه خالی باشه = هیچ فیلتری اعمال نشده (همه نشون داده می‌شه)
-        private readonly HashSet<string> _selectedStatuses = new HashSet<string>();
-        private readonly HashSet<string> _selectedProvinces = new HashSet<string>();
-        private readonly HashSet<string> _selectedCities = new HashSet<string>();
-        private readonly HashSet<string> _selectedLegalStatuses = new HashSet<string>();
-        private readonly HashSet<string> _selectedAccountStatuses = new HashSet<string>();
+        private bool _isPanelOpen = true;
+        private bool _sizeWired = false;
 
         public PersonListView()
         {
             InitializeComponent();
-            FillEmptyRows();
+
+            using var scope = App.ServiceProvider.CreateScope();
+            ViewModel = new PersonListViewModel(App.ServiceProvider);
+
+            DataContext = ViewModel;
 
             SearchBox.TextChanged += (s, e) =>
             {
-                _currentPage = 1;
-                ApplyFilters();
+                ViewModel.HandleSearchTextChanged(SearchBox.Text);
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    UpdateRowBorders();
+                    AdjustDataGridHeight();
+                }), DispatcherPriority.Loaded);
             };
+
+            ViewModel.PropertyChanged += ViewModel_PropertyChanged;
 
             Loaded += PersonListView_Loaded;
         }
 
-        // ======================================================
-        //  Async Data Load
-        // ======================================================
+        private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(PersonListViewModel.FilteredPersons))
+            {
+                if (PersonsDataGrid != null)
+                    PersonsDataGrid.ItemsSource = ViewModel.FilteredPersons;
+
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    UpdateRowBorders();
+                    AdjustDataGridHeight();
+                }), DispatcherPriority.Loaded);
+            }
+            else if (e.PropertyName == nameof(PersonListViewModel.Pages))
+            {
+                if (PageButtonsItemsControl != null)
+                    PageButtonsItemsControl.ItemsSource = ViewModel.Pages;
+            }
+            else if (e.PropertyName == nameof(PersonListViewModel.IsLoading))
+            {
+                ShowLoading(ViewModel.IsLoading);
+            }
+            else if (e.PropertyName == nameof(PersonListViewModel.PageInfoText))
+            {
+                if (PageInfoText != null)
+                    PageInfoText.Text = ViewModel.PageInfoText;
+            }
+            else if (e.PropertyName == nameof(PersonListViewModel.TotalDebitText))
+            {
+                if (TotalDebitText != null)
+                    TotalDebitText.Text = ViewModel.TotalDebitText;
+            }
+            else if (e.PropertyName == nameof(PersonListViewModel.TotalCreditText))
+            {
+                if (TotalCreditText != null)
+                    TotalCreditText.Text = ViewModel.TotalCreditText;
+            }
+            else if (e.PropertyName == nameof(PersonListViewModel.SelectedSummaryText))
+            {
+                if (SelectedSummaryText != null)
+                    SelectedSummaryText.Text = ViewModel.SelectedSummaryText;
+            }
+            else if (e.PropertyName == nameof(PersonListViewModel.SelectedTotalText))
+            {
+                if (SelectedTotalText != null)
+                    SelectedTotalText.Text = ViewModel.SelectedTotalText;
+            }
+            else if (e.PropertyName == nameof(PersonListViewModel.SelectedCountText))
+            {
+                if (SelectedCountText != null)
+                    SelectedCountText.Text = ViewModel.SelectedCountText;
+            }
+            else if (e.PropertyName == nameof(PersonListViewModel.TabAllCount))
+            {
+                tabAll.Tag = ViewModel.TabAllCount;
+            }
+            else if (e.PropertyName == nameof(PersonListViewModel.TabCustomersCount))
+            {
+                tabCustomers.Tag = ViewModel.TabCustomersCount;
+            }
+            else if (e.PropertyName == nameof(PersonListViewModel.TabSuppliersCount))
+            {
+                tabSuppliers.Tag = ViewModel.TabSuppliersCount;
+            }
+            else if (e.PropertyName == nameof(PersonListViewModel.TabPersonnelCount))
+            {
+                tabPersonnel.Tag = ViewModel.TabPersonnelCount;
+            }
+        }
+
         private async void PersonListView_Loaded(object sender, RoutedEventArgs e)
         {
             if (_isLoadedOnce) return;
             _isLoadedOnce = true;
-            await LoadDataAsync();
-        }
-
-        /// <summary>
-        /// لود کردن اشخاص از دیتابیس به‌صورت async.
-        /// برای هر شخص، تماس‌ها (موبایل/تلفن) و آدرس (استان/شهر) رو هم از سرویس‌های جداگانه می‌گیره.
-        /// </summary>
-        private async Task LoadDataAsync()
-        {
-            ShowLoading(true);
-
-            // دادن فرصت به UI برای نمایش اسپینر قبل از کار سنگین
-            await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background);
-
-            try
-            {
-                var items = await Task.Run(() =>
-                {
-                    using var scope = App.ServiceProvider.CreateScope();
-                    var sp = scope.ServiceProvider;
-
-                    var personApp = sp.GetRequiredService<IPersonApplication>();
-                    var persons = personApp.GetPersons() ?? new List<PersonViewModel>();
-
-                    var personIds = persons.Select(p => p.Id).ToList();
-
-                    var allContacts = new List<PersonContactViewModel>();
-                    var allAddresses = new List<PersonAddressViewModel>();
-
-                    var contactTasks = personIds.Select(pid =>
-                        Task.Run(() =>
-                        {
-                            using var s = App.ServiceProvider.CreateScope();
-                            var app = s.ServiceProvider.GetRequiredService<IPersonContactApplication>();
-                            try { return app.GetByPersonId(pid) ?? new List<PersonContactViewModel>(); }
-                            catch { return new List<PersonContactViewModel>(); }
-                        })).ToList();
-
-                    var addressTasks = personIds.Select(pid =>
-                        Task.Run(() =>
-                        {
-                            using var s = App.ServiceProvider.CreateScope();
-                            var app = s.ServiceProvider.GetRequiredService<IPersonAddressApplication>();
-                            try { return app.GetByPersonId(pid) ?? new List<PersonAddressViewModel>(); }
-                            catch { return new List<PersonAddressViewModel>(); }
-                        })).ToList();
-
-                    Task.WaitAll(contactTasks.ToArray());
-                    Task.WaitAll(addressTasks.ToArray());
-
-                    foreach (var t in contactTasks) allContacts.AddRange(t.Result);
-                    foreach (var t in addressTasks) allAddresses.AddRange(t.Result);
-
-                    // گروه‌بندی تماس‌ها بر اساس PersonId
-                    var contactsByPerson = allContacts
-                        .GroupBy(c => c.PersonId)
-                        .ToDictionary(g => g.Key, g => g.ToList());
-
-                    // گروه‌بندی آدرس‌ها بر اساس PersonId (آدرس پیش‌فرض یا اولین)
-                    var addressesByPerson = allAddresses
-                        .GroupBy(a => a.PersonId)
-                        .ToDictionary(g => g.Key, g => g.FirstOrDefault());
-
-                    return persons.Select((p, index) =>
-                    {
-                        // پیدا کردن موبایل و تلفن از لیست تماس‌ها
-                        string mobile = "—";
-                        string phone = "—";
-
-                        if (contactsByPerson.TryGetValue(p.Id, out var contacts) && contacts.Count > 0)
-                        {
-                            // موبایل: تماسی که نوعش "موبایل" هست
-                            var mobileContact = contacts.FirstOrDefault(c =>
-                                c.ContactTypeTitle != null && c.ContactTypeTitle.Contains("موبایل"));
-                            if (mobileContact != null && !string.IsNullOrWhiteSpace(mobileContact.Value))
-                                mobile = mobileContact.Value;
-
-                            // تلفن: تماسی که نوعش "تلفن" هست
-                            var phoneContact = contacts.FirstOrDefault(c =>
-                                c.ContactTypeTitle != null && c.ContactTypeTitle.Contains("تلفن"));
-                            if (phoneContact != null && !string.IsNullOrWhiteSpace(phoneContact.Value))
-                                phone = phoneContact.Value;
-                        }
-
-                        // پیدا کردن استان و شهر از آدرس
-                        string province = "—";
-                        string city = "—";
-
-                        if (addressesByPerson.TryGetValue(p.Id, out var address) && address != null)
-                        {
-                            if (!string.IsNullOrWhiteSpace(address.ProvinceName))
-                                province = address.ProvinceName;
-                            if (!string.IsNullOrWhiteSpace(address.CityName))
-                                city = address.CityName;
-                        }
-
-                        // نام کامل
-                        string fullName;
-                        if (p.IsLegal)
-                        {
-                            // شخص حقوقی: نام شرکت در FirstName قرار داره
-                            fullName = p.FirstName ?? "";
-                        }
-                        else
-                        {
-                            fullName = $"{p.FirstName ?? ""} {p.LastName ?? ""}".Trim();
-                            if (string.IsNullOrEmpty(fullName))
-                                fullName = "—";
-                        }
-
-                        return new PersonItem
-                        {
-                            Id = p.Id,
-                            RowNumber = index + 1,
-                            Code = string.IsNullOrWhiteSpace(p.Code) ? p.Id.ToString() : p.Code,
-                            Category = string.IsNullOrWhiteSpace(p.PersonType) ? "—" : p.PersonType,
-                            Status = p.IsActive ? "فعال" : "غیرفعال",
-                            Nickname = "—",
-                            FullNameText = fullName,
-                            Company = string.IsNullOrWhiteSpace(p.BranchName) ? "—" : p.BranchName,
-                            Province = province,
-                            City = city,
-                            Phone = phone,
-                            Mobile = mobile,
-                            NationalId = string.IsNullOrWhiteSpace(p.NationalCode) ? "—" : p.NationalCode,
-                            EconomicId = string.IsNullOrWhiteSpace(p.EconomicCode) ? "—" : p.EconomicCode,
-
-                            // ★ اینها رو باید بعداً از سرویس تراکنش/حساب واقعی پر کنی
-                            TransactionType = "—",
-                            TransactionDate = "—",
-                            AccountStatus = "—",
-                            BalanceDisplay = "—",
-
-                            IsLegal = p.IsLegal,
-                            PersonType = p.PersonType,
-                            IsEmpty = false
-                        };
-                    }).ToList();
-                });
-
-                AllPersons = new ObservableCollection<PersonItem>(items);
-                _currentPage = 1;
-                UpdateTabCounts();
-                ApplyFilters();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(BuildFullExceptionMessage(ex), "خطا در لود اشخاص",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
-                AllPersons = new ObservableCollection<PersonItem>();
-                ApplyFilters();
-            }
-            finally
-            {
-                ShowLoading(false);
-            }
+            await ViewModel.LoadDataAsync();
         }
 
         private void ShowLoading(bool show)
@@ -235,262 +135,21 @@ namespace Taadol.Views
         }
 
         // ======================================================
-        //  Empty Rows (برای حفظ ارتفاع DataGrid وقتی داده‌ای نیست)
-        // ======================================================
-        private void FillEmptyRows()
-        {
-            FilteredPersons = new ObservableCollection<PersonItem>();
-
-            for (int i = 1; i <= _pageSize; i++)
-            {
-                FilteredPersons.Add(new PersonItem
-                {
-                    RowNumber = 0,
-                    IsEmpty = true
-                });
-            }
-
-            if (PersonsDataGrid != null)
-                PersonsDataGrid.ItemsSource = FilteredPersons;
-        }
-
-        // ======================================================
-        //  Filtering + Pagination
-        // ======================================================
-        private void ApplyFilters()
-        {
-            if (AllPersons == null) return;
-
-            var query = AllPersons.AsEnumerable();
-
-            // فیلتر نوع شخص (تب‌های بالا - چند انتخابه)
-            if (!_selectedTabs.Contains("all"))
-            {
-                var tabFilters = new List<string>();
-                if (_selectedTabs.Contains("customer")) tabFilters.Add("مشتری");
-                if (_selectedTabs.Contains("supplier")) tabFilters.Add("تامین");
-                if (_selectedTabs.Contains("personnel")) tabFilters.Add("پرسنل");
-
-                if (tabFilters.Count > 0)
-                {
-                    query = query.Where(p => p.PersonType != null &&
-                        tabFilters.Any(f => p.PersonType.Contains(f)));
-                }
-            }
-
-            // فیلتر پاپ‌آپ وضعیت
-            if (_selectedStatuses.Count > 0)
-            {
-                query = query.Where(p => p.Status != null && _selectedStatuses.Contains(p.Status));
-            }
-
-            // فیلتر پاپ‌آپ استان
-            if (_selectedProvinces.Count > 0)
-            {
-                query = query.Where(p => p.Province != null && p.Province != "—" && _selectedProvinces.Contains(p.Province));
-            }
-
-            // فیلتر پاپ‌آپ شهر
-            if (_selectedCities.Count > 0)
-            {
-                query = query.Where(p => p.City != null && p.City != "—" && _selectedCities.Contains(p.City));
-            }
-
-            // فیلتر پاپ‌آپ نوع
-            if (_selectedLegalStatuses.Count > 0)
-            {
-                query = query.Where(p => p.LegalStatus != null && _selectedLegalStatuses.Contains(p.LegalStatus));
-            }
-
-            // فیلتر پاپ‌آپ وضعیت حساب
-            if (_selectedAccountStatuses.Count > 0)
-            {
-                query = query.Where(p => p.AccountStatus != null && p.AccountStatus != "—" && _selectedAccountStatuses.Contains(p.AccountStatus));
-            }
-
-            var searchText = SearchBox?.Text?.Trim();
-
-            if (!string.IsNullOrWhiteSpace(searchText))
-            {
-                query = query.Where(p =>
-                    (!string.IsNullOrWhiteSpace(p.Code) && p.Code.Contains(searchText)) ||
-                    (!string.IsNullOrWhiteSpace(p.FullName) && p.FullName.Contains(searchText)) ||
-                    (!string.IsNullOrWhiteSpace(p.NationalId) && p.NationalId.Contains(searchText)) ||
-                    (!string.IsNullOrWhiteSpace(p.EconomicId) && p.EconomicId.Contains(searchText)) ||
-                    (!string.IsNullOrWhiteSpace(p.Company) && p.Company.Contains(searchText)) ||
-                    (!string.IsNullOrWhiteSpace(p.Mobile) && p.Mobile.Contains(searchText)) ||
-                    (!string.IsNullOrWhiteSpace(p.Phone) && p.Phone.Contains(searchText))
-                );
-            }
-
-            var filteredList = query.ToList();
-            _lastFilteredListCount = filteredList.Count;
-
-            _totalPages = (int)Math.Ceiling(filteredList.Count / (double)_pageSize);
-            if (_totalPages == 0) _totalPages = 1;
-
-            if (_currentPage > _totalPages) _currentPage = _totalPages;
-            if (_currentPage < 1) _currentPage = 1;
-
-            var pageItems = filteredList
-                .Skip((_currentPage - 1) * _pageSize)
-                .Take(_pageSize)
-                .ToList();
-
-            for (int i = 0; i < pageItems.Count; i++)
-                pageItems[i].RowNumber = ((_currentPage - 1) * _pageSize) + i + 1;
-
-            FilteredPersons = new ObservableCollection<PersonItem>(pageItems);
-
-            int realCount = FilteredPersons.Count;
-            for (int i = realCount + 1; i <= _pageSize; i++)
-            {
-                FilteredPersons.Add(new PersonItem
-                {
-                    RowNumber = 0,
-                    IsEmpty = true
-                });
-            }
-
-            if (PersonsDataGrid != null)
-                PersonsDataGrid.ItemsSource = FilteredPersons;
-
-            BuildPaginationButtons();
-            UpdatePageInfo();
-            UpdateSummaryBar();
-
-            Dispatcher.BeginInvoke(new Action(() =>
-            {
-                UpdateRowBorders();
-                AdjustDataGridHeight();
-            }), System.Windows.Threading.DispatcherPriority.Loaded);
-        }
-
-        private void BuildPaginationButtons()
-        {
-            if (PageButtonsItemsControl == null) return;
-
-            var pages = new ObservableCollection<PageItem>();
-
-            if (_totalPages <= 5)
-            {
-                for (int i = 1; i <= _totalPages; i++)
-                {
-                    pages.Add(new PageItem
-                    {
-                        PageNumber = i,
-                        PageNumberDisplay = ToPersianNumber(i),
-                        IsCurrent = i == _currentPage
-                    });
-                }
-                PageButtonsItemsControl.ItemsSource = pages;
-                return;
-            }
-
-            // صفحه اول
-            pages.Add(new PageItem
-            {
-                PageNumber = 1,
-                PageNumberDisplay = ToPersianNumber(1),
-                IsCurrent = _currentPage == 1
-            });
-
-            // سه نقطه اول — همیشه ثابت
-            pages.Add(new PageItem
-            {
-                PageNumber = 0,
-                PageNumberDisplay = "...",
-                IsCurrent = false
-            });
-
-            // صفحات وسط (۳ تا)
-            int middleStart = _currentPage - 1;
-            int middleEnd = _currentPage + 1;
-
-            if (_currentPage <= 3)
-            {
-                middleStart = 2;
-                middleEnd = 4;
-            }
-            else if (_currentPage >= _totalPages - 2)
-            {
-                middleStart = _totalPages - 3;
-                middleEnd = _totalPages - 1;
-            }
-
-            for (int i = middleStart; i <= middleEnd; i++)
-            {
-                if (i > 1 && i < _totalPages)
-                {
-                    pages.Add(new PageItem
-                    {
-                        PageNumber = i,
-                        PageNumberDisplay = ToPersianNumber(i),
-                        IsCurrent = i == _currentPage
-                    });
-                }
-            }
-
-            // سه نقطه دوم — همیشه ثابت
-            pages.Add(new PageItem
-            {
-                PageNumber = 0,
-                PageNumberDisplay = "...",
-                IsCurrent = false
-            });
-
-            // صفحه آخر
-            pages.Add(new PageItem
-            {
-                PageNumber = _totalPages,
-                PageNumberDisplay = ToPersianNumber(_totalPages),
-                IsCurrent = _currentPage == _totalPages
-            });
-
-            PageButtonsItemsControl.ItemsSource = pages;
-        }
-
-        // ======================================================
-        //  Event Handlers
+        //  Tab Filter Handlers
         // ======================================================
         private void FilterTab_Click(object sender, RoutedEventArgs e)
         {
             if (sender is not ToggleButton tb) return;
 
             string tabName = GetTabName(tb);
+            bool isChecked = tb.IsChecked == true;
 
-            if (tb.IsChecked == true)
-            {
-                if (tabName == "all")
-                {
-                    // همه: بقیه رو خاموش کن
-                    _selectedTabs.Clear();
-                    _selectedTabs.Add("all");
-                    UpdateTabStates();
-                }
-                else
-                {
-                    // غیرفعال کردن "همه"
-                    _selectedTabs.Remove("all");
-                    tabAll.IsChecked = false;
-                    _selectedTabs.Add(tabName);
-                }
-            }
-            else
-            {
-                // وقتی یکی خاموش میشه
-                _selectedTabs.Remove(tabName);
+            ViewModel.UpdateTabSelection(tabName, isChecked);
 
-                // اگه هیچ‌کدوم انتخاب نباشه، همه فعال بشه
-                if (_selectedTabs.Count == 0)
-                {
-                    _selectedTabs.Add("all");
-                    tabAll.IsChecked = true;
-                }
-            }
-
-            _currentPage = 1;
-            ApplyFilters();
+            tabAll.IsChecked = ViewModel.SelectedTabs.Contains("all");
+            tabCustomers.IsChecked = ViewModel.SelectedTabs.Contains("customer");
+            tabSuppliers.IsChecked = ViewModel.SelectedTabs.Contains("supplier");
+            tabPersonnel.IsChecked = ViewModel.SelectedTabs.Contains("personnel");
         }
 
         private string GetTabName(ToggleButton tb)
@@ -502,36 +161,12 @@ namespace Taadol.Views
             return "all";
         }
 
-        private void UpdateTabStates()
-        {
-            tabAll.IsChecked = _selectedTabs.Contains("all");
-            tabCustomers.IsChecked = _selectedTabs.Contains("customer");
-            tabSuppliers.IsChecked = _selectedTabs.Contains("supplier");
-            tabPersonnel.IsChecked = _selectedTabs.Contains("personnel");
-        }
-
-        private void UpdateTabCounts()
-        {
-            if (AllPersons == null) return;
-
-            var validPersons = AllPersons.Where(p => !p.IsEmpty).ToList();
-            int total = validPersons.Count;
-            int customers = validPersons.Count(p => p.PersonType != null && p.PersonType.Contains("مشتری"));
-            int suppliers = validPersons.Count(p => p.PersonType != null && p.PersonType.Contains("تامین"));
-            int personnel = validPersons.Count(p => p.PersonType != null && p.PersonType.Contains("پرسنل"));
-
-            tabAll.Tag = $"( {ToPersianNumber(total)} )";
-            tabCustomers.Tag = $"( {ToPersianNumber(customers)} )";
-            tabSuppliers.Tag = $"( {ToPersianNumber(suppliers)} )";
-            tabPersonnel.Tag = $"( {ToPersianNumber(personnel)} )";
-        }
-
+        // ======================================================
+        //  CRUD Handlers
+        // ======================================================
         private async void BtnDelete_Click(object sender, RoutedEventArgs e)
         {
-            // پشتیبانی از حذف چندتایی با چک‌باکس (مثل BranchListView) + حذف تک‌تک با انتخاب ردیف
-            var selectedItems = AllPersons?
-                .Where(p => p.IsSelected && !p.IsEmpty)
-                .ToList() ?? new List<PersonItem>();
+            var selectedItems = ViewModel.GetSelectedItems();
 
             if (selectedItems.Count == 0)
             {
@@ -545,7 +180,7 @@ namespace Taadol.Views
                 }
             }
 
-            var names = string.Join("\n", selectedItems.Take(5).Select(p => $"• {p.FullName}"));
+            var names = string.Join("\n", selectedItems.Take(5).Select(p => $"\u2022 {p.FullName}"));
             if (selectedItems.Count > 5)
                 names += $"\n... و {selectedItems.Count - 5} مورد دیگر";
 
@@ -560,36 +195,16 @@ namespace Taadol.Views
 
             try
             {
-                var idsToDelete = selectedItems.Select(p => p.Id).ToList();
-                await Task.Run(() =>
-                {
-                    using var scope = App.ServiceProvider.CreateScope();
-                    var personApp = scope.ServiceProvider.GetRequiredService<IPersonApplication>();
-
-                    foreach (var id in idsToDelete)
-                    {
-                        var op = personApp.Remove(id);
-                        if (!op.IsSucceeded)
-                        {
-                            System.Diagnostics.Debug.WriteLine(
-                                $"Failed to delete person {id}: {op.Message}");
-                        }
-                    }
-                });
+                await ViewModel.DeleteSelectedAsync();
+                _isLoadedOnce = false;
+                MessageBox.Show("عملیات حذف انجام شد.", "موفق",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
                 MessageBox.Show("خطا در حذف: " + ex.Message, "خطا",
                     MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
             }
-
-            // رفرش لیست
-            _isLoadedOnce = false;
-            await LoadDataAsync();
-
-            MessageBox.Show("عملیات حذف انجام شد.", "موفق",
-                MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void BtnEdit_Click(object sender, RoutedEventArgs e)
@@ -606,62 +221,178 @@ namespace Taadol.Views
             }
         }
 
-        private void BtnNew_Click(object sender, RoutedEventArgs e)
+        private void BtnNew_Click(object sender, MouseButtonEventArgs e)
         {
-            // باز کردن فرم ثبت شخص جدید در MainWindow
             var mainWindow = Window.GetWindow(this) as MainWindow;
             if (mainWindow != null)
             {
                 var newView = new NewPersonView();
-
                 var mainContent = mainWindow.FindName("MainContent") as ContentControl;
                 if (mainContent != null)
                 {
                     mainContent.Content = newView;
-
                     var mainContentBorder = mainWindow.FindName("MainContentBorder") as Border;
                     if (mainContentBorder != null)
                         mainContentBorder.Visibility = Visibility.Visible;
                 }
-                else
+            }
+        }
+
+        private async void BtnRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            _isLoadedOnce = false;
+            await ViewModel.RefreshAsync();
+        }
+
+        // ======================================================
+        //  Panel Toggle Animation
+        // ======================================================
+        private void TogglePanelBtn_Click(object sender, MouseButtonEventArgs e)
+        {
+            TogglePanel();
+        }
+
+        private void BtnToggleSidebar_Click(object sender, RoutedEventArgs e)
+        {
+            TogglePanel();
+        }
+
+        private void TogglePanel()
+        {
+            _isPanelOpen = !_isPanelOpen;
+
+            var anim = new System.Windows.Media.Animation.DoubleAnimation();
+            anim.Duration = TimeSpan.FromMilliseconds(250);
+            var ease = new System.Windows.Media.Animation.CubicEase();
+            var arrow = BtnToggleSidebar.FindName("ArrowRotation") as System.Windows.Media.RotateTransform;
+
+            if (_isPanelOpen)
+            {
+                anim.To = 340;
+                ease.EasingMode = System.Windows.Media.Animation.EasingMode.EaseOut;
+                anim.EasingFunction = ease;
+                DetailPanelContainer.Visibility = Visibility.Visible;
+                DetailPanelColumn.BeginAnimation(System.Windows.Controls.ColumnDefinition.MaxWidthProperty, anim);
+                DetailPanelColumn.BeginAnimation(System.Windows.Controls.ColumnDefinition.MinWidthProperty, anim);
+                anim.Completed += (s, ev) =>
                 {
-                    MessageBox.Show("فرم شخص جدید", "شخص جدید",
-                        MessageBoxButton.OK, MessageBoxImage.Information);
-                }
+                    DetailPanelColumn.Width = new GridLength(340);
+                };
+                if (arrow != null) arrow.Angle = 0;
+
+                // اگه پنل‌ها موقع بسته بودن از دست رفتن، دوباره از انتخاب فعلی بساز
+                if (DetailPanelsStack.Children.Count == 0)
+                    UpdateDetailPanels();
             }
             else
             {
-                MessageBox.Show("فرم شخص جدید", "شخص جدید",
-                    MessageBoxButton.OK, MessageBoxImage.Information);
+                anim.To = 0;
+                ease.EasingMode = System.Windows.Media.Animation.EasingMode.EaseIn;
+                anim.EasingFunction = ease;
+                DetailPanelContainer.Visibility = Visibility.Collapsed;
+                DetailPanelColumn.BeginAnimation(System.Windows.Controls.ColumnDefinition.MaxWidthProperty, anim);
+                DetailPanelColumn.BeginAnimation(System.Windows.Controls.ColumnDefinition.MinWidthProperty, anim);
+                anim.Completed += (s, ev) =>
+                {
+                    DetailPanelColumn.Width = new GridLength(0);
+                };
+                if (arrow != null) arrow.Angle = 180;
             }
         }
 
-        private void BtnMore_Click(object sender, RoutedEventArgs e)
+        // ======================================================
+        //  Pagination Handlers
+        // ======================================================
+        private void BtnNextPage_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("منوی بیشتر — شامل: فعال/غیرفعال کردن، صادرات Excel، چاپ، و...",
-                "عملیات", MessageBoxButton.OK, MessageBoxImage.Information);
+            ViewModel.GoToNextPage();
         }
 
-        private void BtnPrint_Click(object sender, RoutedEventArgs e)
+        private void BtnPrevPage_Click(object sender, RoutedEventArgs e)
         {
+            ViewModel.GoToPreviousPage();
         }
 
-        private void BtnRefresh_Click(object sender, RoutedEventArgs e)
+        private void BtnPage_Click(object sender, RoutedEventArgs e)
         {
-            _isLoadedOnce = false;
-            _ = LoadDataAsync();
+            if (sender is Button btn && btn.Tag != null)
+            {
+                int pageNumber = Convert.ToInt32(btn.Tag);
+                ViewModel.GoToPage(pageNumber);
+            }
         }
 
-        private void DetailPanelContainer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        private void PageSizeSelector_SelectionChanged(object sender, int newSize)
         {
-            if (DetailPanelScroll == null) return;
+            ViewModel.ChangePageSize(newSize);
+        }
 
-            if (e.Delta > 0)
-                DetailPanelScroll.LineUp();
-            else
-                DetailPanelScroll.LineDown();
+        // ======================================================
+        //  DataGrid Visual Handlers
+        // ======================================================
+        private void PersonsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (PersonsDataGrid.SelectedItem != null)
+            {
+                PersonsDataGrid.SelectedItem = null;
+            }
+        }
 
-            e.Handled = true;
+        private void PersonsDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (PersonsDataGrid.SelectedItem is PersonItem item && !item.IsEmpty)
+            {
+                var mainWindow = Window.GetWindow(this) as MainWindow;
+                mainWindow?.NavigateToEditPerson(item.Id);
+            }
+        }
+
+        private void DataGridRow_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (!IsInsideCheckBox(e.OriginalSource as DependencyObject))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void DataGridRow_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (!IsInsideCheckBox(e.OriginalSource as DependencyObject))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void DataGridRow_MouseEnter(object sender, MouseEventArgs e)
+        {
+            if (sender is DataGridRow row && row.DataContext is PersonItem item && !item.IsEmpty)
+            {
+                row.Background = new System.Windows.Media.SolidColorBrush(
+                    (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#EFF6FF"));
+            }
+        }
+
+        private void DataGridRow_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (sender is DataGridRow row && row.DataContext is PersonItem item && !item.IsEmpty)
+            {
+                bool isAlt = row.AlternationIndex == 1;
+                var bgColor = isAlt
+                    ? (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#F8F8F8")
+                    : System.Windows.Media.Colors.White;
+                row.Background = new System.Windows.Media.SolidColorBrush(bgColor);
+            }
+        }
+
+        private bool IsInsideCheckBox(DependencyObject element)
+        {
+            while (element != null)
+            {
+                if (element is FrameworkElement fe && fe.Name == "CheckBoxBorder")
+                    return true;
+                element = System.Windows.Media.VisualTreeHelper.GetParent(element);
+            }
+            return false;
         }
 
         private void CheckBoxBorder_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -671,37 +402,35 @@ namespace Taadol.Views
                 item.IsSelected = !item.IsSelected;
                 UpdateRowBorders();
                 UpdateDetailPanels();
-                UpdateSummaryBar();
+                ViewModel.UpdateSummaryBar();
                 e.Handled = true;
             }
         }
-        private void AdjustDataGridHeight()
-        {
-            if (PersonsDataGrid == null)
-                return;
 
-            PersonsDataGrid.Height = double.NaN;
-            PersonsDataGrid.MaxHeight = double.PositiveInfinity;
-        }
-        private void RootBorder_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            Dispatcher.BeginInvoke(new Action(() => AdjustDataGridHeight()), DispatcherPriority.Background);
-        }
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
-        {
-            // با تأخیر تا Layout کامل شود
-            Dispatcher.BeginInvoke(new Action(() => AdjustDataGridHeight()), DispatcherPriority.Background);
-        }
         private void UpdateRowBorders()
         {
+            if (PersonsDataGrid == null) return;
+
             var items = PersonsDataGrid.Items;
             var blue = new System.Windows.Media.SolidColorBrush(
                 (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#2667FF"));
             var transparent = System.Windows.Media.Brushes.Transparent;
+            var gray = new System.Windows.Media.SolidColorBrush(
+                (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#D1D5DB"));
+
+            int lastRealIndex = -1;
+            for (int i = items.Count - 1; i >= 0; i--)
+            {
+                if (items[i] is PersonItem p && !p.IsEmpty)
+                {
+                    lastRealIndex = i;
+                    break;
+                }
+            }
 
             for (int i = 0; i < items.Count; i++)
             {
-                var row = PersonsDataGrid.ItemContainerGenerator.ContainerFromIndex(i) as System.Windows.Controls.DataGridRow;
+                var row = PersonsDataGrid.ItemContainerGenerator.ContainerFromIndex(i) as DataGridRow;
                 if (row == null) continue;
 
                 var item = items[i] as PersonItem;
@@ -713,11 +442,17 @@ namespace Taadol.Views
                 }
 
                 bool prevSelected = (i > 0) && items[i - 1] is PersonItem prev && !prev.IsEmpty && prev.IsSelected;
+                bool isLast = (i == lastRealIndex);
 
                 if (item.IsSelected)
                 {
                     row.BorderBrush = blue;
                     row.BorderThickness = new Thickness(0, prevSelected ? 0 : 1, 0, 1);
+                }
+                else if (isLast)
+                {
+                    row.BorderBrush = gray;
+                    row.BorderThickness = new Thickness(0, 0, 0, 1);
                 }
                 else
                 {
@@ -727,13 +462,12 @@ namespace Taadol.Views
             }
         }
 
+        // ======================================================
+        //  Detail Panel Management
+        // ======================================================
         private async void UpdateDetailPanels()
         {
-            var selectedItems = AllPersons?
-                .Where(p => p.IsSelected && !p.IsEmpty)
-                .ToList() ?? new List<PersonItem>();
-
-            SelectedCountText.Text = $"({selectedItems.Count})";
+            var selectedItems = ViewModel.GetSelectedItems();
 
             var existingIds = DetailPanelsStack.Children
                 .OfType<Taadol.Controls.PersonDetailPanel>()
@@ -756,7 +490,7 @@ namespace Taadol.Views
 
                 var personType = item.IsLegal ? "حقوقی" : "حقیقی";
                 var category = item.Category ?? "";
-                var balance = item.BalanceDisplay ?? "—";
+                var balance = item.BalanceDisplay ?? "\u2014";
                 var balanceStatus = item.AccountStatus ?? "";
                 var phone = !string.IsNullOrEmpty(item.Phone) && !string.IsNullOrEmpty(item.Mobile)
                     ? $"{item.Phone} / {item.Mobile}"
@@ -791,11 +525,11 @@ namespace Taadol.Views
                         var banks = bankApp.GetByPersonId(item.Id) ?? new List<PersonBankViewModel>();
                         return banks.Select(b => new Taadol.Models.BankAccountItem
                         {
-                            BankName = b.BankName ?? "—",
-                            BranchName = b.BankBranchName ?? "—",
-                            CardNumber = b.CardNumber ?? "—",
-                            ShebaNumber = b.Shaba ?? "—",
-                            AccountNumber = b.AccountNumber ?? "—",
+                            BankName = b.BankName ?? "\u2014",
+                            BranchName = b.BankBranchName ?? "\u2014",
+                            CardNumber = b.CardNumber ?? "\u2014",
+                            ShebaNumber = b.Shaba ?? "\u2014",
+                            AccountNumber = b.AccountNumber ?? "\u2014",
                             OtherAccount = "ندارد",
                             IsDefault = b.IsDefault
                         }).ToList();
@@ -814,13 +548,13 @@ namespace Taadol.Views
 
         private void DetailPanel_CloseRequested(object sender, long personId)
         {
-            var item = AllPersons?.FirstOrDefault(p => p.Id == personId);
+            var item = ViewModel.AllPersons?.FirstOrDefault(p => p.Id == personId);
             if (item != null)
             {
                 item.IsSelected = false;
                 UpdateRowBorders();
                 UpdateDetailPanels();
-                UpdateSummaryBar();
+                ViewModel.UpdateSummaryBar();
             }
         }
 
@@ -832,11 +566,11 @@ namespace Taadol.Views
 
         private async void DetailPanel_DeleteRequested(object sender, long personId)
         {
-            var item = AllPersons?.FirstOrDefault(p => p.Id == personId && !p.IsEmpty);
+            var item = ViewModel.AllPersons?.FirstOrDefault(p => p.Id == personId && !p.IsEmpty);
             if (item == null) return;
 
             var result = MessageBox.Show(
-                $"آیا از حذف «{item.FullName}» مطمئن هستید؟",
+                $"آیا از حذف \u00AB{item.FullName}\u00BB مطمئن هستید؟",
                 "حذف شخص",
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Warning,
@@ -846,309 +580,157 @@ namespace Taadol.Views
 
             try
             {
-                using var scope = App.ServiceProvider.CreateScope();
-                var personApp = scope.ServiceProvider.GetRequiredService<IPersonApplication>();
-                var op = personApp.Remove(item.Id);
-                if (!op.IsSucceeded)
-                {
-                    MessageBox.Show("خطا در حذف: " + op.Message, "خطا",
-                        MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
+                await ViewModel.DeletePersonAsync(item);
+
+                var panelToRemove = DetailPanelsStack.Children
+                    .OfType<Taadol.Controls.PersonDetailPanel>()
+                    .FirstOrDefault(p => p.PersonId == personId);
+                if (panelToRemove != null)
+                    DetailPanelsStack.Children.Remove(panelToRemove);
+
+                _isLoadedOnce = false;
+                MessageBox.Show("عملیات حذف انجام شد.", "موفق",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
                 MessageBox.Show("خطا در حذف: " + ex.Message, "خطا",
                     MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-
-            var panelToRemove = DetailPanelsStack.Children
-                .OfType<Taadol.Controls.PersonDetailPanel>()
-                .FirstOrDefault(p => p.PersonId == personId);
-            if (panelToRemove != null)
-                DetailPanelsStack.Children.Remove(panelToRemove);
-
-            _isLoadedOnce = false;
-            await LoadDataAsync();
-
-            MessageBox.Show("عملیات حذف انجام شد.", "موفق",
-                MessageBoxButton.OK, MessageBoxImage.Information);
-        }
-
-        private void UpdateSummaryBar()
-        {
-            if (AllPersons == null) return;
-
-            var validPersons = AllPersons.Where(p => !p.IsEmpty).ToList();
-            var selectedItems = validPersons.Where(p => p.IsSelected).ToList();
-
-            // جمع بدهکار / بستانکار
-            long totalDebit = 0;
-            long totalCredit = 0;
-            foreach (var p in validPersons)
-            {
-                if (long.TryParse(p.BalanceDisplay?.Replace(",", "").Replace("ریال", "").Trim(), out long bal))
-                {
-                    if (p.AccountStatus == "بدهکار")
-                        totalDebit += bal;
-                    else if (p.AccountStatus == "بستانکار")
-                        totalCredit += bal;
-                }
-            }
-
-            if (TotalDebitText != null)
-                TotalDebitText.Text = $"{ToPersianNumber(totalDebit)} ریال";
-            if (TotalCreditText != null)
-                TotalCreditText.Text = $"{ToPersianNumber(totalCredit)} ریال";
-            if (SelectedSummaryText != null)
-                SelectedSummaryText.Text = $"جمع اشخاص انتخاب شده ({ToPersianNumber(selectedItems.Count)})";
-            if (SelectedTotalText != null)
-            {
-                long selectedTotal = 0;
-                foreach (var p in selectedItems)
-                {
-                    if (long.TryParse(p.BalanceDisplay?.Replace(",", "").Replace("ریال", "").Trim(), out long bal))
-                        selectedTotal += bal;
-                }
-                SelectedTotalText.Text = $"{ToPersianNumber(selectedTotal)} ریال";
             }
         }
 
-        private void BtnNextPage_Click(object sender, RoutedEventArgs e)
-        {
-            if (_currentPage < _totalPages)
-            {
-                _currentPage++;
-                ApplyFilters();
-            }
-        }
-
-        private void BtnPrevPage_Click(object sender, RoutedEventArgs e)
-        {
-            if (_currentPage > 1)
-            {
-                _currentPage--;
-                ApplyFilters();
-            }
-        }
-
-        private void BtnPage_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is Button btn && btn.Tag != null)
-            {
-                int pageNumber = Convert.ToInt32(btn.Tag);
-                if (pageNumber <= 0) return;
-                _currentPage = pageNumber;
-                ApplyFilters();
-            }
-        }
-
-        private void PageSizeSelector_SelectionChanged(object sender, int newSize)
-        {
-            _pageSize = newSize;
-            _currentPage = 1;
-            ApplyFilters();
-        }
-
-        private void UpdatePageInfo()
-        {
-            if (PageInfoText == null) return;
-            int currentPageCount = FilteredPersons.Count(p => !p.IsEmpty);
-            int totalCount = (int)Math.Ceiling(FilteredPersons.Count / (double)_pageSize) > 0
-                ? (FilteredPersons.Count - FilteredPersons.Count(p => p.IsEmpty)) + (FilteredPersons.Count(p => !p.IsEmpty) > 0 ? 0 : 0)
-                : 0;
-            // Use the filtered source count from the last ApplyFilters
-            int totalFiltered = _lastFilteredListCount;
-            PageInfoText.Text = $"نمایش {ToPersianNumber(currentPageCount)} از {ToPersianNumber(totalFiltered)} مورد";
-        }
-
-        private void PersonsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            // جلوگیری از انتخاب خودکار توسط DataGrid
-            if (PersonsDataGrid.SelectedItem != null)
-            {
-                PersonsDataGrid.SelectedItem = null;
-            }
-        }
-
-        private void PersonsDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            if (PersonsDataGrid.SelectedItem is PersonItem item && !item.IsEmpty)
-            {
-                var mainWindow = Window.GetWindow(this) as MainWindow;
-                mainWindow?.NavigateToEditPerson(item.Id);
-            }
-        }
-        private void DataGridRow_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            // فقط اگر کلیک داخل چک‌باکس بود، اجازه بده
-            if (!IsInsideCheckBox(e.OriginalSource as DependencyObject))
-            {
-                e.Handled = true;
-            }
-        }
-        private void DataGridRow_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            if (!IsInsideCheckBox(e.OriginalSource as DependencyObject))
-            {
-                e.Handled = true;
-            }
-        }
-
-        private void DataGridRow_MouseEnter(object sender, MouseEventArgs e)
-        {
-            if (sender is System.Windows.Controls.DataGridRow row && row.DataContext is PersonItem item && !item.IsEmpty)
-            {
-                row.Background = new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#EFF6FF"));
-            }
-        }
-
-        private void DataGridRow_MouseLeave(object sender, MouseEventArgs e)
-        {
-            if (sender is System.Windows.Controls.DataGridRow row && row.DataContext is PersonItem item && !item.IsEmpty)
-            {
-                bool isAlt = row.AlternationIndex == 1;
-                var bgColor = isAlt ? (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#F8F8F8") : System.Windows.Media.Colors.White;
-                row.Background = new System.Windows.Media.SolidColorBrush(bgColor);
-            }
-        }
-        private bool IsInsideCheckBox(DependencyObject element)
-        {
-            while (element != null)
-            {
-                if (element is FrameworkElement fe && fe.Name == "CheckBoxBorder")
-                    return true;
-                element = System.Windows.Media.VisualTreeHelper.GetParent(element);
-            }
-            return false;
-        }
         // ======================================================
-        //  Popup Filter Handlers (وضعیت / استان / شهر)
-        //  همه‌ی منطق پاپ‌آپ داخل FilterPopupControl قرار داره.
-        //  برای ویرایش ظاهر، فایل Controls/FilterPopupControl.xaml رو ببینید.
+        //  Scroll & Layout
         // ======================================================
+        private void DetailPanelContainer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (DetailPanelScroll == null) return;
 
-        /// <summary>کلیک روی آیکون فیلتر وضعیت → پاپ‌آپ با «فعال» و «غیرفعال»</summary>
+            if (e.Delta > 0)
+                DetailPanelScroll.LineUp();
+            else
+                DetailPanelScroll.LineDown();
+
+            e.Handled = true;
+        }
+
+        private void AdjustDataGridHeight()
+        {
+            if (PersonsDataGrid == null) return;
+            PersonsDataGrid.Height = double.NaN;
+            PersonsDataGrid.MaxHeight = double.PositiveInfinity;
+        }
+
+        private void RootBorder_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            Dispatcher.BeginInvoke(new Action(() => AdjustDataGridHeight()), DispatcherPriority.Background);
+        }
+
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            Dispatcher.BeginInvoke(new Action(() => FillAvailableSpace()), DispatcherPriority.Background);
+            Dispatcher.BeginInvoke(new Action(() => AdjustDataGridHeight()), DispatcherPriority.Background);
+        }
+
+        // فرم لیست باید همیشه کل فضای محتوا رو پر کنه حتی اگه ردیف جدول کم باشه
+        // یا پنل جزئیات بسته باشه (چون MainContent با Top/Left فقط اندازه محتوا رو می‌گیره).
+        private void FillAvailableSpace()
+        {
+            if (Window.GetWindow(this) is not Window window) return;
+            if (window.FindName("MainContentBorder") is not Border border) return;
+
+            if (!_sizeWired)
+            {
+                _sizeWired = true;
+                border.SizeChanged += (s, _) => FillAvailableSpace();
+            }
+
+            var pad = border.Padding;
+            var margin = Margin;
+            var w = border.ActualWidth - pad.Left - pad.Right - margin.Left - margin.Right;
+            var h = border.ActualHeight - pad.Top - pad.Bottom - margin.Top - margin.Bottom;
+            Width = w > 0 ? w : 0;
+            Height = h > 0 ? h : 0;
+        }
+
+        // ======================================================
+        //  Popup Filter Handlers
+        // ======================================================
         private void StatusFilter_Click(object sender, RoutedEventArgs e)
         {
             ShowFilterPopup(
                 anchor: sender as Button,
                 title: "فیلتر وضعیت",
                 options: new List<string> { "فعال", "غیرفعال" },
-                selected: _selectedStatuses,
+                selected: ViewModel.SelectedStatuses,
                 showSearch: false,
                 immediateApply: true,
                 onSelectionChanged: result =>
                 {
-                    _selectedStatuses.Clear();
-                    foreach (var r in result) _selectedStatuses.Add(r);
-                    _currentPage = 1;
-                    ApplyFilters();
+                    ViewModel.SetFilterResult("status", result);
                 });
         }
 
-        /// <summary>کلیک روی آیکون فیلتر استان</summary>
         private void ProvinceFilter_Click(object sender, RoutedEventArgs e)
         {
-            var options = AllPersons?
-                .Select(p => p.Province)
-                .Where(x => !string.IsNullOrWhiteSpace(x) && x != "—")
-                .Distinct()
-                .OrderBy(x => x)
-                .ToList() ?? new List<string>();
-
             ShowFilterPopup(
                 anchor: sender as Button,
                 title: "فیلتر استان",
-                options: options,
-                selected: _selectedProvinces,
+                options: ViewModel.GetProvinceOptions(),
+                selected: ViewModel.SelectedProvinces,
                 showSearch: true,
                 immediateApply: false,
                 onSelectionChanged: result =>
                 {
-                    _selectedProvinces.Clear();
-                    foreach (var r in result) _selectedProvinces.Add(r);
-                    _currentPage = 1;
-                    ApplyFilters();
+                    ViewModel.SetFilterResult("province", result);
                 });
         }
 
-        /// <summary>کلیک روی آیکون فیلتر شهر</summary>
         private void CityFilter_Click(object sender, RoutedEventArgs e)
         {
-            var options = AllPersons?
-                .Select(p => p.City)
-                .Where(x => !string.IsNullOrWhiteSpace(x) && x != "—")
-                .Distinct()
-                .OrderBy(x => x)
-                .ToList() ?? new List<string>();
-
             ShowFilterPopup(
                 anchor: sender as Button,
                 title: "فیلتر شهر",
-                options: options,
-                selected: _selectedCities,
+                options: ViewModel.GetCityOptions(),
+                selected: ViewModel.SelectedCities,
                 showSearch: true,
                 immediateApply: false,
                 onSelectionChanged: result =>
                 {
-                    _selectedCities.Clear();
-                    foreach (var r in result) _selectedCities.Add(r);
-                    _currentPage = 1;
-                    ApplyFilters();
+                    ViewModel.SetFilterResult("city", result);
                 });
         }
 
-        /// <summary>کلیک روی آیکون فیلتر نوع</summary>
         private void LegalStatusFilter_Click(object sender, RoutedEventArgs e)
         {
             ShowFilterPopup(
                 anchor: sender as Button,
                 title: "فیلتر نوع",
                 options: new List<string> { "حقیقی", "حقوقی" },
-                selected: _selectedLegalStatuses,
+                selected: ViewModel.SelectedLegalStatuses,
                 showSearch: false,
                 immediateApply: true,
                 onSelectionChanged: result =>
                 {
-                    _selectedLegalStatuses.Clear();
-                    foreach (var r in result) _selectedLegalStatuses.Add(r);
-                    _currentPage = 1;
-                    ApplyFilters();
+                    ViewModel.SetFilterResult("legal", result);
                 });
         }
 
-        /// <summary>کلیک روی آیکون فیلتر وضعیت حساب</summary>
         private void AccountStatusFilter_Click(object sender, RoutedEventArgs e)
         {
-            var options = AllPersons?
-                .Select(p => p.AccountStatus)
-                .Where(x => !string.IsNullOrWhiteSpace(x) && x != "—")
-                .Distinct()
-                .OrderBy(x => x)
-                .ToList() ?? new List<string>();
-
             ShowFilterPopup(
                 anchor: sender as Button,
                 title: "فیلتر وضعیت حساب",
-                options: options,
-                selected: _selectedAccountStatuses,
+                options: ViewModel.GetAccountStatusOptions(),
+                selected: ViewModel.SelectedAccountStatuses,
                 showSearch: false,
                 immediateApply: true,
                 onSelectionChanged: result =>
                 {
-                    _selectedAccountStatuses.Clear();
-                    foreach (var r in result) _selectedAccountStatuses.Add(r);
-                    _currentPage = 1;
-                    ApplyFilters();
+                    ViewModel.SetFilterResult("account", result);
                 });
         }
 
-        /// <summary>
-        /// راه‌اندازی FilterPopupControl و نمایش آن.
-        /// همه‌ی منطق پاپ‌آپ (ظاهر، سرچ، چک‌باکس‌ها، دکمه‌ها) داخل UserControl قرار داره.
-        /// </summary>
         private void ShowFilterPopup(
             Button anchor,
             string title,
@@ -1180,17 +762,6 @@ namespace Taadol.Views
         // ======================================================
         //  Helpers
         // ======================================================
-        private string ToPersianNumber(long number)
-        {
-            string[] persianDigits = { "۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹" };
-            string result = "";
-            foreach (char c in number.ToString())
-                result += persianDigits[int.Parse(c.ToString())];
-            return result;
-        }
-
-        private string ToPersianNumber(int number) => ToPersianNumber((long)number);
-
         private static string BuildFullExceptionMessage(Exception ex)
         {
             if (ex == null) return "خطای ناشناخته.";
@@ -1209,14 +780,11 @@ namespace Taadol.Views
             return sb.ToString();
         }
 
-        private void ActionButton_Loaded(object sender, RoutedEventArgs e)
+        private void ActionButton_Loaded(object sender, RoutedEventArgs e) { }
+        private void ActionButton_Loaded_1(object sender, RoutedEventArgs e) { }
+
+        private void BtnPrint_Click(object sender, RoutedEventArgs e)
         {
-
-        }
-
-        private void ActionButton_Loaded_1(object sender, RoutedEventArgs e)
-        {
-
         }
     }
 
@@ -1274,14 +842,12 @@ namespace Taadol.Views
         public string AccountStatus { get; set; }
         public string PersonType { get; set; }
         public bool IsEmpty { get; set; }
-
-        // ★ فیلدهای جدید برای ستون‌های جدید گرید
-        public string LastTransaction { get; set; } = "—";
+        public string LastTransaction { get; set; } = "\u2014";
         public bool IsLegal { get; set; }
         public string LegalStatus => IsEmpty ? "" : IsLegal ? "حقوقی" : "حقیقی";
-        public string TransactionType { get; set; } = "—";
-        public string TransactionDate { get; set; } = "—";
-        public string BalanceDisplay { get; set; } = "—";
+        public string TransactionType { get; set; } = "\u2014";
+        public string TransactionDate { get; set; } = "\u2014";
+        public string BalanceDisplay { get; set; } = "\u2014";
 
         public string FullName =>
             IsEmpty ? "" : !string.IsNullOrWhiteSpace(FullNameText)
@@ -1295,12 +861,12 @@ namespace Taadol.Views
             IsEmpty || string.IsNullOrEmpty(Status) ? Visibility.Collapsed : Visibility.Visible;
 
         public Visibility AccountStatusVisibility =>
-            IsEmpty || string.IsNullOrEmpty(AccountStatus) || AccountStatus == "—"
+            IsEmpty || string.IsNullOrEmpty(AccountStatus) || AccountStatus == "\u2014"
                 ? Visibility.Collapsed : Visibility.Visible;
 
         private string ToPersianNumber(int number)
         {
-            string[] persianDigits = { "۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹" };
+            string[] persianDigits = { "\u06F0", "\u06F1", "\u06F2", "\u06F3", "\u06F4", "\u06F5", "\u06F6", "\u06F7", "\u06F8", "\u06F9" };
             string result = "";
             foreach (char c in number.ToString())
                 result += persianDigits[int.Parse(c.ToString())];

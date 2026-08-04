@@ -124,18 +124,18 @@
                                  Loaded="Sidebar_Loaded" />
 
         <Border x:Name="MainContentBorder"
-               
+                
                 Grid.Row="1"
                 Padding="15,10,25,25"
                 Grid.Column="1"
                 Background="#FFF8ED"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
                 Visibility="Collapsed">
 
             <ContentControl x:Name="MainContent"
-                            VerticalAlignment="Stretch"
-                            HorizontalAlignment="Stretch" />
+                            VerticalAlignment="Top"
+                            HorizontalAlignment="Left" />
 
         </Border>
 
