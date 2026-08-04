@@ -57,16 +57,8 @@ namespace Taadol.Views
                 _currentPage = 1;
                 ApplyFilters();
             };
-            DataGridBorder.SizeChanged += DataGridBorder_SizeChanged;
 
             Loaded += PersonListView_Loaded;
-        }
-        private void DataGridBorder_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            if (DataGridClipGeometry != null && e.NewSize.Width > 0 && e.NewSize.Height > 0)
-            {
-                DataGridClipGeometry.Rect = new Rect(0, 0, e.NewSize.Width, e.NewSize.Height);
-            }
         }
 
         // ======================================================
@@ -685,42 +677,11 @@ namespace Taadol.Views
         }
         private void AdjustDataGridHeight()
         {
-            if (PersonsDataGrid == null || PersonsDataGrid.Items == null)
+            if (PersonsDataGrid == null)
                 return;
 
-            const double headerHeight = 44;
-            const double rowHeight = 36;
-
-            // فقط ردیف‌های واقعی رو بشمار، نه پدینگ خالی
-            int itemCount = PersonsDataGrid.Items
-                .OfType<PersonItem>()
-                .Count(p => !p.IsEmpty);
-
-            double requiredDataGridHeight = headerHeight + (itemCount * rowHeight);
-
-            double totalHeight = RootBorder.ActualHeight;
-            double usedHeight = HeaderBorder.ActualHeight + FooterBorder.ActualHeight;
-            double availableHeight = Math.Max(totalHeight - usedHeight, headerHeight);
-
-            double otherComponentsHeight = 0;
-            if (FilterBarBorder != null) otherComponentsHeight += FilterBarBorder.ActualHeight;
-            if (SummaryBorder != null) otherComponentsHeight += SummaryBorder.ActualHeight;
-            if (PaginationBorder != null) otherComponentsHeight += PaginationBorder.ActualHeight;
-
-            double maxAllowedHeight = Math.Max(availableHeight - otherComponentsHeight, headerHeight);
-
-            if (requiredDataGridHeight <= maxAllowedHeight)
-            {
-                // داده کمه → گرید جمع بشه، بدون فضای خالی زیرش
-                PersonsDataGrid.Height = requiredDataGridHeight;
-                PersonsDataGrid.MaxHeight = requiredDataGridHeight;
-            }
-            else
-            {
-                // داده زیاده → کل فضای موجود پر بشه و اسکرول فعال شه
-                PersonsDataGrid.Height = maxAllowedHeight;
-                PersonsDataGrid.MaxHeight = maxAllowedHeight;
-            }
+            PersonsDataGrid.Height = double.NaN;
+            PersonsDataGrid.MaxHeight = double.PositiveInfinity;
         }
         private void RootBorder_SizeChanged(object sender, SizeChangedEventArgs e)
         {

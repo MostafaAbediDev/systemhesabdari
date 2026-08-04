@@ -381,10 +381,8 @@
                 Value="#E5E7EB" />
         <Setter Property="BorderThickness"
                 Value="1" />
-        <!-- افزایش Padding برای پهن‌تر شدن -->
         <Setter Property="Padding"
-                Value="22,10" />
-
+                Value="10,10" />
         <Setter Property="Margin"
                 Value="2,0,2,0" />
         <Setter Property="Cursor"
@@ -397,17 +395,22 @@
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="4"
+                            ClipToBounds="True"
                             Padding="{TemplateBinding Padding}">
-                        <StackPanel Orientation="Horizontal"
-                                    FlowDirection="RightToLeft"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center">
+                        <Grid FlowDirection="RightToLeft">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
                             <Border x:Name="CloseBorder"
+                                    Grid.Column="0"
                                     Width="18"
                                     Height="18"
                                     CornerRadius="9"
                                     Background="Transparent"
-                                    Margin="0,1,0,0"
+                                    Margin="0,0,4,0"
                                     VerticalAlignment="Center"
                                     Opacity="0"
                                     Cursor="Hand">
@@ -421,20 +424,25 @@
                             </Border>
 
                             <TextBlock x:Name="TitleText"
+                                       Grid.Column="1"
                                        Text="{TemplateBinding Content}"
                                        VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis"
+                                       TextAlignment="Center"
                                        FontWeight="Regular"
                                        FontFamily="{StaticResource IRANSans}"
                                        Foreground="#0D2159" />
 
                             <TextBlock x:Name="CountText"
+                                       Grid.Column="2"
                                        Text="{TemplateBinding Tag}"
                                        FontSize="11"
                                        Foreground="#0D2159"
                                        FontFamily="{StaticResource IRANSans}"
                                        VerticalAlignment="Center"
                                        Margin="4,0,0,0" />
-                        </StackPanel>
+                        </Grid>
                     </Border>
 
                     <ControlTemplate.Triggers>
@@ -1623,13 +1631,15 @@
     <!-- ═══════════════════════════════════════════════════
          اسکرول بار مینیمال — رنگ تم برنامه (#2667FF)
     ════════════════════════════════════════════════════ -->
-    <Style x:Key="MinimalScrollBar" TargetType="ScrollBar">
-        <Setter Property="Width" Value="6" />
-        <Setter Property="MinWidth" Value="6" />
+    <Style x:Key="MinimalScrollBar"
+           TargetType="ScrollBar">
+        <Setter Property="Background"
+                Value="Transparent" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ScrollBar">
-                    <Grid>
+                    <Grid x:Name="RootGrid"
+                          Background="Transparent">
                         <Track x:Name="PART_Track"
                                IsDirectionReversed="True">
                             <Track.DecreaseRepeatButton>
@@ -1655,14 +1665,114 @@
                                 </RepeatButton>
                             </Track.IncreaseRepeatButton>
                             <Track.Thumb>
-                                <Thumb>
+                                <Thumb x:Name="PART_Thumb"
+                                       MinWidth="8"
+                                       MinHeight="8">
                                     <Thumb.Template>
                                         <ControlTemplate TargetType="Thumb">
                                             <Border x:Name="ThumbBorder"
-                                                    Width="6"
+                                                    CornerRadius="3"
+                                                    Background="#9CA3AF"
+                                                    Margin="0"
+                                                    HorizontalAlignment="Stretch"
+                                                    VerticalAlignment="Stretch">
+                                                <Border.Triggers>
+                                                    <EventTrigger RoutedEvent="MouseEnter">
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <ColorAnimation To="#2667FF"
+                                                                                Duration="0:0:0.2"
+                                                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                                                Storyboard.TargetName="ThumbBorder" />
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </EventTrigger>
+                                                    <EventTrigger RoutedEvent="MouseLeave">
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <ColorAnimation To="#9CA3AF"
+                                                                                Duration="0:0:0.2"
+                                                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                                                Storyboard.TargetName="ThumbBorder" />
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </EventTrigger>
+                                                </Border.Triggers>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Thumb.Template>
+                                </Thumb>
+                            </Track.Thumb>
+                        </Track>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Orientation"
+                                 Value="Vertical">
+                            <Setter TargetName="RootGrid"
+                                    Property="Width"
+                                    Value="8" />
+                            <Setter TargetName="PART_Track"
+                                    Property="IsDirectionReversed"
+                                    Value="True" />
+                        </Trigger>
+                        <Trigger Property="Orientation"
+                                 Value="Horizontal">
+                            <Setter TargetName="RootGrid"
+                                    Property="Height"
+                                    Value="8" />
+                            <Setter TargetName="PART_Track"
+                                    Property="IsDirectionReversed"
+                                    Value="False" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="MinimalScrollBarHorizontal" TargetType="ScrollBar">
+        <Setter Property="Width" Value="6" />
+        <Setter Property="MinWidth" Value="6" />
+        <Setter Property="Height" Value="6" />
+        <Setter Property="MinHeight" Value="6" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ScrollBar">
+                    <Grid>
+                        <Track x:Name="PART_Track"
+                               IsDirectionReversed="False">
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton Command="ScrollBar.PageLeftCommand"
+                                              Opacity="0">
+                                    <RepeatButton.Template>
+                                        <ControlTemplate>
+                                            <Border Background="{StaticResource AccentBrush}"
+                                                    CornerRadius="3" />
+                                        </ControlTemplate>
+                                    </RepeatButton.Template>
+                                </RepeatButton>
+                            </Track.DecreaseRepeatButton>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton Command="ScrollBar.PageRightCommand"
+                                              Opacity="0">
+                                    <RepeatButton.Template>
+                                        <ControlTemplate>
+                                            <Border Background="{StaticResource AccentBrush}"
+                                                    CornerRadius="3" />
+                                        </ControlTemplate>
+                                    </RepeatButton.Template>
+                                </RepeatButton>
+                            </Track.IncreaseRepeatButton>
+                            <Track.Thumb>
+                                <Thumb x:Name="PART_Thumb">
+                                    <Thumb.Template>
+                                        <ControlTemplate TargetType="Thumb">
+                                            <Border x:Name="ThumbBorder"
                                                     CornerRadius="3"
                                                     Background="#C0C0C0"
-                                                    Margin="0">
+                                                    Margin="0"
+                                                    HorizontalAlignment="Stretch"
+                                                    VerticalAlignment="Stretch">
                                                 <Border.Triggers>
                                                     <EventTrigger RoutedEvent="MouseEnter">
                                                         <BeginStoryboard>
@@ -1692,6 +1802,99 @@
                             </Track.Thumb>
                         </Track>
                     </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Orientation"
+                                 Value="Horizontal">
+                            <Setter TargetName="PART_Track"
+                                    Property="IsDirectionReversed"
+                                    Value="False" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="MinimalScrollBarVertical" TargetType="ScrollBar">
+        <Setter Property="Width" Value="6" />
+        <Setter Property="MinWidth" Value="6" />
+        <Setter Property="Height" Value="6" />
+        <Setter Property="MinHeight" Value="6" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ScrollBar">
+                    <Grid>
+                        <Track x:Name="PART_Track"
+                               IsDirectionReversed="True">
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton Command="ScrollBar.PageUpCommand"
+                                              Opacity="0">
+                                    <RepeatButton.Template>
+                                        <ControlTemplate>
+                                            <Border Background="{StaticResource AccentBrush}"
+                                                    CornerRadius="3" />
+                                        </ControlTemplate>
+                                    </RepeatButton.Template>
+                                </RepeatButton>
+                            </Track.DecreaseRepeatButton>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton Command="ScrollBar.PageDownCommand"
+                                              Opacity="0">
+                                    <RepeatButton.Template>
+                                        <ControlTemplate>
+                                            <Border Background="{StaticResource AccentBrush}"
+                                                    CornerRadius="3" />
+                                        </ControlTemplate>
+                                    </RepeatButton.Template>
+                                </RepeatButton>
+                            </Track.IncreaseRepeatButton>
+                            <Track.Thumb>
+                                <Thumb x:Name="PART_Thumb">
+                                    <Thumb.Template>
+                                        <ControlTemplate TargetType="Thumb">
+                                            <Border x:Name="ThumbBorder"
+                                                    CornerRadius="3"
+                                                    Background="#C0C0C0"
+                                                    Margin="0"
+                                                    HorizontalAlignment="Stretch"
+                                                    VerticalAlignment="Stretch">
+                                                <Border.Triggers>
+                                                    <EventTrigger RoutedEvent="MouseEnter">
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <ColorAnimation To="#2667FF"
+                                                                                Duration="0:0:0.2"
+                                                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                                                Storyboard.TargetName="ThumbBorder" />
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </EventTrigger>
+                                                    <EventTrigger RoutedEvent="MouseLeave">
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <ColorAnimation To="#C0C0C0"
+                                                                                Duration="0:0:0.2"
+                                                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                                                Storyboard.TargetName="ThumbBorder" />
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </EventTrigger>
+                                                </Border.Triggers>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Thumb.Template>
+                                </Thumb>
+                            </Track.Thumb>
+                        </Track>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Orientation"
+                                 Value="Vertical">
+                            <Setter TargetName="PART_Track"
+                                    Property="IsDirectionReversed"
+                                    Value="True" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
