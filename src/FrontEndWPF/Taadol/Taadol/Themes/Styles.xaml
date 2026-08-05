@@ -381,10 +381,10 @@
                 Value="#E5E7EB" />
         <Setter Property="BorderThickness"
                 Value="1" />
-        <Setter Property="Padding"
-                Value="10,10" />
-        <Setter Property="Margin"
-                Value="2,0,2,0" />
+         <Setter Property="Padding"
+                 Value="4,4" />
+         <Setter Property="Margin"
+                 Value="1,0,1,0" />
         <Setter Property="Cursor"
                 Value="Hand" />
         <Setter Property="Template">
@@ -401,7 +401,6 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
 
                             <Border x:Name="CloseBorder"
@@ -423,25 +422,25 @@
                                            VerticalAlignment="Center" />
                             </Border>
 
-                            <TextBlock x:Name="TitleText"
-                                       Grid.Column="1"
-                                       Text="{TemplateBinding Content}"
-                                       VerticalAlignment="Center"
-                                       HorizontalAlignment="Center"
-                                       TextTrimming="CharacterEllipsis"
-                                       TextAlignment="Center"
-                                       FontWeight="Regular"
-                                       FontFamily="{StaticResource IRANSans}"
-                                       Foreground="#0D2159" />
-
-                            <TextBlock x:Name="CountText"
-                                       Grid.Column="2"
-                                       Text="{TemplateBinding Tag}"
-                                       FontSize="11"
-                                       Foreground="#0D2159"
-                                       FontFamily="{StaticResource IRANSans}"
-                                       VerticalAlignment="Center"
-                                       Margin="4,0,0,0" />
+                            <StackPanel Grid.Column="1"
+                                        Orientation="Horizontal"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Center">
+                                <TextBlock x:Name="TitleText"
+                                           Text="{TemplateBinding Content}"
+                                           VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis"
+                                           FontWeight="Regular"
+                                           FontFamily="{StaticResource IRANSans}"
+                                           Foreground="#0D2159" />
+                                <TextBlock x:Name="CountText"
+                                           Text="{TemplateBinding Tag}"
+                                           FontSize="11"
+                                           Foreground="#0D2159"
+                                           FontFamily="{StaticResource IRANSans}"
+                                           VerticalAlignment="Center"
+                                           Margin="6,0,0,0" />
+                            </StackPanel>
                         </Grid>
                     </Border>
 
@@ -1723,6 +1722,9 @@
                             <Setter TargetName="PART_Track"
                                     Property="IsDirectionReversed"
                                     Value="False" />
+                            <Setter TargetName="PART_Track"
+                                    Property="Orientation"
+                                    Value="Horizontal" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -1740,6 +1742,7 @@
                 <ControlTemplate TargetType="ScrollBar">
                     <Grid>
                         <Track x:Name="PART_Track"
+                               Orientation="Horizontal"
                                IsDirectionReversed="False">
                             <Track.DecreaseRepeatButton>
                                 <RepeatButton Command="ScrollBar.PageLeftCommand"

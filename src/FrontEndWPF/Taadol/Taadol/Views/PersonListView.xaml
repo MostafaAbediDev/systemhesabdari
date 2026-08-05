@@ -17,6 +17,82 @@
              Background="#FFFFFF">
 
     <UserControl.Resources>
+        <Style x:Key="MinimalScrollBarH"
+               TargetType="ScrollBar">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid x:Name="Root"
+                              Background="Transparent"
+                              Height="8">
+                            <Track x:Name="PART_Track"
+                                   IsDirectionReversed="False"
+                                   Orientation="Horizontal">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="ScrollBar.PageLeftCommand"
+                                                  Opacity="0">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate>
+                                                <Border Background="{StaticResource AccentBrush}"
+                                                        CornerRadius="3" />
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.DecreaseRepeatButton>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="ScrollBar.PageRightCommand"
+                                                  Opacity="0">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate>
+                                                <Border Background="{StaticResource AccentBrush}"
+                                                        CornerRadius="3" />
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.IncreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb x:Name="PART_Thumb"
+                                           MinWidth="8">
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Border x:Name="ThumbBorder"
+                                                        CornerRadius="3"
+                                                        Background="#9CA3AF"
+                                                        HorizontalAlignment="Stretch"
+                                                        VerticalAlignment="Stretch">
+                                                    <Border.Triggers>
+                                                        <EventTrigger RoutedEvent="MouseEnter">
+                                                            <BeginStoryboard>
+                                                                <Storyboard>
+                                                                    <ColorAnimation To="#2667FF"
+                                                                                    Duration="0:0:0.2"
+                                                                                    Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                                                    Storyboard.TargetName="ThumbBorder" />
+                                                                </Storyboard>
+                                                            </BeginStoryboard>
+                                                        </EventTrigger>
+                                                        <EventTrigger RoutedEvent="MouseLeave">
+                                                            <BeginStoryboard>
+                                                                <Storyboard>
+                                                                    <ColorAnimation To="#9CA3AF"
+                                                                                    Duration="0:0:0.2"
+                                                                                    Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                                                    Storyboard.TargetName="ThumbBorder" />
+                                                                </Storyboard>
+                                                            </BeginStoryboard>
+                                                        </EventTrigger>
+                                                    </Border.Triggers>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
         <Style x:Key="EllipseLeft" TargetType="Ellipse">
             <Setter Property="Width" Value="25" />
@@ -42,11 +118,10 @@
 
     <Border x:Name="RootBorder"
             Margin="0"
-            SizeChanged="RootBorder_SizeChanged"
             Background="#FFFFFF"
             CornerRadius="4"
             BorderBrush="#E5E7EB"
-            BorderThickness="1"
+            BorderThickness="0"
             ClipToBounds="True">
 
         <Grid>
@@ -139,16 +214,16 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition x:Name="DetailPanelColumn"
                                       Width="340"
-                                      MinWidth="280"
+                                      MinWidth="64"
                                       MaxWidth="340" />
-                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="4" />
                     <ColumnDefinition Width="*"
                                       MinWidth="500" />
                 </Grid.ColumnDefinitions>
 
                 <!-- ═══ پنل سمت راست — اطلاعات اشخاص انتخاب شده ═══ -->
                 <Grid Grid.Column="0"
-                      MinWidth="280"
+                      MinWidth="64"
                       HorizontalAlignment="Stretch">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -158,12 +233,16 @@
 
                     <!-- عنوان پنل -->
                     <Border Grid.Row="0"
-                            Background="#FAFCFF"
+                            x:Name="PanelHeaderBorder"
+                            Background="#ffffff"
                             BorderBrush="#E5E7EB"
                             BorderThickness="0,0,0,0"
-                            Padding="10,6">
-                        <StackPanel Orientation="Horizontal"
-                                    VerticalAlignment="Center">
+                            Padding="10,6"
+                            ClipToBounds="True">
+                        <StackPanel x:Name="PanelHeaderStack"
+                                    Orientation="Horizontal"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Left">
                             <svg:SvgViewbox x:Name="MainIcon"
                                             Width="20"
                                             Height="20"
@@ -171,20 +250,24 @@
                                             Source="/Assets/Icons/user_blue.svg"
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center" />
-                            <TextBlock Text="اشخاص انتخاب شده"
+                            <TextBlock x:Name="PanelHeaderText"
+                                       Text="اشخاص انتخاب شده"
                                        FontSize="13"
                                        FontWeight="SemiBold"
                                        Foreground="#0D2159"
                                        VerticalAlignment="Center" />
                             <Border x:Name="SelectedCountBadge"
                                     CornerRadius="10"
-                                    Padding="8,2"
-                                    Margin="8,0,0,0"
-                                    VerticalAlignment="Center">
+                                    Padding="0,2"
+                                    Margin="0,0,0,0"
+                                    VerticalAlignment="Center"
+                                    Background="#ffffff"
+                                    BorderBrush="#ffffff"
+                                    BorderThickness="1">
                                 <TextBlock x:Name="SelectedCountText"
                                            Text=""
                                            FontSize="13"
-                                           FontWeight="Medium"
+                                           FontWeight="DemiBold"
                                            Foreground="#0D2159"
                                            VerticalAlignment="Center" />
                             </Border>
@@ -195,7 +278,7 @@
                     <Border x:Name="DetailPanelContainer"
                             Grid.Row="1"
                             Width="340"
-                            Padding="10,5"
+                            Padding="10,5,2,5"
                             Visibility="Visible"
                             PreviewMouseWheel="DetailPanelContainer_PreviewMouseWheel">
                         <ScrollViewer x:Name="DetailPanelScroll"
@@ -208,6 +291,7 @@
 
                     <!-- دکمه + شخص جدید -->
                     <Border Grid.Row="2"
+                            x:Name="BtnNewBorder"
                             Margin="10,8,10,8"
                             Cursor="Hand"
                             Background="#2563EB"
@@ -215,17 +299,19 @@
                             Padding="0,10"
                             HorizontalAlignment="Stretch"
                             MouseLeftButtonDown="BtnNew_Click">
-                        <StackPanel Orientation="Horizontal"
+                        <StackPanel x:Name="BtnNewStack"
+                                    Orientation="Horizontal"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Center">
-                            <svg:SvgViewbox 
+                            <svg:SvgViewbox x:Name="BtnNewIcon"
                                             Width="15"
                                             Height="15"
-                                            Margin="0,0,12,0"
+                                            Margin="0,0,10,0"
                                             Source="/Assets/Icons/plus_LINE.svg"
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center" />
-                            <TextBlock Text="شخص جدید"
+                            <TextBlock x:Name="BtnNewText"
+                                       Text="شخص جدید"
                                        FontSize="13"
                                        FontWeight="Regular"
                                        Foreground="White"
@@ -236,62 +322,7 @@
                 </Grid>
 
                 <!-- دکمه باز/بسته پنل -->
-                <Button x:Name="BtnToggleSidebar"
-                        Click="BtnToggleSidebar_Click"
-                        Grid.Column="1"
-                        Grid.RowSpan="2"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Top"
-                        Panel.ZIndex="999"
-                        Margin="0,40,-13,0"
-                        Cursor="Hand">
-                    <Button.Template>
-                        <ControlTemplate TargetType="Button">
-                            <Border x:Name="toggleBorder"
-                                    Background="White"
-                                    CornerRadius="4"
-                                    Width="28"
-                                    Height="28">
-                                <Border.Effect>
-                                    <DropShadowEffect Color="#6366F1"
-                                                      BlurRadius="8"
-                                                      ShadowDepth="2"
-                                                      Opacity="0.10"
-                                                      Direction="315" />
-                                </Border.Effect>
-                                <svg:SvgViewbox x:Name="ToggleArrowIcon"
-                                                Width="5"
-                                                Height="8"
-                                                Source="/Assets/Icons/ArrowLeft.svg"
-                                                HorizontalAlignment="Center"
-                                                VerticalAlignment="Center"
-                                                RenderTransformOrigin="0.5,0.5">
-                                    <svg:SvgViewbox.RenderTransform>
-                                        <RotateTransform x:Name="ArrowRotation"
-                                                         Angle="0" />
-                                    </svg:SvgViewbox.RenderTransform>
-                                </svg:SvgViewbox>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver"
-                                         Value="True">
-                                    <Setter TargetName="toggleBorder"
-                                            Property="BorderBrush"
-                                            Value="#7DA4FF" />
-                                    <Setter TargetName="toggleBorder"
-                                            Property="BorderThickness"
-                                            Value="1" />
-                                </Trigger>
-                                <Trigger Property="IsPressed"
-                                         Value="True">
-                                    <Setter TargetName="toggleBorder"
-                                            Property="Background"
-                                            Value="#D4E1FF" />
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Button.Template>
-                </Button>
+              
 
             <!-- ═══ DataGrid Container ═══ -->
             <Border Grid.Column="2"
@@ -303,21 +334,21 @@
                 <Grid x:Name="DataGridInnerGrid"
                       HorizontalAlignment="Stretch"
                       VerticalAlignment="Stretch">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
+                     <Grid.RowDefinitions>
+                         <RowDefinition Height="Auto" />
+                         <RowDefinition Height="*" />
+                         <RowDefinition Height="Auto" />
+                         <RowDefinition Height="Auto" />
+                     </Grid.RowDefinitions>
 
                     <!-- ═══ Filter Tabs + Search ═══ -->
-                        <!-- ═══ Filter Tabs + Search ═══ -->
-                        <Border Grid.Row="0"
-                                x:Name="FilterBarBorder"
-                                BorderBrush="#E5E7EB"
-                                BorderThickness="0,0,0,1"
-                                Background="#FAFCFF"
-                                Padding="8,6">
+                         <Border Grid.Row="0"
+                                 x:Name="FilterBarBorder"
+                                 BorderBrush="#E5E7EB"
+                                 BorderThickness="0,0,0,1"
+                                 Background="#ffffff"
+                                 Padding="0,6,0,6"
+                                 Margin="0">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="1.6*"
@@ -462,52 +493,60 @@
                                               Margin="4,0,0,0" />
                             </Grid>
                         </Border>
-                        <!-- ═══ DataGrid ═══ -->
-                        <Grid x:Name="DataGridContainer"
-                              Grid.Row="1"
-                              ClipToBounds="True">
-                            <Border x:Name="DataGridBorder"
-                                    Background="#FFFFFF"
+                         <!-- ═══ DataGrid ═══ -->
+                         <Grid x:Name="DataGridContainer"
+                               Grid.Row="1"
+                               ClipToBounds="True">
+                              <Border x:Name="DataGridBorder"
+                                      Background="#FFFFFF"
                                     BorderBrush="#E5E7EB"
-                                    BorderThickness="1,1,1,0"
-                                    CornerRadius="4"
-                                    Padding="0"
-                                    Margin="0"
-                                    ClipToBounds="True"
-                                    SnapsToDevicePixels="True"
-                                    HorizontalAlignment="Stretch"
-                                    VerticalAlignment="Stretch">
-                                <DataGrid x:Name="PersonsDataGrid"
-                                          VerticalAlignment="Stretch"
-                                          HorizontalAlignment="Stretch"
-                                          CanUserSortColumns="False"
-                                          SnapsToDevicePixels="True"
-                                          UseLayoutRounding="True"
-                                          AutoGenerateColumns="False"
-                                          HeadersVisibility="Column"
-                                          GridLinesVisibility="Vertical"
-                                          VerticalGridLinesBrush="#E5E7EB"
-                                          HorizontalGridLinesBrush="Transparent"
-                                          RowHeight="36"
-                                          Background="White"
-                                          BorderBrush="Transparent"
-                                          BorderThickness="0,0,0,0"
-                                          CanUserAddRows="False"
-                                          CanUserDeleteRows="False"
-                                          CanUserResizeRows="False"
-                                          SelectionMode="Extended"
-                                          AlternationCount="2"
-                                          IsReadOnly="True"
-                                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                                          ScrollViewer.VerticalScrollBarVisibility="Auto"
-                  FontFamily="{StaticResource IRANSans}"
-                  SelectionChanged="PersonsDataGrid_SelectionChanged"
-                  MouseDoubleClick="PersonsDataGrid_MouseDoubleClick">
+                                      BorderThickness="1,1,1,1.5"
+                                      CornerRadius="4"
+                                      Padding="0"
+                                      Margin="0"
+                                      ClipToBounds="True"
+                                      SnapsToDevicePixels="True"
+                                      HorizontalAlignment="Stretch"
+                                      VerticalAlignment="Stretch">
+                                  <DataGrid x:Name="PersonsDataGrid"
+                                            VerticalAlignment="Stretch"
+                                            HorizontalAlignment="Stretch"
+                                            CanUserSortColumns="False"
+                                            SnapsToDevicePixels="True"
+                                            UseLayoutRounding="True"
+                                            AutoGenerateColumns="False"
+                                            HeadersVisibility="Column"
+                                            GridLinesVisibility="Vertical"
+                                            VerticalGridLinesBrush="#E5E7EB"
+                                            HorizontalGridLinesBrush="Transparent"
+                                            RowHeight="36"
+                                            Background="White"
+                                            BorderBrush="Transparent"
+                                            BorderThickness="0,0,0,0"
+                                            CanUserAddRows="False"
+                                            CanUserDeleteRows="False"
+                                            CanUserResizeRows="False"
+                                            SelectionMode="Extended"
+                                            AlternationCount="2"
+                                            IsReadOnly="True"
+                                            ScrollViewer.HorizontalScrollBarVisibility="Visible"
+                                            ScrollViewer.VerticalScrollBarVisibility="Auto"
+                    FontFamily="{StaticResource IRANSans}"
+                   SelectionChanged="PersonsDataGrid_SelectionChanged"
+                   MouseDoubleClick="PersonsDataGrid_MouseDoubleClick">
 
 
                                     <DataGrid.Resources>
                                         <Style TargetType="ScrollBar"
-                                               BasedOn="{StaticResource MinimalScrollBar}" />
+                                               BasedOn="{StaticResource MinimalScrollBar}">
+                                            <Style.Triggers>
+                                                <Trigger Property="Orientation"
+                                                         Value="Horizontal">
+                                                    <Setter Property="Height"
+                                                            Value="8" />
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
 
                                 <!-- استایل متن ستون‌ها -->
                                 <Style x:Key="BaseTextColumnStyle"
@@ -580,8 +619,8 @@
                                                 <Setter.Value>
                                                     <ControlTemplate TargetType="DataGridColumnHeader">
                                                         <Border Background="{TemplateBinding Background}"
-                                                                BorderBrush="#E5E7EB"
-                                                                BorderThickness="0,0,1,2"
+                                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                                BorderThickness="{TemplateBinding BorderThickness}"
                                                                 Padding="{TemplateBinding Padding}">
                                                             <ContentPresenter VerticalAlignment="Center"
                                                                               HorizontalAlignment="Center" />
@@ -674,29 +713,54 @@
 
                             <DataGrid.Columns>
 
-                                <!-- 1️⃣ چک‌باکس -->
-                                <DataGridTemplateColumn Header=""
-                                                        Width="55">
-                                    <DataGridTemplateColumn.HeaderStyle>
-                                        <Style TargetType="DataGridColumnHeader"
-                                               BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
-                                            <Setter Property="BorderThickness"
-                                                    Value="0,0,1,2" />
-                                            <Setter Property="BorderBrush"
-                                                    Value="#E0E7FF" />
-                                        </Style>
-                                    </DataGridTemplateColumn.HeaderStyle>
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <Border x:Name="CheckBoxBorder"
-                                                    Width="20"
-                                                    Height="20"
-                                                    CornerRadius="4"
-                                                    Cursor="Hand"
-                                                    BorderThickness="1.5"
-                                                    HorizontalAlignment="Center"
-                                                    VerticalAlignment="Center"
-                                                    PreviewMouseLeftButtonUp="CheckBoxBorder_MouseLeftButtonUp">
+                                 <!-- 1️⃣ چک‌باکس -->
+                                 <DataGridTemplateColumn Header=""
+                                                         Width="55"
+                                                         MinWidth="50">
+                                     <DataGridTemplateColumn.HeaderTemplate>
+                                         <DataTemplate>
+                                             <Border x:Name="SelectAllBorder"
+                                                     Width="20"
+                                                     Height="20"
+                                                     CornerRadius="4"
+                                                     Cursor="Hand"
+                                                     BorderThickness="1.5"
+                                                     HorizontalAlignment="Center"
+                                                     VerticalAlignment="Center"
+                                                     Background="#FFFFFF"
+                                                      BorderBrush="#CBD5E1"
+                                                      PreviewMouseLeftButtonDown="SelectAllBorder_PreviewMouseLeftButtonDown">
+                                                 <svg:SvgViewbox x:Name="SelectAllCheckMark"
+                                                                 Width="8"
+                                                                 Height="8"
+                                                                 Source="/Assets/Icons/CHECK_w.svg"
+                                                                 FlowDirection="LeftToRight"
+                                                                 HorizontalAlignment="Center"
+                                                                 VerticalAlignment="Center"
+                                                                 Visibility="Collapsed" />
+                                             </Border>
+                                         </DataTemplate>
+                                     </DataGridTemplateColumn.HeaderTemplate>
+                                     <DataGridTemplateColumn.HeaderStyle>
+                                         <Style TargetType="DataGridColumnHeader"
+                                                BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                                             <Setter Property="BorderThickness"
+                                                     Value="1,0,0,2" />
+                                             <Setter Property="BorderBrush"
+                                                     Value="#E0E7FF" />
+                                         </Style>
+                                     </DataGridTemplateColumn.HeaderStyle>
+                                     <DataGridTemplateColumn.CellTemplate>
+                                         <DataTemplate>
+                                             <Border x:Name="CheckBoxBorder"
+                                                     Width="20"
+                                                     Height="20"
+                                                     CornerRadius="4"
+                                                     Cursor="Hand"
+                                                     BorderThickness="1.5"
+                                                     HorizontalAlignment="Center"
+                                                     VerticalAlignment="Center"
+                                                     PreviewMouseLeftButtonUp="CheckBoxBorder_MouseLeftButtonUp">
                                                 <Border.Style>
                                                     <Style TargetType="Border">
                                                         <Setter Property="Background" Value="#FFFFFF" />
@@ -735,25 +799,27 @@
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
-                                <!-- 2️⃣ ردیف (#) -->
-                                <DataGridTextColumn Header="#"
-                                                    Width="50"
+                                 <!-- 2️⃣ ردیف (#) -->
+                                 <DataGridTextColumn Header="#"
+                                                     Width="50"
+                                                     MinWidth="45"
                                                     Binding="{Binding RowNumberDisplay}"
                                                     ElementStyle="{StaticResource RowNumberColumnStyle}">
                                     <DataGridTextColumn.HeaderStyle>
                                         <Style TargetType="DataGridColumnHeader"
                                                BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
                                             <Setter Property="BorderThickness"
-                                                    Value="0,0,1,2" />
+                                                    Value="1,0,1,2" />
                                             <Setter Property="BorderBrush"
                                                     Value="#E0E7FF" />
                                         </Style>
                                     </DataGridTextColumn.HeaderStyle>
                                 </DataGridTextColumn>
 
-                                <!-- 3️⃣ کد یکتا -->
-                                <DataGridTextColumn Header="کد یکتا"
-                                                    Width="100"
+                                 <!-- 3️⃣ کد یکتا -->
+                                 <DataGridTextColumn Header="کد یکتا"
+                                                     Width="100"
+                                                     MinWidth="90"
                                                     Binding="{Binding Code}"
                                                     ElementStyle="{StaticResource BaseTextColumnStyle}">
                                     <DataGridTextColumn.HeaderStyle>
@@ -767,9 +833,10 @@
                                     </DataGridTextColumn.HeaderStyle>
                                 </DataGridTextColumn>
 
-                                <!-- 4️⃣ نام کامل / شرکت -->
-                                <DataGridTextColumn Header="نام کامل / شرکت"
-                                                    Width="180"
+                                 <!-- 4️⃣ نام کامل / شرکت -->
+                                 <DataGridTextColumn Header="نام کامل / شرکت"
+                                                     Width="180"
+                                                     MinWidth="160"
                                                     Binding="{Binding FullName}"
                                                     ElementStyle="{StaticResource FullNameColumnStyle}">
                                     <DataGridTextColumn.HeaderStyle>
@@ -783,8 +850,9 @@
                                     </DataGridTextColumn.HeaderStyle>
                                 </DataGridTextColumn>
 
-                                <!-- 5️⃣ وضعیت (با فیلتر) -->
-                                <DataGridTemplateColumn Width="100">
+                                 <!-- 5️⃣ وضعیت (با فیلتر) -->
+                                 <DataGridTemplateColumn Width="100"
+                                                         MinWidth="90">
                                     <DataGridTemplateColumn.HeaderStyle>
                                         <Style TargetType="DataGridColumnHeader"
                                                BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
@@ -884,8 +952,9 @@
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
-                                <!-- 6️⃣ نوع (حقیقی/حقوقی) با فیلتر -->
-                                <DataGridTemplateColumn Width="90">
+                                 <!-- 6️⃣ نوع (حقیقی/حقوقی) با فیلتر -->
+                                 <DataGridTemplateColumn Width="90"
+                                                         MinWidth="80">
                                     <DataGridTemplateColumn.HeaderStyle>
                                         <Style TargetType="DataGridColumnHeader"
                                                BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
@@ -945,9 +1014,10 @@
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
-                                <!-- 7️⃣ موبایل -->
-                                <DataGridTextColumn Header="موبایل"
-                                                    Width="130"
+                                 <!-- 7️⃣ موبایل -->
+                                 <DataGridTextColumn Header="موبایل"
+                                                     Width="130"
+                                                     MinWidth="120"
                                                     Binding="{Binding Mobile}"
                                                     ElementStyle="{StaticResource LtrTextColumnStyle}">
                                     <DataGridTextColumn.HeaderStyle>
@@ -961,8 +1031,9 @@
                                     </DataGridTextColumn.HeaderStyle>
                                 </DataGridTextColumn>
 
-                                <!-- 8️⃣ شهر (با فیلتر) -->
-                                <DataGridTemplateColumn Width="120">
+                                 <!-- 8️⃣ شهر (با فیلتر) -->
+                                 <DataGridTemplateColumn Width="120"
+                                                         MinWidth="110">
                                     <DataGridTemplateColumn.HeaderStyle>
                                         <Style TargetType="DataGridColumnHeader"
                                                BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
@@ -1022,9 +1093,10 @@
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
-                                <!-- 9️⃣ آخرین تراکنش -->
-                                <DataGridTemplateColumn Header="آخرین تراکنش"
-                                                        Width="130">
+                                 <!-- 9️⃣ آخرین تراکنش -->
+                                 <DataGridTemplateColumn Header="آخرین تراکنش"
+                                                         Width="130"
+                                                         MinWidth="120">
                                     <DataGridTemplateColumn.HeaderStyle>
                                         <Style TargetType="DataGridColumnHeader"
                                                BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
@@ -1059,12 +1131,13 @@
                                 </DataGridTemplateColumn>
 
                                 <!-- 🔟 وضعیت حساب با فیلتر -->
-                                <DataGridTemplateColumn Width="180">
+                                <DataGridTemplateColumn Width="*"
+                                                        MinWidth="180">
                                     <DataGridTemplateColumn.HeaderStyle>
                                         <Style TargetType="DataGridColumnHeader"
                                                BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
                                             <Setter Property="BorderThickness"
-                                                    Value="0,0,0,2" />
+                                                    Value="0,0,1,2" />
                                             <Setter Property="BorderBrush"
                                                     Value="#E0E7FF" />
                                         </Style>
@@ -1389,12 +1462,12 @@
                 <!-- ═══ نوار خلاصه زیر گرید ═══ -->
                 <Border Grid.Row="2"
                         Background="#ffffff"
-                                BorderBrush="#E5E7EB"
-                                x:Name="SummaryBorder"
-                                BorderThickness="1"
+                        BorderBrush="#E5E7EB"
+                        x:Name="SummaryBorder"
+                        BorderThickness="1"
                         Height="53"
                         CornerRadius="4"
-                        Margin="5,0,10,2"
+                        Margin="0,2,0,2"
                         Padding="16,8">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -1461,13 +1534,13 @@
                 <!-- ═══ نوار کلیدهای میانبر ═══ -->
              
 
-                <!-- ═══ صفحه‌بندی ═══ -->
-                        <Border Grid.Row="3"
-                                Padding="5,5"
-                                Background="White"
-                                BorderBrush="#E9F0FF"
-                                x:Name="PaginationBorder"
-                                BorderThickness="0,0,0,0">
+                 <!-- ═══ صفحه‌بندی ═══ -->
+                         <Border Grid.Row="3"
+                                 Padding="0,5"
+                                 Background="White"
+                                 BorderBrush="#E9F0FF"
+                                 x:Name="PaginationBorder"
+                                 BorderThickness="0,0,0,0">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
@@ -1669,10 +1742,71 @@
                         </Border>
                     </Grid>
             </Border>
-
-            <!-- ═══ Decorative Ellipses ═══ -->
+                <!-- ═══ Decorative Ellipses ═══ -->
             <Ellipse Style="{StaticResource EllipseLeft}" Grid.Row="1" Grid.ColumnSpan="3" Margin="-18,0,0,0" />
             <Ellipse Style="{StaticResource EllipseRight}" Grid.Row="1" Grid.ColumnSpan="3" Margin="0,0,-18,0" />
+
+            <!-- ═══ Toggle Button — direct grid child, last = on top ═══ -->
+            <Button x:Name="BtnToggleSidebar"
+                    Grid.Row="1" Grid.ColumnSpan="3"
+                    Click="BtnToggleSidebar_Click"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Margin="332,40,0,0"
+                    Width="24"
+                    Height="24"
+                    Cursor="Hand"
+                    Panel.ZIndex="9999"
+                    FlowDirection="LeftToRight">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="toggleBorder"
+                                    Background="White"
+                                    BorderBrush="#D1D5DB"
+                                    BorderThickness="1"
+                                    CornerRadius="5"
+                                    Width="24"
+                                    Height="24">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="#6366F1"
+                                                      BlurRadius="12"
+                                                      ShadowDepth="3"
+                                                      Opacity="0.22"
+                                                      Direction="315" />
+                                </Border.Effect>
+                                <svg:SvgViewbox x:Name="ToggleArrowIcon"
+                                                Width="7"
+                                                Height="10"
+                                                Source="/Assets/Icons/ArrowLeft.svg"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                RenderTransformOrigin="0.5,0.5">
+                                    <svg:SvgViewbox.RenderTransform>
+                                        <RotateTransform x:Name="ArrowRotation"
+                                                         Angle="0" />
+                                    </svg:SvgViewbox.RenderTransform>
+                                </svg:SvgViewbox>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver"
+                                         Value="True">
+                                    <Setter TargetName="toggleBorder"
+                                            Property="BorderBrush"
+                                            Value="#7DA4FF" />
+                                    <Setter TargetName="toggleBorder"
+                                            Property="BorderThickness"
+                                            Value="1" />
+                                </Trigger>
+                                <Trigger Property="IsPressed"
+                                         Value="True">
+                                    <Setter TargetName="toggleBorder"
+                                            Property="Background"
+                                            Value="#D4E1FF" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
 
         </Grid>
             <Border Grid.Row="2"

@@ -88,6 +88,20 @@ namespace Taadol.ViewModels
             return AllPersons?.Where(p => p.IsSelected && !p.IsEmpty).ToList() ?? new List<PersonItem>();
         }
 
+        public void SelectAll()
+        {
+            if (FilteredPersons == null) return;
+            foreach (var p in FilteredPersons.Where(p => !p.IsEmpty))
+                p.IsSelected = true;
+        }
+
+        public void DeselectAll()
+        {
+            if (FilteredPersons == null) return;
+            foreach (var p in FilteredPersons.Where(p => !p.IsEmpty))
+                p.IsSelected = false;
+        }
+
         public List<PersonItem> GetAllSelectedItems()
         {
             return AllPersons?.Where(p => !p.IsEmpty).ToList() ?? new List<PersonItem>();

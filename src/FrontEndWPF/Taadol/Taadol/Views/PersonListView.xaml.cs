@@ -13,6 +13,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 using Taadol.ViewModels;
 
@@ -24,6 +25,7 @@ namespace Taadol.Views
         private bool _isLoadedOnce = false;
         private bool _isPanelOpen = true;
         private bool _sizeWired = false;
+        private bool _scrollWired = false;
 
         public PersonListView()
         {
@@ -40,7 +42,6 @@ namespace Taadol.Views
                 Dispatcher.BeginInvoke(new Action(() =>
                 {
                     UpdateRowBorders();
-                    AdjustDataGridHeight();
                 }), DispatcherPriority.Loaded);
             };
 
@@ -59,7 +60,7 @@ namespace Taadol.Views
                 Dispatcher.BeginInvoke(new Action(() =>
                 {
                     UpdateRowBorders();
-                    AdjustDataGridHeight();
+                    UpdateHeaderSelectAllState();
                 }), DispatcherPriority.Loaded);
             }
             else if (e.PropertyName == nameof(PersonListViewModel.Pages))
@@ -262,9 +263,9 @@ namespace Taadol.Views
             _isPanelOpen = !_isPanelOpen;
 
             var anim = new System.Windows.Media.Animation.DoubleAnimation();
-            anim.Duration = TimeSpan.FromMilliseconds(250);
-            var ease = new System.Windows.Media.Animation.CubicEase();
-            var arrow = BtnToggleSidebar.FindName("ArrowRotation") as System.Windows.Media.RotateTransform;
+            anim.Duration = TimeSpan.FromMilliseconds(180);
+            var ease = new System.Windows.Media.Animation.SineEase();
+            var arrow = BtnToggleSidebar.Template?.FindName("ArrowRotation", BtnToggleSidebar) as System.Windows.Media.RotateTransform;
 
             if (_isPanelOpen)
             {
@@ -272,6 +273,30 @@ namespace Taadol.Views
                 ease.EasingMode = System.Windows.Media.Animation.EasingMode.EaseOut;
                 anim.EasingFunction = ease;
                 DetailPanelContainer.Visibility = Visibility.Visible;
+                DetailPanelContainer.Opacity = 0;
+                PanelHeaderText.Visibility = Visibility.Visible;
+                PanelHeaderText.Opacity = 0;
+                BtnNewText.Visibility = Visibility.Visible;
+                BtnNewText.Opacity = 0;
+                BtnNewStack.HorizontalAlignment = HorizontalAlignment.Center;
+                BtnNewBorder.Margin = new Thickness(10, 8, 10, 8);
+                BtnNewBorder.Padding = new Thickness(0, 10, 0, 10);
+                BtnNewBorder.Width = double.NaN;
+                BtnNewBorder.HorizontalAlignment = HorizontalAlignment.Stretch;
+                BtnNewIcon.Margin = new Thickness(0, 0, 10, 0);
+                PanelHeaderStack.HorizontalAlignment = HorizontalAlignment.Left;
+                PanelHeaderBorder.Padding = new Thickness(10, 6, 10, 6);
+                SelectedCountBadge.Padding = new Thickness(8, 2, 8, 2);
+                var fadeIn = new System.Windows.Media.Animation.DoubleAnimation(1, TimeSpan.FromMilliseconds(180));
+                fadeIn.EasingFunction = ease;
+                DetailPanelContainer.BeginAnimation(UIElement.OpacityProperty, fadeIn);
+                PanelHeaderText.BeginAnimation(UIElement.OpacityProperty, fadeIn);
+                BtnNewText.BeginAnimation(UIElement.OpacityProperty, fadeIn);
+                var marginLeftAnim = new System.Windows.Media.Animation.ThicknessAnimation(
+                    new Thickness(332, 40, 0, 0),
+                    TimeSpan.FromMilliseconds(180));
+                marginLeftAnim.EasingFunction = ease;
+                BtnToggleSidebar.BeginAnimation(FrameworkElement.MarginProperty, marginLeftAnim);
                 DetailPanelColumn.BeginAnimation(System.Windows.Controls.ColumnDefinition.MaxWidthProperty, anim);
                 DetailPanelColumn.BeginAnimation(System.Windows.Controls.ColumnDefinition.MinWidthProperty, anim);
                 anim.Completed += (s, ev) =>
@@ -280,21 +305,44 @@ namespace Taadol.Views
                 };
                 if (arrow != null) arrow.Angle = 0;
 
-                // اگه پنل‌ها موقع بسته بودن از دست رفتن، دوباره از انتخاب فعلی بساز
                 if (DetailPanelsStack.Children.Count == 0)
                     UpdateDetailPanels();
             }
             else
             {
-                anim.To = 0;
+                anim.To = 64;
                 ease.EasingMode = System.Windows.Media.Animation.EasingMode.EaseIn;
                 anim.EasingFunction = ease;
-                DetailPanelContainer.Visibility = Visibility.Collapsed;
+                BtnNewStack.HorizontalAlignment = HorizontalAlignment.Center;
+                BtnNewBorder.Margin = new Thickness(6, 8, 6, 8);
+                BtnNewBorder.Padding = new Thickness(0, 8, 0, 8);
+                BtnNewBorder.Width = 44;
+                BtnNewBorder.HorizontalAlignment = HorizontalAlignment.Center;
+                BtnNewIcon.Margin = new Thickness(0);
+                PanelHeaderStack.HorizontalAlignment = HorizontalAlignment.Center;
+                PanelHeaderBorder.Padding = new Thickness(4, 6, 4, 6);
+                SelectedCountBadge.Padding = new Thickness(3, 1, 3, 1);
+                var fadeOut = new System.Windows.Media.Animation.DoubleAnimation(0, TimeSpan.FromMilliseconds(180));
+                fadeOut.EasingFunction = ease;
+                fadeOut.Completed += (s, ev) =>
+                {
+                    DetailPanelContainer.Visibility = Visibility.Collapsed;
+                    PanelHeaderText.Visibility = Visibility.Collapsed;
+                    BtnNewText.Visibility = Visibility.Collapsed;
+                };
+                DetailPanelContainer.BeginAnimation(UIElement.OpacityProperty, fadeOut);
+                PanelHeaderText.BeginAnimation(UIElement.OpacityProperty, fadeOut);
+                BtnNewText.BeginAnimation(UIElement.OpacityProperty, fadeOut);
+                var marginLeftAnim = new System.Windows.Media.Animation.ThicknessAnimation(
+                    new Thickness(56, 40, 0, 0),
+                    TimeSpan.FromMilliseconds(180));
+                marginLeftAnim.EasingFunction = ease;
+                BtnToggleSidebar.BeginAnimation(FrameworkElement.MarginProperty, marginLeftAnim);
                 DetailPanelColumn.BeginAnimation(System.Windows.Controls.ColumnDefinition.MaxWidthProperty, anim);
                 DetailPanelColumn.BeginAnimation(System.Windows.Controls.ColumnDefinition.MinWidthProperty, anim);
                 anim.Completed += (s, ev) =>
                 {
-                    DetailPanelColumn.Width = new GridLength(0);
+                    DetailPanelColumn.Width = new GridLength(64);
                 };
                 if (arrow != null) arrow.Angle = 180;
             }
@@ -395,17 +443,72 @@ namespace Taadol.Views
             return false;
         }
 
-        private void CheckBoxBorder_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            if (sender is FrameworkElement fe && fe.DataContext is PersonItem item)
-            {
-                item.IsSelected = !item.IsSelected;
-                UpdateRowBorders();
-                UpdateDetailPanels();
-                ViewModel.UpdateSummaryBar();
-                e.Handled = true;
-            }
-        }
+         private void CheckBoxBorder_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+         {
+             if (sender is FrameworkElement fe && fe.DataContext is PersonItem item)
+             {
+                 item.IsSelected = !item.IsSelected;
+                 UpdateRowBorders();
+                 UpdateDetailPanels();
+                 ViewModel.UpdateSummaryBar();
+                 UpdateHeaderSelectAllState();
+                 e.Handled = true;
+             }
+         }
+
+         private void SelectAllBorder_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+         {
+             if (sender is Border border)
+             {
+                 var allSelected = ViewModel.FilteredPersons?.All(p => p.IsSelected) ?? false;
+                 if (allSelected)
+                     ViewModel.DeselectAll();
+                 else
+                     ViewModel.SelectAll();
+
+                 UpdateRowBorders();
+                 UpdateDetailPanels();
+                 ViewModel.UpdateSummaryBar();
+                 UpdateHeaderSelectAllState();
+
+                 e.Handled = true;
+             }
+         }
+
+         private void UpdateHeaderSelectAllState()
+         {
+             if (PersonsDataGrid == null || ViewModel.FilteredPersons == null) return;
+
+             var headerBorder = FindDescendantByName(PersonsDataGrid, "SelectAllBorder") as Border;
+             if (headerBorder == null) return;
+
+             var allSelected = ViewModel.FilteredPersons.Count > 0 &&
+                               ViewModel.FilteredPersons.All(p => p.IsSelected);
+
+             if (headerBorder.FindName("SelectAllCheckMark") is FrameworkElement checkMark)
+                 checkMark.Visibility = allSelected ? Visibility.Visible : Visibility.Collapsed;
+
+             var blue = new SolidColorBrush(
+                 (Color)ColorConverter.ConvertFromString("#2667FF"));
+             headerBorder.Background = allSelected ? blue : Brushes.White;
+             headerBorder.BorderBrush = allSelected ? blue
+                 : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#CBD5E1"));
+         }
+
+         private static DependencyObject FindDescendantByName(DependencyObject root, string name)
+         {
+             int count = VisualTreeHelper.GetChildrenCount(root);
+             for (int i = 0; i < count; i++)
+             {
+                 var child = VisualTreeHelper.GetChild(root, i);
+                 if (child is FrameworkElement fe && fe.Name == name)
+                     return child;
+                 var result = FindDescendantByName(child, name);
+                 if (result != null)
+                     return result;
+             }
+             return null;
+         }
 
         private void UpdateRowBorders()
         {
@@ -614,22 +717,27 @@ namespace Taadol.Views
             e.Handled = true;
         }
 
-        private void AdjustDataGridHeight()
-        {
-            if (PersonsDataGrid == null) return;
-            PersonsDataGrid.Height = double.NaN;
-            PersonsDataGrid.MaxHeight = double.PositiveInfinity;
-        }
-
-        private void RootBorder_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            Dispatcher.BeginInvoke(new Action(() => AdjustDataGridHeight()), DispatcherPriority.Background);
-        }
-
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            Dispatcher.BeginInvoke(new Action(() => FillAvailableSpace()), DispatcherPriority.Background);
-            Dispatcher.BeginInvoke(new Action(() => AdjustDataGridHeight()), DispatcherPriority.Background);
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                FillAvailableSpace();
+                WireScrollChanged();
+                UpdateRowBorders();
+                UpdateHeaderSelectAllState();
+            }), DispatcherPriority.Background);
+        }
+
+        // وقتی ردیف آخر با اسکرول دیده می‌شود، لینک زیرین آن باید دوباره رسم شود
+        private void WireScrollChanged()
+        {
+            if (PersonsDataGrid == null || _scrollWired) return;
+            if (FindDescendantByName(PersonsDataGrid, "DG_ScrollViewer") is ScrollViewer sv)
+            {
+                _scrollWired = true;
+                sv.ScrollChanged += (s, _) =>
+                    Dispatcher.BeginInvoke(new Action(UpdateRowBorders), DispatcherPriority.Background);
+            }
         }
 
         // فرم لیست باید همیشه کل فضای محتوا رو پر کنه حتی اگه ردیف جدول کم باشه
