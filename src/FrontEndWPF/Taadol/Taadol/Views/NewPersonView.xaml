@@ -251,7 +251,7 @@
                                                            Margin="0,0,0,5"
                                                            FirstLabel="خودکار"
                                                            SecondLabel="دستی"
-                                                           IsFirstSelected="False"
+                                                           IsFirstSelected="True"
                                                            SelectionChanged="CodeModeToggle_SelectionChanged" />
 
                             <TextBlock Grid.Row="0" Grid.Column="1"

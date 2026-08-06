@@ -562,6 +562,11 @@
                                                 Tag="branch_list"
                                                 Style="{StaticResource SubmenuItem}" />
 
+                                        <Button Content="آرشیو شعبه"
+                                                Click="SubMenuClick"
+                                                Tag="branch_archive"
+                                                Style="{StaticResource SubmenuItem}" />
+
                                         <Button Content="دوره مالی"
                                                 Click="SubMenuClick"
                                                 Tag="financial_period"
