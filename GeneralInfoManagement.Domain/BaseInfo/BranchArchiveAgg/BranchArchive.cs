@@ -11,18 +11,20 @@ namespace GeneralInfoManagement.Domain.BaseInfo.BranchArchiveAgg
         public long BranchId { get; private set; }
         public Branches Branch { get; private set; }
 
-        public BranchArchive(string title, string description, string file)
+        public BranchArchive(string title, string description, string file, long branchId)
         {
             Title = title;
             Description = description;
             File = file;
+            BranchId = branchId;
         }
 
-        public void Edit(string title, string description, string file)
+        public void Edit(string title, string description, string file, long branchId)
         {
             Title = title;
             Description = description;
             File = file;
+            BranchId = branchId;
         }
 
         public void Remove()

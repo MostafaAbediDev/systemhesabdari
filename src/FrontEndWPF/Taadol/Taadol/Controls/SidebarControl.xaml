@@ -567,7 +567,12 @@
                                                 Tag="branch_archive"
                                                 Style="{StaticResource SubmenuItem}" />
 
-                                        <Button Content="دوره مالی"
+                                        <Button Content="دوره مالی جدید"
+                                                Click="SubMenuClick"
+                                                Tag="financial_period_new"
+                                                Style="{StaticResource SubmenuItem}" />
+
+                                        <Button Content="لیست دوره‌ها"
                                                 Click="SubMenuClick"
                                                 Tag="financial_period"
                                                 Style="{StaticResource SubmenuItem}" />

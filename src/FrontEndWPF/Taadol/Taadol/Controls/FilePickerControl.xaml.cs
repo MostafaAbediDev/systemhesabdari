@@ -29,6 +29,9 @@ namespace Taadol.Controls
             Loaded += (s, e) => UpdateState(animate: false);
         }
 
+        public event EventHandler FileSelected;
+        public event EventHandler FileCleared;
+
         public string FilePath
         {
             get => _filePath;
@@ -57,6 +60,7 @@ namespace Taadol.Controls
         {
             FilePath = null;
             FileCountText.Visibility = Visibility.Collapsed;
+            FileCleared?.Invoke(this, EventArgs.Empty);
         }
 
         private void ActionButton_MouseEnter(object sender, MouseEventArgs e)
@@ -93,6 +97,7 @@ namespace Taadol.Controls
                 FilePath = dialog.FileName;
                 FileCountText.Text = Path.GetFileName(dialog.FileName);
                 FileCountText.Visibility = Visibility.Visible;
+                FileSelected?.Invoke(this, EventArgs.Empty);
             }
         }
 

@@ -17,16 +17,17 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
         public List<BranchArchiveViewModel> GetBranchArchives()
         {
             return _context.BranchArchives
-                .Include(x => x.Branch)
                 .Select(x => new BranchArchiveViewModel
                 {
                     Id = x.Id,
                     Title = x.Title,
                     Description = x.Description,
                     File = x.File,
-                    BranchTitle = x.Branch.Title,
-                    CreationDate = x.CreationDate.ToString()
+                    BranchId = x.BranchId,
+                    BranchTitle = x.Branch == null ? "—" : x.Branch.Title,
+                    CreationDate = x.CreationDate.ToString("yyyy/MM/dd")
                 })
+                .OrderByDescending(x => x.Id)
                 .ToList();
         }
 
@@ -47,15 +48,14 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
         public List<BranchArchiveViewModel> Search(BranchArchiveSearchModel searchModel)
         {
             var query = _context.BranchArchives
-                .Include(x => x.Branch)
                 .Select(x => new BranchArchiveViewModel
                 {
                     Id = x.Id,
                     Title = x.Title,
                     Description = x.Description,
                     BranchId = x.BranchId,
-                    BranchTitle = x.Branch.Title,
-                    CreationDate = x.CreationDate.ToString()
+                    BranchTitle = x.Branch == null ? "—" : x.Branch.Title,
+                    CreationDate = x.CreationDate.ToString("yyyy/MM/dd")
                 });
 
             if (!string.IsNullOrWhiteSpace(searchModel.Title))

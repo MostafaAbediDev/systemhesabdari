@@ -10,13 +10,15 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Globalization;
 using System.Threading.Tasks;
 using System.Windows.Threading;
+using Taadol.Models;
+
 namespace Taadol.Views
 {
     public partial class BranchListView : UserControl
     {
-
         public ObservableCollection<BranchItem> AllBranches { get; set; }
         public ObservableCollection<BranchItem> FilteredBranches { get; set; }
+        public ObservableCollection<PageItem> Pages { get; set; } = new ObservableCollection<PageItem>();
 
         private readonly IBranchApplication _branchApplication;
         private int _pageSize = 15;
@@ -33,10 +35,17 @@ namespace Taadol.Views
 
             AllBranches = new ObservableCollection<BranchItem>();
 
+            BranchesGrid.NextPageRequested += (s, e) => GoToNextPage();
+            BranchesGrid.PreviousPageRequested += (s, e) => GoToPreviousPage();
+            BranchesGrid.PageRequested += (s, page) => GoToPage(page);
+            BranchesGrid.PageSizeRequested += (s, size) => ChangePageSize(size);
+            BranchesGrid.CheckedItemsChanged += (s, e) => UpdateSummary();
+
             FillEmptyRows();
 
             Loaded += BranchListView_Loaded;
         }
+
         private async void BranchListView_Loaded(object sender, RoutedEventArgs e)
         {
             if (_isLoadedOnce) return;
@@ -48,7 +57,7 @@ namespace Taadol.Views
 
         private async Task LoadDataAsync()
         {
-            ShowLoading(true);
+            BranchesGrid.IsLoading = true;
 
             await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background);
 
@@ -96,7 +105,7 @@ namespace Taadol.Views
             }
             finally
             {
-                ShowLoading(false);
+                BranchesGrid.IsLoading = false;
             }
         }
 
@@ -113,14 +122,9 @@ namespace Taadol.Views
                 });
             }
 
-            BranchesDataGrid.ItemsSource = FilteredBranches;
+            BranchesGrid.ItemsSource = FilteredBranches;
         }
 
-        private void ShowLoading(bool show)
-        {
-            LoadingOverlay.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
-            BranchesDataGrid.IsHitTestVisible = !show;
-        }
         private string ToPersianDate(object dateValue)
         {
             if (dateValue == null)
@@ -146,42 +150,6 @@ namespace Taadol.Views
 
             return $"{year:0000}/{month:00}/{day:00}";
         }
-        private void LoadData()
-        {
-            try
-            {
-                var branches = _branchApplication.GetBranches();
-
-
-                AllBranches = new ObservableCollection<BranchItem>(
-                    branches.Select((b, index) => new BranchItem
-                    {
-                        RowNumber = index + 1,
-                        RegisterDate = ToPersianDate(b.CreatedAt),
-                        UniqueId = b.Id.ToString(),
-                        BranchType = "—",
-                        CompanyName = b.CompanyId.ToString(),
-                        BranchName = b.Title,
-                        RegistrationNumber = b.RegisterNumber,
-                        BranchCode = b.Code,
-                        Province = b.ProvinceName,
-                        City = b.CityName,
-                        Phone = b.TelePhone,
-                        Mobile = b.MobilePhone,
-                        Address = b.Address,
-                        Status = b.IsActive ? "فعال" : "غیرفعال",
-                        IsEmpty = false
-                    })
-                )
-                {
-
-                };
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "خطا در لود شعبه‌ها");
-            }
-        }
 
         private void ApplyFilters()
         {
@@ -202,6 +170,7 @@ namespace Taadol.Views
             }
 
             var filteredList = query.ToList();
+            filteredListCount = filteredList.Count;
 
             _totalPages = (int)Math.Ceiling(filteredList.Count / (double)_pageSize);
 
@@ -237,10 +206,23 @@ namespace Taadol.Views
                 });
             }
 
-            BranchesDataGrid.ItemsSource = FilteredBranches;
+            BranchesGrid.ItemsSource = FilteredBranches;
 
             BuildPaginationButtons();
+            UpdateSummary();
         }
+
+        private void UpdateSummary()
+        {
+            if (BranchSummaryBar == null) return;
+
+            int selected = AllBranches?.Count(b => b.IsSelected && !b.IsEmpty) ?? 0;
+            int total = filteredListCount;
+
+            BranchSummaryBar.SelectedSummaryText = $"شعبه انتخاب شده ({ToPersianNumber(selected)})";
+            BranchSummaryBar.TotalCountText = $"{ToPersianNumber(total)} مورد";
+        }
+
         private void BuildPaginationButtons()
         {
             var pages = new ObservableCollection<PageItem>();
@@ -257,7 +239,9 @@ namespace Taadol.Views
                     });
                 }
 
-                PageButtonsItemsControl.ItemsSource = pages;
+                Pages = pages;
+                BranchesGrid.PagesSource = Pages;
+                BranchesGrid.PageInfoContent = $"نمایش {ToPersianNumber(FilteredBranches.Count(b => !b.IsEmpty))} از {ToPersianNumber(filteredListCount)} مورد";
                 return;
             }
 
@@ -322,8 +306,13 @@ namespace Taadol.Views
                 IsCurrent = _currentPage == _totalPages
             });
 
-            PageButtonsItemsControl.ItemsSource = pages;
+            Pages = pages;
+            BranchesGrid.PagesSource = Pages;
+            BranchesGrid.PageInfoContent = $"نمایش {ToPersianNumber(FilteredBranches.Count(b => !b.IsEmpty))} از {ToPersianNumber(filteredListCount)} مورد";
         }
+
+        private int filteredListCount = 0;
+
         private string ToPersianNumber(int number)
         {
             string[] persianDigits = { "۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹" };
@@ -335,21 +324,14 @@ namespace Taadol.Views
 
             return result;
         }
-        private void CheckBoxBorder_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            var border = sender as Border;
-            if (border?.DataContext is BranchItem item && !item.IsEmpty)
-            {
-                item.IsSelected = !item.IsSelected;
-                e.Handled = true;
-            }
-        }
+
         public class PageItem
         {
             public int PageNumber { get; set; }
             public string PageNumberDisplay { get; set; }
             public bool IsCurrent { get; set; }
         }
+
         private void FilterTab_Checked(object sender, RoutedEventArgs e)
         {
             if (sender is RadioButton rb)
@@ -363,36 +345,39 @@ namespace Taadol.Views
             }
         }
 
-        private void BtnDelete_Click(object sender, RoutedEventArgs e)
+        private async void BtnDelete_Click(object sender, RoutedEventArgs e)
         {
             var selectedItems = AllBranches.Where(b => b.IsSelected && !b.IsEmpty).ToList();
 
             if (selectedItems.Count == 0)
             {
-                if (BranchesDataGrid.SelectedItem is BranchItem item && !item.IsEmpty)
-                    selectedItems.Add(item);
-                else
-                {
-                    MessageBox.Show("لطفاً یک شعبه انتخاب کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
+                MessageBox.Show("لطفاً یک شعبه انتخاب کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
             }
 
             var result = MessageBox.Show($"آیا از حذف {selectedItems.Count} شعبه مطمئن هستید؟", "حذف",
                 MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No);
 
-            if (result == MessageBoxResult.Yes)
+            if (result != MessageBoxResult.Yes)
+                return;
+
+            foreach (var item in selectedItems.ToList())
             {
-                foreach (var item in selectedItems.ToList())
-                    AllBranches.Remove(item);
-                ApplyFilters();
+                if (long.TryParse(item.UniqueId, out var branchId))
+                    _branchApplication.Remove(branchId);
             }
+
+            _currentPage = 1;
+            await LoadDataAsync();
+
+            MessageBox.Show("شعبه‌های انتخاب‌شده حذف شدند.", "حذف", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void BtnEdit_Click(object sender, RoutedEventArgs e)
         {
-            if (BranchesDataGrid.SelectedItem is BranchItem item && !item.IsEmpty)
-                MessageBox.Show($"ویرایش شعبه: {item.BranchName}", "ویرایش شعبه", MessageBoxButton.OK, MessageBoxImage.Information);
+            var selectedItem = AllBranches.FirstOrDefault(b => b.IsSelected && !b.IsEmpty);
+            if (selectedItem != null)
+                MessageBox.Show($"ویرایش شعبه: {selectedItem.BranchName}", "ویرایش شعبه", MessageBoxButton.OK, MessageBoxImage.Information);
             else
                 MessageBox.Show("لطفاً یک شعبه انتخاب کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
@@ -406,7 +391,8 @@ namespace Taadol.Views
         {
             MessageBox.Show("منوی بیشتر - شعبه‌ها", "عملیات", MessageBoxButton.OK, MessageBoxImage.Information);
         }
-        private void BtnNextPage_Click(object sender, RoutedEventArgs e)
+
+        private void GoToNextPage()
         {
             if (_currentPage < _totalPages)
             {
@@ -415,7 +401,7 @@ namespace Taadol.Views
             }
         }
 
-        private void BtnPrevPage_Click(object sender, RoutedEventArgs e)
+        private void GoToPreviousPage()
         {
             if (_currentPage > 1)
             {
@@ -424,37 +410,22 @@ namespace Taadol.Views
             }
         }
 
-        private void BtnPage_Click(object sender, RoutedEventArgs e)
+        private void GoToPage(int pageNumber)
         {
-            if (sender is Button btn && btn.Tag != null)
-            {
-                int pageNumber = Convert.ToInt32(btn.Tag);
-
-                if (pageNumber <= 0)
-                    return;
-
-                _currentPage = pageNumber;
-                ApplyFilters();
-            }
-        }
-        private void BranchesDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e) { }
-
-        private void SearchBox_TextChanged(object sender, TextChangedEventArgs e) => ApplyFilters();
-
-        private void RowCheckBox_Checked(object sender, RoutedEventArgs e)
-        {
-            if ((sender as CheckBox)?.DataContext is BranchItem item)
-                item.IsSelected = true;
+            if (pageNumber <= 0) return;
+            _currentPage = pageNumber;
+            ApplyFilters();
         }
 
-        private void RowCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        private void ChangePageSize(int newSize)
         {
-            if ((sender as CheckBox)?.DataContext is BranchItem item)
-                item.IsSelected = false;
+            _pageSize = newSize;
+            _currentPage = 1;
+            ApplyFilters();
         }
     }
 
-    public class BranchItem : INotifyPropertyChanged
+    public class BranchItem : INotifyPropertyChanged, IListRowItem
     {
         private int _rowNumber;
         private bool _isSelected;
@@ -506,20 +477,5 @@ namespace Taadol.Views
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-    }
-
-    public class InverseBooleanConverter : System.Windows.Data.IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            if (value is bool boolValue) return !boolValue;
-            return true;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            if (value is bool boolValue) return !boolValue;
-            return false;
-        }
     }
 }

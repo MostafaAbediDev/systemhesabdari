@@ -12,6 +12,7 @@
                                              SecondaryColor="Green" />
 
                 <ResourceDictionary Source="Themes/Styles.xaml" />
+                <ResourceDictionary Source="Themes/GridStyles.xaml" />
 
             </ResourceDictionary.MergedDictionaries>
 

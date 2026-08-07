@@ -25,7 +25,9 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
                     StartDate = x.StartDate.ToString("yyyy/MM/dd"),
                     EndDate = x.EndDate.ToString("yyyy/MM/dd"),
                     BranchTitle = x.Branch.Title,
-                    BranchId = x.BranchId
+                    BranchId = x.BranchId,
+                    IsActive = x.IsActive,
+                    IsDeleted = x.IsDeleted
                 })
                 .OrderByDescending(x => x.Id)
                 .ToList();
@@ -55,9 +57,11 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
                    Title = x.Title,
                    StartDate = x.StartDate.ToString("yyyy/MM/dd"),
                    EndDate = x.EndDate.ToString("yyyy/MM/dd"),
-                   BranchTitle = x.Branch.Title,
-                   BranchId = x.BranchId
-               });
+BranchTitle = x.Branch.Title,
+                    BranchId = x.BranchId,
+                    IsActive = x.IsActive,
+                    IsDeleted = x.IsDeleted
+                });
 
             if (!string.IsNullOrWhiteSpace(searchModel.Title))
                 query = query.Where(x => x.Title.Contains(searchModel.Title));

@@ -15,6 +15,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using Taadol.Models;
 using Taadol.ViewModels;
 
 namespace Taadol.Views
@@ -25,7 +26,6 @@ namespace Taadol.Views
         private bool _isLoadedOnce = false;
         private bool _isPanelOpen = true;
         private bool _sizeWired = false;
-        private bool _scrollWired = false;
 
         public PersonListView()
         {
@@ -41,8 +41,28 @@ namespace Taadol.Views
                 ViewModel.HandleSearchTextChanged(SearchBox.Text);
                 Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    UpdateRowBorders();
+                    PersonsGrid.RefreshVisualState();
                 }), DispatcherPriority.Loaded);
+            };
+
+            PersonsGrid.NextPageRequested += (s, e) => ViewModel.GoToNextPage();
+            PersonsGrid.PreviousPageRequested += (s, e) => ViewModel.GoToPreviousPage();
+            PersonsGrid.PageRequested += (s, page) => ViewModel.GoToPage(page);
+            PersonsGrid.PageSizeRequested += (s, size) => ViewModel.ChangePageSize(size);
+
+            PersonsGrid.GridDoubleClicked += (s, e) =>
+            {
+                if (PersonsGrid.DoubleClickedItem is PersonItem item && !item.IsEmpty)
+                {
+                    var mainWindow = Window.GetWindow(this) as MainWindow;
+                    mainWindow?.NavigateToEditPerson(item.Id);
+                }
+            };
+
+            PersonsGrid.CheckedItemsChanged += (s, e) =>
+            {
+                UpdateDetailPanels();
+                ViewModel.UpdateSummaryBar();
             };
 
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
@@ -52,32 +72,7 @@ namespace Taadol.Views
 
         private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(PersonListViewModel.FilteredPersons))
-            {
-                if (PersonsDataGrid != null)
-                    PersonsDataGrid.ItemsSource = ViewModel.FilteredPersons;
-
-                Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    UpdateRowBorders();
-                    UpdateHeaderSelectAllState();
-                }), DispatcherPriority.Loaded);
-            }
-            else if (e.PropertyName == nameof(PersonListViewModel.Pages))
-            {
-                if (PageButtonsItemsControl != null)
-                    PageButtonsItemsControl.ItemsSource = ViewModel.Pages;
-            }
-            else if (e.PropertyName == nameof(PersonListViewModel.IsLoading))
-            {
-                ShowLoading(ViewModel.IsLoading);
-            }
-            else if (e.PropertyName == nameof(PersonListViewModel.PageInfoText))
-            {
-                if (PageInfoText != null)
-                    PageInfoText.Text = ViewModel.PageInfoText;
-            }
-            else if (e.PropertyName == nameof(PersonListViewModel.TotalDebitText))
+            if (e.PropertyName == nameof(PersonListViewModel.TotalDebitText))
             {
                 if (TotalDebitText != null)
                     TotalDebitText.Text = ViewModel.TotalDebitText;
@@ -127,14 +122,6 @@ namespace Taadol.Views
             await ViewModel.LoadDataAsync();
         }
 
-        private void ShowLoading(bool show)
-        {
-            if (LoadingOverlay != null)
-                LoadingOverlay.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
-            if (PersonsDataGrid != null)
-                PersonsDataGrid.IsHitTestVisible = !show;
-        }
-
         // ======================================================
         //  Tab Filter Handlers
         // ======================================================
@@ -171,7 +158,7 @@ namespace Taadol.Views
 
             if (selectedItems.Count == 0)
             {
-                if (PersonsDataGrid.SelectedItem is PersonItem item && !item.IsEmpty)
+                if (PersonsGrid.Grid.SelectedItem is PersonItem item && !item.IsEmpty)
                     selectedItems.Add(item);
                 else
                 {
@@ -210,7 +197,7 @@ namespace Taadol.Views
 
         private void BtnEdit_Click(object sender, RoutedEventArgs e)
         {
-            if (PersonsDataGrid.SelectedItem is PersonItem item && !item.IsEmpty)
+            if (PersonsGrid.Grid.SelectedItem is PersonItem item && !item.IsEmpty)
             {
                 var mainWindow = Window.GetWindow(this) as MainWindow;
                 mainWindow?.NavigateToEditPerson(item.Id);
@@ -349,223 +336,6 @@ namespace Taadol.Views
         }
 
         // ======================================================
-        //  Pagination Handlers
-        // ======================================================
-        private void BtnNextPage_Click(object sender, RoutedEventArgs e)
-        {
-            ViewModel.GoToNextPage();
-        }
-
-        private void BtnPrevPage_Click(object sender, RoutedEventArgs e)
-        {
-            ViewModel.GoToPreviousPage();
-        }
-
-        private void BtnPage_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is Button btn && btn.Tag != null)
-            {
-                int pageNumber = Convert.ToInt32(btn.Tag);
-                ViewModel.GoToPage(pageNumber);
-            }
-        }
-
-        private void PageSizeSelector_SelectionChanged(object sender, int newSize)
-        {
-            ViewModel.ChangePageSize(newSize);
-        }
-
-        // ======================================================
-        //  DataGrid Visual Handlers
-        // ======================================================
-        private void PersonsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (PersonsDataGrid.SelectedItem != null)
-            {
-                PersonsDataGrid.SelectedItem = null;
-            }
-        }
-
-        private void PersonsDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            if (PersonsDataGrid.SelectedItem is PersonItem item && !item.IsEmpty)
-            {
-                var mainWindow = Window.GetWindow(this) as MainWindow;
-                mainWindow?.NavigateToEditPerson(item.Id);
-            }
-        }
-
-        private void DataGridRow_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            if (!IsInsideCheckBox(e.OriginalSource as DependencyObject))
-            {
-                e.Handled = true;
-            }
-        }
-
-        private void DataGridRow_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            if (!IsInsideCheckBox(e.OriginalSource as DependencyObject))
-            {
-                e.Handled = true;
-            }
-        }
-
-        private void DataGridRow_MouseEnter(object sender, MouseEventArgs e)
-        {
-            if (sender is DataGridRow row && row.DataContext is PersonItem item && !item.IsEmpty)
-            {
-                row.Background = new System.Windows.Media.SolidColorBrush(
-                    (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#EFF6FF"));
-            }
-        }
-
-        private void DataGridRow_MouseLeave(object sender, MouseEventArgs e)
-        {
-            if (sender is DataGridRow row && row.DataContext is PersonItem item && !item.IsEmpty)
-            {
-                bool isAlt = row.AlternationIndex == 1;
-                var bgColor = isAlt
-                    ? (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#F8F8F8")
-                    : System.Windows.Media.Colors.White;
-                row.Background = new System.Windows.Media.SolidColorBrush(bgColor);
-            }
-        }
-
-        private bool IsInsideCheckBox(DependencyObject element)
-        {
-            while (element != null)
-            {
-                if (element is FrameworkElement fe && fe.Name == "CheckBoxBorder")
-                    return true;
-                element = System.Windows.Media.VisualTreeHelper.GetParent(element);
-            }
-            return false;
-        }
-
-         private void CheckBoxBorder_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-         {
-             if (sender is FrameworkElement fe && fe.DataContext is PersonItem item)
-             {
-                 item.IsSelected = !item.IsSelected;
-                 UpdateRowBorders();
-                 UpdateDetailPanels();
-                 ViewModel.UpdateSummaryBar();
-                 UpdateHeaderSelectAllState();
-                 e.Handled = true;
-             }
-         }
-
-         private void SelectAllBorder_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-         {
-             if (sender is Border border)
-             {
-                 var allSelected = ViewModel.FilteredPersons?.All(p => p.IsSelected) ?? false;
-                 if (allSelected)
-                     ViewModel.DeselectAll();
-                 else
-                     ViewModel.SelectAll();
-
-                 UpdateRowBorders();
-                 UpdateDetailPanels();
-                 ViewModel.UpdateSummaryBar();
-                 UpdateHeaderSelectAllState();
-
-                 e.Handled = true;
-             }
-         }
-
-         private void UpdateHeaderSelectAllState()
-         {
-             if (PersonsDataGrid == null || ViewModel.FilteredPersons == null) return;
-
-             var headerBorder = FindDescendantByName(PersonsDataGrid, "SelectAllBorder") as Border;
-             if (headerBorder == null) return;
-
-             var allSelected = ViewModel.FilteredPersons.Count > 0 &&
-                               ViewModel.FilteredPersons.All(p => p.IsSelected);
-
-             if (headerBorder.FindName("SelectAllCheckMark") is FrameworkElement checkMark)
-                 checkMark.Visibility = allSelected ? Visibility.Visible : Visibility.Collapsed;
-
-             var blue = new SolidColorBrush(
-                 (Color)ColorConverter.ConvertFromString("#2667FF"));
-             headerBorder.Background = allSelected ? blue : Brushes.White;
-             headerBorder.BorderBrush = allSelected ? blue
-                 : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#CBD5E1"));
-         }
-
-         private static DependencyObject FindDescendantByName(DependencyObject root, string name)
-         {
-             int count = VisualTreeHelper.GetChildrenCount(root);
-             for (int i = 0; i < count; i++)
-             {
-                 var child = VisualTreeHelper.GetChild(root, i);
-                 if (child is FrameworkElement fe && fe.Name == name)
-                     return child;
-                 var result = FindDescendantByName(child, name);
-                 if (result != null)
-                     return result;
-             }
-             return null;
-         }
-
-        private void UpdateRowBorders()
-        {
-            if (PersonsDataGrid == null) return;
-
-            var items = PersonsDataGrid.Items;
-            var blue = new System.Windows.Media.SolidColorBrush(
-                (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#2667FF"));
-            var transparent = System.Windows.Media.Brushes.Transparent;
-            var gray = new System.Windows.Media.SolidColorBrush(
-                (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#D1D5DB"));
-
-            int lastRealIndex = -1;
-            for (int i = items.Count - 1; i >= 0; i--)
-            {
-                if (items[i] is PersonItem p && !p.IsEmpty)
-                {
-                    lastRealIndex = i;
-                    break;
-                }
-            }
-
-            for (int i = 0; i < items.Count; i++)
-            {
-                var row = PersonsDataGrid.ItemContainerGenerator.ContainerFromIndex(i) as DataGridRow;
-                if (row == null) continue;
-
-                var item = items[i] as PersonItem;
-                if (item == null || item.IsEmpty)
-                {
-                    row.BorderBrush = transparent;
-                    row.BorderThickness = new Thickness(0);
-                    continue;
-                }
-
-                bool prevSelected = (i > 0) && items[i - 1] is PersonItem prev && !prev.IsEmpty && prev.IsSelected;
-                bool isLast = (i == lastRealIndex);
-
-                if (item.IsSelected)
-                {
-                    row.BorderBrush = blue;
-                    row.BorderThickness = new Thickness(0, prevSelected ? 0 : 1, 0, 1);
-                }
-                else if (isLast)
-                {
-                    row.BorderBrush = gray;
-                    row.BorderThickness = new Thickness(0, 0, 0, 1);
-                }
-                else
-                {
-                    row.BorderBrush = transparent;
-                    row.BorderThickness = new Thickness(0);
-                }
-            }
-        }
-
-        // ======================================================
         //  Detail Panel Management
         // ======================================================
         private async void UpdateDetailPanels()
@@ -655,7 +425,7 @@ namespace Taadol.Views
             if (item != null)
             {
                 item.IsSelected = false;
-                UpdateRowBorders();
+                PersonsGrid.RefreshVisualState();
                 UpdateDetailPanels();
                 ViewModel.UpdateSummaryBar();
             }
@@ -722,22 +492,7 @@ namespace Taadol.Views
             Dispatcher.BeginInvoke(new Action(() =>
             {
                 FillAvailableSpace();
-                WireScrollChanged();
-                UpdateRowBorders();
-                UpdateHeaderSelectAllState();
             }), DispatcherPriority.Background);
-        }
-
-        // وقتی ردیف آخر با اسکرول دیده می‌شود، لینک زیرین آن باید دوباره رسم شود
-        private void WireScrollChanged()
-        {
-            if (PersonsDataGrid == null || _scrollWired) return;
-            if (FindDescendantByName(PersonsDataGrid, "DG_ScrollViewer") is ScrollViewer sv)
-            {
-                _scrollWired = true;
-                sv.ScrollChanged += (s, _) =>
-                    Dispatcher.BeginInvoke(new Action(UpdateRowBorders), DispatcherPriority.Background);
-            }
         }
 
         // فرم لیست باید همیشه کل فضای محتوا رو پر کنه حتی اگه ردیف جدول کم باشه
@@ -894,12 +649,17 @@ namespace Taadol.Views
         private void BtnPrint_Click(object sender, RoutedEventArgs e)
         {
         }
+
+        private void PersonsGrid_Loaded(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 
     // ======================================================
     //  PersonItem (مدل ردیف DataGrid)
     // ======================================================
-    public class PersonItem : INotifyPropertyChanged
+    public class PersonItem : INotifyPropertyChanged, IListRowItem
     {
         private int _rowNumber;
         private bool _isSelected;

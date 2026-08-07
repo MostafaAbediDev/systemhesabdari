@@ -34,7 +34,8 @@ namespace Taadol
             _factory.Register("branch_list", () => new BranchListView());
             _factory.Register("branch_archive", () => new BranchArchiveListView());
 
-            _factory.Register("financial_period", () => new NewFinancialPeriodView());
+            _factory.Register("financial_period", () => new FinancialPeriodListView());
+            _factory.Register("financial_period_new", () => new NewFinancialPeriodView());
 
             _nav = new NavigationService(MainContent, _factory);
 

@@ -8,8 +8,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Taadol.Models;
 
 namespace Taadol.ViewModels
 {
@@ -145,7 +147,9 @@ namespace Taadol.ViewModels
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"LoadDataAsync error: {ex.Message}");
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                    System.Windows.MessageBox.Show(ex.Message, "خطا در لود آرشیو شعبه",
+                        System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error));
                 AllArchives = new ObservableCollection<BranchArchiveItem>();
                 ApplyFilters();
             }
@@ -278,8 +282,33 @@ namespace Taadol.ViewModels
             PageInfoText = $"نمایش {ToPersianNumber(currentPageCount)} از {ToPersianNumber(_lastFilteredListCount)} مورد";
         }
 
-        public async Task DeleteSelectedAsync()
+        public async Task AddNewArchiveAsync(string title, string description, string filePath, long branchId)
         {
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                    System.Windows.MessageBox.Show("ابتدا یک فایل انتخاب کنید.", "خطا",
+                        System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning));
+                return;
+            }
+
+            await Task.Run(() =>
+            {
+                using var scope = _serviceProvider.CreateScope();
+                var app = scope.ServiceProvider.GetRequiredService<IBranchArchiveApplication>();
+                app.Create(new CreateBranchArchive
+                {
+                    Title = string.IsNullOrWhiteSpace(title) ? Path.GetFileName(filePath) : title.Trim(),
+                    Description = description ?? "",
+                    File = filePath,
+                    BranchId = branchId
+                });
+            });
+
+            await LoadDataAsync();
+        }
+
+        public async Task DeleteSelectedAsync()        {
             var selectedItems = GetSelectedItems();
             if (selectedItems.Count == 0) return;
 
@@ -313,7 +342,7 @@ namespace Taadol.ViewModels
     }
 
     // ─── Models ───
-    public class BranchArchiveItem : INotifyPropertyChanged
+    public class BranchArchiveItem : INotifyPropertyChanged, IListRowItem
     {
         private int _rowNumber;
         private bool _isSelected;

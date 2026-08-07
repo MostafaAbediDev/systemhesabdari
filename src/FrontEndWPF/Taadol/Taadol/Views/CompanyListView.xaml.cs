@@ -8,19 +8,23 @@ using System.Windows.Input;
 using GeneralInfoManagement.Application.Contract.Company;
 using Microsoft.Extensions.DependencyInjection;
 using System.Globalization;
-using System.Windows.Media;
+using Taadol.Models;
+
 namespace Taadol.Views
 {
     public partial class CompanyListView : UserControl
     {
-
-
         public ObservableCollection<CompanyItem> AllCompanies { get; set; }
         public ObservableCollection<CompanyItem> FilteredCompanies { get; set; }
+        public ObservableCollection<PageItem> Pages { get; set; } = new ObservableCollection<PageItem>();
 
         private readonly ICompanyApplication _companyApplication;
         private int _pageSize = 15;
         private string _currentFilter = "all";
+        private int _currentPage = 1;
+        private int _totalPages = 1;
+        private int filteredListCount = 0;
+        private bool _isLoadedOnce = false;
 
         public CompanyListView()
         {
@@ -28,20 +32,88 @@ namespace Taadol.Views
 
             _companyApplication = App.ServiceProvider.GetRequiredService<ICompanyApplication>();
 
-            LoadData();
-            ApplyFilters();
+            AllCompanies = new ObservableCollection<CompanyItem>();
+
+            CompaniesGrid.NextPageRequested += (s, e) => GoToNextPage();
+            CompaniesGrid.PreviousPageRequested += (s, e) => GoToPreviousPage();
+            CompaniesGrid.PageRequested += (s, page) => GoToPage(page);
+            CompaniesGrid.PageSizeRequested += (s, size) => ChangePageSize(size);
+            CompaniesGrid.CheckedItemsChanged += (s, e) => UpdateSummary();
+
+            FillEmptyRows();
+
+            Loaded += CompanyListView_Loaded;
         }
-        private void RoundedGridClip_SizeChanged(object sender, SizeChangedEventArgs e)
+
+        private async void CompanyListView_Loaded(object sender, RoutedEventArgs e)
         {
-            if (sender is Grid grid)
+            if (_isLoadedOnce) return;
+
+            _isLoadedOnce = true;
+
+            await LoadDataAsync();
+        }
+
+        private async System.Threading.Tasks.Task LoadDataAsync()
+        {
+            CompaniesGrid.IsLoading = true;
+
+            try
             {
-                grid.Clip = new RectangleGeometry(
-                    new Rect(0, 0, e.NewSize.Width, e.NewSize.Height),
-                    12,
-                    12
-                );
+                var items = await System.Threading.Tasks.Task.Run(() =>
+                {
+                    using var scope = App.ServiceProvider.CreateScope();
+
+                    var companyApplication = scope.ServiceProvider.GetRequiredService<ICompanyApplication>();
+
+                    var companies = companyApplication.GetCompanies();
+
+                    return companies.Select((c, index) => new CompanyItem
+                    {
+                        Id = c.Id,
+                        RowNumber = index + 1,
+                        RegisterDate = ToPersianDate(c.CreationDate),
+                        Title = c.Title,
+                        LegalName = c.LegalName,
+                        Status = "فعال",
+                        IsEmpty = false
+                    }).ToList();
+                });
+
+                AllCompanies = new ObservableCollection<CompanyItem>(items);
+
+                ApplyFilters();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "خطا در لود شرکت‌ها", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                AllCompanies = new ObservableCollection<CompanyItem>();
+
+                ApplyFilters();
+            }
+            finally
+            {
+                CompaniesGrid.IsLoading = false;
             }
         }
+
+        private void FillEmptyRows()
+        {
+            FilteredCompanies = new ObservableCollection<CompanyItem>();
+
+            for (int i = 1; i <= _pageSize; i++)
+            {
+                FilteredCompanies.Add(new CompanyItem
+                {
+                    RowNumber = i,
+                    IsEmpty = true
+                });
+            }
+
+            CompaniesGrid.ItemsSource = FilteredCompanies;
+        }
+
         private string ToPersianDate(object dateValue)
         {
             if (dateValue == null)
@@ -67,31 +139,6 @@ namespace Taadol.Views
 
             return $"{year:0000}/{month:00}/{day:00}";
         }
-        private void LoadData()
-        {
-            try
-            {
-                var companies = _companyApplication.GetCompanies();
-
-                AllCompanies = new ObservableCollection<CompanyItem>(
-     companies.Select((c, index) => new CompanyItem
-     {
-         Id = c.Id,
-         RowNumber = index + 1,
-         RegisterDate = ToPersianDate(c.CreationDate),
-         Title = c.Title,
-         LegalName = c.LegalName,
-         Status = "فعال",
-         IsEmpty = false
-     })
- );
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "خطا در لود شرکت‌ها", MessageBoxButton.OK, MessageBoxImage.Error);
-                AllCompanies = new ObservableCollection<CompanyItem>();
-            }
-        }
 
         private void ApplyFilters()
         {
@@ -111,6 +158,7 @@ namespace Taadol.Views
             }
 
             var filteredList = query.ToList();
+            filteredListCount = filteredList.Count;
 
             _totalPages = (int)Math.Ceiling(filteredList.Count / (double)_pageSize);
             if (_totalPages == 0) _totalPages = 1;
@@ -142,10 +190,23 @@ namespace Taadol.Views
                 });
             }
 
-            CompaniesDataGrid.ItemsSource = FilteredCompanies;
+            CompaniesGrid.ItemsSource = FilteredCompanies;
 
             BuildPaginationButtons();
+            UpdateSummary();
         }
+
+        private void UpdateSummary()
+        {
+            if (CompanySummaryBar == null) return;
+
+            int selected = AllCompanies?.Count(c => c.IsSelected && !c.IsEmpty) ?? 0;
+            int total = filteredListCount;
+
+            CompanySummaryBar.SelectedSummaryText = $"شرکت انتخاب شده ({ToPersianNumber(selected)})";
+            CompanySummaryBar.TotalCountText = $"{ToPersianNumber(total)} مورد";
+        }
+
         private void BuildPaginationButtons()
         {
             var pages = new ObservableCollection<PageItem>();
@@ -162,7 +223,9 @@ namespace Taadol.Views
                     });
                 }
 
-                PageButtonsItemsControl.ItemsSource = pages;
+                Pages = pages;
+                CompaniesGrid.PagesSource = Pages;
+                CompaniesGrid.PageInfoContent = $"نمایش {ToPersianNumber(FilteredCompanies.Count(c => !c.IsEmpty))} از {ToPersianNumber(filteredListCount)} مورد";
                 return;
             }
 
@@ -227,21 +290,16 @@ namespace Taadol.Views
                 IsCurrent = _currentPage == _totalPages
             });
 
-            PageButtonsItemsControl.ItemsSource = pages;
+            Pages = pages;
+            CompaniesGrid.PagesSource = Pages;
+            CompaniesGrid.PageInfoContent = $"نمایش {ToPersianNumber(FilteredCompanies.Count(c => !c.IsEmpty))} از {ToPersianNumber(filteredListCount)} مورد";
         }
+
         public class PageItem
         {
             public int PageNumber { get; set; }
             public string PageNumberDisplay { get; set; }
             public bool IsCurrent { get; set; }
-        }
-        private void BtnNextPage_Click(object sender, RoutedEventArgs e)
-        {
-            if (_currentPage < _totalPages)
-            {
-                _currentPage++;
-                ApplyFilters();
-            }
         }
 
         private string ToPersianNumber(int number)
@@ -254,18 +312,6 @@ namespace Taadol.Views
 
             return result;
         }
-        private int _currentPage = 1;
-        private int _totalPages = 1;
-        private void CheckBoxBorder_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            var border = sender as Border;
-
-            if (border?.DataContext is CompanyItem item && !item.IsEmpty)
-            {
-                item.IsSelected = !item.IsSelected;
-                e.Handled = true;
-            }
-        }
 
         private void FilterTab_Checked(object sender, RoutedEventArgs e)
         {
@@ -275,6 +321,7 @@ namespace Taadol.Views
                 else if (rb == tabActive) _currentFilter = "active";
                 else if (rb == tabInactive) _currentFilter = "inactive";
 
+                _currentPage = 1;
                 ApplyFilters();
             }
         }
@@ -287,13 +334,8 @@ namespace Taadol.Views
 
             if (selectedItems.Count == 0)
             {
-                if (CompaniesDataGrid.SelectedItem is CompanyItem item && !item.IsEmpty)
-                    selectedItems.Add(item);
-                else
-                {
-                    MessageBox.Show("لطفاً یک شرکت انتخاب کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
+                MessageBox.Show("لطفاً یک شرکت انتخاب کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
             }
 
             var result = MessageBox.Show(
@@ -311,16 +353,16 @@ namespace Taadol.Views
             }
 
             _currentPage = 1;
-            LoadData();
-            ApplyFilters();
+            LoadDataAsync();
 
             MessageBox.Show("عملیات حذف انجام شد.", "موفق", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void BtnEdit_Click(object sender, RoutedEventArgs e)
         {
-            if (CompaniesDataGrid.SelectedItem is CompanyItem item && !item.IsEmpty)
-                MessageBox.Show($"ویرایش شرکت: {item.Title}", "ویرایش شرکت", MessageBoxButton.OK, MessageBoxImage.Information);
+            var selectedItem = AllCompanies.FirstOrDefault(c => c.IsSelected && !c.IsEmpty);
+            if (selectedItem != null)
+                MessageBox.Show($"ویرایش شرکت: {selectedItem.Title}", "ویرایش شرکت", MessageBoxButton.OK, MessageBoxImage.Information);
             else
                 MessageBox.Show("لطفاً یک شرکت انتخاب کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
@@ -335,7 +377,16 @@ namespace Taadol.Views
             MessageBox.Show("منوی بیشتر - شرکت‌ها", "عملیات", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        private void BtnPrevPage_Click(object sender, RoutedEventArgs e)
+        private void GoToNextPage()
+        {
+            if (_currentPage < _totalPages)
+            {
+                _currentPage++;
+                ApplyFilters();
+            }
+        }
+
+        private void GoToPreviousPage()
         {
             if (_currentPage > 1)
             {
@@ -344,27 +395,22 @@ namespace Taadol.Views
             }
         }
 
-
-        private void BtnPage_Click(object sender, RoutedEventArgs e)
+        private void GoToPage(int pageNumber)
         {
-            if (sender is Button btn && btn.Tag != null)
-            {
-                int pageNumber = Convert.ToInt32(btn.Tag);
-
-                if (pageNumber <= 0)
-                    return;
-
-                _currentPage = pageNumber;
-                ApplyFilters();
-            }
+            if (pageNumber <= 0) return;
+            _currentPage = pageNumber;
+            ApplyFilters();
         }
 
-        private void CompaniesDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ChangePageSize(int newSize)
         {
+            _pageSize = newSize;
+            _currentPage = 1;
+            ApplyFilters();
         }
     }
 
-    public class CompanyItem : INotifyPropertyChanged
+    public class CompanyItem : INotifyPropertyChanged, IListRowItem
     {
         private int _rowNumber;
         private bool _isSelected;

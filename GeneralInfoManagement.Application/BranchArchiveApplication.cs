@@ -34,7 +34,7 @@ namespace GeneralInfoManagement.Application
             if (_branchArchiveRepository.Exists(x => x.Title == command.Title))
                 return operation.Failed("آرشیو شعبه‌ای با این عنوان قبلاً ثبت شده است.");
 
-            var archive = new BranchArchive(command.Title, command.Description, command.File);
+            var archive = new BranchArchive(command.Title, command.Description, command.File, command.BranchId);
 
             _branchArchiveRepository.Create(archive);
 
@@ -66,7 +66,7 @@ namespace GeneralInfoManagement.Application
             if (_branchArchiveRepository.Exists(x => x.Title == command.Title && x.Id != command.Id))
                 return operation.Failed("عنوان تکراری است.");
 
-            archive.Edit(command.Title, command.Description, command.File);
+            archive.Edit(command.Title, command.Description, command.File, command.BranchId);
 
             _branchArchiveRepository.SaveChanges();
             return operation.Succedded();

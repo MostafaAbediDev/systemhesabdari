@@ -8,5 +8,7 @@
         public string EndDate { get; set; }
         public string BranchTitle { get; set; }
         public long BranchId { get; set; }
+        public bool IsActive { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }
