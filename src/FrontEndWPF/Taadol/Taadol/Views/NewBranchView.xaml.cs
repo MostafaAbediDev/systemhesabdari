@@ -735,6 +735,7 @@ namespace Taadol.Views
                     MessageBoxImage.Information);
 
                 ClearForm();
+                NavigateToBranchList();
             }
             catch (Exception ex)
             {
@@ -765,6 +766,17 @@ namespace Taadol.Views
             LongitudeText = "";
         }
 
+        private void NavigateToBranchList()
+        {
+            var mainWindow = Window.GetWindow(this) as MainWindow;
+            mainWindow?.NavigateTo("branch_list");
+        }
+
+        private void Cancel_Click(object sender, RoutedEventArgs e)
+        {
+            NavigateToBranchList();
+        }
+
         private bool IsOperationSucceeded(object operation)
         {
             if (operation == null) return false;
@@ -783,7 +795,7 @@ namespace Taadol.Views
         }
         private void BranchTypeToggle_SelectionChanged(object sender, bool isFirstSelected)
         {
-            MessageBox.Show(isFirstSelected.ToString());
+            BranchType = isFirstSelected ? "Main" : "Sub";
         }
         private string _branchType = "Main"; // Main = اصلی، Sub = فرعی
         public string BranchType
@@ -857,28 +869,32 @@ namespace Taadol.Views
 
             PricingContent.Visibility = Visibility.Collapsed;
             InventoryContent.Visibility = Visibility.Collapsed;
+            TaxContent.Visibility = Visibility.Visible;
         }
 
         private void TabInventory_Checked(object sender, RoutedEventArgs e)
         {
-            if (TabPricing == null) return;
+            if (TabPricing == null ) return;
 
             TabPricing.IsChecked = false;
+        
 
             PricingContent.Visibility = Visibility.Collapsed;
             InventoryContent.Visibility = Visibility.Visible;
+            TaxContent.Visibility = Visibility.Collapsed;
 
             InventoryContent.Height = PricingContent.ActualHeight > 0 ? PricingContent.ActualHeight : double.NaN;
         }
 
         private void TabPricing_Checked(object sender, RoutedEventArgs e)
         {
-            if (TabInventory == null) return;
+            if (TabInventory == null ) return;
 
             TabInventory.IsChecked = false;
 
             PricingContent.Visibility = Visibility.Visible;
             InventoryContent.Visibility = Visibility.Collapsed;
+            TaxContent.Visibility = Visibility.Collapsed;
 
             PricingContent.Height = InventoryContent.ActualHeight > 0 ? InventoryContent.ActualHeight : double.NaN;
         }

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using GeneralInfoManagement.Application.Contract.Branches;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,6 +24,7 @@ namespace Taadol.Views
         private readonly IBranchApplication _branchApplication;
         private int _pageSize = 15;
         private string _currentFilter = "all";
+        private string _searchText = "";
         private int _currentPage = 1;
         private int _totalPages = 1;
         private bool _isLoadedOnce = false;
@@ -40,6 +42,13 @@ namespace Taadol.Views
             BranchesGrid.PageRequested += (s, page) => GoToPage(page);
             BranchesGrid.PageSizeRequested += (s, size) => ChangePageSize(size);
             BranchesGrid.CheckedItemsChanged += (s, e) => UpdateSummary();
+
+            BranchSearchBox.TextChanged += (s, e) =>
+            {
+                _searchText = BranchSearchBox.Text.Trim();
+                _currentPage = 1;
+                ApplyFilters();
+            };
 
             FillEmptyRows();
 
@@ -167,6 +176,14 @@ namespace Taadol.Views
                 case "inactive":
                     query = query.Where(b => b.Status == "غیرفعال");
                     break;
+            }
+
+            if (!string.IsNullOrWhiteSpace(_searchText))
+            {
+                query = query.Where(b =>
+                    (b.BranchName != null && b.BranchName.Contains(_searchText, StringComparison.OrdinalIgnoreCase)) ||
+                    (b.BranchCode != null && b.BranchCode.Contains(_searchText, StringComparison.OrdinalIgnoreCase)) ||
+                    (b.RegistrationNumber != null && b.RegistrationNumber.Contains(_searchText, StringComparison.OrdinalIgnoreCase)));
             }
 
             var filteredList = query.ToList();
@@ -332,17 +349,20 @@ namespace Taadol.Views
             public bool IsCurrent { get; set; }
         }
 
-        private void FilterTab_Checked(object sender, RoutedEventArgs e)
+        private void FilterTab_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is RadioButton rb)
-            {
-                if (rb == tabAll) _currentFilter = "all";
-                else if (rb == tabActive) _currentFilter = "active";
-                else if (rb == tabInactive) _currentFilter = "inactive";
+            if (sender is not ToggleButton tb) return;
 
-                _currentPage = 1;
-                ApplyFilters();
-            }
+            if (tb == tabAll) _currentFilter = "all";
+            else if (tb == tabActive) _currentFilter = "active";
+            else if (tb == tabInactive) _currentFilter = "inactive";
+
+            tabAll.IsChecked = tb == tabAll;
+            tabActive.IsChecked = tb == tabActive;
+            tabInactive.IsChecked = tb == tabInactive;
+
+            _currentPage = 1;
+            ApplyFilters();
         }
 
         private async void BtnDelete_Click(object sender, RoutedEventArgs e)

@@ -265,7 +265,7 @@ namespace Taadol.Controls
             timer.Tick += (s, e2) =>
             {
                 timer.Stop();
-                SetAllTextsVisibility(Visibility.Collapsed);
+                // Visibility.Collapsed حذف شد - فقط فید آوت می‌شود تا جایش ثابت بماند
 
                 AnimateWidth(SIDEBAR_OPEN, SIDEBAR_CLOSED, 180, () =>
                 {
@@ -273,6 +273,7 @@ namespace Taadol.Controls
                 });
             };
             FadeOutAllTexts();
+            FadeOutLogoText(); // لاگو تکست هم فید آوت شود
             YearSelector.Collapse(); // ★
             timer.Start();
         }
@@ -318,7 +319,7 @@ namespace Taadol.Controls
         private void HideElements()
         {
             FadeOutAllTexts();
-            SetAllTextsVisibility(Visibility.Collapsed);
+            // Visibility.Collapsed حذف شد - فقط فید آوت می‌شود تا جایش ثابت بماند
         }
 
         private void FadeIn(UIElement el, int ms = 250)
@@ -360,6 +361,7 @@ namespace Taadol.Controls
             FadeInChild<SvgViewbox>(BtnSales, "chevSales");
             FadeInChild<TextBlock>(BtnReports, "txtReports");
             FadeInChild<SvgViewbox>(BtnReports, "chevReports");
+            FadeInLogoText();
         }
 
 
@@ -379,6 +381,19 @@ namespace Taadol.Controls
             FadeOutChild<SvgViewbox>(BtnSales, "chevSales");
             FadeOutChild<TextBlock>(BtnReports, "txtReports");
             FadeOutChild<SvgViewbox>(BtnReports, "chevReports");
+            FadeOutLogoText();
+        }
+
+        private void FadeInLogoText()
+        {
+            var logoText = FindChild<TextBlock>(this, "LogoText");
+            if (logoText != null) FadeIn(logoText, 250);
+        }
+
+        private void FadeOutLogoText()
+        {
+            var logoText = FindChild<TextBlock>(this, "LogoText");
+            if (logoText != null) FadeOut(logoText, 150);
         }
 
         private void FadeInChild<T>(Button btn, string name) where T : FrameworkElement

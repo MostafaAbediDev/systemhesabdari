@@ -5,7 +5,6 @@
              xmlns:controls="clr-namespace:Taadol.Controls"
              xmlns:svg="http://sharpvectors.codeplex.com/svgc/"
              FlowDirection="RightToLeft"
-             HorizontalAlignment="Center"
              VerticalAlignment="Stretch"
              FontFamily="{StaticResource IRANSans}"
              Background="Transparent">
@@ -93,10 +92,17 @@
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="شناسه یکتا"
                                                Style="{StaticResource FormLabel}" />
+                                    <controls:ToggleSwitch2Control Margin="12,0,0,5"
+                                                                   FirstLabel="اتوماتیک"
+                                                                   SecondLabel="دستی"
+                                                                   IsFirstSelected="True"
+                                                                   Grid.Column="2"
+                                                                   SelectionChanged="UniqueCodeMode_SelectionChanged" />
                                 </StackPanel>
                                 <Grid Margin="0,0,0,8">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="200" />
+                                        <ColumnDefinition Width="90" />
+                                        <ColumnDefinition Width="139" />
                                         <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
@@ -105,13 +111,9 @@
                                                                    InputType="Number"
                                                                    FlowDirection="LeftToRight"
                                                                    Placeholder="1234"
-                                                                   IsEnabled="{Binding IsUniqueCodeManual}" />
-                                    <controls:ToggleSwitch2Control Margin="12,0,0,0"
-                                                                   FirstLabel="اتوماتیک"
-                                                                   SecondLabel="دستی"
-                                                                   IsFirstSelected="True"
-                                                                   Grid.Column="1"
-                                                                   SelectionChanged="UniqueCodeMode_SelectionChanged" />
+                                                                   IsEnabled="{Binding IsUniqueCodeManual}"
+                                                                   Grid.ColumnSpan="2" />
+                                  
                                 </Grid>
 
                                 <TextBlock Text="نام شرکت"
@@ -186,11 +188,10 @@
                                                                        Grid.Column="1"
                                                                        Margin="9,0,0,0"
                                                                        SelectionChanged="BranchTypeToggle_SelectionChanged" />
-                                        <ToggleButton Content="شعبه فعال است"
-                                                      FlowDirection="LeftToRight"
-                                                      Style="{StaticResource StatusToggleButton}"
-                                                      IsChecked="{Binding IsActive, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                      Margin="10,0,18,0" />
+                                        <controls:ActiveToggleControl x:Name="BranchActiveToggle"
+                                                                      Label="شعبه فعال است"
+                                                                      IsChecked="{Binding IsActive, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                      Margin="10,0,18,0" />
                                     </StackPanel>
                                 </Grid>
 
@@ -240,7 +241,8 @@
                                         <TextBlock Text="شماره ثبت"
                                                    Style="{StaticResource FormLabel}" />
                                         <controls:ModernPersianTextBox Text="{Binding RegisterNumber, UpdateSourceTrigger=PropertyChanged}"
-                                                                       FlowDirection="LeftToRight"
+                                                                       FlowDirection="RightToLeft"
+                                                                       InputType="Number"
                                                                        Placeholder="2480" />
                                     </StackPanel>
                                 </Grid>
@@ -279,31 +281,26 @@
                     <!-- ═══ تب‌ها ═══ -->
                     <StackPanel Margin="20,0,0,0"
                                 HorizontalAlignment="Left">
-                        <Border CornerRadius="12"
-                                BorderThickness="1.5"
-                                BorderBrush="#BED1FF"
-                                Background="#F8FAFF"
-                                Padding="4"
-                                Margin="0,0,0,10"
+                        <Border CornerRadius="0"
+                                BorderThickness="0,0,0,2"
+                                BorderBrush="#E5E7EB"
+                                Background="#ffffff"
+                                Padding="0"
+                                Margin="0,0,0,0"
                                 HorizontalAlignment="Center">
                             <StackPanel Orientation="Horizontal">
                                 <RadioButton Content="تماس"
-                                              Style="{StaticResource ModernTabButton}"
-                                              Margin="10,0,6,0"
-                                              IsChecked="True"
-                                              x:Name="TabPricing"
-                                              Checked="TabPricing_Checked" />
+                                             Style="{StaticResource ModernTabButton}"
+                                             Margin="0,0,6,0"
+                                             IsChecked="True"
+                                             x:Name="TabPricing"
+                                             Checked="TabPricing_Checked" />
                                 <RadioButton Content="آدرس"
-                                              Style="{StaticResource ModernTabButton}"
-                                              Margin="10,0,6,0"
-                                              x:Name="TabInventory"
-                                              Checked="TabInventory_Checked" />
-                                <RadioButton Content="مالیات"
-                                              Visibility="Collapsed"
-                                              Style="{StaticResource ModernTabButton}"
-                                              x:Name="TabTax"
-                                              Margin="10,0,6,0"
-                                              Checked="TabTax_Checked" />
+                                             Style="{StaticResource ModernTabButton}"
+                                             Margin="0,0,0,0"
+                                             x:Name="TabInventory"
+                                             Checked="TabInventory_Checked" />
+                              
                             </StackPanel>
                         </Border>
                     </StackPanel>
@@ -315,7 +312,7 @@
                                         Width="650"
                                         Visibility="Visible">
                                 <StackPanel Grid.Column="0">
-                                    <Grid Margin="0,0,0,16">
+                                    <Grid Margin="10,0,0,16">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="8" />
@@ -328,7 +325,9 @@
                                             <TextBlock Text="شماره تلفن"
                                                        Style="{StaticResource FormLabel}" />
                                             <controls:ModernPersianTextBox Width="200"
-                                                                           FlowDirection="LeftToRight"
+                                                                           InputType="Number"
+                                                                           MaxLength="11"
+                                                                           FlowDirection="RightToLeft"
                                                                            Text="{Binding TelePhone, UpdateSourceTrigger=PropertyChanged}"
                                                                            Placeholder="071" />
                                         </StackPanel>
@@ -337,17 +336,21 @@
                                             <TextBlock Text="موبایل"
                                                        Style="{StaticResource FormLabel}" />
                                             <controls:ModernPersianTextBox Width="200"
-                                                                   FlowDirection="LeftToRight"
-                                                                   Text="{Binding MobilePhone, UpdateSourceTrigger=PropertyChanged}"
-                                                                   Placeholder="091" />
+                                                                           InputType="Number"
+                                                                           MaxLength="11"
+                                                                           FlowDirection="RightToLeft"
+                                                                           Text="{Binding MobilePhone, UpdateSourceTrigger=PropertyChanged}"
+                                                                           Placeholder="091" />
                                         </StackPanel>
 
                                         <StackPanel Grid.Column="4">
                                             <TextBlock Text="ایمیل "
                                                        Style="{StaticResource FormLabel}" />
                                             <controls:ModernPersianTextBox Width="200"
-                                                                   Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}"
-                                                                   Placeholder="example@mail.com" />
+                                                                           InputType="Number"
+                                                                           FlowDirection="LeftToRight"
+                                                                           Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}"
+                                                                           Placeholder="example@mail.com" />
                                         </StackPanel>
                                     </Grid>
                                 </StackPanel>
@@ -385,7 +388,9 @@
                                                    HorizontalAlignment="Left"
                                                    Style="{StaticResource FormLabel}" />
                                         <controls:ModernPersianTextBox Text="{Binding PostCode, UpdateSourceTrigger=PropertyChanged}"
-                                                                       FlowDirection="LeftToRight"
+                                                                       InputType="Number"
+                                                                       MaxLength="11"
+                                                                       FlowDirection="RightToLeft"
                                                                        Placeholder="74100" />
                                     </StackPanel>
 
@@ -436,8 +441,8 @@
                                                    Style="{StaticResource FormLabel}" />
                                         <controls:ModernPersianTextBox x:Name="LatitudeField"
                                                                        Text="{Binding LatitudeText, UpdateSourceTrigger=PropertyChanged}"
-                                                                       FlowDirection="LeftToRight"
                                                                        InputType="Text"
+                                                                       FlowDirection="RightToLeft"
                                                                        Width="170"
                                                                        Placeholder="35.6892" />
                                     </StackPanel>
@@ -447,8 +452,8 @@
                                                    Style="{StaticResource FormLabel}" />
                                         <controls:ModernPersianTextBox x:Name="LongitudeField"
                                                                        Text="{Binding LongitudeText, UpdateSourceTrigger=PropertyChanged}"
-                                                                       FlowDirection="LeftToRight"
                                                                        InputType="Text"
+                                                                       FlowDirection="RightToLeft"
                                                                        Width="170"
                                                                        Placeholder="51.3890" />
                                     </StackPanel>
@@ -606,22 +611,27 @@
                                          ButtonBackground="#2667FF"
                                          CornerRadius="4" />
 
-                    <StackPanel Grid.Column="1"
-                                Orientation="Horizontal"
-                                Margin="0,0,20,0"
-                                VerticalAlignment="Center"
-                                HorizontalAlignment="Right">
-                        <svg:SvgViewbox Source="/Assets/Icons/redo.svg"
-                                        Width="14"
-                                        Height="14"
-                                        FlowDirection="LeftToRight"
-                                        Margin="6,0,15,0" />
-                        <TextBlock Text="انصراف"
-                                   FontFamily="{StaticResource IRANSans}"
-                                   FontSize="14"
-                                   Foreground="#2667FF"
-                                   VerticalAlignment="Center" />
-                    </StackPanel>
+                    <Button Grid.Column="1"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Cursor="Hand"
+                            Margin="0,0,20,0"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Right"
+                            Click="Cancel_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <svg:SvgViewbox Source="/Assets/Icons/redo.svg"
+                                            Width="14"
+                                            Height="14"
+                                            FlowDirection="LeftToRight"
+                                            Margin="6,0,15,0" />
+                            <TextBlock Text="انصراف"
+                                       FontFamily="{StaticResource IRANSans}"
+                                       FontSize="14"
+                                       Foreground="#2667FF"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
 
                     <controls:CustomOutlinedButton Grid.Column="2"
                                                    Text="ثبت موقت"

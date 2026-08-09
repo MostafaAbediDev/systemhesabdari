@@ -1,14 +1,12 @@
 <UserControl x:Class="Taadol.Views.EditPersonView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:controls="clr-namespace:Taadol.Controls"
-             xmlns:local="clr-namespace:Taadol.Views"
-             xmlns:svg="http://sharpvectors.codeplex.com/svgc/"
-             FlowDirection="RightToLeft"
-             VerticalAlignment="Center"
-             HorizontalAlignment="Center"
-             Background="Transparent">
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+              xmlns:controls="clr-namespace:Taadol.Controls"
+              xmlns:local="clr-namespace:Taadol.Views"
+              xmlns:svg="http://sharpvectors.codeplex.com/svgc/"
+              FlowDirection="RightToLeft"
+              Background="Transparent">
 
     <UserControl.Resources>
         <local:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />

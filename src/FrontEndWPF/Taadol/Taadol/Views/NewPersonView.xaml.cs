@@ -668,16 +668,14 @@ namespace Taadol.Views
             _isSaving = true;
             if (SaveButton != null) SaveButton.IsEnabled = false;
 
-            try
-            {
-                // 1) تأیید کاربر
-                var dialog = new CustomConfirmDialog();
-                if (dialog.ShowDialog() != true) return;
+            // 1) تأیید کاربر
+            var dialog = new CustomConfirmDialog();
+            if (dialog.ShowDialog() != true) return;
 
-                // 2) اعتبارسنجی
-                if (!ValidatePerson()) return;
+            // 2) اعتبارسنجی
+            if (!ValidatePerson()) return;
 
-                // 3) ذخیره تمام اطلاعات در یک Task.Run با Scope جداگانه
+            // 3) ذخیره تمام اطلاعات در یک Task.Run با Scope جداگانه
             var isLegal = IsLegal;
             var companyName = CompanyName;
             var firstName = FirstName;
@@ -839,6 +837,7 @@ namespace Taadol.Views
                 MessageBox.Show("ثبت شخص با موفقیت انجام شد.", "موفقیت", MessageBoxButton.OK, MessageBoxImage.Information);
 
                 ClearForm();
+                NavigateToPersonList();
             }
             catch (Exception ex)
             {
@@ -854,12 +853,6 @@ namespace Taadol.Views
                 catch
                 {
                 }
-            }
-            finally
-            {
-                _isSaving = false;
-                if (SaveButton != null) SaveButton.IsEnabled = true;
-            }
             }
             finally
             {
@@ -1361,6 +1354,17 @@ namespace Taadol.Views
             {
                 System.Diagnostics.Debug.WriteLine("Code generation after clear failed: " + ex.Message);
             }
+        }
+
+        private void NavigateToPersonList()
+        {
+            var mainWindow = Window.GetWindow(this) as MainWindow;
+            mainWindow?.NavigateTo("person_list");
+        }
+
+        private void Cancel_Click(object sender, RoutedEventArgs e)
+        {
+            NavigateToPersonList();
         }
 
         // ======================================================

@@ -215,6 +215,7 @@ namespace Taadol.Views
                 MessageBox.Show("دوره مالی با موفقیت ثبت شد.", "موفق", MessageBoxButton.OK, MessageBoxImage.Information);
 
                 ClearForm();
+                NavigateToPeriodList();
             }
             catch (Exception ex)
             {
@@ -232,6 +233,17 @@ namespace Taadol.Views
             StartDate = null;
             EndDate = null;
             IsCurrentPeriod = true;
+        }
+
+        private void NavigateToPeriodList()
+        {
+            var mainWindow = Window.GetWindow(this) as MainWindow;
+            mainWindow?.NavigateTo("financial_period");
+        }
+
+        private void Cancel_Click(object sender, RoutedEventArgs e)
+        {
+            NavigateToPeriodList();
         }
 
         private void DatePicker_DateChanged(object sender, RoutedEventArgs e)

@@ -1,13 +1,12 @@
 ﻿<UserControl x:Class="Taadol.Views.NewCompanyView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:controls="clr-namespace:Taadol.Controls"
-             xmlns:svg="http://sharpvectors.codeplex.com/svgc/"
-             FlowDirection="RightToLeft"
-             HorizontalAlignment="Center"
-             VerticalAlignment="Stretch"
-             FontFamily="{StaticResource IRANSans}"
-             Background="Transparent">
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:controls="clr-namespace:Taadol.Controls"
+              xmlns:svg="http://sharpvectors.codeplex.com/svgc/"
+              FlowDirection="RightToLeft"
+              VerticalAlignment="Stretch"
+              FontFamily="{StaticResource IRANSans}"
+              Background="Transparent">
 
     <Border CornerRadius="12"
             ClipToBounds="False"
@@ -111,10 +110,9 @@
                                             VerticalAlignment="Center">
                                     <TextBlock Text=""
                                                Style="{StaticResource FormLabel}" />
-                                    <ToggleButton Content=".شرکت فعال است"
-                                                  FlowDirection="LeftToRight"
-                                                  Style="{StaticResource StatusToggleButton}"
-                                                  IsChecked="{Binding IsBranchActive}" />
+                                    <controls:ActiveToggleControl x:Name="CompanyActiveToggle"
+                                                                  Label="شرکت فعال است"
+                                                                  IsChecked="{Binding IsBranchActive, Mode=TwoWay}" />
                                 </StackPanel>
                             </Grid>
 
@@ -224,22 +222,27 @@
                                          ButtonBackground="#2667FF"
                                          CornerRadius="4" />
 
-                    <StackPanel Grid.Column="1"
-                                Orientation="Horizontal"
-                                Margin="0,0,20,0"
-                                VerticalAlignment="Center"
-                                HorizontalAlignment="Right">
-                        <svg:SvgViewbox Source="/Assets/Icons/redo.svg"
-                                        Width="14"
-                                        Height="14"
-                                        FlowDirection="LeftToRight"
-                                        Margin="6,0,15,0" />
-                        <TextBlock Text="انصراف"
-                                   FontFamily="{StaticResource IRANSans}"
-                                   FontSize="14"
-                                   Foreground="#2667FF"
-                                   VerticalAlignment="Center" />
-                    </StackPanel>
+                    <Button Grid.Column="1"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Cursor="Hand"
+                            Margin="0,0,20,0"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Right"
+                            Click="Cancel_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <svg:SvgViewbox Source="/Assets/Icons/redo.svg"
+                                            Width="14"
+                                            Height="14"
+                                            FlowDirection="LeftToRight"
+                                            Margin="6,0,15,0" />
+                            <TextBlock Text="انصراف"
+                                       FontFamily="{StaticResource IRANSans}"
+                                       FontSize="14"
+                                       Foreground="#2667FF"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
 
                     <controls:CustomOutlinedButton Grid.Column="2"
                                                    Text="ثبت موقت"

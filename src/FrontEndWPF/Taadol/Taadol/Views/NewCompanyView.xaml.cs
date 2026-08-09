@@ -158,7 +158,18 @@ namespace Taadol.Views
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
 
-            ClearForm();
+            NavigateToCompanyList();
+        }
+
+        private void NavigateToCompanyList()
+        {
+            var mainWindow = Window.GetWindow(this) as MainWindow;
+            mainWindow?.NavigateTo("company_list");
+        }
+
+        private void Cancel_Click(object sender, RoutedEventArgs e)
+        {
+            NavigateToCompanyList();
         }
 
         private void ClearForm()

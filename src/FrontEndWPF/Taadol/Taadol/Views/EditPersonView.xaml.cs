@@ -82,6 +82,17 @@ namespace Taadol.Views
         private bool _mainBankIsDefault = true;
         private long _selectedBankBranchId;
 
+        // ★ snapshot اولیه برای تشخیص تغییرات قبل از بستن با «انصراف»
+        private List<BankAccountRow> _initialBankAccounts = new();
+        private string _initialImagePath = "";
+        private bool _initialAddressLoaded;
+
+        private (string FirstName, string LastName, string ContactFirstName, string ContactLastName,
+                string NationalCode, string CompanyName, string EconomicCode, string RegistrationNumber,
+                string ManualCode, bool IsLegal, bool IsActive, long SelectedBranchId, long SelectedPersonTypeId,
+                string Phone, string Mobile, string Email, string PostalCode, string Address,
+                long SelectedProvinceId, long SelectedCityId) _initialPerson;
+
         public string FirstName { get => _firstName; set { _firstName = value; OnPropertyChanged(); } }
         public string LastName { get => _lastName; set { _lastName = value; OnPropertyChanged(); } }
         public string ContactFirstName { get => _contactFirstName; set { _contactFirstName = value; OnPropertyChanged(); } }
@@ -146,7 +157,6 @@ namespace Taadol.Views
 
             // Debug toast
             System.Diagnostics.Debug.WriteLine($"[DEBUG] EditPersonView constructor called for personId={personId}");
-            ToastManager.Info($"EditPersonView created for ID: {personId}");
         }
 
         private async void OnLoaded(object sender, RoutedEventArgs e)
@@ -167,12 +177,10 @@ namespace Taadol.Views
                 System.Diagnostics.Debug.WriteLine("[DEBUG] EditPersonView: all load tasks completed, calling LoadPersonData");
                 LoadPersonData();
                 System.Diagnostics.Debug.WriteLine("[DEBUG] EditPersonView: LoadPersonData completed");
-                ToastManager.Success("اطلاعات شخص بارگذاری شد");
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"[DEBUG] ERROR in EditPersonView.OnLoaded: {ex}");
-                ToastManager.Error("خطا در لود: " + ex.Message);
             }
         }
 
@@ -509,11 +517,83 @@ namespace Taadol.Views
                 {
                     System.Diagnostics.Debug.WriteLine("Picture load failed: " + ex.Message);
                 }
+
+                CaptureInitialSnapshot();
             }
             catch (Exception ex)
             {
                 MessageBox.Show("خطا در لود اطلاعات: " + ex.Message, "خطا", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private void CaptureInitialSnapshot()
+        {
+            _initialPerson = (
+                FirstName, LastName, ContactFirstName, ContactLastName,
+                NationalCode, CompanyName, EconomicCode, RegistrationNumber,
+                ManualCode, IsLegal, IsActive, SelectedBranchId, SelectedPersonTypeId,
+                Phone, Mobile, Email, PostalCode, Address,
+                SelectedProvinceId, SelectedCityId);
+
+            _initialBankAccounts = BankAccounts.Select(b => new BankAccountRow
+            {
+                BankBranchId = b.BankBranchId,
+                BankName = b.BankName ?? "",
+                BranchName = b.BranchName ?? "",
+                CardNumber = b.CardNumber ?? "",
+                Shaba = b.Shaba ?? "",
+                AccountNumber = b.AccountNumber ?? "",
+                IsDefault = b.IsDefault
+            }).ToList();
+
+            _initialImagePath = PersonImagePicker.ImagePath ?? "";
+        }
+
+        private bool HasUnsavedChanges()
+        {
+            if (FirstName != _initialPerson.FirstName ||
+                LastName != _initialPerson.LastName ||
+                ContactFirstName != _initialPerson.ContactFirstName ||
+                ContactLastName != _initialPerson.ContactLastName ||
+                NationalCode != _initialPerson.NationalCode ||
+                CompanyName != _initialPerson.CompanyName ||
+                EconomicCode != _initialPerson.EconomicCode ||
+                RegistrationNumber != _initialPerson.RegistrationNumber ||
+                ManualCode != _initialPerson.ManualCode ||
+                IsLegal != _initialPerson.IsLegal ||
+                IsActive != _initialPerson.IsActive ||
+                SelectedBranchId != _initialPerson.SelectedBranchId ||
+                SelectedPersonTypeId != _initialPerson.SelectedPersonTypeId ||
+                Phone != _initialPerson.Phone ||
+                Mobile != _initialPerson.Mobile ||
+                Email != _initialPerson.Email ||
+                PostalCode != _initialPerson.PostalCode ||
+                Address != _initialPerson.Address ||
+                SelectedProvinceId != _initialPerson.SelectedProvinceId ||
+                SelectedCityId != _initialPerson.SelectedCityId)
+                return true;
+
+            if (PersonImagePicker.ImagePath != _initialImagePath)
+                return true;
+
+            if (_initialBankAccounts.Count != BankAccounts.Count)
+                return true;
+
+            for (int i = 0; i < BankAccounts.Count; i++)
+            {
+                var a = _initialBankAccounts[i];
+                var b = BankAccounts[i];
+                if (a.BankBranchId != b.BankBranchId ||
+                    a.BankName != b.BankName ||
+                    a.BranchName != b.BranchName ||
+                    a.CardNumber != b.CardNumber ||
+                    a.Shaba != b.Shaba ||
+                    a.AccountNumber != b.AccountNumber ||
+                    a.IsDefault != b.IsDefault)
+                    return true;
+            }
+
+            return false;
         }
 
         private void UpdateLegalTypePanels()
@@ -629,15 +709,13 @@ namespace Taadol.Views
             _isSaving = true;
             if (SaveButton != null) SaveButton.IsEnabled = false;
 
+            var dialog = new CustomConfirmDialog();
+            if (dialog.ShowDialog() != true) return;
+
+            if (!ValidatePerson()) return;
+
             try
             {
-                var dialog = new CustomConfirmDialog();
-                if (dialog.ShowDialog() != true) return;
-
-                if (!ValidatePerson()) return;
-
-                try
-                {
                 var personId = _personId;
                 var isLegal = IsLegal;
                 var companyName = CompanyName;
@@ -775,16 +853,11 @@ namespace Taadol.Views
 
                 var mainWindow = Window.GetWindow(this) as MainWindow;
                 mainWindow?.CloseModal();
+                mainWindow?.NavigateTo("person_list");
             }
             catch (Exception ex)
             {
                 MessageBox.Show("خطا در ویرایش: " + ex.Message, "خطا", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            finally
-            {
-                _isSaving = false;
-                if (SaveButton != null) SaveButton.IsEnabled = true;
-            }
             }
             finally
             {
@@ -1291,6 +1364,23 @@ namespace Taadol.Views
 
         private void Cancel_Click(object sender, MouseButtonEventArgs e)
         {
+            if (HasUnsavedChanges())
+            {
+                var result = MessageBox.Show(
+                    "تغییراتی که ایجاد کرده‌اید ذخیره نشده است.\nآیا می‌خواهید آن‌ها را ذخیره کنید؟",
+                    "ذخیره تغییرات",
+                    MessageBoxButton.YesNoCancel,
+                    MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    SavePerson();
+                    return;
+                }
+                if (result == MessageBoxResult.Cancel)
+                    return;
+            }
+
             var mainWindow = Window.GetWindow(this) as MainWindow;
             mainWindow?.CloseModal();
         }

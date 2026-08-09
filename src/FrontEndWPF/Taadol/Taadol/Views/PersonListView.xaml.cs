@@ -52,11 +52,8 @@ namespace Taadol.Views
 
             PersonsGrid.GridDoubleClicked += (s, e) =>
             {
-                if (PersonsGrid.DoubleClickedItem is PersonItem item && !item.IsEmpty)
-                {
-                    var mainWindow = Window.GetWindow(this) as MainWindow;
-                    mainWindow?.NavigateToEditPerson(item.Id);
-                }
+                // دسترسی به ویرایش شخص فقط از طریق دکمه داخل پنل جزئیات رخ می‌دهد،
+                // نه با دابل‌کلیک روی ردیف گرید.
             };
 
             PersonsGrid.CheckedItemsChanged += (s, e) =>
@@ -250,8 +247,8 @@ namespace Taadol.Views
             _isPanelOpen = !_isPanelOpen;
 
             var anim = new System.Windows.Media.Animation.DoubleAnimation();
-            anim.Duration = TimeSpan.FromMilliseconds(180);
-            var ease = new System.Windows.Media.Animation.SineEase();
+            anim.Duration = TimeSpan.FromMilliseconds(250);
+            var ease = new System.Windows.Media.Animation.CubicEase();
             var arrow = BtnToggleSidebar.Template?.FindName("ArrowRotation", BtnToggleSidebar) as System.Windows.Media.RotateTransform;
 
             if (_isPanelOpen)
@@ -271,17 +268,16 @@ namespace Taadol.Views
                 BtnNewBorder.Width = double.NaN;
                 BtnNewBorder.HorizontalAlignment = HorizontalAlignment.Stretch;
                 BtnNewIcon.Margin = new Thickness(0, 0, 10, 0);
-                PanelHeaderStack.HorizontalAlignment = HorizontalAlignment.Left;
                 PanelHeaderBorder.Padding = new Thickness(10, 6, 10, 6);
                 SelectedCountBadge.Padding = new Thickness(8, 2, 8, 2);
-                var fadeIn = new System.Windows.Media.Animation.DoubleAnimation(1, TimeSpan.FromMilliseconds(180));
+                var fadeIn = new System.Windows.Media.Animation.DoubleAnimation(1, TimeSpan.FromMilliseconds(250));
                 fadeIn.EasingFunction = ease;
                 DetailPanelContainer.BeginAnimation(UIElement.OpacityProperty, fadeIn);
                 PanelHeaderText.BeginAnimation(UIElement.OpacityProperty, fadeIn);
                 BtnNewText.BeginAnimation(UIElement.OpacityProperty, fadeIn);
                 var marginLeftAnim = new System.Windows.Media.Animation.ThicknessAnimation(
                     new Thickness(332, 40, 0, 0),
-                    TimeSpan.FromMilliseconds(180));
+                    TimeSpan.FromMilliseconds(250));
                 marginLeftAnim.EasingFunction = ease;
                 BtnToggleSidebar.BeginAnimation(FrameworkElement.MarginProperty, marginLeftAnim);
                 DetailPanelColumn.BeginAnimation(System.Windows.Controls.ColumnDefinition.MaxWidthProperty, anim);
@@ -306,10 +302,9 @@ namespace Taadol.Views
                 BtnNewBorder.Width = 44;
                 BtnNewBorder.HorizontalAlignment = HorizontalAlignment.Center;
                 BtnNewIcon.Margin = new Thickness(0);
-                PanelHeaderStack.HorizontalAlignment = HorizontalAlignment.Center;
                 PanelHeaderBorder.Padding = new Thickness(4, 6, 4, 6);
                 SelectedCountBadge.Padding = new Thickness(3, 1, 3, 1);
-                var fadeOut = new System.Windows.Media.Animation.DoubleAnimation(0, TimeSpan.FromMilliseconds(180));
+                var fadeOut = new System.Windows.Media.Animation.DoubleAnimation(0, TimeSpan.FromMilliseconds(250));
                 fadeOut.EasingFunction = ease;
                 fadeOut.Completed += (s, ev) =>
                 {
@@ -322,7 +317,7 @@ namespace Taadol.Views
                 BtnNewText.BeginAnimation(UIElement.OpacityProperty, fadeOut);
                 var marginLeftAnim = new System.Windows.Media.Animation.ThicknessAnimation(
                     new Thickness(56, 40, 0, 0),
-                    TimeSpan.FromMilliseconds(180));
+                    TimeSpan.FromMilliseconds(250));
                 marginLeftAnim.EasingFunction = ease;
                 BtnToggleSidebar.BeginAnimation(FrameworkElement.MarginProperty, marginLeftAnim);
                 DetailPanelColumn.BeginAnimation(System.Windows.Controls.ColumnDefinition.MaxWidthProperty, anim);

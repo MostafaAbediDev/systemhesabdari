@@ -73,7 +73,7 @@
                           SelectionMode="Extended"
                           AlternationCount="2"
                           IsReadOnly="True"
-                          ScrollViewer.HorizontalScrollBarVisibility="Visible"
+                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
                           ScrollViewer.VerticalScrollBarVisibility="Auto"
                           ColumnHeaderStyle="{StaticResource UnifiedGridColumnHeaderStyle}"
                           CellStyle="{StaticResource UnifiedGridCellStyle}"

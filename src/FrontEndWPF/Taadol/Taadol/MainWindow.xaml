@@ -19,11 +19,14 @@
     <Grid ClipToBounds="False">
         <Grid.ColumnDefinitions>
             <ColumnDefinition x:Name="SidebarColumn"
-                              Width="240" />
+                              Width="240"
+                              MinWidth="60"
+                              MaxWidth="320" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="90" />
+            <RowDefinition Height="Auto"
+                           MinHeight="90" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -35,11 +38,51 @@
                 Panel.ZIndex="5">
             <Grid Margin="16,15,40,0">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions> 
+                </Grid.ColumnDefinitions>
 
-                <Border Grid.Column="1"
+                <!-- ═══ انتخابگر شرکت — سمت راست (RTL: اولین ستون) ═══ -->
+                <StackPanel Grid.Column="0"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Left"
+                            Background="#ffffff"
+                            MinWidth="250">
+
+                    <!-- عنوان بالای کمبو -->
+                    <TextBlock Text="شرکت های شما"
+                               FontFamily="{StaticResource IRANSans}"
+                               FontSize="13"
+                               FontWeight="DemiBold"
+                               Foreground="#0D2159"
+                               HorizontalAlignment="Left"
+                               Margin="0,4,4,2" />
+
+                    <!-- کمبو باکس با پدینگ دورش -->
+                    <Border Background="#FFFFFF"
+                            BorderBrush="#ffffff"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="4">
+                        <ComboBox x:Name="CompanySelector"
+                                  DisplayMemberPath="Title"
+                                  SelectedValuePath="Id"
+                                 Height="35"
+                                  Style="{StaticResource SearchableComboBox}"
+                                  ItemContainerStyle="{StaticResource SearchableComboBoxItem}"
+                                  SelectionChanged="CompanySelector_SelectionChanged"
+                                  BorderThickness="0"
+                                  Background="#E9F0FF"
+                                  MinWidth="220" />
+                    </Border>
+                </StackPanel>
+
+                <!-- ═══ ناحیه خالی ═══ -->
+                <Border Grid.Column="1" Background="Transparent" />
+
+                <!-- ═══ اطلاعات کاربر + دکمه خروج ═══ -->
+                <Border Grid.Column="2"
                         CornerRadius="6"
                         Width="320"
                         Height="65"

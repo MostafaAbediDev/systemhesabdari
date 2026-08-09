@@ -7,6 +7,7 @@ using GeneralInfoManagement.Domain.General.CityAgg;
 using GeneralInfoManagement.Domain.General.ProvinceAgg;
 using GeneralInfoManagement.Infrastructure.EFCore.Repository;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PersonManagement.Application;
 using PersonManagement.Application.Contract.Persons;
@@ -57,8 +58,7 @@ namespace Taadol
                 LogStep("Creating ServiceCollection...");
                 var services = new ServiceCollection();
 
-                string connectionString =
-                    @"Data Source=DESKTOP-MRP0FEV\MSSQLSERVER86;Initial Catalog=TaadolFake;Integrated Security=True;TrustServerCertificate=True";
+                string connectionString = GetConnectionString();
                 ConnectionString = connectionString;
                 LogStep($"Connection string set: {connectionString}");
 
@@ -144,6 +144,32 @@ namespace Taadol
                 }
 
                 Environment.FailFast(fullMessage);
+            }
+        }
+
+        private static string GetConnectionString()
+        {
+            const string fallback =
+                @"Data Source=DESKTOP-MRP0FEV\MSSQLSERVER86;Initial Catalog=TaadolFake;Integrated Security=True;TrustServerCertificate=True";
+
+            try
+            {
+                var config = new ConfigurationBuilder()
+                    .SetBasePath(AppContext.BaseDirectory)
+                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+                    .Build();
+
+                var cs = config.GetConnectionString("TaadolDb");
+                LogStep(cs != null
+                    ? "appsettings.json taadol has ConnectionStrings:TaadolDb"
+                    : "appsettings.json does NOT contain ConnectionStrings:TaadolDb — using fallback");
+
+                return !string.IsNullOrWhiteSpace(cs) ? cs : fallback;
+            }
+            catch (Exception ex)
+            {
+                LogStep($"Error reading appsettings.json: {ex.Message}");
+                return fallback;
             }
         }
 

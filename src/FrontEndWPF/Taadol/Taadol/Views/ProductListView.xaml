@@ -1,289 +1,17 @@
 ﻿<UserControl x:Class="Taadol.Views.ProductListView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:svg="http://sharpvectors.codeplex.com/svgc/"
-             d:DesignHeight="650"
-             d:DesignWidth="1440"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d"
-             Margin="24"
-             FlowDirection="RightToLeft"
-             FontFamily="{StaticResource IRANSans}"
-             Background="#FFFFFF"
-             HorizontalAlignment="Center"
-             VerticalAlignment="Center">
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:svg="http://sharpvectors.codeplex.com/svgc/"
+              d:DesignHeight="650"
+              d:DesignWidth="1440"
+              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+              mc:Ignorable="d"
+              FlowDirection="RightToLeft"
+              FontFamily="{StaticResource IRANSans}"
+              Background="#FFFFFF">
 
-    <UserControl.Resources>
-        
-        <Style x:Key="FilterTabStyle2"
-               TargetType="RadioButton">
-            <Setter Property="FontFamily"
-                    Value="{StaticResource IRANSans}" />
-            <Setter Property="FontSize"
-                    Value="12" />
-            <Setter Property="Width"
-                    Value="215" />
-            <Setter Property="Foreground"
-                    Value="#2563EB" />
-            <Setter Property="Background"
-                    Value="Transparent" />
-            <Setter Property="BorderBrush"
-                    Value="Transparent" />
-            <Setter Property="BorderThickness"
-                    Value="0" />
-            <Setter Property="Padding"
-                    Value="16,10" />
-            <Setter Property="Margin"
-                    Value="0,0,4,0" />
-            <Setter Property="Cursor"
-                    Value="Hand" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="RadioButton">
-                        <Border x:Name="Root"
-                                Background="Transparent"
-                                CornerRadius="8"
-                                Padding="{TemplateBinding Padding}">
-                            <Grid VerticalAlignment="Center">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-
-                                
-                                <StackPanel Grid.Column="0"
-                                            Orientation="Horizontal"
-                                            HorizontalAlignment="Right">
-                                    <Border x:Name="CheckBoxBorder"
-                                            Width="20"
-                                            Height="20"
-                                            BorderThickness="2"
-                                            BorderBrush="#2ECC71"
-                                            CornerRadius="4"
-                                            Background="White"
-                                            Padding="2"
-                                            Margin="0,0,6,0"
-                                            Visibility="Collapsed">
-                                        <svg:SvgViewbox x:Name="CheckMark"
-                                                        Width="8"
-                                                        Height="8"
-                                                        Source="/Assets/Icons/Line.svg"
-                                                        FlowDirection="LeftToRight"
-                                                        HorizontalAlignment="Center"
-                                                        VerticalAlignment="Center" />
-                                    </Border>
-
-                                    <TextBlock x:Name="TitleText"
-                                               Text="{TemplateBinding Content}"
-                                               Foreground="#2563EB"
-                                               FontWeight="Medium" />
-                                </StackPanel>
-
-                                
-                                <TextBlock Grid.Column="2"
-                                           x:Name="CountText"
-                                           Text="{TemplateBinding Tag}"
-                                           Foreground="#94A3B8"
-                                           FontWeight="Normal"
-                                           HorizontalAlignment="Left" />
-                            </Grid>
-                        </Border>
-
-                        <ControlTemplate.Triggers>
-                            
-                            <Trigger Property="IsChecked"
-                                     Value="True">
-                                <Setter TargetName="Root"
-                                        Property="Background"
-                                        Value="Transparent" />
-                                <Setter TargetName="Root"
-                                        Property="BorderBrush"
-                                        Value="#2563EB" />
-                                <Setter TargetName="Root"
-                                        Property="BorderThickness"
-                                        Value="1" />
-
-                                <Setter TargetName="TitleText"
-                                        Property="Foreground"
-                                        Value="#2563EB" />
-                                <Setter TargetName="TitleText"
-                                        Property="FontWeight"
-                                        Value="Bold" />
-                                <Setter TargetName="CountText"
-                                        Property="Foreground"
-                                        Value="#64748B" />
-
-                                
-                                <Setter TargetName="CheckBoxBorder"
-                                        Property="Visibility"
-                                        Value="Visible" />
-                            </Trigger>
-                            <Trigger Property="IsChecked"
-                                     Value="False">
-                                <Setter TargetName="Root"
-                                        Property="Background"
-                                        Value="Transparent" />
-                                <Setter TargetName="Root"
-                                        Property="BorderBrush"
-                                        Value="#E9F0FF" />
-                                <Setter TargetName="Root"
-                                        Property="BorderThickness"
-                                        Value="1" />
-
-                                <Setter TargetName="TitleText"
-                                        Property="Foreground"
-                                        Value="#2563EB" />
-                                <Setter TargetName="TitleText"
-                                        Property="FontWeight"
-                                        Value="Bold" />
-                                <Setter TargetName="CountText"
-                                        Property="Foreground"
-                                        Value="#64748B" />
-                            </Trigger>
-                            
-                            <Trigger Property="IsMouseOver"
-                                     Value="True">
-                                <Setter TargetName="Root"
-                                        Property="Background"
-                                        Value="#F4F7FF" />
-                            </Trigger>
-
-                            
-                            <Trigger Property="IsEnabled"
-                                     Value="False">
-                                <Setter TargetName="TitleText"
-                                        Property="Foreground"
-                                        Value="#CBD5E1" />
-                                <Setter TargetName="CountText"
-                                        Property="Foreground"
-                                        Value="#E2E8F0" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        
-        <Style x:Key="FilterTabStyle"
-               TargetType="RadioButton">
-            <Setter Property="FontFamily"
-                    Value="{StaticResource IRANSans}" />
-            <Setter Property="FontSize"
-                    Value="13" />
-            <Setter Property="Foreground"
-                    Value="#64748B" />
-            <Setter Property="Cursor"
-                    Value="Hand" />
-            <Setter Property="Margin"
-                    Value="0" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="RadioButton">
-                        <Border x:Name="bd"
-                                Background="Transparent"
-                                BorderThickness="0,0,0,2.5"
-                                BorderBrush="Transparent"
-                                Padding="22,11"
-                                SnapsToDevicePixels="True">
-                            <StackPanel Orientation="Horizontal"
-                                        HorizontalAlignment="Center">
-
-                                <Border x:Name="checkIcon"
-                                        Width="18"
-                                        Height="18"
-                                        CornerRadius="4"
-                                        Background="#22C55E"
-                                        Margin="0,0,7,0"
-                                        VerticalAlignment="Center"
-                                        Visibility="Collapsed">
-                                    <TextBlock Text="✓"
-                                               Foreground="White"
-                                               FontSize="11"
-                                               FontWeight="Bold"
-                                               FontFamily="{StaticResource IRANSans}"
-                                               HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"
-                                               Margin="0,-1,0,0" />
-                                </Border>
-
-                                <TextBlock x:Name="txt"
-                                           Text="{TemplateBinding Content}"
-                                           VerticalAlignment="Center"
-                                           FontWeight="Medium"
-                                           FontFamily="{StaticResource IRANSans}" />
-
-                                <Border x:Name="countBorder"
-                                        Background="#F1F5F9"
-                                        CornerRadius="8"
-                                        Padding="8,3"
-                                        Margin="10,0,0,0"
-                                        VerticalAlignment="Center">
-                                    <TextBlock x:Name="countText"
-                                               Text="{TemplateBinding Tag}"
-                                               FontSize="11"
-                                               Foreground="#94A3B8"
-                                               FontFamily="{StaticResource IRANSans}" />
-                                </Border>
-
-                                <Border x:Name="separator"
-                                        Width="1"
-                                        Height="20"
-                                        Background="#E2E8F0"
-                                        Margin="22,0,0,0"
-                                        VerticalAlignment="Center" />
-                            </StackPanel>
-                        </Border>
-
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsChecked"
-                                     Value="True">
-                                <Setter TargetName="txt"
-                                        Property="Foreground"
-                                        Value="#1E40AF" />
-                                <Setter TargetName="txt"
-                                        Property="FontWeight"
-                                        Value="Bold" />
-                                <Setter TargetName="bd"
-                                        Property="BorderBrush"
-                                        Value="#3B82F6" />
-                                <Setter TargetName="bd"
-                                        Property="Background"
-                                        Value="#F0F7FF" />
-                                <Setter TargetName="countBorder"
-                                        Property="Background"
-                                        Value="#DBEAFE" />
-                                <Setter TargetName="countText"
-                                        Property="Foreground"
-                                        Value="#2563EB" />
-                                <Setter TargetName="checkIcon"
-                                        Property="Visibility"
-                                        Value="Visible" />
-                            </Trigger>
-                            <Trigger Property="IsMouseOver"
-                                     Value="True">
-                                <Setter TargetName="bd"
-                                        Property="Background"
-                                        Value="#F8FAFC" />
-                            </Trigger>
-                            <MultiTrigger>
-                                <MultiTrigger.Conditions>
-                                    <Condition Property="IsChecked"
-                                               Value="True" />
-                                    <Condition Property="IsMouseOver"
-                                               Value="True" />
-                                </MultiTrigger.Conditions>
-                                <Setter TargetName="bd"
-                                        Property="Background"
-                                        Value="#E8F1FF" />
-                            </MultiTrigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+<UserControl.Resources>
     </UserControl.Resources>
 
     <Border Margin="0,16"
@@ -450,46 +178,180 @@
 
             
             <Border Grid.Row="1"
-                    BorderBrush="#E9E5FF"
-                    BorderThickness="0,1,0,0"
-                    Background="#FAFBFF"
-                    Padding="24,12">
-                <StackPanel Orientation="Horizontal"
-                            FlowDirection="RightToLeft"
-                            VerticalAlignment="Center">
-                
+                    BorderBrush="#E5E7EB"
+                    BorderThickness="0,0,0,0"
+                    Background="#ffffff"
+                    Padding="10,6,10,6"
+                    Margin="0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.6*"
+                                          MinWidth="120" />
+                        <ColumnDefinition Width="*"
+                                          MinWidth="70" />
+                        <ColumnDefinition Width="*"
+                                          MinWidth="70" />
+                        <ColumnDefinition Width="*"
+                                          MinWidth="70" />
+                    </Grid.ColumnDefinitions>
 
-                    <RadioButton x:Name="tabAllTypes"
-                                 Style="{StaticResource FilterTabStyle2}"
-                                 GroupName="ItemType"
-                                 Content="همه"
-                                 Tag="۹۰"
-                                 IsChecked="True"
-                                 Checked="TypeTab_Checked" />
+                    <!-- جستجو -->
+                    <Border Grid.Column="0"
+                            Background="#FFFFFF"
+                            BorderBrush="#E5E7EB"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Margin="0,0,4,0"
+                            Height="40"
+                            Padding="5,0"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Stretch">
+                        <Grid FlowDirection="RightToLeft">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
 
-                    <RadioButton x:Name="tabProducts"
-                                 Style="{StaticResource FilterTabStyle2}"
-                                 GroupName="ItemType"
-                                 Content="کالاها"
-                                 Tag="۶۸"
-                                 Checked="TypeTab_Checked" />
+                            <Grid Grid.Column="0"
+                                  VerticalAlignment="Center"
+                                  Margin="0,0,8,0"
+                                  Height="30">
+                                <TextBlock Text="جستجو در نام ، کد"
+                                           FontSize="12"
+                                           Foreground="#94A3B8"
+                                           FontFamily="{StaticResource IRANSans}"
+                                           FlowDirection="RightToLeft"
+                                           VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis"
+                                           IsHitTestVisible="False"
+                                           Panel.ZIndex="1">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility"
+                                                    Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Text, ElementName=ProductSearchBox}"
+                                                             Value="">
+                                                    <Setter Property="Visibility"
+                                                            Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <TextBox x:Name="ProductSearchBox"
+                                         Height="30"
+                                         FontSize="12"
+                                         Foreground="#1F2937"
+                                         CaretBrush="#3B82F6"
+                                         Background="Transparent"
+                                         BorderThickness="0"
+                                         Padding="0,2"
+                                         VerticalAlignment="Center"
+                                         VerticalContentAlignment="Center"
+                                         FlowDirection="RightToLeft"
+                                         FontFamily="{StaticResource IRANSans}"
+                                         TextAlignment="Left">
+                                    <TextBox.Style>
+                                        <Style TargetType="TextBox">
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="TextBox">
+                                                        <Border Background="{TemplateBinding Background}"
+                                                                BorderThickness="0"
+                                                                CornerRadius="4">
+                                                            <ScrollViewer x:Name="PART_ContentHost"
+                                                                          Focusable="False"
+                                                                          HorizontalScrollBarVisibility="Hidden"
+                                                                          VerticalScrollBarVisibility="Hidden" />
+                                                        </Border>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </TextBox.Style>
+                                </TextBox>
+                            </Grid>
 
-                    <RadioButton x:Name="tabServices"
-                                 Style="{StaticResource FilterTabStyle2}"
-                                 GroupName="ItemType"
-                                 Content="خدمات"
-                                 Tag="۲۲"
-                                 Checked="TypeTab_Checked" />
-                </StackPanel>
+                            <StackPanel Grid.Column="1"
+                                        Orientation="Horizontal"
+                                        VerticalAlignment="Center">
+                                <Border Width="1"
+                                        Height="14"
+                                        Background="#BED1FF"
+                                        VerticalAlignment="Center" />
+                                <svg:SvgViewbox Width="14"
+                                                Height="14"
+                                                FlowDirection="LeftToRight"
+                                                Source="/Assets/Icons/search.svg"
+                                                VerticalAlignment="Center"
+                                                Margin="8,0,0,0" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- تب‌های نوع -->
+                    <ToggleButton x:Name="tabAllTypes"
+                                  Grid.Column="1"
+                                  Style="{StaticResource FilterTabStyle2}"
+                                  Content="همه"
+                                  Tag="۹۰"
+                                  IsChecked="True"
+                                  HorizontalAlignment="Stretch"
+                                  Click="TypeTab_Click"
+                                  Margin="4,0,0,0" />
+
+                    <ToggleButton x:Name="tabProducts"
+                                  Grid.Column="2"
+                                  Style="{StaticResource FilterTabStyle2}"
+                                  Content="کالاها"
+                                  Tag="۶۸"
+                                  HorizontalAlignment="Stretch"
+                                  Click="TypeTab_Click"
+                                  Margin="4,0,0,0" />
+
+                    <ToggleButton x:Name="tabServices"
+                                  Grid.Column="3"
+                                  Style="{StaticResource FilterTabStyle2}"
+                                  Content="خدمات"
+                                  Tag="۲۲"
+                                  HorizontalAlignment="Stretch"
+                                  Click="TypeTab_Click"
+                                  Margin="4,0,0,0" />
+                </Grid>
             </Border>
 
             
             <Border Grid.Row="2"
-                    BorderBrush="#D4E0FF"
-                    BorderThickness="0,2,0,0"
+                    BorderBrush="#E5E7EB"
+                    BorderThickness="0,1,0,0"
                     Background="#FAFCFF"
-                    Padding="24,12">
-             
+                    Padding="24,8">
+                <StackPanel Orientation="Horizontal"
+                            FlowDirection="RightToLeft"
+                            VerticalAlignment="Center">
+                    <ToggleButton x:Name="tabAll"
+                                  Style="{StaticResource FilterTabStyle2}"
+                                  Content="همه"
+                                  IsChecked="True"
+                                  HorizontalAlignment="Stretch"
+                                  Click="FilterTab_Click"
+                                  Margin="4,0,8,0" />
+
+                    <ToggleButton x:Name="tabActive"
+                                  Style="{StaticResource FilterTabStyle2}"
+                                  Content="فعال"
+                                  HorizontalAlignment="Stretch"
+                                  Click="FilterTab_Click"
+                                  Margin="4,0,8,0" />
+
+                    <ToggleButton x:Name="tabInactive"
+                                  Style="{StaticResource FilterTabStyle2}"
+                                  Content="غیرفعال"
+                                  HorizontalAlignment="Stretch"
+                                  Click="FilterTab_Click"
+                                  Margin="4,0,8,0" />
+                </StackPanel>
             </Border>
 
             
@@ -539,7 +401,8 @@
                     </Grid.Resources>
 
                     <DataGrid x:Name="ProductsDataGrid"
-                              CanUserSortColumns="False"
+                               Padding="0,0,10,0"
+                               CanUserSortColumns="False"
                               AutoGenerateColumns="False"
                               HeadersVisibility="Column"
                               GridLinesVisibility="All"

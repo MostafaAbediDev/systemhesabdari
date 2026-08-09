@@ -33,7 +33,7 @@
                                 Width="40"
                                 Height="40"
                                 HorizontalAlignment="Center"
-                                Source="/Assets/Icons/add_doc.svg" />
+                                Source="/Assets/Icons/document-copy.svg" />
                 <TextBlock x:Name="PlaceholderLabel"
                            Text="انتخاب فایل"
                            FontFamily="{StaticResource IRANSans}"

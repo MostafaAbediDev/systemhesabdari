@@ -19,6 +19,12 @@
             <Style TargetType="Control">
                 <Setter Property="FontFamily" Value="{StaticResource IRANSans}" />
             </Style>
+            <Style TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="{StaticResource IRANSans}" />
+            </Style>
+            <Style TargetType="TextElement">
+                <Setter Property="FontFamily" Value="{StaticResource IRANSans}" />
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

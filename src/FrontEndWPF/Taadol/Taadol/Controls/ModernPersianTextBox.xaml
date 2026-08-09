@@ -25,7 +25,7 @@
                          BorderThickness="0"
                          Padding="12,0"
                          VerticalContentAlignment="Center"
-                         HorizontalContentAlignment="Left"
+                         HorizontalContentAlignment="Right"
                          
                          TextChanged="TextBox_TextChanged"
                          PreviewTextInput="PART_TextBox_PreviewTextInput"

@@ -239,39 +239,54 @@
                             BorderThickness="0,0,0,0"
                             Padding="10,6"
                             ClipToBounds="True">
-                        <StackPanel x:Name="PanelHeaderStack"
-                                    Orientation="Horizontal"
-                                    VerticalAlignment="Center"
-                                    HorizontalAlignment="Left">
-                            <svg:SvgViewbox x:Name="MainIcon"
-                                            Width="20"
-                                            Height="20"
-                                            Margin="0,0,6,0"
-                                            Source="/Assets/Icons/user_blue.svg"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center" />
-                            <TextBlock x:Name="PanelHeaderText"
-                                       Text="اشخاص انتخاب شده"
-                                       FontSize="13"
-                                       FontWeight="SemiBold"
-                                       Foreground="#0D2159"
-                                       VerticalAlignment="Center" />
-                            <Border x:Name="SelectedCountBadge"
-                                    CornerRadius="10"
-                                    Padding="0,2"
-                                    Margin="0,0,0,0"
-                                    VerticalAlignment="Center"
-                                    Background="#ffffff"
-                                    BorderBrush="#ffffff"
-                                    BorderThickness="1">
-                                <TextBlock x:Name="SelectedCountText"
-                                           Text=""
+                        <Grid x:Name="PanelHeaderStack"
+                              VerticalAlignment="Center"
+                              HorizontalAlignment="Left">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0"
+                                        Orientation="Horizontal"
+                                        VerticalAlignment="Center">
+                                <svg:SvgViewbox x:Name="MainIcon"
+                                                Width="20"
+                                                Height="20"
+                                                Margin="0,0,6,0"
+                                                Source="/Assets/Icons/user_blue.svg"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center" />
+                                <Border x:Name="SelectedCountBadge"
+                                        CornerRadius="10"
+                                        Padding="8,2"
+                                        Margin="0,0,0,0"
+                                        VerticalAlignment="Center"
+                                        Background="#ffffff"
+                                        BorderBrush="#ffffff"
+                                        BorderThickness="1">
+                                    <TextBlock x:Name="SelectedCountText"
+                                               Text=""
+                                               FontSize="13"
+                                               FontWeight="DemiBold"
+                                               Foreground="#0D2159"
+                                               VerticalAlignment="Center" />
+                                </Border>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1"
+                                        x:Name="HeaderTextStack"
+                                        Orientation="Horizontal"
+                                        VerticalAlignment="Center">
+                                <TextBlock x:Name="PanelHeaderText"
+                                           Text="اشخاص انتخاب شده"
                                            FontSize="13"
-                                           FontWeight="DemiBold"
+                                           FontWeight="SemiBold"
                                            Foreground="#0D2159"
-                                           VerticalAlignment="Center" />
-                            </Border>
-                        </StackPanel>
+                                           VerticalAlignment="Center"
+                                           Margin="4,0,0,0" />
+                            </StackPanel>
+                        </Grid>
                     </Border>
 
                     <!-- پنل اطلاعات -->
@@ -344,9 +359,9 @@
                          <Border Grid.Row="0"
                                  x:Name="FilterBarBorder"
                                  BorderBrush="#E5E7EB"
-                                 BorderThickness="0,0,0,1"
+                                 BorderThickness="0,0,0,0"
                                  Background="#ffffff"
-                                 Padding="0,6,0,6"
+                                 Padding="0,6,10,6"
                                  Margin="0">
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -495,6 +510,7 @@
                          <!-- ═══ DataGrid (کنترل مشترک) ═══ -->
                          <controls:UnifiedListView x:Name="PersonsGrid"
                                                    Grid.Row="1"
+                                                   Padding="0,0,10,0"
                                                    ItemsSource="{Binding FilteredPersons}"
                                                    PagesSource="{Binding Pages}"
                                                    PageInfoContent="{Binding PageInfoText}"
@@ -951,7 +967,7 @@
                         BorderThickness="1"
                         Height="53"
                         CornerRadius="4"
-                        Margin="0,2,0,2"
+                        Margin="0,2,10,2"
                         Padding="16,8">
                     <Grid>
                         <Grid.ColumnDefinitions>

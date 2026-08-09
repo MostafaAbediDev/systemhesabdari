@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 
 namespace Taadol.Views
 {
@@ -11,13 +13,22 @@ namespace Taadol.Views
         public ObservableCollection<ItemBase> AllServices { get; set; }
         public ObservableCollection<ItemBase> FilteredItems { get; set; }
 
-        private string _currentType = "all"; private string _currentStatus = "all"; private int _pageSize = 20;
+        private string _currentType = "all";
+        private string _currentStatus = "all";
+        private string _searchText = "";
+        private int _pageSize = 20;
 
         public ProductListView()
         {
             InitializeComponent();
 
             LoadTestData();
+
+            ProductSearchBox.TextChanged += (s, e) =>
+            {
+                _searchText = ProductSearchBox.Text.Trim();
+                ApplyFilter();
+            };
 
             this.Dispatcher.BeginInvoke(new Action(() => ApplyFilter()));
         }
@@ -317,6 +328,24 @@ namespace Taadol.Views
                 }
             }
 
+            if (!string.IsNullOrWhiteSpace(_searchText))
+            {
+                var all = FilteredItems.ToList();
+                FilteredItems = new ObservableCollection<ItemBase>();
+                int searchRow = 1;
+
+                foreach (var item in all)
+                {
+                    if ((item.Name != null && item.Name.Contains(_searchText, StringComparison.OrdinalIgnoreCase)) ||
+                        (item.Code != null && item.Code.Contains(_searchText, StringComparison.OrdinalIgnoreCase)) ||
+                        (item.Category != null && item.Category.Contains(_searchText, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        item.RowNumber = searchRow++;
+                        FilteredItems.Add(item);
+                    }
+                }
+            }
+
             int realCount = FilteredItems.Count;
             for (int i = realCount + 1; i <= _pageSize; i++)
             {
@@ -344,46 +373,52 @@ namespace Taadol.Views
             }
         }
 
-        private void TypeTab_Checked(object sender, RoutedEventArgs e)
+        private void TypeTab_Click(object sender, RoutedEventArgs e)
         {
             if (AllProducts == null || AllServices == null)
                 return;
 
-            if (sender is RadioButton rb)
-            {
-                if (rb.Name == "tabAllTypes")
-                {
-                    _currentType = "all";
-                }
-                else if (rb.Name == "tabProducts")
-                {
-                    _currentType = "products";
-                }
-                else if (rb.Name == "tabServices")
-                {
-                    _currentType = "services";
-                }
+            if (sender is not ToggleButton tb) return;
 
-                ApplyFilter();
+            tabAllTypes.IsChecked = tb == tabAllTypes;
+            tabProducts.IsChecked = tb == tabProducts;
+            tabServices.IsChecked = tb == tabServices;
+
+            if (tb == tabAllTypes)
+            {
+                _currentType = "all";
             }
+            else if (tb == tabProducts)
+            {
+                _currentType = "products";
+            }
+            else if (tb == tabServices)
+            {
+                _currentType = "services";
+            }
+
+            ApplyFilter();
         }
 
-        private void FilterTab_Checked(object sender, RoutedEventArgs e)
+        private void FilterTab_Click(object sender, RoutedEventArgs e)
         {
             if (AllProducts == null || AllServices == null)
                 return;
 
-            if (sender is RadioButton rb)
-            {
-                if (rb.Name == "tabAll")
-                    _currentStatus = "all";
-                else if (rb.Name == "tabActive")
-                    _currentStatus = "active";
-                else if (rb.Name == "tabInactive")
-                    _currentStatus = "inactive";
+            if (sender is not ToggleButton tb) return;
 
-                ApplyFilter();
-            }
+            tabAll.IsChecked = tb == tabAll;
+            tabActive.IsChecked = tb == tabActive;
+            tabInactive.IsChecked = tb == tabInactive;
+
+            if (tb == tabAll)
+                _currentStatus = "all";
+            else if (tb == tabActive)
+                _currentStatus = "active";
+            else if (tb == tabInactive)
+                _currentStatus = "inactive";
+
+            ApplyFilter();
         }
 
         private void BtnMore_Click(object sender, RoutedEventArgs e)
