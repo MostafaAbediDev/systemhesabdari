@@ -181,7 +181,7 @@
                     BorderBrush="#E5E7EB"
                     BorderThickness="0,0,0,0"
                     Background="#ffffff"
-                    Padding="10,6,10,6"
+                    Padding="15,6,10,6"
                     Margin="0">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -326,7 +326,7 @@
                     BorderBrush="#E5E7EB"
                     BorderThickness="0,1,0,0"
                     Background="#FAFCFF"
-                    Padding="24,8">
+                    Padding="15,8">
                 <StackPanel Orientation="Horizontal"
                             FlowDirection="RightToLeft"
                             VerticalAlignment="Center">

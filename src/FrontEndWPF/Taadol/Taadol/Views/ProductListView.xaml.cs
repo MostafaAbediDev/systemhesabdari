@@ -498,6 +498,10 @@ namespace Taadol.Views
 
         private void ProductsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (sender is DataGrid dg && dg.SelectedItem is ItemBase item && item.IsEmpty)
+            {
+                dg.SelectedItem = null;
+            }
         }
     }
 

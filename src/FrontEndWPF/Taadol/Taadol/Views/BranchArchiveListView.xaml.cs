@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Taadol.Controls;
 using Taadol.ViewModels;
 
 namespace Taadol.Views
@@ -89,7 +90,14 @@ namespace Taadol.Views
         {
             if (_isLoadedOnce) return;
             _isLoadedOnce = true;
-            await ViewModel.LoadDataAsync();
+            try
+            {
+                await ViewModel.LoadDataAsync();
+            }
+            catch (Exception ex)
+            {
+                ToastManager.Error("خطا در بارگذاری بایگانی: " + ex.Message);
+            }
         }
 
         // ─── CRUD ───
@@ -108,12 +116,26 @@ namespace Taadol.Views
                 "تایید حذف", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
             if (result != MessageBoxResult.Yes) return;
-            await ViewModel.DeleteSelectedAsync();
+            try
+            {
+                await ViewModel.DeleteSelectedAsync();
+            }
+            catch (Exception ex)
+            {
+                ToastManager.Error("خطا در حذف: " + ex.Message);
+            }
         }
 
         private async void BtnRefresh_Click(object sender, RoutedEventArgs e)
         {
-            await ViewModel.RefreshAsync();
+            try
+            {
+                await ViewModel.RefreshAsync();
+            }
+            catch (Exception ex)
+            {
+                ToastManager.Error("خطا در بروزرسانی: " + ex.Message);
+            }
         }
 
         private void BtnSave_Click(object sender, RoutedEventArgs e)

@@ -145,8 +145,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeManagement.Application.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taadol", "src\FrontEndWPF\Taadol\Taadol\Taadol.csproj", "{81F55448-070C-582F-60F7-564B5AD36B4A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConnectionStringProject", "ConnectionStringProject\ConnectionStringProject.csproj", "{4CF5B311-CD4C-521D-6683-506F93A7AA0A}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FinancialManagement", "FinancialManagement", "{9B30A45C-5AD9-4B1C-A993-FA343D6EDFF7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FM.Domain", "FM.Domain", "{D8EC6903-3E16-4EC3-9177-28596F11505A}"
@@ -335,10 +333,6 @@ Global
 		{81F55448-070C-582F-60F7-564B5AD36B4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{81F55448-070C-582F-60F7-564B5AD36B4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{81F55448-070C-582F-60F7-564B5AD36B4A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4CF5B311-CD4C-521D-6683-506F93A7AA0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4CF5B311-CD4C-521D-6683-506F93A7AA0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4CF5B311-CD4C-521D-6683-506F93A7AA0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4CF5B311-CD4C-521D-6683-506F93A7AA0A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1B9C23C8-98D9-442B-9188-FA3F7BF7BEB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1B9C23C8-98D9-442B-9188-FA3F7BF7BEB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B9C23C8-98D9-442B-9188-FA3F7BF7BEB6}.Release|Any CPU.ActiveCfg = Release|Any CPU

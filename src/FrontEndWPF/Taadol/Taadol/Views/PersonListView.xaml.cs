@@ -15,6 +15,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using Taadol.Controls;
 using Taadol.Models;
 using Taadol.ViewModels;
 
@@ -116,7 +117,14 @@ namespace Taadol.Views
         {
             if (_isLoadedOnce) return;
             _isLoadedOnce = true;
-            await ViewModel.LoadDataAsync();
+            try
+            {
+                await ViewModel.LoadDataAsync();
+            }
+            catch (Exception ex)
+            {
+                ToastManager.Error("خطا در بارگذاری اشخاص: " + ex.Message);
+            }
         }
 
         // ======================================================
@@ -226,7 +234,14 @@ namespace Taadol.Views
         private async void BtnRefresh_Click(object sender, RoutedEventArgs e)
         {
             _isLoadedOnce = false;
-            await ViewModel.RefreshAsync();
+            try
+            {
+                await ViewModel.RefreshAsync();
+            }
+            catch (Exception ex)
+            {
+                ToastManager.Error("خطا در بروزرسانی: " + ex.Message);
+            }
         }
 
         // ======================================================
@@ -352,65 +367,75 @@ namespace Taadol.Views
             foreach (var panel in toRemove)
                 DetailPanelsStack.Children.Remove(panel);
 
-            foreach (var item in selectedItems.Where(p => !existingIds.Contains(p.Id)))
+            try
             {
-                var panel = new Taadol.Controls.PersonDetailPanel();
-
-                var personType = item.IsLegal ? "حقوقی" : "حقیقی";
-                var category = item.Category ?? "";
-                var balance = item.BalanceDisplay ?? "\u2014";
-                var balanceStatus = item.AccountStatus ?? "";
-                var phone = !string.IsNullOrEmpty(item.Phone) && !string.IsNullOrEmpty(item.Mobile)
-                    ? $"{item.Phone} / {item.Mobile}"
-                    : !string.IsNullOrEmpty(item.Mobile) ? item.Mobile
-                    : item.Phone ?? "";
-                var city = !string.IsNullOrEmpty(item.Province) && !string.IsNullOrEmpty(item.City)
-                    ? $"{item.Province} / {item.City}"
-                    : !string.IsNullOrEmpty(item.Province) ? item.Province
-                    : item.City ?? "";
-                var nationalId = item.NationalId ?? "";
-
-                panel.LoadData(
-                    item.Id,
-                    item.FullName,
-                    personType,
-                    category,
-                    nationalId,
-                    phone,
-                    "",
-                    city,
-                    "",
-                    balance,
-                    balanceStatus,
-                    item.Status == "فعال");
-
-                try
+                foreach (var item in selectedItems.Where(p => !existingIds.Contains(p.Id)))
                 {
-                    var bankItems = await Task.Run(() =>
+                    var panel = new Taadol.Controls.PersonDetailPanel();
+
+                    var personType = item.IsLegal ? "حقوقی" : "حقیقی";
+                    var category = item.Category ?? "";
+                    var balance = item.BalanceDisplay ?? "\u2014";
+                    var balanceStatus = item.AccountStatus ?? "";
+                    var phone = !string.IsNullOrEmpty(item.Phone) && !string.IsNullOrEmpty(item.Mobile)
+                        ? $"{item.Phone} / {item.Mobile}"
+                        : !string.IsNullOrEmpty(item.Mobile) ? item.Mobile
+                        : item.Phone ?? "";
+                    var city = !string.IsNullOrEmpty(item.Province) && !string.IsNullOrEmpty(item.City)
+                        ? $"{item.Province} / {item.City}"
+                        : !string.IsNullOrEmpty(item.Province) ? item.Province
+                        : item.City ?? "";
+                    var nationalId = item.NationalId ?? "";
+
+                    panel.LoadData(
+                        item.Id,
+                        item.FullName,
+                        personType,
+                        category,
+                        nationalId,
+                        phone,
+                        "",
+                        city,
+                        "",
+                        balance,
+                        balanceStatus,
+                        item.Status == "فعال");
+
+                    try
                     {
-                        using var scope = App.ServiceProvider.CreateScope();
-                        var bankApp = scope.ServiceProvider.GetRequiredService<IPersonBankApplication>();
-                        var banks = bankApp.GetByPersonId(item.Id) ?? new List<PersonBankViewModel>();
-                        return banks.Select(b => new Taadol.Models.BankAccountItem
+                        var bankItems = await Task.Run(() =>
                         {
-                            BankName = b.BankName ?? "\u2014",
-                            BranchName = b.BankBranchName ?? "\u2014",
-                            CardNumber = b.CardNumber ?? "\u2014",
-                            ShebaNumber = b.Shaba ?? "\u2014",
-                            AccountNumber = b.AccountNumber ?? "\u2014",
-                            OtherAccount = "ندارد",
-                            IsDefault = b.IsDefault
-                        }).ToList();
-                    });
-                    panel.LoadBankAccounts(bankItems);
+                            using var scope = App.ServiceProvider.CreateScope();
+                            var bankApp = scope.ServiceProvider.GetRequiredService<IPersonBankApplication>();
+                            var banks = bankApp.GetByPersonId(item.Id) ?? new List<PersonBankViewModel>();
+                            return banks.Select(b => new Taadol.Models.BankAccountItem
+                            {
+                                BankName = b.BankName ?? "\u2014",
+                                BranchName = b.BankBranchName ?? "\u2014",
+                                CardNumber = b.CardNumber ?? "\u2014",
+                                ShebaNumber = b.Shaba ?? "\u2014",
+                                AccountNumber = b.AccountNumber ?? "\u2014",
+                                OtherAccount = "ندارد",
+                                IsDefault = b.IsDefault
+                            }).ToList();
+                        });
+                        panel.LoadBankAccounts(bankItems);
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[PersonListView] بارگذاری حساب‌های بانکی شخص {item.Id} ناموفق بود: {ex.Message}");
+                    }
+
+                    panel.CloseRequested += DetailPanel_CloseRequested;
+                    panel.EditRequested += DetailPanel_EditRequested;
+                    panel.DeleteRequested += DetailPanel_DeleteRequested;
+
+                    DetailPanelsStack.Children.Insert(0, panel);
                 }
-                catch { }
-
-                panel.CloseRequested += DetailPanel_CloseRequested;
-                panel.EditRequested += DetailPanel_EditRequested;
-                panel.DeleteRequested += DetailPanel_DeleteRequested;
-
-                DetailPanelsStack.Children.Insert(0, panel);
+            }
+            catch (Exception ex)
+            {
+                ToastManager.Error("خطا در نمایش جزئیات: " + ex.Message);
             }
         }
 

@@ -114,29 +114,38 @@ namespace Taadol.Views
 
             await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background);
 
-            await Task.Run(() =>
+            try
             {
-                using var scope = App.ServiceProvider.CreateScope();
-                var repo = scope.ServiceProvider.GetRequiredService<IProvinceRepository>();
-
-                var provincesFromBackend = repo.GetProvincesForSelectList();
-
-                var mappedProvinces = provincesFromBackend.Select(p => new ProvinceComboItem
+                await Task.Run(() =>
                 {
-                    Id = p.Id,
-                    Title = p.Title
-                }).ToList();
+                    using var scope = App.ServiceProvider.CreateScope();
+                    var repo = scope.ServiceProvider.GetRequiredService<IProvinceRepository>();
 
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    Provinces = new ObservableCollection<ProvinceComboItem>(mappedProvinces);
-                    OnPropertyChanged(nameof(Provinces));
-                    if (Provinces.Count > 0)
-                        SelectedProvinceId = Provinces[0].Id;
+                    var provincesFromBackend = repo.GetProvincesForSelectList();
+
+                    var mappedProvinces = provincesFromBackend.Select(p => new ProvinceComboItem
+                    {
+                        Id = p.Id,
+                        Title = p.Title
+                    }).ToList();
+
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        Provinces = new ObservableCollection<ProvinceComboItem>(mappedProvinces);
+                        OnPropertyChanged(nameof(Provinces));
+                        if (Provinces.Count > 0)
+                            SelectedProvinceId = Provinces[0].Id;
+                    });
                 });
-            });
-
-            ProvinceComboBox.IsEnabled = true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "خطا در لود استان‌ها", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                ProvinceComboBox.IsEnabled = true;
+            }
         }
         private async Task LoadCitiesAsync(long provinceId)
         {

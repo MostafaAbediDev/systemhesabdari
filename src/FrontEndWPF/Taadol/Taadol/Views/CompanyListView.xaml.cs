@@ -366,9 +366,17 @@ namespace Taadol.Views
             if (result != MessageBoxResult.Yes)
                 return;
 
-            foreach (var item in selectedItems)
+            try
             {
-                _companyApplication.Remove(item.Id);
+                foreach (var item in selectedItems)
+                {
+                    _companyApplication.Remove(item.Id);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("خطا در حذف: " + ex.Message, "خطا", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
 
             _currentPage = 1;
@@ -377,24 +385,7 @@ namespace Taadol.Views
             MessageBox.Show("عملیات حذف انجام شد.", "موفق", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        private void BtnEdit_Click(object sender, RoutedEventArgs e)
-        {
-            var selectedItem = AllCompanies.FirstOrDefault(c => c.IsSelected && !c.IsEmpty);
-            if (selectedItem != null)
-                MessageBox.Show($"ویرایش شرکت: {selectedItem.Title}", "ویرایش شرکت", MessageBoxButton.OK, MessageBoxImage.Information);
-            else
-                MessageBox.Show("لطفاً یک شرکت انتخاب کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
-        }
 
-        private void BtnNew_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("فرم ثبت شرکت جدید", "شرکت جدید", MessageBoxButton.OK, MessageBoxImage.Information);
-        }
-
-        private void BtnMore_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("منوی بیشتر - شرکت‌ها", "عملیات", MessageBoxButton.OK, MessageBoxImage.Information);
-        }
 
         private void GoToNextPage()
         {

@@ -381,10 +381,18 @@ namespace Taadol.Views
             if (result != MessageBoxResult.Yes)
                 return;
 
-            foreach (var item in selectedItems.ToList())
+            try
             {
-                if (long.TryParse(item.UniqueId, out var branchId))
-                    _branchApplication.Remove(branchId);
+                foreach (var item in selectedItems.ToList())
+                {
+                    if (long.TryParse(item.UniqueId, out var branchId))
+                        _branchApplication.Remove(branchId);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("خطا در حذف: " + ex.Message, "خطا", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
 
             _currentPage = 1;
@@ -393,24 +401,7 @@ namespace Taadol.Views
             MessageBox.Show("شعبه‌های انتخاب‌شده حذف شدند.", "حذف", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        private void BtnEdit_Click(object sender, RoutedEventArgs e)
-        {
-            var selectedItem = AllBranches.FirstOrDefault(b => b.IsSelected && !b.IsEmpty);
-            if (selectedItem != null)
-                MessageBox.Show($"ویرایش شعبه: {selectedItem.BranchName}", "ویرایش شعبه", MessageBoxButton.OK, MessageBoxImage.Information);
-            else
-                MessageBox.Show("لطفاً یک شعبه انتخاب کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
-        }
 
-        private void BtnNew_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("فرم ثبت شعبه جدید", "شعبه جدید", MessageBoxButton.OK, MessageBoxImage.Information);
-        }
-
-        private void BtnMore_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("منوی بیشتر - شعبه‌ها", "عملیات", MessageBoxButton.OK, MessageBoxImage.Information);
-        }
 
         private void GoToNextPage()
         {

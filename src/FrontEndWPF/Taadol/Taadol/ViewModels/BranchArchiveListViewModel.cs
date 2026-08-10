@@ -147,9 +147,8 @@ namespace Taadol.ViewModels
             }
             catch (Exception ex)
             {
-                System.Windows.Application.Current.Dispatcher.Invoke(() =>
-                    System.Windows.MessageBox.Show(ex.Message, "خطا در لود آرشیو شعبه",
-                        System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error));
+                System.Windows.MessageBox.Show(ex.Message, "خطا در لود آرشیو شعبه",
+                    System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
                 AllArchives = new ObservableCollection<BranchArchiveItem>();
                 ApplyFilters();
             }
@@ -170,22 +169,29 @@ namespace Taadol.ViewModels
                 return;
             }
 
-            Task.Run(async () =>
+            _ = LoadBranchesForCompanyAsync();
+        }
+
+        private async Task LoadBranchesForCompanyAsync()
+        {
+            try
             {
                 using var scope = _serviceProvider.CreateScope();
                 var branchApp = scope.ServiceProvider.GetRequiredService<IBranchApplication>();
-                var branches = branchApp.GetBranches() ?? new List<BranchViewModel>();
+                var branches = await Task.Run(() => branchApp.GetBranches())
+                    ?? new List<BranchViewModel>();
                 var filtered = branches.Where(b => b.CompanyId == SelectedCompany.Id).ToList();
                 _companyBranchIds = filtered.Select(b => b.Id).ToList();
 
-                System.Windows.Application.Current.Dispatcher.Invoke(() =>
-                {
-                    BranchItems = new ObservableCollection<BranchFilterItem>(
-                        filtered.Select(b => new BranchFilterItem { Id = b.Id, Title = b.Title }));
-                    SelectedBranch = null;
-                    ApplyFilters();
-                });
-            });
+                BranchItems = new ObservableCollection<BranchFilterItem>(
+                    filtered.Select(b => new BranchFilterItem { Id = b.Id, Title = b.Title }));
+                SelectedBranch = null;
+                ApplyFilters();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("BranchArchive OnCompanyChanged failed: " + ex.Message);
+            }
         }
 
         public void OnBranchChanged()
@@ -286,9 +292,8 @@ namespace Taadol.ViewModels
         {
             if (string.IsNullOrWhiteSpace(filePath))
             {
-                System.Windows.Application.Current.Dispatcher.Invoke(() =>
-                    System.Windows.MessageBox.Show("ابتدا یک فایل انتخاب کنید.", "خطا",
-                        System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning));
+                System.Windows.MessageBox.Show("ابتدا یک فایل انتخاب کنید.", "خطا",
+                    System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
                 return;
             }
 

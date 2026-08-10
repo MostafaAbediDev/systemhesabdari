@@ -57,7 +57,45 @@ namespace Taadol
                 LoadCompanies();
             };
 
+            this.Closing += MainWindow_Closing;
+
             MainContentBorder.Visibility = Visibility.Collapsed;
+        }
+
+        private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (ModalOverlay?.Visibility == Visibility.Visible && ModalContent.Content is EditPersonView editView)
+            {
+                if (editView.IsDirty)
+                {
+                    var result = Controls.ModernDialog.ShowConfirm(
+                        "تأیید خروج",
+                        "شما تغییرات ذخیره‌نشده دارید. آیا از خروج مطمئن هستید؟",
+                        Controls.ModernDialog.DialogType.Warning,
+                        "خروج",
+                        "انصراف",
+                        this);
+
+                    if (!result)
+                    {
+                        e.Cancel = true;
+                        return;
+                    }
+                }
+
+                CloseModal();
+            }
+
+            var confirmExit = Controls.ModernDialog.ShowConfirm(
+                "تأیید خروج",
+                "آیا از خروج از برنامه مطمئن هستید؟",
+                Controls.ModernDialog.DialogType.Warning,
+                "خروج",
+                "انصراف",
+                this);
+
+            if (!confirmExit)
+                e.Cancel = true;
         }
 
         private void LoadCompanies()

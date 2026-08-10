@@ -146,8 +146,8 @@ namespace Taadol.ViewModels
                 allTasks.AddRange(addressTasks);
                 await Task.WhenAll(allTasks);
 
-                foreach (var t in contactTasks) allContacts.AddRange(t.Result);
-                foreach (var t in addressTasks) allAddresses.AddRange(t.Result);
+                foreach (var t in contactTasks) allContacts.AddRange(await t);
+                foreach (var t in addressTasks) allAddresses.AddRange(await t);
 
                 var contactsByPerson = allContacts
                     .GroupBy(c => c.PersonId)

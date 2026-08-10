@@ -47,6 +47,9 @@ namespace Taadol.Views
 
         public ICommand SaveCommand { get; }
 
+        // ★ IsDirty property — true when user has unsaved changes
+        public bool IsDirty => HasUnsavedChanges();
+
         public BulkObservableCollection<BranchComboItem> Branches { get; } = new();
         public BulkObservableCollection<ProvinceViewModel> Provinces { get; } = new();
         public BulkObservableCollection<CityViewModel> Cities { get; } = new();
@@ -146,6 +149,20 @@ namespace Taadol.Views
             DataContext = this;
 
             Loaded += OnLoaded;
+            BankAccounts.CollectionChanged += (s, e) =>
+            {
+                if (e.NewItems != null)
+                {
+                    foreach (BankAccountRow item in e.NewItems)
+                        item.PropertyChanged += (_, _) => OnPropertyChanged(nameof(IsDirty));
+                }
+                if (e.OldItems != null)
+                {
+                    foreach (BankAccountRow item in e.OldItems)
+                        item.PropertyChanged -= (_, _) => OnPropertyChanged(nameof(IsDirty));
+                }
+                OnPropertyChanged(nameof(IsDirty));
+            };
 
             ShabaInput.Text = "IR";
             DependencyPropertyDescriptor
@@ -166,6 +183,14 @@ namespace Taadol.Views
                 System.Diagnostics.Debug.WriteLine("[DEBUG] EditPersonView.OnLoaded fired");
                 if (CategorySearch != null)
                     CategorySearch.CategorySelected += OnCategorySelected;
+
+                // Subscribe to image picker changes for IsDirty
+                if (PersonImagePicker != null)
+                {
+                    PersonImagePicker.ImageSelected += (_, _) => OnPropertyChanged(nameof(IsDirty));
+                    PersonImagePicker.ImageRemoved += (_, _) => OnPropertyChanged(nameof(IsDirty));
+                }
+
                 System.Diagnostics.Debug.WriteLine("[DEBUG] EditPersonView: starting data load tasks");
                 await Task.WhenAll(
                     LoadBranchesAsync(),
@@ -1413,8 +1438,12 @@ namespace Taadol.Views
         private void MyDatePicker_DateChanged(object sender, RoutedEventArgs e) { }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string name = null) =>
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            if (name != nameof(IsDirty))
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsDirty)));
+        }
 
         public class BulkObservableCollection<T> : ObservableCollection<T>
         {

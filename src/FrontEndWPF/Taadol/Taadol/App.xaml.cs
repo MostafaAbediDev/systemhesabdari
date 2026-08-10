@@ -149,27 +149,29 @@ namespace Taadol
 
         private static string GetConnectionString()
         {
-            const string fallback =
-                @"Data Source=DESKTOP-MRP0FEV\MSSQLSERVER86;Initial Catalog=TaadolFake;Integrated Security=True;TrustServerCertificate=True";
-
             try
             {
                 var config = new ConfigurationBuilder()
                     .SetBasePath(AppContext.BaseDirectory)
-                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
                     .Build();
 
                 var cs = config.GetConnectionString("TaadolDb");
                 LogStep(cs != null
-                    ? "appsettings.json taadol has ConnectionStrings:TaadolDb"
-                    : "appsettings.json does NOT contain ConnectionStrings:TaadolDb — using fallback");
+                    ? "appsettings.json has ConnectionStrings:TaadolDb"
+                    : "appsettings.json does NOT contain ConnectionStrings:TaadolDb");
 
-                return !string.IsNullOrWhiteSpace(cs) ? cs : fallback;
+                // بدون fallback سخت‌کد: اگر تنظیم دیتابیس نبود، خطای واضح بده
+                if (string.IsNullOrWhiteSpace(cs))
+                    throw new InvalidOperationException(
+                        "رشته اتصال 'TaadolDb' در appsettings.json تعریف نشده است.");
+
+                return cs!;
             }
             catch (Exception ex)
             {
                 LogStep($"Error reading appsettings.json: {ex.Message}");
-                return fallback;
+                throw;
             }
         }
 

@@ -248,7 +248,7 @@ namespace Taadol.Controls
         {
             if (box == null || string.IsNullOrEmpty(source)) return;
             try { box.Source = new Uri(source, UriKind.RelativeOrAbsolute); }
-            catch { }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine("ImagePicker SetSvg failed: " + ex.Message); }
         }
 
         private void ApplyPlaceholderIcon()

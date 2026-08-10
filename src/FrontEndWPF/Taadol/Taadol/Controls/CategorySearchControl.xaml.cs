@@ -64,10 +64,15 @@ namespace Taadol.Controls
             VirtualizingPanel.SetIsVirtualizing(CategoryTree, true);
             VirtualizingPanel.SetVirtualizationMode(CategoryTree, VirtualizationMode.Recycling);
 
-            // LoadSampleData();  ← این خط حذف/کامنت بشه
-
             _searchTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(300) };
             _searchTimer.Tick += SearchTimer_Tick;
+
+            Unloaded += CategorySearchControl_Unloaded;
+        }
+
+        private void CategorySearchControl_Unloaded(object sender, RoutedEventArgs e)
+        {
+            Dispose();
         }
         // این متد رو حذف کن:
         // private void LoadSampleData() { ... }
@@ -1076,10 +1081,38 @@ namespace Taadol.Controls
 
         public void Dispose()
         {
-            _searchTimer?.Stop();
-            _searchTimer = null;
+            if (_searchTimer != null)
+            {
+                _searchTimer.Stop();
+                _searchTimer.Tick -= SearchTimer_Tick;
+                _searchTimer = null;
+            }
+
+            if (CategoryTree != null)
+            {
+                foreach (TreeViewItem item in CategoryTree.Items)
+                    UnsubscribeTreeItemEvents(item);
+            }
+
             _allCategories?.Clear();
             _dotCache?.Clear();
+        }
+
+        private void UnsubscribeTreeItemEvents(TreeViewItem treeItem)
+        {
+            if (treeItem == null) return;
+
+            treeItem.Loaded -= TreeItem_Loaded;
+
+            var bd = FindChild<Border>(treeItem, "Bd");
+            if (bd != null)
+            {
+                bd.MouseEnter -= TreeItemBorder_MouseEnter;
+                bd.MouseLeave -= TreeItemBorder_MouseLeave;
+            }
+
+            foreach (TreeViewItem child in treeItem.Items)
+                UnsubscribeTreeItemEvents(child);
         }
 
         // ==================== Nested Classes ====================

@@ -355,10 +355,7 @@ namespace Taadol.Views
             ApplyFilters();
         }
 
-        private void BtnNew_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("فرم ثبت دوره مالی جدید", "دوره مالی جدید", MessageBoxButton.OK, MessageBoxImage.Information);
-        }
+
 
         private void GoToNextPage()
         {

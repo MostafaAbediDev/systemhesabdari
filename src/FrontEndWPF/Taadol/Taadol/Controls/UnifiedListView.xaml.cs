@@ -259,7 +259,7 @@ namespace Taadol.Controls
 
         private void CheckBoxBorder_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (sender is FrameworkElement fe && fe.DataContext is IListRowItem item)
+            if (sender is FrameworkElement fe && fe.DataContext is IListRowItem item && !item.IsEmpty)
             {
                 item.IsSelected = !item.IsSelected;
                 UpdateRowBorders();

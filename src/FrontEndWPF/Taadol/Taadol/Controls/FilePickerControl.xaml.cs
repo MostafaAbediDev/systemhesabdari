@@ -129,7 +129,7 @@ namespace Taadol.Controls
         {
             if (box == null || string.IsNullOrEmpty(source)) return;
             try { box.Source = new Uri(source, UriKind.RelativeOrAbsolute); }
-            catch { }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine("FilePicker SetSvg failed: " + ex.Message); }
         }
 
         private void SetBorderColors(Border border, Color bg, Color stroke)

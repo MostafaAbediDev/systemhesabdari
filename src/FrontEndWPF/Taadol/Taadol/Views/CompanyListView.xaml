@@ -12,10 +12,6 @@
               FontFamily="{StaticResource IRANSans}"
               Background="Transparent">
 
-<UserControl.Resources>
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-    </UserControl.Resources>
-
     <Border Margin="0"
             Background="White"
             CornerRadius="12"
@@ -65,34 +61,6 @@
                                 Height="36"
                                 Margin="4,0,0,0"
                                 Cursor="Hand"
-                                Click="BtnMore_Click">
-                            <Button.Template>
-                                <ControlTemplate TargetType="Button">
-                                    <Border x:Name="bd"
-                                            Background="Transparent"
-                                            CornerRadius="8"
-                                            Width="36"
-                                            Height="36">
-                                        <svg:SvgViewbox Width="18"
-                                                        Height="18"
-                                                        Source="/Assets/Icons/MORE.svg" />
-                                    </Border>
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsMouseOver"
-                                                 Value="True">
-                                            <Setter TargetName="bd"
-                                                    Property="Background"
-                                                    Value="#F5F7FA" />
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </Button.Template>
-                        </Button>
-
-                        <Button Width="36"
-                                Height="36"
-                                Margin="4,0,0,0"
-                                Cursor="Hand"
                                 Click="BtnDelete_Click">
                             <Button.Template>
                                 <ControlTemplate TargetType="Button">
@@ -111,62 +79,6 @@
                                             <Setter TargetName="bd"
                                                     Property="Background"
                                                     Value="#FEF2F2" />
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </Button.Template>
-                        </Button>
-
-                        <Button Width="36"
-                                Height="36"
-                                Margin="4,0,0,0"
-                                Cursor="Hand"
-                                Click="BtnEdit_Click">
-                            <Button.Template>
-                                <ControlTemplate TargetType="Button">
-                                    <Border x:Name="bd"
-                                            Background="Transparent"
-                                            CornerRadius="8"
-                                            Width="36"
-                                            Height="36">
-                                        <svg:SvgViewbox Width="18"
-                                                        Height="18"
-                                                        Source="/Assets/Icons/EDIT.svg" />
-                                    </Border>
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsMouseOver"
-                                                 Value="True">
-                                            <Setter TargetName="bd"
-                                                    Property="Background"
-                                                    Value="#F0F5FF" />
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </Button.Template>
-                        </Button>
-
-                        <Button Width="36"
-                                Height="36"
-                                Margin="4,0,0,0"
-                                Cursor="Hand"
-                                Click="BtnNew_Click">
-                            <Button.Template>
-                                <ControlTemplate TargetType="Button">
-                                    <Border x:Name="bd"
-                                            Background="Transparent"
-                                            CornerRadius="8"
-                                            Width="36"
-                                            Height="36">
-                                        <svg:SvgViewbox Width="18"
-                                                        Height="18"
-                                                        Source="/Assets/Icons/plus.svg" />
-                                    </Border>
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsMouseOver"
-                                                 Value="True">
-                                            <Setter TargetName="bd"
-                                                    Property="Background"
-                                                    Value="#F0FFF4" />
                                         </Trigger>
                                     </ControlTemplate.Triggers>
                                 </ControlTemplate>
