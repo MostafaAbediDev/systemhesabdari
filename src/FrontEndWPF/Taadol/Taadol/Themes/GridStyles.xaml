@@ -154,6 +154,12 @@
                 <Setter Property="Cursor"
                         Value="Arrow" />
             </DataTrigger>
+
+            <DataTrigger Binding="{Binding RowBackground}"
+                         Value="#FCEBEC">
+                <Setter Property="Background"
+                        Value="#FCEBEC" />
+            </DataTrigger>
         </Style.Triggers>
     </Style>
 

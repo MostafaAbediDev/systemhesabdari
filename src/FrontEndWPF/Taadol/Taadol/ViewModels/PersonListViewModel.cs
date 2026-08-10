@@ -74,6 +74,9 @@ namespace Taadol.ViewModels
         private string _selectedTotalText = string.Empty;
 
         [ObservableProperty]
+        private string _selectedTotalTextColor = "#2563EB";
+
+        [ObservableProperty]
         private string _selectedCountText = string.Empty;
 
         public HashSet<string> SelectedTabs { get; }
@@ -214,10 +217,10 @@ namespace Taadol.ViewModels
                         Mobile = mobile,
                         NationalId = string.IsNullOrWhiteSpace(p.NationalCode) ? "—" : p.NationalCode,
                         EconomicId = string.IsNullOrWhiteSpace(p.EconomicCode) ? "—" : p.EconomicCode,
-                        TransactionType = "—",
-                        TransactionDate = "—",
-                        AccountStatus = "—",
-                        BalanceDisplay = "—",
+                        TransactionType = p.CreditLimit > 0 ? "بدهکار" : (p.AvailableCredit > 0 ? "بستانکار" : ""),
+                        TransactionDate = p.CreditLimit > 0 || p.AvailableCredit > 0 ? "—" : "",
+                        AccountStatus = p.CreditLimit > 0 ? "بدهکار" : (p.AvailableCredit > 0 ? "بستانکار" : "بی حساب"),
+                        BalanceDisplay = p.CreditLimit > 0 ? p.CreditLimit.ToString("N0") : (p.AvailableCredit > 0 ? p.AvailableCredit.ToString("N0") : ""),
                         IsLegal = p.IsLegal,
                         PersonType = p.PersonType,
                         IsEmpty = false
@@ -445,7 +448,7 @@ namespace Taadol.ViewModels
             long totalCredit = 0;
             foreach (var p in validPersons)
             {
-                if (long.TryParse(p.BalanceDisplay?.Replace(",", "").Replace("ریال", "").Trim(), out long bal))
+                if (long.TryParse(p.BalanceDisplay?.Replace(",", "").Trim(), out long bal))
                 {
                     if (p.AccountStatus == "بدهکار")
                         totalDebit += bal;
@@ -454,17 +457,31 @@ namespace Taadol.ViewModels
                 }
             }
 
-            TotalDebitText = $"{ToPersianNumber(totalDebit)} ریال";
-            TotalCreditText = $"{ToPersianNumber(totalCredit)} ریال";
-            SelectedSummaryText = $"جمع اشخاص انتخاب شده ({ToPersianNumber(selectedItems.Count)})";
+            TotalDebitText = $"{totalDebit.ToString("N0")} ریال";
+            TotalCreditText = $"{totalCredit.ToString("N0")} ریال";
 
-            long selectedTotal = 0;
+            long selectedDebit = 0;
+            long selectedCredit = 0;
             foreach (var p in selectedItems)
             {
-                if (long.TryParse(p.BalanceDisplay?.Replace(",", "").Replace("ریال", "").Trim(), out long bal))
-                    selectedTotal += bal;
+                if (long.TryParse(p.BalanceDisplay?.Replace(",", "").Trim(), out long bal))
+                {
+                    if (p.AccountStatus == "بدهکار")
+                        selectedDebit += bal;
+                    else if (p.AccountStatus == "بستانکار")
+                        selectedCredit += bal;
+                }
             }
-            SelectedTotalText = $"{ToPersianNumber(selectedTotal)} ریال";
+
+            long selectedNet = selectedDebit - selectedCredit;
+            SelectedSummaryText = $"جمع اشخاص انتخاب شده ({ToPersianNumber(selectedItems.Count)})";
+            if (selectedDebit > selectedCredit)
+                SelectedTotalTextColor = "#22C55E";
+            else if (selectedCredit > selectedDebit)
+                SelectedTotalTextColor = "#DC2626";
+            else
+                SelectedTotalTextColor = "#374151";
+            SelectedTotalText = $"{Math.Abs(selectedNet).ToString("N0")} ریال";
             SelectedCountText = $"({selectedItems.Count})";
         }
 

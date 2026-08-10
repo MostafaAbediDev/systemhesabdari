@@ -90,7 +90,7 @@ namespace Taadol.Views
                         RegisterDate = ToPersianDate(b.CreatedAt),
                         UniqueId = b.Id.ToString(),
                         BranchType = "—",
-                        CompanyName = b.CompanyId.ToString(),
+                        CompanyName = b.CompanyName ?? "—",
                         BranchName = b.Title,
                         RegistrationNumber = b.RegisterNumber,
                         BranchCode = b.Code,

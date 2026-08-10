@@ -41,8 +41,10 @@
     <None Remove="Assets\Icons\dollar-circle_u.svg" />
     <None Remove="Assets\Icons\edit.svg" />
     <None Remove="Assets\Icons\editblue.svg" />
+    <None Remove="Assets\Icons\export.svg" />
     <None Remove="Assets\Icons\filter-search.svg" />
     <None Remove="Assets\Icons\Filter.svg" />
+    <None Remove="Assets\Icons\import.svg" />
     <None Remove="Assets\Icons\Leftsquare.svg" />
     <None Remove="Assets\Icons\Line.svg" />
     <None Remove="Assets\Icons\LOGO.svg" />
@@ -73,6 +75,7 @@
     <None Remove="Assets\Icons\tempsave.svg" />
     <None Remove="Assets\Icons\trash.svg" />
     <None Remove="Assets\Icons\user_blue.svg" />
+    <None Remove="Assets\Icons\wh_check.svg" />
     <None Remove="Fonts\IRANSansXFaNum-Black.ttf" />
     <None Remove="Fonts\IRANSansXFaNum-Bold.ttf" />
     <None Remove="Fonts\IRANSansXFaNum-DemiBold.ttf" />
@@ -195,10 +198,16 @@
     <Content Include="Assets\Icons\editblue.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\Icons\export.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\Icons\filter-search.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Icons\Filter.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\import.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Icons\Leftsquare.svg">
@@ -292,6 +301,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\wh_check.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <ProjectReference Include="..\..\..\..\BankManagement.Configuration\BankManagement.Configuration.csproj" />

@@ -79,7 +79,8 @@
                           CellStyle="{StaticResource UnifiedGridCellStyle}"
                           RowStyle="{StaticResource UnifiedGridRowStyle}"
                           SelectionChanged="DataGridView_SelectionChanged"
-                          MouseDoubleClick="DataGridView_MouseDoubleClick">
+                          MouseDoubleClick="DataGridView_MouseDoubleClick"
+                          LoadingRow="DataGridView_LoadingRow">
 
                     <DataGrid.Resources>
                         <Style TargetType="ScrollBar"
@@ -135,49 +136,54 @@
                             </DataGridTemplateColumn.HeaderStyle>
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Border x:Name="CheckBoxBorder"
-                                            Width="20"
-                                            Height="20"
-                                            CornerRadius="4"
-                                            Cursor="Hand"
-                                            BorderThickness="1.5"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            PreviewMouseLeftButtonUp="CheckBoxBorder_MouseLeftButtonUp">
-                                        <Border.Style>
-                                            <Style TargetType="Border">
-                                                <Setter Property="Background" Value="#FFFFFF" />
-                                                <Setter Property="BorderBrush" Value="#CBD5E1" />
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                        <Setter Property="Background" Value="#2667FF" />
-                                                        <Setter Property="BorderBrush" Value="#2667FF" />
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding IsEmpty}" Value="True">
-                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Border.Style>
-                                        <svg:SvgViewbox x:Name="CheckMark"
-                                                        Width="8"
-                                                        Height="8"
-                                                        Source="/Assets/Icons/CHECK_w.svg"
-                                                        FlowDirection="LeftToRight"
-                                                        HorizontalAlignment="Center"
+                                    <ToggleButton x:Name="RowToggle"
+                                                  Cursor="Hand"
+                                                  Background="Transparent"
+                                                  BorderThickness="0"
+                                                  Padding="0"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center"
+                                                  Checked="RowToggle_Checked"
+                                                  Unchecked="RowToggle_Unchecked">
+                                        <ToggleButton.Template>
+                                            <ControlTemplate TargetType="ToggleButton">
+                                                <Border x:Name="CheckBoxBorder"
+                                                        Width="20"
+                                                        Height="20"
+                                                        BorderThickness="1.5"
+                                                        BorderBrush="#CBD5E1"
+                                                        CornerRadius="4"
+                                                        Background="#FFFFFF"
                                                         VerticalAlignment="Center">
-                                            <svg:SvgViewbox.Style>
-                                                <Style TargetType="svg:SvgViewbox">
-                                                    <Setter Property="Visibility" Value="Collapsed" />
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                            <Setter Property="Visibility" Value="Visible" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </svg:SvgViewbox.Style>
-                                        </svg:SvgViewbox>
-                                    </Border>
+                                                    <svg:SvgViewbox x:Name="CheckMark"
+                                                                    Width="8"
+                                                                    Height="8"
+                                                                    Source="/Assets/Icons/wh_check.svg"
+                                                                    FlowDirection="LeftToRight"
+                                                                    HorizontalAlignment="Center"
+                                                                    VerticalAlignment="Center"
+                                                                    Visibility="Collapsed" />
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsChecked" Value="True">
+                                                        <Setter TargetName="CheckBoxBorder" Property="BorderBrush" Value="#2667FF" />
+                                                        <Setter TargetName="CheckBoxBorder" Property="Background" Value="#2667FF" />
+                                                        <Setter TargetName="CheckBoxBorder" Property="BorderThickness" Value="0" />
+                                                        <Setter TargetName="CheckMark" Property="Visibility" Value="Visible" />
+                                                    </Trigger>
+                                                    <Trigger Property="IsChecked" Value="False">
+                                                        <Setter TargetName="CheckBoxBorder" Property="BorderBrush" Value="#CBD5E1" />
+                                                        <Setter TargetName="CheckBoxBorder" Property="Background" Value="#FFFFFF" />
+                                                        <Setter TargetName="CheckBoxBorder" Property="BorderThickness" Value="1.5" />
+                                                        <Setter TargetName="CheckMark" Property="Visibility" Value="Collapsed" />
+                                                    </Trigger>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="CheckBoxBorder" Property="BorderBrush" Value="#2667FF" />
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </ToggleButton.Template>
+                                    </ToggleButton>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>

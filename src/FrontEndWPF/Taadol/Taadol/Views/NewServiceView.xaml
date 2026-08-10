@@ -31,7 +31,7 @@
                         <svg:SvgViewbox FlowDirection="LeftToRight"
                                         Width="16"
                                         Height="16"
-                                        Source="/Assets/Icons/arrow-right.svg"
+                                        Source="/Assets/Icons/closeTHIN.svg"
                                         Margin="10,0,10,0" />
                         <TextBlock Text="مشخصات خدمات جدید"
                                    FontSize="18"

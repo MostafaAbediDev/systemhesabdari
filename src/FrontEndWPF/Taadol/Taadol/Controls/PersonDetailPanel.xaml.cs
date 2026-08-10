@@ -68,9 +68,15 @@ namespace Taadol.Controls
             EmailText.Text = email;
             CityText.Text = city;
             AddressText.Text = address;
-            BalanceText.Text = balance;
+            BalanceText.Text = balance + " ریال";
 
-            if (!string.IsNullOrEmpty(balanceStatus) && balanceStatus != "تسویه")
+            if (balanceStatus == "بدهکار")
+            {
+                BalanceStatusText.Text = balanceStatus;
+                BalanceStatusText.Foreground = new SolidColorBrush(Color.FromRgb(0x22, 0xC5, 0x5E));
+                BalanceText.Foreground = new SolidColorBrush(Color.FromRgb(0x22, 0xC5, 0x5E));
+            }
+            else if (balanceStatus == "بستانکار")
             {
                 BalanceStatusText.Text = balanceStatus;
                 BalanceStatusText.Foreground = new SolidColorBrush(Color.FromRgb(0xDC, 0x26, 0x26));
@@ -78,9 +84,9 @@ namespace Taadol.Controls
             }
             else
             {
-                BalanceStatusText.Text = "تسویه";
-                BalanceStatusText.Foreground = new SolidColorBrush(Color.FromRgb(0x16, 0xA3, 0x4A));
-                BalanceText.Foreground = new SolidColorBrush(Color.FromRgb(0x16, 0xA3, 0x4A));
+                BalanceStatusText.Text = "بی حساب";
+                BalanceStatusText.Foreground = new SolidColorBrush(Color.FromRgb(0x64, 0x74, 0x8B));
+                BalanceText.Foreground = new SolidColorBrush(Color.FromRgb(0x64, 0x74, 0x8B));
             }
 
             if (isActive)

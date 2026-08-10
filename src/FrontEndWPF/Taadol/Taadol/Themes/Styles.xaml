@@ -128,14 +128,15 @@
                                     Width="18"
                                     Height="18"
                                     CornerRadius="4"
-                                    Background="#22C55E"
+                                    Background="#2667FF"
                                     Margin="0,0,7,0"
                                     VerticalAlignment="Center"
                                     Visibility="Collapsed">
                                 <svg:SvgViewbox x:Name="CheckMark"
                                                 Width="8"
                                                 Height="8"
-                                                Source="/Assets/Icons/Line.svg"
+                                                Source="/Assets/Icons/wh_check.svg"
+                                                FlowDirection="LeftToRight"
                                                 HorizontalAlignment="Center"
                                                 VerticalAlignment="Center"
                                                 Visibility="Collapsed" />
@@ -1342,16 +1343,15 @@
                         <Border x:Name="CheckBoxBorder"
                                 Width="20"
                                 Height="20"
-                                BorderThickness="2"
-                                BorderBrush="#BDC3C7"
+                                BorderThickness="1.5"
+                                BorderBrush="#CBD5E1"
                                 CornerRadius="4"
-                                Background="White"
-                                Padding="2">
+                                Background="#FFFFFF">
 
                             <svg:SvgViewbox x:Name="CheckMark"
                                             Width="8"
                                             Height="8"
-                                            Source="/Assets/Icons/Line.svg"
+                                            Source="/Assets/Icons/wh_check.svg"
                                             FlowDirection="LeftToRight"
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
@@ -1365,10 +1365,13 @@
                                  Value="True">
                             <Setter TargetName="CheckBoxBorder"
                                     Property="BorderBrush"
-                                    Value="#2ECC71" />
+                                    Value="#2667FF" />
                             <Setter TargetName="CheckBoxBorder"
                                     Property="Background"
-                                    Value="White" />
+                                    Value="#2667FF" />
+                            <Setter TargetName="CheckBoxBorder"
+                                    Property="BorderThickness"
+                                    Value="0" />
                             <Setter TargetName="CheckMark"
                                     Property="Visibility"
                                     Value="Visible" />
@@ -1379,11 +1382,14 @@
                                  Value="False">
                             <Setter TargetName="CheckBoxBorder"
                                     Property="BorderBrush"
-                                    Value="#BDC3C7" />
+                                    Value="#CBD5E1" />
 
                             <Setter TargetName="CheckBoxBorder"
                                     Property="Background"
-                                    Value="White" />
+                                    Value="#FFFFFF" />
+                            <Setter TargetName="CheckBoxBorder"
+                                    Property="BorderThickness"
+                                    Value="1.5" />
                             <Setter TargetName="CheckMark"
                                     Property="Visibility"
                                     Value="Collapsed" />
@@ -1394,7 +1400,7 @@
                                  Value="True">
                             <Setter TargetName="CheckBoxBorder"
                                     Property="BorderBrush"
-                                    Value="#27AE60" />
+                                    Value="#2667FF" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -1586,16 +1592,16 @@
                         <Border x:Name="RadioBorder"
                                 Width="20"
                                 Height="20"
-                                BorderThickness="2"
-                                BorderBrush="#BDC3C7"
+                                BorderThickness="1.5"
+                                BorderBrush="#CBD5E1"
                                 CornerRadius="4"
-                                Background="White"
-                                Padding="2">
+                                Background="#FFFFFF">
                             
                             <svg:SvgViewbox x:Name="CheckMark"
                                             Width="8"
                                             Height="8"
-                                            Source="/Assets/Icons/Line.svg"
+                                            Source="/Assets/Icons/wh_check.svg"
+                                            FlowDirection="LeftToRight"
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
                                             Visibility="Collapsed" />
@@ -1608,10 +1614,13 @@
                                  Value="True">
                             <Setter TargetName="RadioBorder"
                                     Property="BorderBrush"
-                                    Value="#2ECC71" />
+                                    Value="#2667FF" />
                             <Setter TargetName="RadioBorder"
                                     Property="Background"
-                                    Value="White" />
+                                    Value="#2667FF" />
+                            <Setter TargetName="RadioBorder"
+                                    Property="BorderThickness"
+                                    Value="0" />
                             <Setter TargetName="CheckMark"
                                     Property="Visibility"
                                     Value="Visible" />
@@ -1622,10 +1631,13 @@
                                  Value="False">
                             <Setter TargetName="RadioBorder"
                                     Property="BorderBrush"
-                                    Value="#BDC3C7" />
+                                    Value="#CBD5E1" />
                             <Setter TargetName="RadioBorder"
                                     Property="Background"
-                                    Value="White" />
+                                    Value="#FFFFFF" />
+                            <Setter TargetName="RadioBorder"
+                                    Property="BorderThickness"
+                                    Value="1.5" />
                             <Setter TargetName="CheckMark"
                                     Property="Visibility"
                                     Value="Collapsed" />
@@ -1636,7 +1648,7 @@
                                  Value="True">
                             <Setter TargetName="RadioBorder"
                                     Property="BorderBrush"
-                                    Value="#27AE60" />
+                                    Value="#2667FF" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

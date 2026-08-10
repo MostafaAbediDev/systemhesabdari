@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -248,7 +249,10 @@ namespace Taadol.Controls
                 if (element is FrameworkElement fe &&
                     (fe.Name == "CheckBoxBorder" || fe.Name == "SelectAllBorder"))
                     return true;
-                element = VisualTreeHelper.GetParent(element);
+                if (element is Visual)
+                    element = VisualTreeHelper.GetParent(element);
+                else
+                    break;
             }
             return false;
         }
@@ -259,7 +263,10 @@ namespace Taadol.Controls
             {
                 if (element is Button)
                     return true;
-                element = VisualTreeHelper.GetParent(element);
+                if (element is Visual)
+                    element = VisualTreeHelper.GetParent(element);
+                else
+                    break;
             }
             return false;
         }
@@ -278,6 +285,54 @@ namespace Taadol.Controls
                 CheckedItemsChanged?.Invoke(this, EventArgs.Empty);
                 e.Handled = true;
             }
+        }
+
+        private void RowToggle_Checked(object sender, RoutedEventArgs e)
+        {
+            if (sender is FrameworkElement fe && fe.DataContext is IListRowItem item && !item.IsEmpty)
+            {
+                item.IsSelected = true;
+                UpdateRowBorders();
+                UpdateHeaderSelectAllState();
+                CheckedItemsChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        private void RowToggle_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (sender is FrameworkElement fe && fe.DataContext is IListRowItem item && !item.IsEmpty)
+            {
+                item.IsSelected = false;
+                UpdateRowBorders();
+                UpdateHeaderSelectAllState();
+                CheckedItemsChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        private void DataGridView_LoadingRow(object sender, DataGridRowEventArgs e)
+        {
+            if (e.Row.Item is IListRowItem item)
+            {
+                var toggle = FindChild<ToggleButton>(e.Row);
+                if (toggle != null)
+                {
+                    toggle.IsChecked = item.IsSelected;
+                }
+            }
+        }
+
+        private static T FindChild<T>(DependencyObject parent) where T : DependencyObject
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                if (child is T found)
+                    return found;
+                var result = FindChild<T>(child);
+                if (result != null)
+                    return result;
+            }
+            return null;
         }
 
         private void SelectAllBorder_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)

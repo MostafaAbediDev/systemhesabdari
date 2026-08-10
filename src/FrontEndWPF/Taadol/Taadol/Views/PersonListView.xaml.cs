@@ -88,7 +88,18 @@ namespace Taadol.Views
             else if (e.PropertyName == nameof(PersonListViewModel.SelectedTotalText))
             {
                 if (SelectedTotalText != null)
+                {
                     SelectedTotalText.Text = ViewModel.SelectedTotalText;
+                    try
+                    {
+                        var color = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(ViewModel.SelectedTotalTextColor);
+                        SelectedTotalText.Foreground = new System.Windows.Media.SolidColorBrush(color);
+                    }
+                    catch
+                    {
+                        SelectedTotalText.Foreground = System.Windows.Media.Brushes.Black;
+                    }
+                }
             }
             else if (e.PropertyName == nameof(PersonListViewModel.SelectedCountText))
             {
@@ -285,16 +296,15 @@ namespace Taadol.Views
                 BtnNewIcon.Margin = new Thickness(0, 0, 10, 0);
                 PanelHeaderBorder.Padding = new Thickness(10, 6, 10, 6);
                 SelectedCountBadge.Padding = new Thickness(8, 2, 8, 2);
+                SelectedCountBadge.Visibility = Visibility.Visible;
+                PanelHeaderText.Visibility = Visibility.Visible;
+                PanelHeaderText.Opacity = 1;
                 var fadeIn = new System.Windows.Media.Animation.DoubleAnimation(1, TimeSpan.FromMilliseconds(250));
                 fadeIn.EasingFunction = ease;
                 DetailPanelContainer.BeginAnimation(UIElement.OpacityProperty, fadeIn);
                 PanelHeaderText.BeginAnimation(UIElement.OpacityProperty, fadeIn);
                 BtnNewText.BeginAnimation(UIElement.OpacityProperty, fadeIn);
-                var marginLeftAnim = new System.Windows.Media.Animation.ThicknessAnimation(
-                    new Thickness(332, 40, 0, 0),
-                    TimeSpan.FromMilliseconds(250));
-                marginLeftAnim.EasingFunction = ease;
-                BtnToggleSidebar.BeginAnimation(FrameworkElement.MarginProperty, marginLeftAnim);
+                BtnToggleSidebar.Margin = new Thickness(332, 40, 0, 0);
                 DetailPanelColumn.BeginAnimation(System.Windows.Controls.ColumnDefinition.MaxWidthProperty, anim);
                 DetailPanelColumn.BeginAnimation(System.Windows.Controls.ColumnDefinition.MinWidthProperty, anim);
                 anim.Completed += (s, ev) =>
@@ -317,24 +327,21 @@ namespace Taadol.Views
                 BtnNewBorder.Width = 44;
                 BtnNewBorder.HorizontalAlignment = HorizontalAlignment.Center;
                 BtnNewIcon.Margin = new Thickness(0);
-                PanelHeaderBorder.Padding = new Thickness(4, 6, 4, 6);
-                SelectedCountBadge.Padding = new Thickness(3, 1, 3, 1);
+                PanelHeaderBorder.Padding = new Thickness(10, 6, 10, 6);
+                SelectedCountBadge.Padding = new Thickness(8, 2, 8, 2);
+                SelectedCountBadge.Visibility = Visibility.Collapsed;
+                PanelHeaderText.Visibility = Visibility.Collapsed;
                 var fadeOut = new System.Windows.Media.Animation.DoubleAnimation(0, TimeSpan.FromMilliseconds(250));
                 fadeOut.EasingFunction = ease;
                 fadeOut.Completed += (s, ev) =>
                 {
                     DetailPanelContainer.Visibility = Visibility.Collapsed;
-                    PanelHeaderText.Visibility = Visibility.Collapsed;
                     BtnNewText.Visibility = Visibility.Collapsed;
                 };
                 DetailPanelContainer.BeginAnimation(UIElement.OpacityProperty, fadeOut);
                 PanelHeaderText.BeginAnimation(UIElement.OpacityProperty, fadeOut);
                 BtnNewText.BeginAnimation(UIElement.OpacityProperty, fadeOut);
-                var marginLeftAnim = new System.Windows.Media.Animation.ThicknessAnimation(
-                    new Thickness(56, 40, 0, 0),
-                    TimeSpan.FromMilliseconds(250));
-                marginLeftAnim.EasingFunction = ease;
-                BtnToggleSidebar.BeginAnimation(FrameworkElement.MarginProperty, marginLeftAnim);
+                BtnToggleSidebar.Margin = new Thickness(56, 40, 0, 0);
                 DetailPanelColumn.BeginAnimation(System.Windows.Controls.ColumnDefinition.MaxWidthProperty, anim);
                 DetailPanelColumn.BeginAnimation(System.Windows.Controls.ColumnDefinition.MinWidthProperty, anim);
                 anim.Completed += (s, ev) =>
@@ -736,6 +743,10 @@ namespace Taadol.Views
         public string TransactionType { get; set; } = "\u2014";
         public string TransactionDate { get; set; } = "\u2014";
         public string BalanceDisplay { get; set; } = "\u2014";
+
+        public string RowBackground => AccountStatus == "بستانکار" ? "#FCEBEC" : "White";
+        public string TransactionIconPath => AccountStatus == "بدهکار" ? "/Assets/Icons/export.svg" : (AccountStatus == "بستانکار" ? "/Assets/Icons/import.svg" : "");
+        public string BalanceColor => AccountStatus == "بدهکار" ? "#22C55E" : (AccountStatus == "بستانکار" ? "#DC2626" : "#374151");
 
         public string FullName =>
             IsEmpty ? "" : !string.IsNullOrWhiteSpace(FullNameText)

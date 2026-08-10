@@ -86,7 +86,7 @@ namespace Taadol.Views
                         RegisterDate = ToPersianDate(c.CreationDate),
                         Title = c.Title,
                         LegalName = c.LegalName,
-                        Status = "فعال",
+                        Status = c.IsActive ? "فعال" : "غیرفعال",
                         IsEmpty = false
                     }).ToList();
                 });

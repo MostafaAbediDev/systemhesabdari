@@ -237,26 +237,26 @@
                             Background="#ffffff"
                             BorderBrush="#E5E7EB"
                             BorderThickness="0,0,0,0"
-                            Padding="10,6"
-                            ClipToBounds="True">
+                            Padding="10,6">
                         <Grid x:Name="PanelHeaderStack"
                               VerticalAlignment="Center"
                               HorizontalAlignment="Left">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
 
-                            <StackPanel Grid.Column="0"
-                                        Orientation="Horizontal"
-                                        VerticalAlignment="Center">
-                                <svg:SvgViewbox x:Name="MainIcon"
-                                                Width="20"
-                                                Height="20"
-                                                Margin="0,0,6,0"
-                                                Source="/Assets/Icons/user_blue.svg"
-                                                HorizontalAlignment="Center"
-                                                VerticalAlignment="Center" />
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                <Border Height="32" VerticalAlignment="Top">
+                                    <svg:SvgViewbox x:Name="MainIcon"
+                                                    Width="20"
+                                                    Height="20"
+                                                    Margin="0,6,6,0"
+                                                    Source="/Assets/Icons/user_blue.svg"
+                                                    HorizontalAlignment="Left"
+                                                    VerticalAlignment="Top" />
+                                </Border>
                                 <Border x:Name="SelectedCountBadge"
                                         CornerRadius="10"
                                         Padding="8,2"
@@ -265,26 +265,29 @@
                                         Background="#ffffff"
                                         BorderBrush="#ffffff"
                                         BorderThickness="1">
-                                    <TextBlock x:Name="SelectedCountText"
-                                               Text=""
+                                    <TextBlock x:Name="PanelHeaderText"
+                                               Text="اشخاص انتخاب شده"
                                                FontSize="13"
-                                               FontWeight="DemiBold"
+                                               FontWeight="SemiBold"
                                                Foreground="#0D2159"
                                                VerticalAlignment="Center" />
                                 </Border>
                             </StackPanel>
 
-                            <StackPanel Grid.Column="1"
+                            <TextBlock x:Name="SelectedCountText"
+                                       Grid.Column="1"
+                                       Text=""
+                                       FontSize="13"
+                                       FontWeight="DemiBold"
+                                       Foreground="#0D2159"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,0,0" />
+
+                            <StackPanel Grid.Column="2"
                                         x:Name="HeaderTextStack"
                                         Orientation="Horizontal"
-                                        VerticalAlignment="Center">
-                                <TextBlock x:Name="PanelHeaderText"
-                                           Text="اشخاص انتخاب شده"
-                                           FontSize="13"
-                                           FontWeight="SemiBold"
-                                           Foreground="#0D2159"
-                                           VerticalAlignment="Center"
-                                           Margin="4,0,0,0" />
+                                        VerticalAlignment="Center"
+                                        Visibility="Collapsed">
                             </StackPanel>
                         </Grid>
                     </Border>
@@ -812,23 +815,23 @@
                                     </DataGridTemplateColumn.HeaderStyle>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <StackPanel Orientation="Vertical"
+                                            <StackPanel Orientation="Horizontal"
                                                         HorizontalAlignment="Center"
                                                         VerticalAlignment="Center"
                                                         Visibility="{Binding AccountStatusVisibility}">
-                                                <TextBlock Text="{Binding TransactionType}"
+                                                <TextBlock Text="{Binding TransactionDate}"
                                                            FontSize="12"
-                                                           FontWeight="Medium"
+                                                           FontWeight="Regular"
                                                            Foreground="#374151"
                                                            FontFamily="{StaticResource IRANSans}"
-                                                           HorizontalAlignment="Center" />
-                                                <TextBlock Text="{Binding TransactionDate}"
-                                                           FontSize="11"
-                                                           Foreground="#94A3B8"
-                                                           FontFamily="{StaticResource IRANSans}"
                                                            FlowDirection="LeftToRight"
-                                                           Margin="0,2,0,0"
-                                                           HorizontalAlignment="Center" />
+                                                           VerticalAlignment="Center"
+                                                           Margin="0,0,6,0" />
+                                                <svg:SvgViewbox Width="14"
+                                                                Height="14"
+                                                                Source="{Binding TransactionIconPath}"
+                                                                FlowDirection="LeftToRight"
+                                                                VerticalAlignment="Center" />
                                             </StackPanel>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
@@ -890,67 +893,31 @@
                                     </DataGridTemplateColumn.HeaderTemplate>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <StackPanel Orientation="Vertical"
+                                            <StackPanel Orientation="Horizontal"
                                                         HorizontalAlignment="Center"
                                                         VerticalAlignment="Center"
                                                         Visibility="{Binding AccountStatusVisibility}">
 
-                                                <TextBlock Text="{Binding AccountStatus}"
-                                                           FontSize="12"
-                                                           FontWeight="Bold"
+                                                <TextBlock FontSize="13"
                                                            FontFamily="{StaticResource IRANSans}"
                                                            HorizontalAlignment="Center">
                                                     <TextBlock.Style>
                                                         <Style TargetType="TextBlock">
                                                             <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding AccountStatus}"
-                                                                             Value="بدهکار">
-                                                                    <Setter Property="Foreground"
-                                                                            Value="#166534" />
+                                                                <DataTrigger Binding="{Binding AccountStatus}" Value="بدهکار">
+                                                                    <Setter Property="Foreground" Value="#22C55E" />
                                                                 </DataTrigger>
-                                                                <DataTrigger Binding="{Binding AccountStatus}"
-                                                                             Value="بستانکار">
-                                                                    <Setter Property="Foreground"
-                                                                            Value="#991B1B" />
+                                                                <DataTrigger Binding="{Binding AccountStatus}" Value="بستانکار">
+                                                                     <Setter Property="Foreground" Value="#DC2626" />
                                                                 </DataTrigger>
-                                                                <DataTrigger Binding="{Binding AccountStatus}"
-                                                                             Value="تسویه">
-                                                                    <Setter Property="Foreground"
-                                                                            Value="#64748B" />
+                                                                <DataTrigger Binding="{Binding AccountStatus}" Value="بی حساب">
+                                                                    <Setter Property="Foreground" Value="#64748B" />
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
                                                     </TextBlock.Style>
-                                                </TextBlock>
-
-                                                <TextBlock Text="{Binding BalanceDisplay}"
-                                                           FontSize="12"
-                                                           FontWeight="SemiBold"
-                                                           FontFamily="{StaticResource IRANSans}"
-                                                           FlowDirection="LeftToRight"
-                                                           Margin="0,2,0,0"
-                                                           HorizontalAlignment="Center">
-                                                    <TextBlock.Style>
-                                                        <Style TargetType="TextBlock">
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding AccountStatus}"
-                                                                             Value="بدهکار">
-                                                                    <Setter Property="Foreground"
-                                                                            Value="#166534" />
-                                                                </DataTrigger>
-                                                                <DataTrigger Binding="{Binding AccountStatus}"
-                                                                             Value="بستانکار">
-                                                                    <Setter Property="Foreground"
-                                                                            Value="#991B1B" />
-                                                                </DataTrigger>
-                                                                <DataTrigger Binding="{Binding AccountStatus}"
-                                                                             Value="تسویه">
-                                                                    <Setter Property="Foreground"
-                                                                            Value="#64748B" />
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </TextBlock.Style>
+                                                    <Run Text="{Binding BalanceDisplay, Mode=OneWay}" FontWeight="Bold" />
+                                                    <Run Text="{Binding AccountStatus, Mode=OneWay}" FontWeight="Regular" />
                                                 </TextBlock>
                                             </StackPanel>
                                         </DataTemplate>
@@ -965,9 +932,9 @@
                         BorderBrush="#E5E7EB"
                         x:Name="SummaryBorder"
                         BorderThickness="1"
-                        Height="53"
+                        Height="42"
                         CornerRadius="4"
-                        Margin="0,2,10,2"
+                        Margin="0,2,10,8"
                         Padding="16,8">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -985,7 +952,7 @@
                            
                             <TextBlock x:Name="TotalDebitText"
                                                FontSize="14" FontWeight="Medium"
-                                       Foreground="#DC2626"
+                                       Foreground="#22C55E"
                                                Margin="8,0"
                                                VerticalAlignment="Center" />
                         </StackPanel>
@@ -1000,8 +967,8 @@
                             <TextBlock x:Name="TotalCreditText"
                                                FontSize="14" FontWeight="Medium"
                                                Margin="8,0"
-                                               Foreground="#16A34A"
-                                       VerticalAlignment="Center" />
+                                               Foreground="#C1121F"
+                                        VerticalAlignment="Center" />
                                     <Border Width="1"
                                             Height="14"
                                             Background="#E5E7EB"
