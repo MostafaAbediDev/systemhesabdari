@@ -17,6 +17,7 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
         public List<BranchArchiveViewModel> GetBranchArchives()
         {
             return _context.BranchArchives
+                .Include(x => x.Branch)
                 .Select(x => new BranchArchiveViewModel
                 {
                     Id = x.Id,
