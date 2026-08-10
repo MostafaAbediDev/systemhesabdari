@@ -25,10 +25,22 @@ namespace GeneralInfoManagement.Application
             if (command.StartDate >= command.EndDate)
                 return operation.Failed("تاریخ پایان باید بعد از تاریخ شروع باشد.");
 
-            var period = new FinancialPeriods(command.Title, command.StartDate, command.EndDate, command.BranchId);
+            var hasOverlap = _financialPeriodRepository.Exists(x =>
+                command.StartDate <= x.EndDate &&
+                command.EndDate >= x.StartDate);
+
+            if (hasOverlap)
+                return operation.Failed("بازه زمانی دوره مالی با یک دوره مالی دیگر همپوشانی دارد.");
+
+            var period = new FinancialPeriods(
+                command.Title,
+                command.StartDate,
+                command.EndDate,
+                command.BranchId);
 
             _financialPeriodRepository.Create(period);
             _financialPeriodRepository.SaveChanges();
+
             return operation.Succedded();
         }
 
@@ -46,6 +58,13 @@ namespace GeneralInfoManagement.Application
 
             if (command.StartDate >= command.EndDate)
                 return operation.Failed("تاریخ پایان باید بعد از تاریخ شروع باشد.");
+
+            var hasOverlap = _financialPeriodRepository.Exists(x =>
+                command.StartDate <= x.EndDate &&
+                command.EndDate >= x.StartDate);
+
+            if (hasOverlap)
+                return operation.Failed("بازه زمانی دوره مالی با یک دوره مالی دیگر همپوشانی دارد.");
 
             period.Edit(command.Title, command.StartDate, command.EndDate, command.BranchId);
 

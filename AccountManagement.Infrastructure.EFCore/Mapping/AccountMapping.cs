@@ -18,7 +18,7 @@ namespace AccountManagement.Infrastructure.EFCore.Mapping
             builder.HasOne(x => x.Company).WithMany().HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.NoAction);
             builder.HasMany(s => s.Children).WithOne(s => s.Parent).HasForeignKey(s => s.ParentId);
             builder.HasMany(s => s.AccountLink).WithOne(s => s.Account).HasForeignKey(s => s.AccountId);
-            builder.HasMany(s => s.AccountingEntrie).WithOne(s => s.Account).HasForeignKey(s => s.AccountId);
+            //builder.HasMany(s => s.AccountingEntrie).WithOne(s => s.Account).HasForeignKey(s => s.AccountId);
 
         }
     }
