@@ -36,8 +36,10 @@ namespace GeneralInfoManagement.Configuration
             services.AddTransient<IPictureRepository, PictureRepository>();
             services.AddTransient<IPictureApplication, PictureApplication>();
 
-
+            //Add DB Context For Real Data
             services.AddDbContext<GeneralInfoSystemContext>(x => x.UseSqlServer(connectionString));
+
+            //Add DB Context For Fake Data
             services.AddDbContext<GeneralInfoFakeDataContext>(x => x.UseSqlServer(connectionString));
         }
     }

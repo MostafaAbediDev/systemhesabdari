@@ -1,5 +1,4 @@
 ﻿using _0_FrameWork.Domain;
-using InventoryManagement.Domain.Inventory.Product.ProductAgg;
 using InventoryManagement.Domain.Inventory.Product.ProductPriceAgg;
 
 namespace InventoryManagement.Domain.Inventory.UnitAgg

@@ -30,5 +30,17 @@ namespace AccountManagement.Domain.AccountOpeningBalanceAgg
             Debit = debit;
             Credit = credit;
         }
+
+        public void Edit(
+            long accountId,
+            long financialPeriodId,
+            decimal debit,
+            decimal credit)
+        {
+            AccountId = accountId;
+            FinancialPeriodId = financialPeriodId;
+            Debit = debit;
+            Credit = credit;
+        }
     }
 }

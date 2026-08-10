@@ -4,6 +4,8 @@ namespace CodeManagement.Application
 {
     public class CodeGeneratorService : ICodeGeneratorService
     {
+
+        //Generate The Code By Symbols
         public string Generate(CodeOwnerTypeDTO ownerType)
         {
             var prefix = ownerType switch

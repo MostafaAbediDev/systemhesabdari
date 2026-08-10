@@ -73,8 +73,8 @@ namespace PersonManagement.Domain.Person.PersonAgg
             ContactLastName = contactLastName;
 
 
-
-            if (IsLegal)
+            
+            if (isLegal)
             {
                 EconomicCode = economicCode;
                 RegistrationNumber = registrationNumber;

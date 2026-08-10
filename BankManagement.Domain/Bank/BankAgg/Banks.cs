@@ -1,7 +1,6 @@
 ﻿using _0_FrameWork.Domain;
 using BankManagement.Domain.Bank.BankBrancheAgg;
 using BankManagement.Domain.Bank.BankTypeAgg;
-using BankManagement.Domain.Bank.ChequeBookAgg;
 using BankManagement.Domain.Bank.CompanyBankAccountAgg;
 
 namespace BankManagement.Domain.Bank.BankAgg

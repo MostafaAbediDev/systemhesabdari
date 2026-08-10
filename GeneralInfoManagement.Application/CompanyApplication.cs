@@ -1,6 +1,7 @@
 ﻿using _0_Framework.Application;
 using _0_FrameWork.Domain;
 using GeneralInfoManagement.Application.Contract.Company;
+using GeneralInfoManagement.Domain.BaseInfo.BranchesAgg;
 using GeneralInfoManagement.Domain.BaseInfo.CompaniesAgg;
 
 namespace GeneralInfoManagement.Application
@@ -8,10 +9,12 @@ namespace GeneralInfoManagement.Application
     public class CompanyApplication : ICompanyApplication
     {
         private readonly ICompanyRepository _companyRepository;
+        private readonly IBranchRepository _branchRepository;
 
-        public CompanyApplication(ICompanyRepository companyRepository)
+        public CompanyApplication(ICompanyRepository companyRepository, IBranchRepository branchRepository)
         {
             _companyRepository = companyRepository;
+            _branchRepository = branchRepository;
         }
 
         public OperationResult Create(CreateCompanies command)
@@ -89,8 +92,15 @@ namespace GeneralInfoManagement.Application
             if (company == null)
                 return operation.Failed(ApplicationMessages.RecordNotFound);
 
+            var hasActiveBranch = _branchRepository.GetAllBranches().Any(x => x.CompanyId == id && x.IsActive);
+
+            if (hasActiveBranch)
+                return operation.Failed("این شرکت دارای شعبه فعال است و امکان حذف آن وجود ندارد.");
+
             company.Remove();
+
             _companyRepository.SaveChanges();
+
             return operation.Succedded();
         }
 

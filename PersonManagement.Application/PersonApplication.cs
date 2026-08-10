@@ -41,8 +41,9 @@ namespace PersonManagement.Application
                 command.PersonCategoryId);
 
             _personRepository.Create(person);
-            _personRepository.SaveChanges();
 
+
+            //Set The code 
             var codeResult = _codeApplication.SetCode(new CreateCode
             {
                 OwnerId = person.Id,
@@ -53,6 +54,8 @@ namespace PersonManagement.Application
 
             if (!codeResult.IsSucceeded)
                 return result.Failed(codeResult.Message);
+
+            _personRepository.SaveChanges();
 
             return result.Succedded();
         }
@@ -66,11 +69,15 @@ namespace PersonManagement.Application
             if (!command.IsLegal && _personRepository.ExistsNationalCode(command.NationalCode, command.Id))
                 return result.Failed("کد ملی وارد شده برای شخص دیگری ثبت شده است.");
 
+            if (command.IsLegal && _personRepository.ExistsEconomicCode(command.EconomicCode, command.Id))
+                return result.Failed("کد اقتصادی تکراری است.");
+
             person.Edit(command.FirstName, command.LastName, command.ContactFirstName, command.ContactLastName , command.NationalCode, command.EconomicCode,
                         command.RegistrationNumber, command.PersonTypeId, command.BranchId, command.IsLegal, command.PersonCategoryId);
 
             person.UpdateFinancialInfo(command.CreditLimit);
 
+            //Set The Code
             var codeResult = _codeApplication.SetCode(new CreateCode
             {
                 OwnerId = person.Id,
