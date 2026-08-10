@@ -12,6 +12,8 @@
         public string TelePhone { get; set; } 
         public string Address { get; set; } 
         public string PostCode { get; set; }
+        public string CompanyName { get; set; }
+        public bool CompanyIsActive { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         public long CompanyId { get; set; }

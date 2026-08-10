@@ -1,6 +1,7 @@
 ﻿using _0_FrameWork.Infrastructure;
 using GeneralInfoManagement.Application.Contract.Branches;
 using GeneralInfoManagement.Domain.BaseInfo.BranchesAgg;
+using GeneralInfoManagement.Domain.BaseInfo.CompaniesAgg;
 using Microsoft.EntityFrameworkCore;
 
 namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
@@ -18,6 +19,7 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
         {
             return _context.Branches
                 .AsNoTracking()
+                .Include(x=>x.Company)
                 .Where(x => !x.IsDeleted)
                 .Select(x => new BranchViewModel
                 {
@@ -34,6 +36,8 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
                     Latitude = x.Location.Latitude,
                     Longitude = x.Location.Longitude,
                     CompanyId = x.CompanyId,
+                    CompanyName = x.Company.Title,
+                    CompanyIsActive = x.Company.IsActive,
                     CityId = x.CityId,
                     CityName = x.Cities.Title,
                     ProvinceName = x.Provinces.Title,
@@ -114,6 +118,8 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
                     Latitude = x.Location.Latitude,
                     Longitude = x.Location.Longitude,
                     CompanyId = x.CompanyId,
+                    CompanyName = x.Company.Title,
+                    CompanyIsActive = x.Company.IsActive,
                     CityId = x.CityId,
                     ProvinceId = x.ProvinceId,
                     CityName = x.Cities.Title,
