@@ -155,7 +155,7 @@
                     <svg:SvgViewbox FlowDirection="LeftToRight"
                                     Width="14"
                                     Height="14"
-                                    Source="/Assets/Icons/arrow-right.svg"
+                                    Source="/Assets/Icons/closeTHIN.svg"
                                     Margin="10,0,10,0" />
                     <TextBlock Text="مشخصات شخص"
                                FontSize="18"

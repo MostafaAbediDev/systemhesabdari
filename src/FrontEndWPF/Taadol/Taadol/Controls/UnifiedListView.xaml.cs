@@ -216,13 +216,13 @@ namespace Taadol.Controls
 
         private void DataGridRow_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (!IsInsideCheckBox(e.OriginalSource as DependencyObject))
+            if (!IsInsideCheckBox(e.OriginalSource as DependencyObject) && !IsInsideFilterButton(e.OriginalSource as DependencyObject))
                 e.Handled = true;
         }
 
         private void DataGridRow_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (!IsInsideCheckBox(e.OriginalSource as DependencyObject))
+            if (!IsInsideCheckBox(e.OriginalSource as DependencyObject) && !IsInsideFilterButton(e.OriginalSource as DependencyObject))
                 e.Handled = true;
         }
 
@@ -247,6 +247,17 @@ namespace Taadol.Controls
             {
                 if (element is FrameworkElement fe &&
                     (fe.Name == "CheckBoxBorder" || fe.Name == "SelectAllBorder"))
+                    return true;
+                element = VisualTreeHelper.GetParent(element);
+            }
+            return false;
+        }
+
+        private bool IsInsideFilterButton(DependencyObject element)
+        {
+            while (element != null)
+            {
+                if (element is Button)
                     return true;
                 element = VisualTreeHelper.GetParent(element);
             }

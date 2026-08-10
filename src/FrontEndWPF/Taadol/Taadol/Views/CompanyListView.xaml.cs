@@ -27,6 +27,8 @@ namespace Taadol.Views
         private int _totalPages = 1;
         private int filteredListCount = 0;
         private bool _isLoadedOnce = false;
+        private HashSet<string> _selectedStatuses = new();
+        private HashSet<string> _selectedTitles = new();
 
         public CompanyListView()
         {
@@ -172,6 +174,12 @@ namespace Taadol.Views
                     (c.Title != null && c.Title.Contains(_searchText, StringComparison.OrdinalIgnoreCase)) ||
                     (c.LegalName != null && c.LegalName.Contains(_searchText, StringComparison.OrdinalIgnoreCase)));
             }
+
+            if (_selectedStatuses.Count > 0)
+                query = query.Where(c => _selectedStatuses.Contains(c.Status));
+
+            if (_selectedTitles.Count > 0)
+                query = query.Where(c => _selectedTitles.Contains(c.Title));
 
             var filteredList = query.ToList();
             filteredListCount = filteredList.Count;
@@ -343,6 +351,70 @@ namespace Taadol.Views
 
             _currentPage = 1;
             ApplyFilters();
+        }
+
+        private void StatusFilter_Click(object sender, RoutedEventArgs e)
+        {
+            ShowFilterPopup(
+                anchor: sender as Button,
+                title: "فیلتر وضعیت",
+                options: new List<string> { "فعال", "غیرفعال" },
+                selected: _selectedStatuses,
+                showSearch: false,
+                immediateApply: true,
+                onSelectionChanged: result =>
+                {
+                    _selectedStatuses = new HashSet<string>(result);
+                    _currentPage = 1;
+                    ApplyFilters();
+                });
+        }
+
+        private void TitleFilter_Click(object sender, RoutedEventArgs e)
+        {
+            var options = AllCompanies.Where(c => !c.IsEmpty && !string.IsNullOrEmpty(c.Title))
+                                      .Select(c => c.Title).Distinct().OrderBy(x => x).ToList();
+            ShowFilterPopup(
+                anchor: sender as Button,
+                title: "فیلتر عنوان شرکت",
+                options: options,
+                selected: _selectedTitles,
+                showSearch: true,
+                immediateApply: false,
+                onSelectionChanged: result =>
+                {
+                    _selectedTitles = new HashSet<string>(result);
+                    _currentPage = 1;
+                    ApplyFilters();
+                });
+        }
+
+        private void ShowFilterPopup(
+            Button anchor,
+            string title,
+            List<string> options,
+            HashSet<string> selected,
+            bool showSearch,
+            bool immediateApply,
+            Action<List<string>> onSelectionChanged)
+        {
+            if (anchor == null) return;
+
+            var popup = new Taadol.Controls.FilterPopupControl
+            {
+                Title = title,
+                Options = options,
+                SelectedOptions = new HashSet<string>(selected),
+                ShowSearch = showSearch,
+                ImmediateApply = immediateApply
+            };
+
+            popup.SelectionChanged += (selectedList) =>
+            {
+                onSelectionChanged(selectedList);
+            };
+
+            popup.ShowAt(anchor);
         }
 
         private void BtnDelete_Click(object sender, RoutedEventArgs e)

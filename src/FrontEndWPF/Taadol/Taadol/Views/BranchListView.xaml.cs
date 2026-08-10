@@ -28,6 +28,10 @@ namespace Taadol.Views
         private int _currentPage = 1;
         private int _totalPages = 1;
         private bool _isLoadedOnce = false;
+        private HashSet<string> _selectedStatuses = new();
+        private HashSet<string> _selectedCompanyNames = new();
+        private HashSet<string> _selectedProvinces = new();
+        private HashSet<string> _selectedCities = new();
 
         public BranchListView()
         {
@@ -185,6 +189,18 @@ namespace Taadol.Views
                     (b.BranchCode != null && b.BranchCode.Contains(_searchText, StringComparison.OrdinalIgnoreCase)) ||
                     (b.RegistrationNumber != null && b.RegistrationNumber.Contains(_searchText, StringComparison.OrdinalIgnoreCase)));
             }
+
+            if (_selectedStatuses.Count > 0)
+                query = query.Where(b => _selectedStatuses.Contains(b.Status));
+
+            if (_selectedCompanyNames.Count > 0)
+                query = query.Where(b => _selectedCompanyNames.Contains(b.CompanyName));
+
+            if (_selectedProvinces.Count > 0)
+                query = query.Where(b => _selectedProvinces.Contains(b.Province));
+
+            if (_selectedCities.Count > 0)
+                query = query.Where(b => _selectedCities.Contains(b.City));
 
             var filteredList = query.ToList();
             filteredListCount = filteredList.Count;
@@ -363,6 +379,108 @@ namespace Taadol.Views
 
             _currentPage = 1;
             ApplyFilters();
+        }
+
+        private void StatusFilter_Click(object sender, RoutedEventArgs e)
+        {
+            ShowFilterPopup(
+                anchor: sender as Button,
+                title: "فیلتر وضعیت",
+                options: new List<string> { "فعال", "غیرفعال" },
+                selected: _selectedStatuses,
+                showSearch: false,
+                immediateApply: true,
+                onSelectionChanged: result =>
+                {
+                    _selectedStatuses = new HashSet<string>(result);
+                    _currentPage = 1;
+                    ApplyFilters();
+                });
+        }
+
+        private void CompanyNameFilter_Click(object sender, RoutedEventArgs e)
+        {
+            var options = AllBranches.Where(b => !b.IsEmpty && !string.IsNullOrEmpty(b.CompanyName))
+                                     .Select(b => b.CompanyName).Distinct().OrderBy(x => x).ToList();
+            ShowFilterPopup(
+                anchor: sender as Button,
+                title: "فیلتر نام شرکت",
+                options: options,
+                selected: _selectedCompanyNames,
+                showSearch: true,
+                immediateApply: false,
+                onSelectionChanged: result =>
+                {
+                    _selectedCompanyNames = new HashSet<string>(result);
+                    _currentPage = 1;
+                    ApplyFilters();
+                });
+        }
+
+        private void ProvinceFilter_Click(object sender, RoutedEventArgs e)
+        {
+            var options = AllBranches.Where(b => !b.IsEmpty && !string.IsNullOrEmpty(b.Province))
+                                     .Select(b => b.Province).Distinct().OrderBy(x => x).ToList();
+            ShowFilterPopup(
+                anchor: sender as Button,
+                title: "فیلتر استان",
+                options: options,
+                selected: _selectedProvinces,
+                showSearch: true,
+                immediateApply: false,
+                onSelectionChanged: result =>
+                {
+                    _selectedProvinces = new HashSet<string>(result);
+                    _currentPage = 1;
+                    ApplyFilters();
+                });
+        }
+
+        private void CityFilter_Click(object sender, RoutedEventArgs e)
+        {
+            var options = AllBranches.Where(b => !b.IsEmpty && !string.IsNullOrEmpty(b.City))
+                                     .Select(b => b.City).Distinct().OrderBy(x => x).ToList();
+            ShowFilterPopup(
+                anchor: sender as Button,
+                title: "فیلتر شهر",
+                options: options,
+                selected: _selectedCities,
+                showSearch: true,
+                immediateApply: false,
+                onSelectionChanged: result =>
+                {
+                    _selectedCities = new HashSet<string>(result);
+                    _currentPage = 1;
+                    ApplyFilters();
+                });
+        }
+
+        private void ShowFilterPopup(
+            Button anchor,
+            string title,
+            List<string> options,
+            HashSet<string> selected,
+            bool showSearch,
+            bool immediateApply,
+            Action<List<string>> onSelectionChanged)
+        {
+            if (anchor == null) return;
+
+            var popup = new Taadol.Controls.FilterPopupControl
+            {
+                Title = title,
+                Options = options,
+                SelectedOptions = new HashSet<string>(selected),
+                ShowSearch = showSearch,
+                ImmediateApply = immediateApply
+            };
+
+            popup.SelectionChanged += (selectedList) =>
+            {
+                onSelectionChanged(selectedList);
+            };
+
+            popup.ShowAt(anchor);
         }
 
         private async void BtnDelete_Click(object sender, RoutedEventArgs e)
