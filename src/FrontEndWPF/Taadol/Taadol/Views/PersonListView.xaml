@@ -237,7 +237,7 @@
                             Background="#ffffff"
                             BorderBrush="#E5E7EB"
                             BorderThickness="0,0,0,0"
-                            Padding="10,6">
+                            Padding="4,6">
                         <Grid x:Name="PanelHeaderStack"
                               VerticalAlignment="Center"
                               HorizontalAlignment="Left">

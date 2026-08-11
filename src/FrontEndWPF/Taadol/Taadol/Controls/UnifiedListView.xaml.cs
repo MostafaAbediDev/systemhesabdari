@@ -47,8 +47,6 @@ namespace Taadol.Controls
                     var control = (UnifiedListView)d;
                     if (control.DataGridView != null)
                         control.DataGridView.ItemsSource = control.ItemsSource;
-
-                    control.Dispatcher.BeginInvoke(new Action(control.RefreshVisualState), DispatcherPriority.Loaded);
                 }));
 
         public IEnumerable ItemsSource
@@ -149,6 +147,13 @@ namespace Taadol.Controls
         public event EventHandler GridDoubleClicked;
         public event EventHandler CheckedItemsChanged;
 
+        /// <summary>
+        /// چک‌باکس سرستون فقط همین صفحه را انتخاب می‌کند؛ ولی وقتی خاموش می‌شود،
+        /// فرم باید انتخابِ صفحات دیگر را هم پاک کند تا چیزی انتخاب‌شده باقی نماند.
+        /// مقدار bool = حالت جدید (true = روشن/انتخاب همین صفحه، false = خاموش/پاک کردن همه).
+        /// </summary>
+        public event EventHandler<bool> SelectAllToggled;
+
         // ══════════════════════════════════════════════════════
         //  Lifecycle
         // ══════════════════════════════════════════════════════
@@ -217,12 +222,20 @@ namespace Taadol.Controls
 
         private void DataGridRow_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            // فقط کلیک‌های داخل ردیف مصرف شوند؛ کلیک روی هدر، اسکرول‌بار یا فضای خالی
+            // نباید بلوک شود وگرنه کشیدن thumb اسکرول افقی/عمودی کار نمی‌کند.
+            if (GetRowFromMouse(e.OriginalSource as DependencyObject) == null)
+                return;
+
             if (!IsInsideCheckBox(e.OriginalSource as DependencyObject) && !IsInsideFilterButton(e.OriginalSource as DependencyObject))
                 e.Handled = true;
         }
 
         private void DataGridRow_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            if (GetRowFromMouse(e.OriginalSource as DependencyObject) == null)
+                return;
+
             if (!IsInsideCheckBox(e.OriginalSource as DependencyObject) && !IsInsideFilterButton(e.OriginalSource as DependencyObject))
                 e.Handled = true;
         }
@@ -291,6 +304,9 @@ namespace Taadol.Controls
         {
             if (sender is FrameworkElement fe && fe.DataContext is IListRowItem item && !item.IsEmpty)
             {
+                // صریح ست می‌کنیم چون رویداد Checked قبل از نوشتن بایندینگ TwoWay
+                // روی item.IsSelected فایر می‌شود؛ بدون این خط، مصرف‌کنندگانِ رویداد
+                // (پنل جزئیات، جمع‌ها) هنوز مقدار قدیمی را می‌بینند.
                 item.IsSelected = true;
                 UpdateRowBorders();
                 UpdateHeaderSelectAllState();
@@ -302,6 +318,7 @@ namespace Taadol.Controls
         {
             if (sender is FrameworkElement fe && fe.DataContext is IListRowItem item && !item.IsEmpty)
             {
+                // همان توضیح بالا — بایندینگ هنوز IsSelected را false نکرده است.
                 item.IsSelected = false;
                 UpdateRowBorders();
                 UpdateHeaderSelectAllState();
@@ -311,14 +328,6 @@ namespace Taadol.Controls
 
         private void DataGridView_LoadingRow(object sender, DataGridRowEventArgs e)
         {
-            if (e.Row.Item is IListRowItem item)
-            {
-                var toggle = FindChild<ToggleButton>(e.Row);
-                if (toggle != null)
-                {
-                    toggle.IsChecked = item.IsSelected;
-                }
-            }
         }
 
         private static T FindChild<T>(DependencyObject parent) where T : DependencyObject
@@ -337,12 +346,17 @@ namespace Taadol.Controls
 
         private void SelectAllBorder_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (sender is Border)
+            if (sender is ToggleButton)
             {
                 var realItems = GetRealItems();
                 var allSelected = realItems.Count > 0 && realItems.All(p => p.IsSelected);
+                var newState = !allSelected;
+
                 foreach (var item in realItems)
-                    item.IsSelected = !allSelected;
+                    item.IsSelected = newState;
+
+                // وقتی هدر خاموش می‌شود، فرم باید انتخابِ بقیه صفحات را هم پاک کند
+                SelectAllToggled?.Invoke(this, newState);
 
                 UpdateRowBorders();
                 UpdateHeaderSelectAllState();
@@ -364,19 +378,14 @@ namespace Taadol.Controls
         {
             if (DataGridView == null) return;
 
-            var headerBorder = FindDescendantByName(DataGridView, "SelectAllBorder") as Border;
-            if (headerBorder == null) return;
+            // چک‌باکس سرستون همان تمپلیت ردیف‌ها (GridCheckBoxTemplate) را دارد؛
+            // فقط IsChecked را ست می‌کنیم تا تریگرهای تمپلیت ظاهر یکسان را بسازند.
+            var toggle = FindDescendantByName(DataGridView, "SelectAllBorder") as ToggleButton;
+            if (toggle == null) return;
 
             var realItems = GetRealItems();
             var allSelected = realItems.Count > 0 && realItems.All(p => p.IsSelected);
-
-            if (headerBorder.FindName("SelectAllCheckMark") is FrameworkElement checkMark)
-                checkMark.Visibility = allSelected ? Visibility.Visible : Visibility.Collapsed;
-
-            var blue = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2667FF"));
-            headerBorder.Background = allSelected ? blue : Brushes.White;
-            headerBorder.BorderBrush = allSelected ? blue
-                : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#CBD5E1"));
+            toggle.IsChecked = allSelected;
         }
 
         private static DependencyObject FindDescendantByName(DependencyObject root, string name)

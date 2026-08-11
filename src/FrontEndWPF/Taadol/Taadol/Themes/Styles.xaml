@@ -690,6 +690,7 @@
                                     <RepeatButton.Template>
                                         <ControlTemplate>
                                             <Border Background="{StaticResource AccentBrush}"
+
                                                     CornerRadius="3" />
                                         </ControlTemplate>
                                     </RepeatButton.Template>

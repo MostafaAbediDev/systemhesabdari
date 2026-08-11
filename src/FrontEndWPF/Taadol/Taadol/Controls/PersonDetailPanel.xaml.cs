@@ -57,8 +57,8 @@ namespace Taadol.Controls
 
         public void LoadData(long id, string name, string personType,
             string category, string nationalId, string phone, string email,
-            string city, string address, string balance, string balanceStatus,
-            bool isActive)
+            string city, string address, string postalCode, string balance,
+            string balanceStatus, bool isActive)
         {
             _personId = id;
             PersonNameText.Text = name;
@@ -68,6 +68,9 @@ namespace Taadol.Controls
             EmailText.Text = email;
             CityText.Text = city;
             AddressText.Text = address;
+            PostalCodeText.Text = string.IsNullOrWhiteSpace(postalCode)
+                ? ""
+                : "کد پستی: " + postalCode;
             BalanceText.Text = balance + " ریال";
 
             if (balanceStatus == "بدهکار")
@@ -120,8 +123,8 @@ namespace Taadol.Controls
             CardNumberText.Text = defaultAccount.CardNumber ?? "—";
             ShebaNumberText.Text = defaultAccount.ShebaNumber ?? "—";
 
-            var otherAccounts = accounts.Where(a => !a.IsDefault).ToList();
-            OtherAccountText.Text = otherAccounts.Count > 0 ? "دارد" : "ندارد";
+            // «حساب دیگر دارد» فقط وقتی مجموع حساب‌ها بیشتر از ۱ باشد
+            OtherAccountText.Text = accounts.Count > 1 ? "دارد" : "ندارد";
         }
 
         public void LoadTransactions(List<TransactionItem> transactions)

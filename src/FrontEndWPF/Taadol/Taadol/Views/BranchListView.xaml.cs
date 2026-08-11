@@ -47,6 +47,14 @@ namespace Taadol.Views
             BranchesGrid.PageSizeRequested += (s, size) => ChangePageSize(size);
             BranchesGrid.CheckedItemsChanged += (s, e) => UpdateSummary();
 
+            // انتخاب همه = فقط همین صفحه؛ خاموش‌کردن هدر = پاک کردن انتخاب کل لیست
+            BranchesGrid.SelectAllToggled += (s, select) =>
+            {
+                if (select || AllBranches == null) return;
+                foreach (var item in AllBranches.Where(b => !b.IsEmpty))
+                    item.IsSelected = false;
+            };
+
             BranchSearchBox.TextChanged += (s, e) =>
             {
                 _searchText = BranchSearchBox.Text.Trim();
@@ -169,6 +177,9 @@ namespace Taadol.Views
             if (AllBranches == null)
                 return;
 
+            var selectedIds = AllBranches.Where(b => !b.IsEmpty && b.IsSelected)
+                                         .Select(b => b.UniqueId).ToHashSet();
+
             var query = AllBranches.AsEnumerable();
 
             switch (_currentFilter)
@@ -222,6 +233,9 @@ namespace Taadol.Views
                 .Skip(skip)
                 .Take(_pageSize)
                 .ToList();
+
+            foreach (var item in pageItems)
+                item.IsSelected = selectedIds.Contains(item.UniqueId);
 
             for (int i = 0; i < pageItems.Count; i++)
                 pageItems[i].RowNumber = skip + i + 1;

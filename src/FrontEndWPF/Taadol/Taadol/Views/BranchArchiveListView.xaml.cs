@@ -31,6 +31,14 @@ namespace Taadol.Views
             ArchivesGrid.CheckedItemsChanged += (s, e) =>
                 ViewModel.UpdateSelectedCount();
 
+            // انتخاب همه = فقط همین صفحه؛ خاموش‌کردن هدر = پاک کردن انتخاب کل لیست
+            ArchivesGrid.SelectAllToggled += (s, select) =>
+            {
+                if (select || ViewModel.AllArchives == null) return;
+                foreach (var item in ViewModel.AllArchives.Where(p => !p.IsEmpty))
+                    item.IsSelected = false;
+            };
+
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
             Loaded += BranchArchiveListView_Loaded;
 

@@ -44,6 +44,14 @@ namespace Taadol.Views
             CompaniesGrid.PageSizeRequested += (s, size) => ChangePageSize(size);
             CompaniesGrid.CheckedItemsChanged += (s, e) => UpdateSummary();
 
+            // انتخاب همه = فقط همین صفحه؛ خاموش‌کردن هدر = پاک کردن انتخاب کل لیست
+            CompaniesGrid.SelectAllToggled += (s, select) =>
+            {
+                if (select || AllCompanies == null) return;
+                foreach (var item in AllCompanies.Where(c => !c.IsEmpty))
+                    item.IsSelected = false;
+            };
+
             CompanySearchBox.TextChanged += (s, e) =>
             {
                 _searchText = CompanySearchBox.Text.Trim();
@@ -86,7 +94,7 @@ namespace Taadol.Views
                         RegisterDate = ToPersianDate(c.CreationDate),
                         Title = c.Title,
                         LegalName = c.LegalName,
-                        Status = c.IsActive ? "فعال" : "غیرفعال",
+                    //    Status = c.IsActive ? "فعال" : "غیرفعال",
                         IsEmpty = false
                     }).ToList();
                 });
@@ -155,6 +163,9 @@ namespace Taadol.Views
         {
             if (AllCompanies == null) return;
 
+            var selectedIds = AllCompanies.Where(c => !c.IsEmpty && c.IsSelected)
+                                          .Select(c => c.Id.ToString()).ToHashSet();
+
             var query = AllCompanies.AsEnumerable();
 
             switch (_currentFilter)
@@ -197,6 +208,9 @@ namespace Taadol.Views
                 .Skip((_currentPage - 1) * _pageSize)
                 .Take(_pageSize)
                 .ToList();
+
+            foreach (var item in pageItems)
+                item.IsSelected = selectedIds.Contains(item.Id.ToString());
 
             for (int i = 0; i < pageItems.Count; i++)
                 pageItems[i].RowNumber = ((_currentPage - 1) * _pageSize) + i + 1;

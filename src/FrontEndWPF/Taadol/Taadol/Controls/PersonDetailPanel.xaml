@@ -266,10 +266,17 @@
                                     <Border Grid.Row="5" Grid.Column="1" Width="2" Height="16"
                                             Background="#BED1FF" Margin="0,0,10,0"
                                             VerticalAlignment="Center" />
-                                    <TextBlock x:Name="AddressText" Grid.Row="5" Grid.Column="2"
-                                               FontSize="12" FontWeight="Medium"
-                                               Foreground="#0D2159" VerticalAlignment="Center"
-                                               TextWrapping="Wrap" />
+                                    <StackPanel Grid.Row="5" Grid.Column="2">
+                                        <TextBlock x:Name="AddressText"
+                                                   FontSize="12" FontWeight="Medium"
+                                                   Foreground="#0D2159"
+                                                   TextWrapping="Wrap" />
+                                        <TextBlock x:Name="PostalCodeText"
+                                                   FontSize="12" FontWeight="Medium"
+                                                   Foreground="#0D2159"
+                                                   TextWrapping="Wrap"
+                                                   Margin="0,4,0,0" />
+                                    </StackPanel>
                                 </Grid>
                             </StackPanel>
 

@@ -14,6 +14,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using Taadol.Controls;
 using Taadol.Models;
@@ -61,6 +62,14 @@ namespace Taadol.Views
             {
                 UpdateDetailPanels();
                 ViewModel.UpdateSummaryBar();
+            };
+
+            // انتخاب همه = فقط همین صفحه؛ خاموش‌کردن هدر = پاک کردن انتخاب کل لیست
+            PersonsGrid.SelectAllToggled += (s, select) =>
+            {
+                if (select || ViewModel.AllPersons == null) return;
+                foreach (var item in ViewModel.AllPersons.Where(p => !p.IsEmpty))
+                    item.IsSelected = false;
             };
 
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
@@ -357,27 +366,34 @@ namespace Taadol.Views
         // ======================================================
         private async void UpdateDetailPanels()
         {
-            var selectedItems = ViewModel.GetSelectedItems();
-
-            var existingIds = DetailPanelsStack.Children
-                .OfType<Taadol.Controls.PersonDetailPanel>()
-                .Select(p => p.PersonId)
-                .ToHashSet();
-
-            var currentIds = selectedItems.Select(p => p.Id).ToHashSet();
-
-            var toRemove = DetailPanelsStack.Children
-                .OfType<Taadol.Controls.PersonDetailPanel>()
-                .Where(p => !currentIds.Contains(p.PersonId))
-                .ToList();
-
-            foreach (var panel in toRemove)
-                DetailPanelsStack.Children.Remove(panel);
-
             try
             {
-                foreach (var item in selectedItems.Where(p => !existingIds.Contains(p.Id)))
+                // پنل‌هایی که دیگر انتخاب نیستند حذف شوند
+                var currentIds = ViewModel.GetSelectedItems().Select(p => p.Id).ToHashSet();
+                var toRemove = DetailPanelsStack.Children
+                    .OfType<Taadol.Controls.PersonDetailPanel>()
+                    .Where(p => !currentIds.Contains(p.PersonId))
+                    .ToList();
+
+                foreach (var panel in toRemove)
+                    DetailPanelsStack.Children.Remove(panel);
+
+                // ساخت تدریجی پنل‌ها: بین هر پنل به Dispatcher فرصت render می‌دهیم
+                // تا ساخت هم‌زمان پنل‌های زیاد (مثلاً «انتخاب همه») برنامه را فریز نکند.
+                // در هر تکرار، انتخاب‌ها دوباره خوانده می‌شوند تا اگر در این بین رویداد جدیدی
+                // آمد (کلیک روی چند ردیف)، پنل‌ها دوباره/دوبار ساخته نشوند.
+                while (true)
                 {
+                    var selectedItems = ViewModel.GetSelectedItems();
+                    var existingIds = DetailPanelsStack.Children
+                        .OfType<Taadol.Controls.PersonDetailPanel>()
+                        .Select(p => p.PersonId)
+                        .ToHashSet();
+
+                    var item = selectedItems.FirstOrDefault(p => !existingIds.Contains(p.Id));
+                    if (item == null)
+                        break;
+
                     var panel = new Taadol.Controls.PersonDetailPanel();
 
                     var personType = item.IsLegal ? "حقوقی" : "حقیقی";
@@ -393,6 +409,9 @@ namespace Taadol.Views
                         : !string.IsNullOrEmpty(item.Province) ? item.Province
                         : item.City ?? "";
                     var nationalId = item.NationalId ?? "";
+                    var email = ViewModel.GetEmail(item.Id) ?? "—";
+                    var address = ViewModel.GetAddress(item.Id) ?? "—";
+                    var postalCode = ViewModel.GetPostalCode(item.Id) ?? "";
 
                     panel.LoadData(
                         item.Id,
@@ -401,43 +420,41 @@ namespace Taadol.Views
                         category,
                         nationalId,
                         phone,
-                        "",
+                        email,
                         city,
-                        "",
+                        address,
+                        postalCode,
                         balance,
                         balanceStatus,
                         item.Status == "فعال");
 
-                    try
-                    {
-                        var bankItems = await Task.Run(() =>
+                    // حساب‌های بانکی از کش (پر شده در LoadDataAsync) — بدون کوئری دیتابیس
+                    var bankItems = ViewModel.GetBankAccounts(item.Id)
+                        .Select(b => new Taadol.Models.BankAccountItem
                         {
-                            using var scope = App.ServiceProvider.CreateScope();
-                            var bankApp = scope.ServiceProvider.GetRequiredService<IPersonBankApplication>();
-                            var banks = bankApp.GetByPersonId(item.Id) ?? new List<PersonBankViewModel>();
-                            return banks.Select(b => new Taadol.Models.BankAccountItem
-                            {
-                                BankName = b.BankName ?? "\u2014",
-                                BranchName = b.BankBranchName ?? "\u2014",
-                                CardNumber = b.CardNumber ?? "\u2014",
-                                ShebaNumber = b.Shaba ?? "\u2014",
-                                AccountNumber = b.AccountNumber ?? "\u2014",
-                                OtherAccount = "ندارد",
-                                IsDefault = b.IsDefault
-                            }).ToList();
-                        });
-                        panel.LoadBankAccounts(bankItems);
-                    }
-                    catch (Exception ex)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"[PersonListView] بارگذاری حساب‌های بانکی شخص {item.Id} ناموفق بود: {ex.Message}");
-                    }
+                            BankName = b.BankName ?? "\u2014",
+                            BranchName = b.BankBranchName ?? "\u2014",
+                            CardNumber = b.CardNumber ?? "\u2014",
+                            ShebaNumber = b.Shaba ?? "\u2014",
+                            AccountNumber = b.AccountNumber ?? "\u2014",
+                            OtherAccount = "ندارد",
+                            IsDefault = b.IsDefault
+                        }).ToList();
+                    panel.LoadBankAccounts(bankItems);
 
                     panel.CloseRequested += DetailPanel_CloseRequested;
                     panel.EditRequested += DetailPanel_EditRequested;
                     panel.DeleteRequested += DetailPanel_DeleteRequested;
 
                     DetailPanelsStack.Children.Insert(0, panel);
+
+                    // پنل جدید بالای لیست اضافه شد — اسکرول را نرم به ابتدا ببر
+                    // تا نفر تازه‌انتخاب‌شده دقیقاً دیده شود.
+                    if (DetailPanelScroll != null)
+                        DetailPanelScroll.SmoothScrollToTop();
+
+                    // به UI فرصت render بده
+                    await Dispatcher.Yield(DispatcherPriority.Background);
                 }
             }
             catch (Exception ex)
@@ -780,5 +797,36 @@ namespace Taadol.Views
         public int PageNumber { get; set; }
         public string PageNumberDisplay { get; set; }
         public bool IsCurrent { get; set; }
+    }
+
+    /// <summary>
+    /// اسکرول نرم برای ScrollViewer. چون VerticalOffset قابل انیمیشن مستقیم نیست،
+    /// از طریق یک attached property واسطه انیمیت می‌شود.
+    /// </summary>
+    public static class SmoothScrollHelper
+    {
+        private static readonly DependencyProperty AnimatedOffsetProperty =
+            DependencyProperty.RegisterAttached(
+                "AnimatedOffset", typeof(double), typeof(SmoothScrollHelper),
+                new PropertyMetadata(0.0, OnAnimatedOffsetChanged));
+
+        private static void OnAnimatedOffsetChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is ScrollViewer sv && e.NewValue is double value)
+                sv.ScrollToVerticalOffset(value);
+        }
+
+        public static void SmoothScrollToTop(this ScrollViewer sv, double durationMs = 400)
+        {
+            var animation = new DoubleAnimation
+            {
+                From = sv.VerticalOffset,
+                To = 0,
+                Duration = TimeSpan.FromMilliseconds(durationMs),
+                EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+            };
+            animation.Completed += (s, e) => sv.BeginAnimation(AnimatedOffsetProperty, null);
+            sv.BeginAnimation(AnimatedOffsetProperty, animation);
+        }
     }
 }

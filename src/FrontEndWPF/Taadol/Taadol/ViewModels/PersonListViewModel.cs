@@ -22,6 +22,13 @@ namespace Taadol.ViewModels
         private int _totalPages = 1;
         private int _lastFilteredListCount;
 
+        // کش حساب‌های بانکی هر شخص — در LoadDataAsync همراه تماس‌ها و آدرس‌ها پر می‌شود
+        private Dictionary<long, List<PersonBankViewModel>> _bankAccountsByPerson = new();
+
+        // کش تماس‌ها و آدرس‌ها — برای پنل جزئیات (ایمیل، آدرس کامل)
+        private Dictionary<long, List<PersonContactViewModel>> _contactsByPerson = new();
+        private Dictionary<long, PersonAddressViewModel> _addressesByPerson = new();
+
         public PersonListViewModel(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
@@ -110,6 +117,54 @@ namespace Taadol.ViewModels
             return AllPersons?.Where(p => !p.IsEmpty).ToList() ?? new List<PersonItem>();
         }
 
+        /// <summary>
+        /// حساب‌های بانکی کش‌شده در LoadDataAsync — بدون کوئری دیتابیس.
+        /// </summary>
+        public List<PersonBankViewModel> GetBankAccounts(long personId)
+        {
+            return _bankAccountsByPerson.TryGetValue(personId, out var list)
+                ? list
+                : new List<PersonBankViewModel>();
+        }
+
+        /// <summary>
+        /// ایمیل شخص از تماس‌های کش‌شده (نوع تماس شامل «ایمیل») — null اگر موجود نباشد.
+        /// </summary>
+        public string GetEmail(long personId)
+        {
+            if (!_contactsByPerson.TryGetValue(personId, out var contacts))
+                return null;
+
+            var email = contacts.FirstOrDefault(c =>
+                c.ContactTypeTitle != null &&
+                c.ContactTypeTitle.Contains("ایمیل", StringComparison.OrdinalIgnoreCase) &&
+                !string.IsNullOrWhiteSpace(c.Value));
+
+            return email?.Value;
+        }
+
+        /// <summary>
+        /// آدرس از آدرس‌های کش‌شده — null اگر موجود نباشد.
+        /// </summary>
+        public string GetAddress(long personId)
+        {
+            if (!_addressesByPerson.TryGetValue(personId, out var address) || address == null)
+                return null;
+
+            return string.IsNullOrWhiteSpace(address.Address) ? null : address.Address.Trim();
+        }
+
+        /// <summary>
+        /// کد پستی از آدرس‌های کش‌شده — null اگر موجود نباشد.
+        /// </summary>
+        public string GetPostalCode(long personId)
+        {
+            if (!_addressesByPerson.TryGetValue(personId, out var address) || address == null)
+                return null;
+
+            return string.IsNullOrWhiteSpace(address.PostalCode) ? null : address.PostalCode.Trim();
+        }
+
         public async Task LoadDataAsync()
         {
             IsLoading = true;
@@ -144,13 +199,27 @@ namespace Taadol.ViewModels
                         catch { return new List<PersonAddressViewModel>(); }
                     })).ToList();
 
-                var allTasks = new List<Task>(contactTasks.Count + addressTasks.Count);
+                var bankTasks = personIds.Select(pid =>
+                    Task.Run(() =>
+                    {
+                        using var s = _serviceProvider.CreateScope();
+                        var app = s.ServiceProvider.GetRequiredService<IPersonBankApplication>();
+                        try { return app.GetByPersonId(pid) ?? new List<PersonBankViewModel>(); }
+                        catch { return new List<PersonBankViewModel>(); }
+                    })).ToList();
+
+                var allTasks = new List<Task>(contactTasks.Count + addressTasks.Count + bankTasks.Count);
                 allTasks.AddRange(contactTasks);
                 allTasks.AddRange(addressTasks);
+                allTasks.AddRange(bankTasks);
                 await Task.WhenAll(allTasks);
 
                 foreach (var t in contactTasks) allContacts.AddRange(await t);
                 foreach (var t in addressTasks) allAddresses.AddRange(await t);
+
+                _bankAccountsByPerson = new Dictionary<long, List<PersonBankViewModel>>();
+                for (int i = 0; i < personIds.Count; i++)
+                    _bankAccountsByPerson[personIds[i]] = await bankTasks[i];
 
                 var contactsByPerson = allContacts
                     .GroupBy(c => c.PersonId)
@@ -159,6 +228,9 @@ namespace Taadol.ViewModels
                 var addressesByPerson = allAddresses
                     .GroupBy(a => a.PersonId)
                     .ToDictionary(g => g.Key, g => g.FirstOrDefault());
+
+                _contactsByPerson = contactsByPerson;
+                _addressesByPerson = addressesByPerson;
 
                 var items = persons.Select((p, index) =>
                 {

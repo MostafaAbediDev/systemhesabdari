@@ -45,7 +45,7 @@
             <!-- خط جداکننده دش‌دار -->
             <Border Grid.Row="0"
                     Height="1"
-                    Margin="7,0,7,2"
+                    Margin="0,0,0,2"
                     VerticalAlignment="Bottom">
                 <Border.Background>
                     <VisualBrush TileMode="Tile"
@@ -144,6 +144,7 @@
                         </Grid>
 
                         <StackPanel Grid.Column="2"
+                                    Margin="0,0,10,0"
                                     VerticalAlignment="Top"
                                     HorizontalAlignment="Center">
                             <controls:ImagePickerControl PlaceholderIconSource="/Assets/Icons/Scale.svg"

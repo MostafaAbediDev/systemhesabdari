@@ -45,6 +45,14 @@ namespace Taadol.Views
             PeriodsGrid.PageSizeRequested += (s, size) => ChangePageSize(size);
             PeriodsGrid.CheckedItemsChanged += (s, e) => UpdateSummary();
 
+            // انتخاب همه = فقط همین صفحه؛ خاموش‌کردن هدر = پاک کردن انتخاب کل لیست
+            PeriodsGrid.SelectAllToggled += (s, select) =>
+            {
+                if (select || AllPeriods == null) return;
+                foreach (var item in AllPeriods.Where(p => !p.IsEmpty))
+                    item.IsSelected = false;
+            };
+
             PeriodSearchBox.TextChanged += (s, e) =>
             {
                 _searchText = PeriodSearchBox.Text.Trim();
@@ -160,6 +168,9 @@ namespace Taadol.Views
             if (AllPeriods == null)
                 return;
 
+            var selectedIds = AllPeriods.Where(p => !p.IsEmpty && p.IsSelected)
+                                        .Select(p => p.UniqueId).ToHashSet();
+
             var query = AllPeriods.AsEnumerable();
 
             switch (_currentFilter)
@@ -206,6 +217,9 @@ namespace Taadol.Views
                 .Skip(skip)
                 .Take(_pageSize)
                 .ToList();
+
+            foreach (var item in pageItems)
+                item.IsSelected = selectedIds.Contains(item.UniqueId);
 
             for (int i = 0; i < pageItems.Count; i++)
                 pageItems[i].RowNumber = skip + i + 1;
