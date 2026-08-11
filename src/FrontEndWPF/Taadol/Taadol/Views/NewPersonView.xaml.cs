@@ -259,12 +259,31 @@ namespace Taadol.Views
         public bool MainBankIsDefault { get => _mainBankIsDefault; set { _mainBankIsDefault = value; OnPropertyChanged(); } }
         public long SelectedBankBranchId { get => _selectedBankBranchId; set { _selectedBankBranchId = value; OnPropertyChanged(); } }
 
+        /// <summary>
+        /// الپس‌های دو سر جداکننده باید با پس‌زمینه‌ی پشت فرم هم‌رنگ باشند:
+        /// وقتی فرم از لیست اشخاص به‌صورت مودال باز می‌شود → رنگ overlay تیره (#66000000)
+        /// و وقتی از سایدبار به‌صورت عادی باز می‌شود → رنگ پس‌زمینه‌ی صفحه (#FFF8ED).
+        /// </summary>
+        private void UpdateDividerEllipseColor()
+        {
+            bool isModal = Window.GetWindow(this) is MainWindow mw && mw.ModalContent.Content == this;
+            var colorHex = isModal ? "#66000000" : "#FFF8ED";
+            var brush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(colorHex));
+            DividerEllipseLeft.Fill = brush;
+            DividerEllipseRight.Fill = brush;
+        }
+
         // ======================================================
         //  Constructor
         // ======================================================
         public NewPersonView()
         {
             InitializeComponent();
+
+            // رنگ الپس‌های جداکننده به حالت میزبانی بستگی دارد؛
+            // تا زمانی که فرم در visual tree نیست (و window/مودال مشخص نیست) نمی‌توان تشخیص داد،
+            // پس در Loaded ست می‌شود.
+            Loaded += (s, e) => UpdateDividerEllipseColor();
 
             // سرویس‌های ضروری — اگه نباشن، فرم باز نمی‌شه
             _personApplication = App.ServiceProvider.GetRequiredService<IPersonApplication>();
@@ -405,6 +424,14 @@ namespace Taadol.Views
                     SelectedPersonTypeId = PersonTypes[0].Id;
                     UpdatePersonTypeToggleSelection();
                 }
+
+                // رفع باگ ترتیب ساخت: تاگل «مشتری» در XAML از اول IsChecked="True" دارد،
+                // پس رویداد Checked در حین InitializeComponent قبل از ساخته‌شدن
+                // CategorySearch فایر می‌شود و PersonTypeId روی کنترل اعمال نمی‌شود.
+                // اینجا صریحاً اعمال مجدد می‌کنیم تا «افزودن دسته» بدون جابه‌جایی بین
+                // انواع شخص کار کند.
+                if (SelectedPersonTypeId > 0)
+                    await LoadCategoriesAsync(SelectedPersonTypeId);
             }
             catch (Exception ex)
             {
@@ -660,6 +687,9 @@ namespace Taadol.Views
         // ======================================================
         private async void SavePerson_Click(object sender, RoutedEventArgs e) => await SavePersonAsync();
 
+        /// <summary>بعد از ذخیره‌ی موفق یک شخص صدا زده می‌شود تا گرید پشت مودال رفرش شود.</summary>
+        public event Action PersonSaved;
+
         private bool _isSaving;
 
         private async Task SavePersonAsync()
@@ -836,8 +866,11 @@ namespace Taadol.Views
 
                 MessageBox.Show("ثبت شخص با موفقیت انجام شد.", "موفقیت", MessageBoxButton.OK, MessageBoxImage.Information);
 
-                ClearForm();
-                NavigateToPersonList();
+                // فرم در مودال باز شده است: فقط مودال بسته شود و گرید پشت آن رفرش شود
+                PersonSaved?.Invoke();
+
+                var mainWindow = Window.GetWindow(this) as MainWindow;
+                mainWindow?.CloseModal();
             }
             catch (Exception ex)
             {
@@ -1356,15 +1389,24 @@ namespace Taadol.Views
             }
         }
 
-        private void NavigateToPersonList()
+        /// <summary>
+        /// بستن فرم: اگر در مودال است (از لیست اشخاص) فقط مودال بسته می‌شود؛
+        /// اگر از سایدبار به‌صورت عادی باز شده، فرم بسته و زیرمنوی سایدبار پاک می‌شود.
+        /// </summary>
+        private void CloseFormOrModal()
         {
             var mainWindow = Window.GetWindow(this) as MainWindow;
-            mainWindow?.NavigateTo("person_list");
+            if (mainWindow == null) return;
+
+            if (mainWindow.ModalContent.Content == this)
+                mainWindow.CloseModal();
+            else
+                mainWindow.CloseCurrentForm();
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
-            NavigateToPersonList();
+            CloseFormOrModal();
         }
 
         // ======================================================
@@ -1772,8 +1814,7 @@ namespace Taadol.Views
         // ======================================================
         private void CloseButton_Click(object sender, MouseButtonEventArgs e)
         {
-            var mainWindow = Window.GetWindow(this) as MainWindow;
-            mainWindow?.CloseModal();
+            CloseFormOrModal();
         }
 
         private void ClearButton_Click(object sender, RoutedEventArgs e)

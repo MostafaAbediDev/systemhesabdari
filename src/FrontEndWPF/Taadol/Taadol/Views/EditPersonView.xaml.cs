@@ -90,42 +90,48 @@ namespace Taadol.Views
         private string _initialImagePath = "";
         private bool _initialAddressLoaded;
 
+        // ردیابی تغییرات واقعی کاربر:
+        // تا پایان لود (IsLoading) تغییرات برنامه‌نویسی نادیده گرفته می‌شوند؛
+        // بعد از آن هر تغییر = تغییر کاربر → انصراف فقط در این صورت سؤال می‌پرسد.
+        private bool _isLoading = true;
+        private bool _userMadeChanges;
+
         private (string FirstName, string LastName, string ContactFirstName, string ContactLastName,
                 string NationalCode, string CompanyName, string EconomicCode, string RegistrationNumber,
                 string ManualCode, bool IsLegal, bool IsActive, long SelectedBranchId, long SelectedPersonTypeId,
                 string Phone, string Mobile, string Email, string PostalCode, string Address,
                 long SelectedProvinceId, long SelectedCityId) _initialPerson;
 
-        public string FirstName { get => _firstName; set { _firstName = value; OnPropertyChanged(); } }
-        public string LastName { get => _lastName; set { _lastName = value; OnPropertyChanged(); } }
-        public string ContactFirstName { get => _contactFirstName; set { _contactFirstName = value; OnPropertyChanged(); } }
-        public string ContactLastName { get => _contactLastName; set { _contactLastName = value; OnPropertyChanged(); } }
-        public string NationalCode { get => _nationalCode; set { _nationalCode = value; OnPropertyChanged(); } }
-        public string CompanyName { get => _companyName; set { _companyName = value; OnPropertyChanged(); } }
-        public string EconomicCode { get => _economicCode; set { _economicCode = value; OnPropertyChanged(); } }
-        public string RegistrationNumber { get => _registrationNumber; set { _registrationNumber = value; OnPropertyChanged(); } }
-        public string ManualCode { get => _manualCode; set { _manualCode = value; OnPropertyChanged(); } }
-        public bool IsLegal { get => _isLegal; set { _isLegal = value; OnPropertyChanged(); UpdateLegalTypePanels(); } }
-        public bool IsActive { get => _isActive; set { _isActive = value; OnPropertyChanged(); } }
-        public long SelectedBranchId { get => _selectedBranchId; set { _selectedBranchId = value; OnPropertyChanged(); } }
+        public string FirstName { get => _firstName; set { _firstName = value; OnPropertyChanged(); MarkUserChange(); } }
+        public string LastName { get => _lastName; set { _lastName = value; OnPropertyChanged(); MarkUserChange(); } }
+        public string ContactFirstName { get => _contactFirstName; set { _contactFirstName = value; OnPropertyChanged(); MarkUserChange(); } }
+        public string ContactLastName { get => _contactLastName; set { _contactLastName = value; OnPropertyChanged(); MarkUserChange(); } }
+        public string NationalCode { get => _nationalCode; set { _nationalCode = value; OnPropertyChanged(); MarkUserChange(); } }
+        public string CompanyName { get => _companyName; set { _companyName = value; OnPropertyChanged(); MarkUserChange(); } }
+        public string EconomicCode { get => _economicCode; set { _economicCode = value; OnPropertyChanged(); MarkUserChange(); } }
+        public string RegistrationNumber { get => _registrationNumber; set { _registrationNumber = value; OnPropertyChanged(); MarkUserChange(); } }
+        public string ManualCode { get => _manualCode; set { _manualCode = value; OnPropertyChanged(); MarkUserChange(); } }
+        public bool IsLegal { get => _isLegal; set { _isLegal = value; OnPropertyChanged(); MarkUserChange(); UpdateLegalTypePanels(); } }
+        public bool IsActive { get => _isActive; set { _isActive = value; OnPropertyChanged(); MarkUserChange(); } }
+        public long SelectedBranchId { get => _selectedBranchId; set { _selectedBranchId = value; OnPropertyChanged(); MarkUserChange(); } }
         public long SelectedPersonTypeId
         {
             get => _selectedPersonTypeId;
-            set { _selectedPersonTypeId = value; OnPropertyChanged(); _ = LoadCategoriesAsync(value); }
+            set { _selectedPersonTypeId = value; OnPropertyChanged(); MarkUserChange(); _ = LoadCategoriesAsync(value); }
         }
-        public string Phone { get => _phone; set { _phone = value; OnPropertyChanged(); } }
-        public string Mobile { get => _mobile; set { _mobile = value; OnPropertyChanged(); } }
-        public string Email { get => _email; set { _email = value; OnPropertyChanged(); } }
-        public string PostalCode { get => _postalCode; set { _postalCode = value; OnPropertyChanged(); } }
-        public string Address { get => _address; set { _address = value; OnPropertyChanged(); } }
-        public long SelectedProvinceId { get => _selectedProvinceId; set { _selectedProvinceId = value; OnPropertyChanged(); _ = LoadCitiesAsync(value); } }
-        public long SelectedCityId { get => _selectedCityId; set { _selectedCityId = value; OnPropertyChanged(); } }
-        public string MainBankName { get => _mainBankName; set { _mainBankName = value; OnPropertyChanged(); } }
-        public string MainCardNumber { get => _mainCardNumber; set { _mainCardNumber = value; OnPropertyChanged(); } }
-        public string MainShaba { get => _mainShaba; set { _mainShaba = value; OnPropertyChanged(); } }
-        public string MainAccountNumber { get => _mainAccountNumber; set { _mainAccountNumber = value; OnPropertyChanged(); } }
-        public bool MainBankIsDefault { get => _mainBankIsDefault; set { _mainBankIsDefault = value; OnPropertyChanged(); } }
-        public long SelectedBankBranchId { get => _selectedBankBranchId; set { _selectedBankBranchId = value; OnPropertyChanged(); } }
+        public string Phone { get => _phone; set { _phone = value; OnPropertyChanged(); MarkUserChange(); } }
+        public string Mobile { get => _mobile; set { _mobile = value; OnPropertyChanged(); MarkUserChange(); } }
+        public string Email { get => _email; set { _email = value; OnPropertyChanged(); MarkUserChange(); } }
+        public string PostalCode { get => _postalCode; set { _postalCode = value; OnPropertyChanged(); MarkUserChange(); } }
+        public string Address { get => _address; set { _address = value; OnPropertyChanged(); MarkUserChange(); } }
+        public long SelectedProvinceId { get => _selectedProvinceId; set { _selectedProvinceId = value; OnPropertyChanged(); MarkUserChange(); _ = LoadCitiesAsync(value); } }
+        public long SelectedCityId { get => _selectedCityId; set { _selectedCityId = value; OnPropertyChanged(); MarkUserChange(); } }
+        public string MainBankName { get => _mainBankName; set { _mainBankName = value; OnPropertyChanged(); MarkUserChange(); } }
+        public string MainCardNumber { get => _mainCardNumber; set { _mainCardNumber = value; OnPropertyChanged(); MarkUserChange(); } }
+        public string MainShaba { get => _mainShaba; set { _mainShaba = value; OnPropertyChanged(); MarkUserChange(); } }
+        public string MainAccountNumber { get => _mainAccountNumber; set { _mainAccountNumber = value; OnPropertyChanged(); MarkUserChange(); } }
+        public bool MainBankIsDefault { get => _mainBankIsDefault; set { _mainBankIsDefault = value; OnPropertyChanged(); MarkUserChange(); } }
+        public long SelectedBankBranchId { get => _selectedBankBranchId; set { _selectedBankBranchId = value; OnPropertyChanged(); MarkUserChange(); } }
 
         public EditPersonView(long personId)
         {
@@ -154,14 +160,15 @@ namespace Taadol.Views
                 if (e.NewItems != null)
                 {
                     foreach (BankAccountRow item in e.NewItems)
-                        item.PropertyChanged += (_, _) => OnPropertyChanged(nameof(IsDirty));
+                        item.PropertyChanged += (_, _) => { OnPropertyChanged(nameof(IsDirty)); MarkUserChange(); };
                 }
                 if (e.OldItems != null)
                 {
                     foreach (BankAccountRow item in e.OldItems)
-                        item.PropertyChanged -= (_, _) => OnPropertyChanged(nameof(IsDirty));
+                        item.PropertyChanged -= (_, _) => { OnPropertyChanged(nameof(IsDirty)); MarkUserChange(); };
                 }
                 OnPropertyChanged(nameof(IsDirty));
+                MarkUserChange();
             };
 
             ShabaInput.Text = "IR";
@@ -187,8 +194,8 @@ namespace Taadol.Views
                 // Subscribe to image picker changes for IsDirty
                 if (PersonImagePicker != null)
                 {
-                    PersonImagePicker.ImageSelected += (_, _) => OnPropertyChanged(nameof(IsDirty));
-                    PersonImagePicker.ImageRemoved += (_, _) => OnPropertyChanged(nameof(IsDirty));
+                    PersonImagePicker.ImageSelected += (_, _) => { OnPropertyChanged(nameof(IsDirty)); MarkUserChange(); };
+                    PersonImagePicker.ImageRemoved += (_, _) => { OnPropertyChanged(nameof(IsDirty)); MarkUserChange(); };
                 }
 
                 System.Diagnostics.Debug.WriteLine("[DEBUG] EditPersonView: starting data load tasks");
@@ -382,12 +389,39 @@ namespace Taadol.Views
             {
                 var personId = _personId;
 
-                var details = await Task.Run(() =>
+                // ★ همه‌ی کوئری‌های مستقل همزمان (موازی) اجرا می‌شوند تا فرم زودتر لود شود
+                var detailsTask = Task.Run(() =>
                 {
                     using var scope = App.ServiceProvider.CreateScope();
                     var app = scope.ServiceProvider.GetRequiredService<IPersonApplication>();
                     return app.GetDetails(personId);
                 });
+                var contactsTask = Task.Run(() =>
+                {
+                    using var scope = App.ServiceProvider.CreateScope();
+                    var app = scope.ServiceProvider.GetRequiredService<IPersonContactApplication>();
+                    return app.GetByPersonId(personId) ?? new List<PersonContactViewModel>();
+                });
+                var addressesTask = Task.Run(() =>
+                {
+                    using var scope = App.ServiceProvider.CreateScope();
+                    var app = scope.ServiceProvider.GetRequiredService<IPersonAddressApplication>();
+                    return app.GetByPersonId(personId) ?? new List<PersonAddressViewModel>();
+                });
+                var banksTask = Task.Run(() =>
+                {
+                    using var scope = App.ServiceProvider.CreateScope();
+                    var app = scope.ServiceProvider.GetRequiredService<IPersonBankApplication>();
+                    return app.GetByPersonId(personId) ?? new List<PersonBankViewModel>();
+                });
+                var picturesTask = Task.Run(() =>
+                {
+                    using var scope = App.ServiceProvider.CreateScope();
+                    var app = scope.ServiceProvider.GetRequiredService<IPictureApplication>();
+                    return app.GetByOwner(personId, PictureOwnerTypeDTO.Person);
+                });
+
+                var details = await detailsTask;
 
                 if (details == null)
                 {
@@ -423,12 +457,7 @@ namespace Taadol.Views
 
                 UpdatePersonTypeToggleSelection();
 
-                var contacts = await Task.Run(() =>
-                {
-                    using var scope = App.ServiceProvider.CreateScope();
-                    var app = scope.ServiceProvider.GetRequiredService<IPersonContactApplication>();
-                    return app.GetByPersonId(personId) ?? new List<PersonContactViewModel>();
-                });
+                var contacts = await contactsTask;
                 foreach (var c in contacts)
                 {
                     if (c.ContactTypeTitle != null && c.ContactTypeTitle.Contains("موبایل") && !string.IsNullOrWhiteSpace(c.Value))
@@ -439,12 +468,7 @@ namespace Taadol.Views
                         Email = c.Value;
                 }
 
-                var addresses = await Task.Run(() =>
-                {
-                    using var scope = App.ServiceProvider.CreateScope();
-                    var app = scope.ServiceProvider.GetRequiredService<IPersonAddressApplication>();
-                    return app.GetByPersonId(personId) ?? new List<PersonAddressViewModel>();
-                });
+                var addresses = await addressesTask;
                 var addr = addresses.FirstOrDefault();
                 if (addr != null)
                 {
@@ -458,12 +482,7 @@ namespace Taadol.Views
 
                 try
                 {
-                    var banks = await Task.Run(() =>
-                    {
-                        using var scope = App.ServiceProvider.CreateScope();
-                        var app = scope.ServiceProvider.GetRequiredService<IPersonBankApplication>();
-                        return app.GetByPersonId(personId) ?? new List<PersonBankViewModel>();
-                    });
+                    var banks = await banksTask;
                     System.Diagnostics.Debug.WriteLine($"🏦 LoadPersonData: loaded {banks.Count} bank(s)");
 
                     BankAccounts.Clear();
@@ -522,12 +541,7 @@ namespace Taadol.Views
 
                 try
                 {
-                    var pictures = await Task.Run(() =>
-                    {
-                        using var scope = App.ServiceProvider.CreateScope();
-                        var app = scope.ServiceProvider.GetRequiredService<IPictureApplication>();
-                        return app.GetByOwner(personId, PictureOwnerTypeDTO.Person);
-                    });
+                    var pictures = await picturesTask;
                     var picture = pictures.FirstOrDefault();
                     if (picture != null && !string.IsNullOrWhiteSpace(picture.Url))
                     {
@@ -542,6 +556,12 @@ namespace Taadol.Views
                 {
                     System.Diagnostics.Debug.WriteLine("Picture load failed: " + ex.Message);
                 }
+
+                // ★ صبر می‌کنیم بارگذاری‌های موازی (شهرها و بایندینگ ComboBox ها) جا بیفتند؛
+                // وگرنه snapshot زودتر از حالت نهایی فرم گرفته می‌شود و «انصراف» بدون تغییر،
+                // اشتباهاً سؤال «ذخیره تغییرات» می‌پرسد.
+                try { await LoadCitiesAsync(SelectedProvinceId); } catch { }
+                await Task.Delay(80);
 
                 CaptureInitialSnapshot();
             }
@@ -572,53 +592,29 @@ namespace Taadol.Views
             }).ToList();
 
             _initialImagePath = PersonImagePicker.ImagePath ?? "";
+
+            // لود کامل شد — از این به بعد هر تغییری = تغییر کاربر
+            _isLoading = false;
         }
 
+        /// <summary>
+        /// فقط تغییرات واقعی کاربر (بعد از پایان لود) محاسبه می‌شود؛
+        /// بارگذاری موازی داده‌ها دیگر باعث سؤال اشتباه «ذخیره تغییرات» نمی‌شود.
+        /// </summary>
         private bool HasUnsavedChanges()
         {
-            if (FirstName != _initialPerson.FirstName ||
-                LastName != _initialPerson.LastName ||
-                ContactFirstName != _initialPerson.ContactFirstName ||
-                ContactLastName != _initialPerson.ContactLastName ||
-                NationalCode != _initialPerson.NationalCode ||
-                CompanyName != _initialPerson.CompanyName ||
-                EconomicCode != _initialPerson.EconomicCode ||
-                RegistrationNumber != _initialPerson.RegistrationNumber ||
-                ManualCode != _initialPerson.ManualCode ||
-                IsLegal != _initialPerson.IsLegal ||
-                IsActive != _initialPerson.IsActive ||
-                SelectedBranchId != _initialPerson.SelectedBranchId ||
-                SelectedPersonTypeId != _initialPerson.SelectedPersonTypeId ||
-                Phone != _initialPerson.Phone ||
-                Mobile != _initialPerson.Mobile ||
-                Email != _initialPerson.Email ||
-                PostalCode != _initialPerson.PostalCode ||
-                Address != _initialPerson.Address ||
-                SelectedProvinceId != _initialPerson.SelectedProvinceId ||
-                SelectedCityId != _initialPerson.SelectedCityId)
-                return true;
+            return _userMadeChanges;
+        }
 
-            if (PersonImagePicker.ImagePath != _initialImagePath)
-                return true;
-
-            if (_initialBankAccounts.Count != BankAccounts.Count)
-                return true;
-
-            for (int i = 0; i < BankAccounts.Count; i++)
-            {
-                var a = _initialBankAccounts[i];
-                var b = BankAccounts[i];
-                if (a.BankBranchId != b.BankBranchId ||
-                    a.BankName != b.BankName ||
-                    a.BranchName != b.BranchName ||
-                    a.CardNumber != b.CardNumber ||
-                    a.Shaba != b.Shaba ||
-                    a.AccountNumber != b.AccountNumber ||
-                    a.IsDefault != b.IsDefault)
-                    return true;
-            }
-
-            return false;
+        /// <summary>
+        /// هر تغییری (توسط کاربر یا بایندینگ) از اینجا می‌گذرد؛
+        /// تا وقتی فرم در حال لود است نادیده گرفته می‌شود.
+        /// </summary>
+        private void MarkUserChange()
+        {
+            if (_isLoading) return;
+            _userMadeChanges = true;
+            OnPropertyChanged(nameof(IsDirty));
         }
 
         private void UpdateLegalTypePanels()
@@ -732,12 +728,13 @@ namespace Taadol.Views
         {
             if (_isSaving) return;
             _isSaving = true;
-            if (SaveButton != null) SaveButton.IsEnabled = false;
+            if (SaveButton != null)
+            {
+                SaveButton.IsEnabled = false;
+                SaveButton.Text = "در حال ذخیره...";
+            }
 
-            var dialog = new CustomConfirmDialog();
-            if (dialog.ShowDialog() != true) return;
-
-            if (!ValidatePerson()) return;
+            // ★ بدون دیالوگ تأیید و بدون ولیدیشن — بعد از ذخیره فقط یک بار اطلاع داده می‌شود
 
             try
             {
@@ -872,7 +869,7 @@ namespace Taadol.Views
                     return;
                 }
 
-                MessageBox.Show("ویرایش شخص با موفقیت انجام شد.", "موفقیت", MessageBoxButton.OK, MessageBoxImage.Information);
+                ToastManager.Success("ویرایش شخص با موفقیت انجام شد.");
 
                 BankAccounts.Clear();
 
@@ -887,7 +884,11 @@ namespace Taadol.Views
             finally
             {
                 _isSaving = false;
-                if (SaveButton != null) SaveButton.IsEnabled = true;
+                if (SaveButton != null)
+                {
+                    SaveButton.IsEnabled = true;
+                    SaveButton.Text = "ویرایش";
+                }
             }
         }
 

@@ -409,13 +409,7 @@ namespace Taadol.Controls
         {
             if (PersonTypeId <= 0)
             {
-                ModernDialog.ShowConfirm(
-                    "نوع شخص انتخاب نشده",
-                    "برای افزودن دسته‌بندی، ابتدا باید نوع شخص را انتخاب کنید.",
-                    ModernDialog.DialogType.Warning,
-                    "متوجه شدم",
-                    "بستن",
-                    Window.GetWindow(this));
+                ToastManager.Warning("برای افزودن دسته‌بندی، ابتدا باید نوع شخص را انتخاب کنید.");
                 return;
             }
 
@@ -449,34 +443,16 @@ namespace Taadol.Controls
                 {
                     await RefreshTreeAsync();
                     DataChanged?.Invoke();
-                    ModernDialog.ShowConfirm(
-                        "افزوده شد",
-                        $"دسته «{title}» با موفقیت اضافه شد.",
-                        ModernDialog.DialogType.Success,
-                        "عالی",
-                        "بستن",
-                        Window.GetWindow(this));
+                    ToastManager.Success($"دسته «{title}» با موفقیت اضافه شد.");
                 }
                 else
                 {
-                    ModernDialog.ShowConfirm(
-                        "خطا در افزودن",
-                        result.Message ?? "افزودن دسته با خطا مواجه شد.",
-                        ModernDialog.DialogType.Warning,
-                        "متوجه شدم",
-                        "بستن",
-                        Window.GetWindow(this));
+                    ToastManager.Error(result.Message ?? "افزودن دسته با خطا مواجه شد.");
                 }
             }
             catch (Exception ex)
             {
-                ModernDialog.ShowConfirm(
-                    "خطای سیستمی",
-                    ex.Message,
-                    ModernDialog.DialogType.Danger,
-                    "بستن",
-                    "بستن",
-                    Window.GetWindow(this));
+                ToastManager.Error("خطا در افزودن: " + ex.Message);
             }
         }
         public async Task RefreshTreeAsync(long? expandToId = null)
@@ -742,13 +718,7 @@ namespace Taadol.Controls
             }
             catch (Exception ex)
             {
-                ModernDialog.ShowConfirm(
-                    "خطای سیستمی",
-                    ex.Message,
-                    ModernDialog.DialogType.Danger,
-                    "بستن",
-                    "بستن",
-                    Window.GetWindow(this));
+                ToastManager.Error("خطا در افزودن: " + ex.Message);
             }
         }
         private async void DeleteButton_Click(object sender, MouseButtonEventArgs e)
@@ -804,13 +774,7 @@ namespace Taadol.Controls
             }
             catch (Exception ex)
             {
-                ModernDialog.ShowConfirm(
-                    "خطای سیستمی",
-                    ex.Message,
-                    ModernDialog.DialogType.Danger,
-                    "بستن",
-                    "بستن",
-                    Window.GetWindow(this));
+                ToastManager.Error("خطا در افزودن: " + ex.Message);
             }
         }
 
@@ -820,13 +784,7 @@ namespace Taadol.Controls
 
             if (PersonTypeId <= 0)
             {
-                ModernDialog.ShowConfirm(
-                    "نوع شخص انتخاب نشده",
-                    "برای افزودن زیرمجموعه، ابتدا باید نوع شخص را انتخاب کنید.",
-                    ModernDialog.DialogType.Warning,
-                    "متوجه شدم",
-                    "بستن",
-                    Window.GetWindow(this));
+                ToastManager.Warning("برای افزودن زیرمجموعه، ابتدا باید نوع شخص را انتخاب کنید.");
                 return;
             }
 
@@ -865,34 +823,16 @@ namespace Taadol.Controls
                     ItemAdded?.Invoke(parent);
                     await RefreshTreeAsync(expandToId: parent.Id);
                     DataChanged?.Invoke();
-                    ModernDialog.ShowConfirm(
-                        "افزوده شد",
-                        $"زیرمجموعه «{title}» به «{parent.Title}» اضافه شد.",
-                        ModernDialog.DialogType.Success,
-                        "عالی",
-                        "بستن",
-                        Window.GetWindow(this));
+                    ToastManager.Success($"زیرمجموعه «{title}» به «{parent.Title}» اضافه شد.");
                 }
                 else
                 {
-                    ModernDialog.ShowConfirm(
-                        "خطا در افزودن",
-                        result.Message ?? "افزودن زیرمجموعه با خطا مواجه شد.",
-                        ModernDialog.DialogType.Warning,
-                        "متوجه شدم",
-                        "بستن",
-                        Window.GetWindow(this));
+                    ToastManager.Error(result.Message ?? "افزودن زیرمجموعه با خطا مواجه شد.");
                 }
             }
             catch (Exception ex)
             {
-                ModernDialog.ShowConfirm(
-                    "خطای سیستمی",
-                    ex.Message,
-                    ModernDialog.DialogType.Danger,
-                    "بستن",
-                    "بستن",
-                    Window.GetWindow(this));
+                ToastManager.Error("خطا در افزودن: " + ex.Message);
             }
         }
         private bool ExpandToId(ItemsControl parent, long targetId)

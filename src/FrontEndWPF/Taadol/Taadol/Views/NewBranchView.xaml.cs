@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -784,6 +785,16 @@ namespace Taadol.Views
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
             NavigateToBranchList();
+        }
+
+        private void HeaderClose_Click(object sender, MouseButtonEventArgs e)
+        {
+            var mainWindow = Window.GetWindow(this) as MainWindow;
+            if (mainWindow == null) return;
+            if (mainWindow.ModalContent.Content == this)
+                mainWindow.CloseModal();
+            else
+                mainWindow.CloseCurrentForm();
         }
 
         private bool IsOperationSucceeded(object operation)

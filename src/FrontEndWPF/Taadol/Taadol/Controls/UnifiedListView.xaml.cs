@@ -29,11 +29,28 @@ namespace Taadol.Controls
 
             DataGridView.PreviewMouseLeftButtonDown += DataGridRow_PreviewMouseLeftButtonDown;
             DataGridView.MouseLeftButtonDown += DataGridRow_MouseLeftButtonDown;
+            DataGridView.PreviewMouseRightButtonDown += DataGridView_PreviewMouseRightButtonDown;
 
             PaginationBar.NextPageRequested += (s, e) => NextPageRequested?.Invoke(this, e);
             PaginationBar.PreviousPageRequested += (s, e) => PreviousPageRequested?.Invoke(this, e);
             PaginationBar.PageRequested += (s, page) => PageRequested?.Invoke(this, page);
             PaginationBar.PageSizeRequested += (s, size) => PageSizeRequested?.Invoke(this, size);
+
+            RowContextMenu.EditRequested += (s, e) =>
+            {
+                var item = _contextRowItem;
+                _contextRowItem = null;
+                if (item != null)
+                    RowEditRequested?.Invoke(this, item);
+            };
+
+            RowContextMenu.DeleteRequested += (s, e) =>
+            {
+                var item = _contextRowItem;
+                _contextRowItem = null;
+                if (item != null)
+                    RowDeleteRequested?.Invoke(this, item);
+            };
         }
 
         // ══════════════════════════════════════════════════════
@@ -154,6 +171,12 @@ namespace Taadol.Controls
         /// </summary>
         public event EventHandler<bool> SelectAllToggled;
 
+        /// <summary>راست‌کلیک روی ردیف → «ویرایش» انتخاب شد.</summary>
+        public event EventHandler<IListRowItem> RowEditRequested;
+
+        /// <summary>راست‌کلیک روی ردیف → «حذف» انتخاب شد.</summary>
+        public event EventHandler<IListRowItem> RowDeleteRequested;
+
         // ══════════════════════════════════════════════════════
         //  Lifecycle
         // ══════════════════════════════════════════════════════
@@ -217,6 +240,20 @@ namespace Taadol.Controls
             {
                 DoubleClickedItem = row.DataContext;
                 GridDoubleClicked?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        private IListRowItem _contextRowItem;
+
+        private void DataGridView_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (GetRowFromMouse(e.OriginalSource as DependencyObject) is DataGridRow row &&
+                row.DataContext is IListRowItem item && !item.IsEmpty)
+            {
+                _contextRowItem = item;
+                RowContextMenu.ShowMenu(RowEditRequested != null, RowDeleteRequested != null,
+                    e.GetPosition(RowContextMenu));
+                e.Handled = true;
             }
         }
 

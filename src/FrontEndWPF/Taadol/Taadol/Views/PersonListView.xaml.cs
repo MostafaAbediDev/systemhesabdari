@@ -72,6 +72,19 @@ namespace Taadol.Views
                     item.IsSelected = false;
             };
 
+            // منوی راست‌کلیک ردیف: ویرایش و حذف (حذف تک‌مورد مثل پنل جزئیات)
+            PersonsGrid.RowEditRequested += (s, item) =>
+            {
+                if (item is PersonItem p && Window.GetWindow(this) is MainWindow mw)
+                    mw.NavigateToEditPerson(p.Id);
+            };
+
+            PersonsGrid.RowDeleteRequested += (s, item) =>
+            {
+                if (item is PersonItem p)
+                    DetailPanel_DeleteRequested(s, p.Id);
+            };
+
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
 
             Loaded += PersonListView_Loaded;
@@ -210,6 +223,12 @@ namespace Taadol.Views
             {
                 await ViewModel.DeleteSelectedAsync();
                 _isLoadedOnce = false;
+
+                // پنل‌های حذف‌شده‌ها حذف و بقیه‌ی انتخاب‌ها/جمع‌ها با لیست همگام شوند
+                PersonsGrid.RefreshVisualState();
+                UpdateDetailPanels();
+                ViewModel.UpdateSummaryBar();
+
                 MessageBox.Show("عملیات حذف انجام شد.", "موفق",
                     MessageBoxButton.OK, MessageBoxImage.Information);
             }
@@ -236,18 +255,29 @@ namespace Taadol.Views
 
         private void BtnNew_Click(object sender, MouseButtonEventArgs e)
         {
+            // فرم «شخص جدید» به‌صورت مودال روی همین گرید باز می‌شود (گرید بسته نمی‌شود)
             var mainWindow = Window.GetWindow(this) as MainWindow;
-            if (mainWindow != null)
+            mainWindow?.OpenNewPerson();
+        }
+
+        private void HeaderClose_Click(object sender, MouseButtonEventArgs e)
+        {
+            (Window.GetWindow(this) as MainWindow)?.CloseCurrentForm();
+        }
+
+        /// <summary>
+        /// رفرش داده‌های گرید از بیرون (مثلاً بعد از بسته‌شدن فرم «شخص جدید» در مودال).
+        /// </summary>
+        public async Task RefreshGridAsync()
+        {
+            _isLoadedOnce = false;
+            try
             {
-                var newView = new NewPersonView();
-                var mainContent = mainWindow.FindName("MainContent") as ContentControl;
-                if (mainContent != null)
-                {
-                    mainContent.Content = newView;
-                    var mainContentBorder = mainWindow.FindName("MainContentBorder") as Border;
-                    if (mainContentBorder != null)
-                        mainContentBorder.Visibility = Visibility.Visible;
-                }
+                await ViewModel.RefreshAsync();
+            }
+            catch (Exception ex)
+            {
+                ToastManager.Error("خطا در بروزرسانی: " + ex.Message);
             }
         }
 
@@ -331,31 +361,45 @@ namespace Taadol.Views
                 ease.EasingMode = System.Windows.Media.Animation.EasingMode.EaseIn;
                 anim.EasingFunction = ease;
                 BtnNewStack.HorizontalAlignment = HorizontalAlignment.Center;
-                BtnNewBorder.Margin = new Thickness(6, 8, 6, 8);
-                BtnNewBorder.Padding = new Thickness(0, 8, 0, 8);
-                BtnNewBorder.Width = 44;
-                BtnNewBorder.HorizontalAlignment = HorizontalAlignment.Center;
                 BtnNewIcon.Margin = new Thickness(0);
                 PanelHeaderBorder.Padding = new Thickness(10, 6, 10, 6);
                 SelectedCountBadge.Padding = new Thickness(8, 2, 8, 2);
                 SelectedCountBadge.Visibility = Visibility.Collapsed;
                 PanelHeaderText.Visibility = Visibility.Collapsed;
+
+                // پنل و عنوان مثل قبل همزمان با ستون محو می‌شوند...
                 var fadeOut = new System.Windows.Media.Animation.DoubleAnimation(0, TimeSpan.FromMilliseconds(250));
                 fadeOut.EasingFunction = ease;
                 fadeOut.Completed += (s, ev) =>
                 {
                     DetailPanelContainer.Visibility = Visibility.Collapsed;
+                };
+
+                // ...ولی متن دکمه «شخص جدید» سریع‌تر محو می‌شود تا وقتی دکمه همراه با
+                // ستون جمع می‌شود، متن هیچ‌وقت بریده دیده نشود.
+                var fadeOutBtnText = new System.Windows.Media.Animation.DoubleAnimation(0, TimeSpan.FromMilliseconds(160));
+                fadeOutBtnText.EasingFunction = ease;
+                fadeOutBtnText.Completed += (s, ev) =>
+                {
                     BtnNewText.Visibility = Visibility.Collapsed;
                 };
                 DetailPanelContainer.BeginAnimation(UIElement.OpacityProperty, fadeOut);
                 PanelHeaderText.BeginAnimation(UIElement.OpacityProperty, fadeOut);
-                BtnNewText.BeginAnimation(UIElement.OpacityProperty, fadeOut);
+                BtnNewText.BeginAnimation(UIElement.OpacityProperty, fadeOutBtnText);
                 BtnToggleSidebar.Margin = new Thickness(56, 40, 0, 0);
                 DetailPanelColumn.BeginAnimation(System.Windows.Controls.ColumnDefinition.MaxWidthProperty, anim);
                 DetailPanelColumn.BeginAnimation(System.Windows.Controls.ColumnDefinition.MinWidthProperty, anim);
                 anim.Completed += (s, ev) =>
                 {
                     DetailPanelColumn.Width = new GridLength(64);
+
+                    // بعد از کامل‌شدن جمع‌شدن (متن دیگر نیست)، دکمه به حالت مربعی
+                    // متمرکز فقط-آیکون می‌رود — بدون هیچ پرشی چون عرضش در این لحظه
+                    // دقیقاً 44px است (64 منهای حاشیه‌ها).
+                    BtnNewBorder.Width = 44;
+                    BtnNewBorder.HorizontalAlignment = HorizontalAlignment.Center;
+                    BtnNewBorder.Margin = new Thickness(6, 8, 6, 8);
+                    BtnNewBorder.Padding = new Thickness(0, 8, 0, 8);
                 };
                 if (arrow != null) arrow.Angle = 180;
             }
@@ -506,6 +550,12 @@ namespace Taadol.Views
                     DetailPanelsStack.Children.Remove(panelToRemove);
 
                 _isLoadedOnce = false;
+
+                // انتخاب‌های باقی‌مانده حفظ شده‌اند؛ وضعیت چک‌باکس‌ها، پنل‌ها و جمع‌ها را همگام کن
+                PersonsGrid.RefreshVisualState();
+                UpdateDetailPanels();
+                ViewModel.UpdateSummaryBar();
+
                 MessageBox.Show("عملیات حذف انجام شد.", "موفق",
                     MessageBoxButton.OK, MessageBoxImage.Information);
             }

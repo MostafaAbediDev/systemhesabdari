@@ -55,6 +55,17 @@ namespace Taadol.Views
                     item.IsSelected = false;
             };
 
+            // منوی راست‌کلیک ردیف: فقط حذف (ویرایش در این فرم وجود ندارد)
+            BranchesGrid.RowDeleteRequested += (s, item) =>
+            {
+                if (item is not BranchItem b) return;
+
+                foreach (var x in AllBranches.Where(bb => !bb.IsEmpty))
+                    x.IsSelected = ReferenceEquals(x, b);
+
+                BtnDelete_Click(this, new RoutedEventArgs());
+            };
+
             BranchSearchBox.TextChanged += (s, e) =>
             {
                 _searchText = BranchSearchBox.Text.Trim();
@@ -65,6 +76,11 @@ namespace Taadol.Views
             FillEmptyRows();
 
             Loaded += BranchListView_Loaded;
+        }
+
+        private void HeaderClose_Click(object sender, MouseButtonEventArgs e)
+        {
+            (Window.GetWindow(this) as MainWindow)?.CloseCurrentForm();
         }
 
         private async void BranchListView_Loaded(object sender, RoutedEventArgs e)

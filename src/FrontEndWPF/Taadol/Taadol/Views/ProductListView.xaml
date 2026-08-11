@@ -14,8 +14,7 @@
 <UserControl.Resources>
     </UserControl.Resources>
 
-    <Border Margin="0,16"
-            Background="White"
+    <Border Background="White"
             CornerRadius="12"
             ClipToBounds="True">
 
@@ -42,11 +41,15 @@
                     <StackPanel Grid.Column="0"
                                 Orientation="Horizontal"
                                 VerticalAlignment="Center">
-                        <svg:SvgViewbox FlowDirection="LeftToRight"
-                                        Width="16"
-                                        Height="16"
-                                        Source="/Assets/Icons/arrow-right_BLUE.svg"
-                                        Margin="5,0,10,0" />
+                        <Border Cursor="Hand"
+                                Background="Transparent"
+                                Margin="5,0,10,0"
+                                MouseLeftButtonDown="HeaderClose_Click">
+                            <svg:SvgViewbox FlowDirection="LeftToRight"
+                                            Width="16"
+                                            Height="16"
+                                            Source="/Assets/Icons/closeTHIN.svg" />
+                        </Border>
                         <TextBlock x:Name="HeaderTitle"
                                    Text="کالاها و خدمات"
                                    FontSize="19"

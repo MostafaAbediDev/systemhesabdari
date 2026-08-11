@@ -172,6 +172,16 @@ namespace Taadol.Views
             NavigateToCompanyList();
         }
 
+        private void HeaderClose_Click(object sender, MouseButtonEventArgs e)
+        {
+            var mainWindow = Window.GetWindow(this) as MainWindow;
+            if (mainWindow == null) return;
+            if (mainWindow.ModalContent.Content == this)
+                mainWindow.CloseModal();
+            else
+                mainWindow.CloseCurrentForm();
+        }
+
         private void ClearForm()
         {
             UniqueId = "";

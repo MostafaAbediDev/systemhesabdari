@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 
 namespace Taadol.Views
 {
@@ -31,6 +32,11 @@ namespace Taadol.Views
             };
 
             this.Dispatcher.BeginInvoke(new Action(() => ApplyFilter()));
+        }
+
+        private void HeaderClose_Click(object sender, MouseButtonEventArgs e)
+        {
+            (Window.GetWindow(this) as MainWindow)?.CloseCurrentForm();
         }
 
         private void LoadTestData()

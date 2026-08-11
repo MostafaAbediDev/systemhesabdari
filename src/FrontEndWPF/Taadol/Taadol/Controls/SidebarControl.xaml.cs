@@ -745,6 +745,33 @@ namespace Taadol.Controls
             if (openMenu != null) SmoothClose(openMenu);
         }
 
+        /// <summary>
+        /// زیرمنوی فعال سایدبار را از حالت انتخاب خارج می‌کند (وقتی فرم با دکمه بستن بسته می‌شود).
+        /// هم حالت بصری دکمه و هم انتخاب ViewModel پاک می‌شود.
+        /// </summary>
+        public void DeselectActiveSubMenu()
+        {
+            if (_activeSubMenuButton != null)
+            {
+                SetSubMenuInactive(_activeSubMenuButton);
+                _activeSubMenuButton = null;
+                _activeSubMenuTag = null;
+            }
+
+            if (DataContext is Taadol.ViewModels.SidebarViewModel vm)
+            {
+                foreach (var menu in vm.MenuItems)
+                {
+                    menu.IsSelected = false;
+                    foreach (var sub in menu.SubItems)
+                    {
+                        sub.IsSelected = false;
+                        sub.IsBold = false;
+                    }
+                }
+            }
+        }
+
         private void SubMenuClick(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn && btn.Tag is string tag)

@@ -157,6 +157,8 @@ namespace Taadol
                 System.Diagnostics.Debug.WriteLine("[DEBUG] EditPersonView created successfully");
                 ModalContent.Content = editView;
                 System.Diagnostics.Debug.WriteLine("[DEBUG] ModalContent.Content set");
+                ModalOverlay.BeginAnimation(UIElement.OpacityProperty, null);
+                ModalOverlay.Opacity = 1;
                 ModalOverlay.Visibility = Visibility.Visible;
                 System.Diagnostics.Debug.WriteLine("[DEBUG] ModalOverlay set to Visible");
             }
@@ -185,10 +187,54 @@ namespace Taadol
             }
         }
 
+        /// <summary>
+        /// فرم «شخص جدید» را به‌صورت مودال روی محتوای فعلی باز می‌کند (گرید پشت آن می‌ماند).
+        /// اگر شخصی ذخیره شود، گرید لیست پشت مودال رفرش می‌شود.
+        /// </summary>
+        public void OpenNewPerson()
+        {
+            var newView = new NewPersonView();
+            newView.PersonSaved += () =>
+            {
+                if (MainContent.Content is PersonListView listView)
+                    _ = listView.RefreshGridAsync();
+            };
+
+            ModalContent.Content = newView;
+            ModalOverlay.BeginAnimation(UIElement.OpacityProperty, null);
+            ModalOverlay.Opacity = 1;
+            ModalOverlay.Visibility = Visibility.Visible;
+        }
+
+        /// <summary>
+        /// فرم فعلی ناحیه محتوا را می‌بندد (برمی‌گردد به حالت اولیه) و
+        /// انتخاب زیرمنوی سایدبار را هم پاک می‌کند.
+        /// </summary>
+        public void CloseCurrentForm()
+        {
+            MainContentBorder.Visibility = Visibility.Collapsed;
+            MainContent.Content = null;
+            Sidebar.DeselectActiveSubMenu();
+        }
+
         public void CloseModal()
         {
-            ModalOverlay.Visibility = Visibility.Collapsed;
-            ModalContent.Content = null;
+            if (ModalOverlay == null) return;
+
+            // بستن نرم با فید-اوت تا فرم «یهویی» ناپدید نشود
+            var fade = new System.Windows.Media.Animation.DoubleAnimation(
+                0, TimeSpan.FromMilliseconds(220));
+            fade.EasingFunction = new System.Windows.Media.Animation.QuadraticEase
+            {
+                EasingMode = System.Windows.Media.Animation.EasingMode.EaseIn
+            };
+            fade.Completed += (s, e) =>
+            {
+                ModalOverlay.Visibility = Visibility.Collapsed;
+                ModalContent.Content = null;
+                ModalOverlay.Opacity = 1;
+            };
+            ModalOverlay.BeginAnimation(UIElement.OpacityProperty, fade);
         }
 
         private void ModalOverlay_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

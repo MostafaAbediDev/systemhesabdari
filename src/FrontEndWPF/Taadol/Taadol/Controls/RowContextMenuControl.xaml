@@ -1,0 +1,124 @@
+<UserControl x:Class="Taadol.Controls.RowContextMenuControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:svg="http://sharpvectors.codeplex.com/svgc/"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignHeight="120"
+             d:DesignWidth="200"
+             FlowDirection="RightToLeft"
+             FontFamily="{StaticResource IRANSans}">
+
+    <!-- ═══ منوی راست‌کلیک ردیف (ویرایش / حذف) ═══
+         به‌جای Popup از overlay داخل همان پنجره استفاده می‌شود (مثل LoadingOverlay)
+         تا هیچ ددلاک/مشکل فوکوس WPF نداشته باشد. با کلیک بیرون، Escape یا
+         از دست رفتن فوکوس پنجره بسته می‌شود. -->
+    <!-- نکته: کارت عمداً در XAML Collapsed نیست تا در حالت دیزاینر (VS) دیده شود؛
+         مخفی‌شدنش در کد-بیهند (فقط در زمان اجرا) انجام می‌شود. -->
+    <Grid x:Name="RootGrid">
+        <Border x:Name="MenuCard"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Panel.ZIndex="40"
+                Background="White"
+                BorderBrush="#E5E7EB"
+                BorderThickness="1"
+                CornerRadius="4"
+                Padding="0"
+                MinWidth="145">
+            <Border.RenderTransform>
+                <TranslateTransform x:Name="PositionTransform" />
+            </Border.RenderTransform>
+            <Border.Effect>
+                <DropShadowEffect Color="#001242"
+                                  BlurRadius="12"
+                                  ShadowDepth="2"
+                                  Opacity="0.12"
+                                  Direction="270" />
+            </Border.Effect>
+            <StackPanel>
+                <Button x:Name="EditButton"
+                        Click="EditButton_Click"
+                        Cursor="Hand"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        HorizontalContentAlignment="Stretch">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="CtxItemBorder"
+                                    Background="Transparent"
+                                    CornerRadius="4"
+                                    Padding="12,9">
+                                <ContentPresenter HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver"
+                                         Value="True">
+                                    <Setter TargetName="CtxItemBorder"
+                                            Property="Background"
+                                            Value="#F1F5F9" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                    <StackPanel Orientation="Horizontal">
+                        <svg:SvgViewbox Width="16"
+                                        Height="16"
+                                        Source="/Assets/Icons/editblue.svg"
+                                        FlowDirection="LeftToRight" />
+                        <TextBlock Text="ویرایش"
+                                   FontSize="14"
+                                   FontWeight="Medium"
+                                   Foreground="#0D2159"
+                                   Margin="14,0,0,0" />
+                    </StackPanel>
+                </Button>
+
+                <Border x:Name="DividerBorder"
+                        Height="1"
+                        Background="#E5E7EB"
+                        Margin="2,1" />
+
+                <Button x:Name="DeleteButton"
+                        Click="DeleteButton_Click"
+                        Cursor="Hand"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        HorizontalContentAlignment="Stretch">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="CtxDeleteBorder"
+                                    Background="Transparent"
+                                    CornerRadius="4"
+                                    Padding="12,9">
+                                <ContentPresenter HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver"
+                                         Value="True">
+                                    <Setter TargetName="CtxDeleteBorder"
+                                            Property="Background"
+                                            Value="#FCEBEC" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                    <StackPanel Orientation="Horizontal">
+                        <svg:SvgViewbox Width="16"
+                                        Height="16"
+                                        Source="/Assets/Icons/trash.svg"
+                                        FlowDirection="LeftToRight" />
+                        <TextBlock Text="حذف"
+                                   FontSize="14"
+                                   FontWeight="Medium"
+                                   Foreground="#DC2626"
+                                   Margin="15,0,14,0" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

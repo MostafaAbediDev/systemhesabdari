@@ -69,11 +69,15 @@
                     <StackPanel Grid.Column="0"
                                 Orientation="Horizontal"
                                 VerticalAlignment="Center">
-                        <svg:SvgViewbox FlowDirection="LeftToRight"
-                                        Width="16"
-                                        Height="16"
-                                        Source="/Assets/Icons/closeTHIN.svg"
-                                        Margin="20,0,10,0" />
+                        <Border Cursor="Hand"
+                                Background="Transparent"
+                                Margin="20,0,10,0"
+                                MouseLeftButtonDown="HeaderClose_Click">
+                            <svg:SvgViewbox FlowDirection="LeftToRight"
+                                            Width="16"
+                                            Height="16"
+                                            Source="/Assets/Icons/closeTHIN.svg" />
+                        </Border>
                         <TextBlock Text="آرشیو شعبه"
                                    FontSize="20"
                                    FontWeight="Bold"

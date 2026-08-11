@@ -169,6 +169,13 @@ namespace Taadol.ViewModels
         {
             IsLoading = true;
 
+            // انتخاب‌های فعلی را حفظ کن تا بعد از بازسازی لیست (مثلاً بعد از حذف یک شخص)
+            // بقیه‌ی آیتم‌های انتخابی از حالت انتخاب خارج نشوند.
+            var selectedIds = AllPersons?
+                .Where(p => p.IsSelected && !p.IsEmpty)
+                .Select(p => p.Id)
+                .ToHashSet() ?? new HashSet<long>();
+
             try
             {
                 using var scope = _serviceProvider.CreateScope();
@@ -295,6 +302,7 @@ namespace Taadol.ViewModels
                         BalanceDisplay = p.CreditLimit > 0 ? p.CreditLimit.ToString("N0") : (p.AvailableCredit > 0 ? p.AvailableCredit.ToString("N0") : ""),
                         IsLegal = p.IsLegal,
                         PersonType = p.PersonType,
+                        IsSelected = selectedIds.Contains(p.Id),
                         IsEmpty = false
                     };
                 }).ToList();

@@ -12,8 +12,7 @@
     <Border CornerRadius="12"
             ClipToBounds="False"
             Background="#ffffff"
-            VerticalAlignment="Stretch"
-            Margin="24,0">
+            VerticalAlignment="Stretch">
 
         <Grid VerticalAlignment="Stretch">
             <Grid.RowDefinitions>
@@ -29,11 +28,15 @@
                   Margin="10,15,10,10">
                 <StackPanel Orientation="Horizontal"
                             VerticalAlignment="Center">
-                    <svg:SvgViewbox FlowDirection="LeftToRight"
-                                    Width="14"
-                                    Height="14"
-                                    Source="/Assets/Icons/closeTHIN.svg"
-                                    Margin="10,0,10,0" />
+                    <Border Cursor="Hand"
+                            Background="Transparent"
+                            Margin="10,0,10,0"
+                            MouseLeftButtonDown="HeaderClose_Click">
+                        <svg:SvgViewbox FlowDirection="LeftToRight"
+                                        Width="14"
+                                        Height="14"
+                                        Source="/Assets/Icons/closeTHIN.svg" />
+                    </Border>
                     <TextBlock Text="مشخصات شعبه جدید"
                                FontSize="20"
                                FontWeight="Bold"

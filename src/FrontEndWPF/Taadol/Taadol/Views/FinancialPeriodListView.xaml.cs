@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 using System.Windows.Threading;
 using GeneralInfoManagement.Application.Contract.FinancialPeriod;
 using Microsoft.Extensions.DependencyInjection;
@@ -63,6 +64,11 @@ namespace Taadol.Views
             FillEmptyRows();
 
             Loaded += FinancialPeriodListView_Loaded;
+        }
+
+        private void HeaderClose_Click(object sender, MouseButtonEventArgs e)
+        {
+            (Window.GetWindow(this) as MainWindow)?.CloseCurrentForm();
         }
 
         private async void FinancialPeriodListView_Loaded(object sender, RoutedEventArgs e)

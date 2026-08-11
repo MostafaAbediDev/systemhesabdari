@@ -39,11 +39,27 @@ namespace Taadol.Views
                     item.IsSelected = false;
             };
 
+            // منوی راست‌کلیک ردیف: فقط حذف (ویرایش در این فرم وجود ندارد)
+            ArchivesGrid.RowDeleteRequested += (s, item) =>
+            {
+                if (item is not BranchArchiveItem a) return;
+
+                foreach (var x in ViewModel.AllArchives.Where(aa => !aa.IsEmpty))
+                    x.IsSelected = ReferenceEquals(x, a);
+
+                BtnDelete_Click(this, new RoutedEventArgs());
+            };
+
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
             Loaded += BranchArchiveListView_Loaded;
 
             if (FilePicker != null)
                 FilePicker.FileSelected += async (s, e) => await AddPickedFileAsync();
+        }
+
+        private void HeaderClose_Click(object sender, MouseButtonEventArgs e)
+        {
+            (Window.GetWindow(this) as MainWindow)?.CloseCurrentForm();
         }
 
         private async Task AddPickedFileAsync()

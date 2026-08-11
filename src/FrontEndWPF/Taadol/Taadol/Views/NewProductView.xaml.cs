@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using Taadol.Controls;
@@ -34,6 +35,17 @@ namespace Taadol.Views
                 SwitchTab(2);
             };
         }
+
+        private void HeaderClose_Click(object sender, MouseButtonEventArgs e)
+        {
+            var mainWindow = Window.GetWindow(this) as MainWindow;
+            if (mainWindow == null) return;
+            if (mainWindow.ModalContent.Content == this)
+                mainWindow.CloseModal();
+            else
+                mainWindow.CloseCurrentForm();
+        }
+
         private void OnImageSelected(object sender, RoutedEventArgs e)
         {
             var imagePicker = sender as ImagePickerControl;

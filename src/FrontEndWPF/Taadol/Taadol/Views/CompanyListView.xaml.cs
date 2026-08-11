@@ -52,6 +52,17 @@ namespace Taadol.Views
                     item.IsSelected = false;
             };
 
+            // منوی راست‌کلیک ردیف: فقط حذف (ویرایش در این فرم وجود ندارد)
+            CompaniesGrid.RowDeleteRequested += (s, item) =>
+            {
+                if (item is not CompanyItem c) return;
+
+                foreach (var x in AllCompanies.Where(cc => !cc.IsEmpty))
+                    x.IsSelected = ReferenceEquals(x, c);
+
+                BtnDelete_Click(this, new RoutedEventArgs());
+            };
+
             CompanySearchBox.TextChanged += (s, e) =>
             {
                 _searchText = CompanySearchBox.Text.Trim();
@@ -62,6 +73,11 @@ namespace Taadol.Views
             FillEmptyRows();
 
             Loaded += CompanyListView_Loaded;
+        }
+
+        private void HeaderClose_Click(object sender, MouseButtonEventArgs e)
+        {
+            (Window.GetWindow(this) as MainWindow)?.CloseCurrentForm();
         }
 
         private async void CompanyListView_Loaded(object sender, RoutedEventArgs e)

@@ -246,6 +246,16 @@ namespace Taadol.Views
             NavigateToPeriodList();
         }
 
+        private void HeaderClose_Click(object sender, MouseButtonEventArgs e)
+        {
+            var mainWindow = Window.GetWindow(this) as MainWindow;
+            if (mainWindow == null) return;
+            if (mainWindow.ModalContent.Content == this)
+                mainWindow.CloseModal();
+            else
+                mainWindow.CloseCurrentForm();
+        }
+
         private void DatePicker_DateChanged(object sender, RoutedEventArgs e)
         {
             var picker = sender as PersianDatePickerControl;

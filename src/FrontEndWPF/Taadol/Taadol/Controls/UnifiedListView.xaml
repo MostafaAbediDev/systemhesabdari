@@ -387,5 +387,8 @@
         <!-- ═══ صفحه‌بندی ═══ -->
         <controls:PaginationBar x:Name="PaginationBar"
                                 Grid.Row="1" />
+
+        <!-- ═══ منوی راست‌کلیک ردیف (ویرایش / حذف) — کنترل مستقل ═══ -->
+        <controls:RowContextMenuControl x:Name="RowContextMenu" />
     </Grid>
 </UserControl>
