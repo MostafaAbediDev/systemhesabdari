@@ -21,6 +21,7 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
                     Id = x.Id,
                     Title = x.Title,
                     LegalName = x.LegalName,
+                    IsActive = x.IsActive,
                     CreationDate = x.CreationDate.ToString()
                 })
                 .OrderByDescending(x => x.Id)
@@ -49,6 +50,7 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
                                 Id = x.Id,
                                 Title = x.Title,
                                 LegalName = x.LegalName,
+                                IsActive = x.IsActive,
                                 CreationDate = x.CreationDate.ToString()
                             });
 
