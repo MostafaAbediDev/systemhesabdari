@@ -1,7 +1,6 @@
 ﻿using _0_FrameWork.Infrastructure;
 using GeneralInfoManagement.Application.Contract.Branches;
 using GeneralInfoManagement.Domain.BaseInfo.BranchesAgg;
-using GeneralInfoManagement.Domain.BaseInfo.CompaniesAgg;
 using Microsoft.EntityFrameworkCore;
 
 namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
