@@ -13,3 +13,4 @@ obj/
 *.cache
 *.db
 *.pdb
+.aider*

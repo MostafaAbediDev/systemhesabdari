@@ -226,27 +226,26 @@
                                          ButtonBackground="#2667FF"
                                          CornerRadius="4" />
 
-                    <Button Grid.Column="1"
-                            Background="Transparent"
-                            BorderThickness="0"
-                            Cursor="Hand"
-                            Margin="0,0,20,0"
-                            VerticalAlignment="Center"
-                            HorizontalAlignment="Right"
-                            Click="Cancel_Click">
-                        <StackPanel Orientation="Horizontal">
-                            <svg:SvgViewbox Source="/Assets/Icons/redo.svg"
-                                            Width="14"
-                                            Height="14"
-                                            FlowDirection="LeftToRight"
-                                            Margin="6,0,15,0" />
-                            <TextBlock Text="انصراف"
-                                       FontFamily="{StaticResource IRANSans}"
-                                       FontSize="14"
-                                       Foreground="#2667FF"
-                                       VerticalAlignment="Center" />
-                        </StackPanel>
-                    </Button>
+                    <!-- آیکون + متن یک واحد قابل‌کلیک هستند -->
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal"
+                                Background="Transparent"
+                                Margin="0,0,20,0"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Right"
+                                Cursor="Hand"
+                                MouseLeftButtonUp="Cancel_Click">
+                        <svg:SvgViewbox Source="/Assets/Icons/redo.svg"
+                                        Width="14"
+                                        Height="14"
+                                        FlowDirection="LeftToRight"
+                                        Margin="6,0,15,0" />
+                        <TextBlock Text="انصراف"
+                                   FontFamily="{StaticResource IRANSans}"
+                                   FontSize="14"
+                                   Foreground="#2667FF"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
 
                     <controls:CustomOutlinedButton Grid.Column="2"
                                                    Text="ثبت موقت"

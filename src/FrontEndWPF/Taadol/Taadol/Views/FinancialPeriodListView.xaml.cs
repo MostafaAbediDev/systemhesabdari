@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using GeneralInfoManagement.Application.Contract.FinancialPeriod;
 using Microsoft.Extensions.DependencyInjection;
+using Taadol.Controls;
 using Taadol.Models;
 
 namespace Taadol.Views
@@ -70,6 +71,25 @@ namespace Taadol.Views
         {
             (Window.GetWindow(this) as MainWindow)?.CloseCurrentForm();
         }
+
+        private void BtnDelete_Click(object sender, RoutedEventArgs e)
+        {
+            ToastManager.Warning("حذف دوره مالی در این نسخه پشتیبانی نمی‌شود.");
+        }
+
+        private void BtnPrint_Click(object sender, RoutedEventArgs e)
+        {
+            ToastManager.Warning("چاپ این بخش به‌زودی اضافه می‌شود.");
+        }
+
+        private async void BtnRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            _isLoadedOnce = false;
+            await LoadDataAsync();
+        }
+
+        private void ActionButton_Loaded(object sender, RoutedEventArgs e) { }
+        private void ActionButton_Loaded_1(object sender, RoutedEventArgs e) { }
 
         private async void FinancialPeriodListView_Loaded(object sender, RoutedEventArgs e)
         {

@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Globalization;
 using System.Threading.Tasks;
 using System.Windows.Threading;
+using Taadol.Controls;
 using Taadol.Models;
 
 namespace Taadol.Views
@@ -82,6 +83,20 @@ namespace Taadol.Views
         {
             (Window.GetWindow(this) as MainWindow)?.CloseCurrentForm();
         }
+
+        private void BtnPrint_Click(object sender, RoutedEventArgs e)
+        {
+            ToastManager.Warning("چاپ این بخش به‌زودی اضافه می‌شود.");
+        }
+
+        private async void BtnRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            _isLoadedOnce = false;
+            await LoadDataAsync();
+        }
+
+        private void ActionButton_Loaded(object sender, RoutedEventArgs e) { }
+        private void ActionButton_Loaded_1(object sender, RoutedEventArgs e) { }
 
         private async void BranchListView_Loaded(object sender, RoutedEventArgs e)
         {

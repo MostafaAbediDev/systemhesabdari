@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using Taadol.Controls;
 
 namespace Taadol.Views
 {
@@ -38,6 +39,20 @@ namespace Taadol.Views
         {
             (Window.GetWindow(this) as MainWindow)?.CloseCurrentForm();
         }
+
+        private void BtnPrint_Click(object sender, RoutedEventArgs e)
+        {
+            ToastManager.Warning("چاپ این بخش به‌زودی اضافه می‌شود.");
+        }
+
+        private void BtnRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            LoadTestData();
+            ApplyFilter();
+        }
+
+        private void ActionButton_Loaded(object sender, RoutedEventArgs e) { }
+        private void ActionButton_Loaded_1(object sender, RoutedEventArgs e) { }
 
         private void LoadTestData()
         {

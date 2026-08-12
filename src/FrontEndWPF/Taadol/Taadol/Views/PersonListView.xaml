@@ -151,8 +151,8 @@
                                 Margin="20,0,10,0"
                                 MouseLeftButtonDown="HeaderClose_Click">
                             <svg:SvgViewbox FlowDirection="LeftToRight"
-                                            Width="16"
-                                            Height="16"
+                                            Width="14"
+                                            Height="14"
                                             Source="/Assets/Icons/closeTHIN.svg" />
                         </Border>
                         <TextBlock Text="لیست اشخاص"

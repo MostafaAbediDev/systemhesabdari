@@ -62,6 +62,14 @@ namespace Taadol.Views
             (Window.GetWindow(this) as MainWindow)?.CloseCurrentForm();
         }
 
+        private void BtnPrint_Click(object sender, RoutedEventArgs e)
+        {
+            ToastManager.Warning("چاپ این بخش به‌زودی اضافه می‌شود.");
+        }
+
+        private void ActionButton_Loaded(object sender, RoutedEventArgs e) { }
+        private void ActionButton_Loaded_1(object sender, RoutedEventArgs e) { }
+
         private async Task AddPickedFileAsync()
         {
             long branchId = 0;

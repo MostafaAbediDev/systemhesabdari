@@ -706,7 +706,7 @@
                                 </StackPanel>
                             </Grid>
 
-                            <!-- ردیف دوم: آدرس (کشیده) - شهرستان - استان (از راست به چپ) -->
+                            <!-- ردیف دوم: استان - شهرستان - آدرس (کشیده) (از راست به چپ) -->
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
@@ -728,27 +728,8 @@
                                                                    Placeholder="" />
                                 </StackPanel>
 
-                                <!-- شهرستان -->
-                                <StackPanel Grid.Column="0"
-                                            HorizontalAlignment="Left">
-                                    <TextBlock Style="{StaticResource FormLabel}">
-                <Run Text="شهرستان" /><Run Text=" *"
-                                           Foreground="#DC2626" />
-                                    </TextBlock>
-                                    <ComboBox x:Name="CityCombo"
-                                              Style="{StaticResource SearchableComboBox}"
-                                              Tag="جستجو..."
-                                              Width="200"
-                                              HorizontalAlignment="Left"
-                                              ItemsSource="{Binding Cities}"
-                                              DisplayMemberPath="Title"
-                                              SelectedValuePath="Id"
-                                              SelectedValue="{Binding SelectedCityId, Mode=TwoWay}"
-                                              ItemContainerStyle="{StaticResource SearchableComboBoxItem}" />
-                                </StackPanel>
-
                                 <!-- استان -->
-                                <StackPanel Grid.Column="2"
+                                <StackPanel Grid.Column="0"
                                             HorizontalAlignment="Left">
                                     <TextBlock Style="{StaticResource FormLabel}">
                 <Run Text="استان" /><Run Text=" *"
@@ -764,6 +745,39 @@
                                               SelectedValuePath="Id"
                                               SelectedValue="{Binding SelectedProvinceId, Mode=TwoWay}"
                                               ItemContainerStyle="{StaticResource SearchableComboBoxItem}" />
+                                </StackPanel>
+
+                                <!-- شهرستان (تا انتخاب استان فعال نمی‌شود) -->
+                                <StackPanel Grid.Column="2"
+                                            HorizontalAlignment="Left">
+                                    <TextBlock Style="{StaticResource FormLabel}">
+                <Run Text="شهرستان" /><Run Text=" *"
+                                           Foreground="#DC2626" />
+                                    </TextBlock>
+                                    <Grid>
+                                        <ComboBox x:Name="CityCombo"
+                                                  Style="{StaticResource SearchableComboBox}"
+                                                  Tag="جستجو..."
+                                                  Width="200"
+                                                  HorizontalAlignment="Left"
+                                                  ItemsSource="{Binding Cities}"
+                                                  DisplayMemberPath="Title"
+                                                  SelectedValuePath="Id"
+                                                  SelectedValue="{Binding SelectedCityId, Mode=TwoWay}"
+                                                  ItemContainerStyle="{StaticResource SearchableComboBoxItem}" />
+                                        <Border x:Name="CityBlockOverlay"
+                                                Background="Transparent"
+                                                Cursor="No"
+                                                Visibility="Collapsed"
+                                                MouseLeftButtonDown="CityBlockOverlay_MouseLeftButtonDown" />
+                                    </Grid>
+                                    <TextBlock x:Name="CityErrorText"
+                                               Text="ابتدا استان را انتخاب کنید"
+                                               FontFamily="{StaticResource IRANSans}"
+                                               FontSize="12"
+                                               Foreground="#DC2626"
+                                               Margin="4,4,0,0"
+                                               Visibility="Collapsed" />
                                 </StackPanel>
                             </Grid>
                         </StackPanel>
@@ -1389,6 +1403,7 @@
                     <!-- سمت چپ: ذخیره موقت -->
                     <controls:CustomOutlinedButton Grid.Column="2"
                                                    Text="ذخیره موقت"
+                                                   Command="{Binding SavePersonCommand}"
                                                    HorizontalAlignment="Stretch"
                                                  
                                                    BorderBrush="#2667FF"

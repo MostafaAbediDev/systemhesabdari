@@ -106,6 +106,23 @@ namespace Taadol.Controls
             UpdateIconAndTextDirection();
         }
 
+        /// <summary>
+        /// فیلد نباید با محتوای زیاد کش بیاید و چیدمان بقیه‌ی فرم را تحت تاثیر قرار دهد.
+        /// عرض دلخواه همیشه به فضای موجود محدود می‌شود (و در بافتِ بدون محدودیت، سقف معقول ۳۶۰).
+        /// محتوای اضافه با اسکرول افقی داخل خود فیلد قابل مشاهده است.
+        /// </summary>
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            var desired = base.MeasureOverride(availableSize);
+
+            if (!double.IsInfinity(availableSize.Width) && availableSize.Width > 0)
+                desired.Width = System.Math.Min(desired.Width, availableSize.Width);
+            else if (double.IsInfinity(availableSize.Width) && desired.Width > 360)
+                desired.Width = 360;
+
+            return desired;
+        }
+
         private void PART_TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             e.Handled = !IsInputAllowed(e.Text);

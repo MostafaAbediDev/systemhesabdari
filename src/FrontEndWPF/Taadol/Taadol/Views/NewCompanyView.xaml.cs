@@ -124,6 +124,12 @@ namespace Taadol.Views
                 return;
             }
 
+            if (FoundingDate.HasValue && FoundingDate.Value.Date > DateTime.Today)
+            {
+                ToastManager.Warning("تاریخ تاسیس نمیتواند در آینده باشد.");
+                return;
+            }
+
             if (!FoundingDate.HasValue)
             {
                 MessageBox.Show("تاریخ تاسیس را انتخاب کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -158,21 +164,42 @@ namespace Taadol.Views
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
 
-            NavigateToCompanyList();
+            // بعد از ثبت، فرم باز می‌ماند و فقط فیلدها پاک می‌شوند (بدون رفتن به لیست شرکت‌ها)
+            ClearForm();
         }
 
-        private void NavigateToCompanyList()
+        private void Cancel_Click(object sender, MouseButtonEventArgs e)
         {
-            var mainWindow = Window.GetWindow(this) as MainWindow;
-            mainWindow?.NavigateTo("company_list");
+            // اگر فیلدها خالی نباشند، ولیدیشن ذخیره/انصراف
+            if (HasContent())
+            {
+                var result = MessageBox.Show(
+                    "تغییراتی که ایجاد کرده‌اید ذخیره نشده است.\nآیا می‌خواهید آن‌ها را ذخیره کنید؟",
+                    "ذخیره تغییرات",
+                    MessageBoxButton.YesNoCancel,
+                    MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    SaveCompany();
+                    return;
+                }
+                if (result == MessageBoxResult.Cancel)
+                    return;
+            }
+
+            CloseForm();
         }
 
-        private void Cancel_Click(object sender, RoutedEventArgs e)
+        private bool HasContent()
         {
-            NavigateToCompanyList();
+            return !string.IsNullOrWhiteSpace(CompanyName)
+                || !string.IsNullOrWhiteSpace(OfficialName)
+                || FoundingDate.HasValue
+                || !string.IsNullOrWhiteSpace(ProductImage);
         }
 
-        private void HeaderClose_Click(object sender, MouseButtonEventArgs e)
+        private void CloseForm()
         {
             var mainWindow = Window.GetWindow(this) as MainWindow;
             if (mainWindow == null) return;
@@ -180,6 +207,12 @@ namespace Taadol.Views
                 mainWindow.CloseModal();
             else
                 mainWindow.CloseCurrentForm();
+        }
+
+        private void HeaderClose_Click(object sender, MouseButtonEventArgs e)
+        {
+            // دکمه X بدون سؤال مستقیم می‌بندد (مثل ویرایش شخص)
+            CloseForm();
         }
 
         private void ClearForm()
@@ -190,6 +223,9 @@ namespace Taadol.Views
             FoundingDate = null;
             ProductImage = "";
             IsBranchActive = true;
+
+            // پاک کردن بصری فیلد تاریخ (خود کنترل فیلدها را خالی می‌کند)
+            FoundingDatePicker?.Clear();
         }
 
         private bool IsOperationSucceeded(object operation)

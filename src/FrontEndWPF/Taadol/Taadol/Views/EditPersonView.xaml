@@ -143,14 +143,8 @@
 
             <!-- ═══ ردیف 0: هدر ═══ -->
             <Grid Grid.Row="0"
-                  Margin="10,15,10,12">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-
-                <StackPanel Grid.Column="0"
-                            Orientation="Horizontal"
+                  Margin="10,15,10,10">
+                <StackPanel Orientation="Horizontal"
                             VerticalAlignment="Center">
                     <Border Cursor="Hand"
                             Background="Transparent"
@@ -162,14 +156,12 @@
                                         Source="/Assets/Icons/closeTHIN.svg" />
                     </Border>
                     <TextBlock Text="مشخصات شخص"
-                               FontSize="18"
+                               FontSize="20"
                                FontWeight="Bold"
                                FontFamily="{StaticResource IRANSans}"
-                               Foreground="{StaticResource PrimaryBrush}"
+                               Foreground="#0D2159"
                                VerticalAlignment="Center" />
                 </StackPanel>
-
-            
             </Grid>
 
             <Border Grid.Row="0"
@@ -1253,6 +1245,7 @@
                     <!-- آیکون + متن یک واحد قابل‌کلیک هستند -->
                     <StackPanel Grid.Column="1"
                                 Orientation="Horizontal"
+                                Background="Transparent"
                                 Margin="0,0,20,0"
                                 VerticalAlignment="Center"
                                 HorizontalAlignment="Right"

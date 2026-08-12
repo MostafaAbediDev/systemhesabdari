@@ -74,15 +74,64 @@
                                 Margin="20,0,10,0"
                                 MouseLeftButtonDown="HeaderClose_Click">
                             <svg:SvgViewbox FlowDirection="LeftToRight"
-                                            Width="16"
-                                            Height="16"
+                                            Width="14"
+                                            Height="14"
                                             Source="/Assets/Icons/closeTHIN.svg" />
                         </Border>
                         <TextBlock Text="آرشیو شعبه"
                                    FontSize="20"
+                                   FontFamily="{StaticResource IRANSans}"
                                    FontWeight="Bold"
                                    Foreground="#0D2159"
                                    VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center"
+                                FlowDirection="LeftToRight">
+
+                        <controls:ActionButton Text="حذف"
+                                               TextColor="#DC2626"
+                                               BorderColor="#E9F0FF"
+                                               IconPath="/Assets/Icons/trash.svg"
+                                               Margin="10,0,0,0"
+                                               Click="BtnDelete_Click" />
+
+                        <controls:ActionButton Text="چاپ"
+                                               TextColor="#2563EB"
+                                               BorderColor="#E9F0FF"
+                                               IconPath="/Assets/Icons/printer.svg"
+                                               Margin="6,0,0,0"
+                                               Click="BtnPrint_Click"
+                                               Loaded="ActionButton_Loaded" />
+
+                        <controls:ActionButton Text="Excel"
+                                               TextColor="#374151"
+                                               BorderColor="#E5E7EB"
+                                               Margin="6,0,0,0" />
+
+                        <controls:ActionButton Text="PDF"
+                                               TextColor="#374151"
+                                               BorderColor="#E5E7EB"
+                                               Margin="6,0,0,0" />
+
+                        <controls:ActionButton Text="بروزرسانی"
+                                               TextColor="#2563EB"
+                                               IconPath="/Assets/Icons/arrow-reload-horizontal-2.svg"
+                                               Margin="6,0,0,0"
+                                               
+                                               Click="BtnRefresh_Click"
+                                               Loaded="ActionButton_Loaded_1" />
+
+                        <!-- X بستن -->
+                        <Border Cursor="Hand"
+                                Background="Transparent"
+                                Padding="6"
+                                VerticalAlignment="Center"
+                                Margin="6,0,0,0">
+                           
+                        </Border>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -317,22 +366,6 @@
                         </Border>
 
                         <!-- دکمه‌ها -->
-                        <StackPanel Grid.Column="2"
-                                    Orientation="Horizontal"
-                                    VerticalAlignment="Center"
-                                    FlowDirection="LeftToRight">
-                            <controls:ActionButton Text="حذف"
-                                                   TextColor="#DC2626"
-                                                   BorderColor="#E9F0FF"
-                                                   IconPath="/Assets/Icons/trash.svg"
-                                                   Margin="10,0,0,0"
-                                                   Click="BtnDelete_Click" />
-                            <controls:ActionButton Text="بروزرسانی"
-                                                   TextColor="#2563EB"
-                                                   IconPath="/Assets/Icons/arrow-reload-horizontal-2.svg"
-                                                   Margin="6,0,0,0"
-                                                   Click="BtnRefresh_Click" />
-                        </StackPanel>
                     </Grid>
                 </Border>
 
