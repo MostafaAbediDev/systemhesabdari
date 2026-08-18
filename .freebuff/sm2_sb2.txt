@@ -1,0 +1,52 @@
+﻿WINDOW size=1936x1056
+ELEMENTS=50
+[0] ControlType.Custom | name='' | id='' | en=True | off=False
+[1] ControlType.Text | name='ثبت شرکت' | id='' | en=True | off=False
+[2] ControlType.Pane | name='' | id='' | en=True | off=False
+[3] ControlType.Text | name='نام شرکت / کسب و کار' | id='' | en=True | off=False
+[4] ControlType.Custom | name='' | id='' | en=True | off=False
+[5] ControlType.Edit | name='' | id='PART_TextBox' | en=True | off=False
+[6] ControlType.Text | name='ایران خودرو' | id='PlaceholderText' | en=True | off=False
+[7] ControlType.Text | name='' | id='' | en=True | off=False
+[8] ControlType.Custom | name='' | id='CompanyActiveToggle' | en=True | off=False
+[9] ControlType.Text | name='شرکت فعال است' | id='LabelText' | en=True | off=False
+[10] ControlType.Text | name='نام رسمی ثبتی' | id='' | en=True | off=False
+[11] ControlType.Custom | name='' | id='' | en=True | off=False
+[12] ControlType.Edit | name='' | id='PART_TextBox' | en=True | off=False
+[13] ControlType.Text | name='ایران خودرو' | id='PlaceholderText' | en=True | off=False
+[14] ControlType.Text | name='تاریخ تاسیس' | id='' | en=True | off=False
+[15] ControlType.Custom | name='' | id='FoundingDatePicker' | en=True | off=False
+[16] ControlType.Edit | name='' | id='YearTextBox' | en=True | off=False
+[17] ControlType.Edit | name='' | id='MonthTextBox' | en=True | off=False
+[18] ControlType.Edit | name='' | id='DayTextBox' | en=True | off=False
+[19] ControlType.Custom | name='' | id='' | en=True | off=False
+[20] ControlType.Custom | name='' | id='SaveButton' | en=True | off=False
+[21] ControlType.Button | name='' | id='' | en=True | off=False
+[22] ControlType.Text | name='ثبت شرکت' | id='' | en=True | off=False
+[23] ControlType.Text | name='انصراف' | id='' | en=True | off=False
+[24] ControlType.Custom | name='' | id='root' | en=True | off=False
+[25] ControlType.Button | name='' | id='' | en=True | off=False
+[26] ControlType.Text | name='ثبت موقت' | id='' | en=True | off=False
+[27] ControlType.Text | name='شرکت های شما' | id='' | en=True | off=False
+[28] ControlType.ComboBox | name='' | id='CompanySelector' | en=True | off=False
+[29] ControlType.Edit | name='' | id='PART_EditableTextBox' | en=True | off=False
+[30] ControlType.Button | name='' | id='' | en=True | off=False
+[31] ControlType.Text | name='خروج از برنامه' | id='' | en=True | off=False
+[32] ControlType.Text | name='کاربر شماره یک' | id='' | en=True | off=False
+[33] ControlType.Text | name='حسابدار' | id='' | en=True | off=False
+[34] ControlType.Custom | name='' | id='Sidebar' | en=True | off=False
+[35] ControlType.Text | name='نرم افزار حسابداری تعادل' | id='LogoText' | en=True | off=False
+[36] ControlType.Custom | name='' | id='YearSelector' | en=True | off=False
+[37] ControlType.Text | name='شعبه ۵۰۰‏ | سال ۱۴۰۳‏' | id='YearText' | en=True | off=False
+[38] ControlType.Button | name='' | id='BtnToggleSidebar' | en=True | off=False
+[39] ControlType.Pane | name='' | id='' | en=True | off=False
+[40] ControlType.Button | name='' | id='BtnDashboard' | en=True | off=False
+[41] ControlType.Button | name='' | id='BtnProducts' | en=True | off=False
+[42] ControlType.Button | name='' | id='BtnPersons' | en=True | off=False
+[43] ControlType.Button | name='لیست اشخاص' | id='' | en=True | off=False
+[44] ControlType.Button | name='شخص جدید' | id='' | en=True | off=False
+[45] ControlType.Button | name='' | id='BtnBusinessInfo' | en=True | off=False
+[46] ControlType.Button | name='' | id='BtnWarehouse' | en=True | off=False
+[47] ControlType.Button | name='' | id='BtnBank' | en=True | off=False
+[48] ControlType.Button | name='' | id='BtnSales' | en=True | off=False
+[49] ControlType.Button | name='' | id='BtnReports' | en=True | off=False

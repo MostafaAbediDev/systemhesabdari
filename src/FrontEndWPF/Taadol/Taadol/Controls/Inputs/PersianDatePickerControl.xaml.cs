@@ -19,12 +19,48 @@ namespace Taadol.Controls
         nameof(SelectedDate),
         typeof(DateTime?),
         typeof(PersianDatePickerControl),
-        new PropertyMetadata(null));
+        new PropertyMetadata(null, OnSelectedDateChanged));
 
         public DateTime? SelectedDate
         {
             get => (DateTime?)GetValue(SelectedDateProperty);
             set => SetValue(SelectedDateProperty, value);
+        }
+
+        /// <summary>
+        /// وقتی SelectedDate از بیرون ست می‌شود (مثلاً لود فرم ویرایش)،
+        /// فیلدهای سال/ماه/روز با تاریخ شمسی همگام می‌شوند.
+        /// (این رویداد DateChanged را بالا نمی‌آورد؛ رویداد فقط برای انتخاب کاربر است.)
+        /// </summary>
+        private static void OnSelectedDateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            (d as PersianDatePickerControl)?.SyncFieldsFromSelectedDate();
+        }
+
+        private void SyncFieldsFromSelectedDate()
+        {
+            if (_isUpdating) return;
+            _isUpdating = true;
+            try
+            {
+                if (SelectedDate.HasValue)
+                {
+                    var date = SelectedDate.Value;
+                    YearTextBox.Text = ToPersianDigits(_pc.GetYear(date).ToString());
+                    MonthTextBox.Text = ToPersianDigits(_pc.GetMonth(date).ToString("D2"));
+                    DayTextBox.Text = ToPersianDigits(_pc.GetDayOfMonth(date).ToString("D2"));
+                }
+                else
+                {
+                    YearTextBox.Text = "";
+                    MonthTextBox.Text = "";
+                    DayTextBox.Text = "";
+                }
+            }
+            finally
+            {
+                _isUpdating = false;
+            }
         }
 
         public static readonly RoutedEvent DateChangedEvent =
@@ -475,19 +511,39 @@ namespace Taadol.Controls
             bool dayOk = int.TryParse(NormalizeDigits(DayTextBox.Text), out day);
             if (!yearOk || !monthOk || !dayOk)
             {
-                SelectedDate = null;
+                // فیلدها ناقص/خالی هستند: مقدار null می‌شود ولی فیلدهای دیگر پاک نمی‌شوند؛
+                // و رویداد بالا می‌آید تا فرم‌ها مقدار قبلی را اشتباهاً نگه ندارند.
+                SetSelectedDateGuarded(null);
+                RaiseEvent(new RoutedEventArgs(DateChangedEvent, this));
                 return;
             }
 
             try
             {
-
-                SelectedDate = _pc.ToDateTime(year, month, day, 0, 0, 0, 0);
+                SetSelectedDateGuarded(_pc.ToDateTime(year, month, day, 0, 0, 0, 0));
                 RaiseEvent(new RoutedEventArgs(DateChangedEvent, this));
             }
             catch
             {
-                SelectedDate = null;
+                SetSelectedDateGuarded(null);
+                RaiseEvent(new RoutedEventArgs(DateChangedEvent, this));
+            }
+        }
+
+        /// <summary>
+        /// ست کردن SelectedDate با guard: وقتی کاربر در حال تایپ/پاک کردن است،
+        /// callback همگام‌سازی نباید فیلدهای دیگر (ماه/روز) را پاک کند.
+        /// </summary>
+        private void SetSelectedDateGuarded(DateTime? value)
+        {
+            _isUpdating = true;
+            try
+            {
+                SelectedDate = value;
+            }
+            finally
+            {
+                _isUpdating = false;
             }
         }
         private string NormalizeDigits(string input)

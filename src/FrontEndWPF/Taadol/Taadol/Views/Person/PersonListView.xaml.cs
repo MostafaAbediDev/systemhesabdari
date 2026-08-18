@@ -37,10 +37,12 @@ namespace Taadol.Views
             ViewModel = new PersonListViewModel(App.ServiceProvider);
 
             DataContext = ViewModel;
+            UpdateEmptyStateMessage();
 
-            SearchBox.TextChanged += (s, e) =>
+            // جستجو با Debounce داخلی SearchBoxControl (پیش‌فرض ۳۰۰ms)
+            SearchBox.SearchTextChanged += (s, text) =>
             {
-                ViewModel.HandleSearchTextChanged(SearchBox.Text);
+                ViewModel.HandleSearchTextChanged(text);
                 Dispatcher.BeginInvoke(new Action(() =>
                 {
                     PersonsGrid.RefreshVisualState();
@@ -144,6 +146,38 @@ namespace Taadol.Views
             {
                 tabPersonnel.Tag = ViewModel.TabPersonnelCount;
             }
+
+            // پیام Empty State را با وضعیت فیلتر/جستجو هماهنگ کن
+            UpdateEmptyStateMessage();
+        }
+
+        /// <summary>
+        /// وقتی هیچ شخصی نمایش داده نمی‌شود، پیام وسط گرید بر اساس وضعیت فیلتر انتخاب می‌شود:
+        /// «هنوز شخصی ثبت نشده» برای حالت بدون داده، «موردی مطابق فیلتر پیدا نشد» برای فیلتر فعال.
+        /// </summary>
+        private void UpdateEmptyStateMessage()
+        {
+            if (PersonsGrid == null) return;
+
+            bool filterActive =
+                !string.IsNullOrWhiteSpace(ViewModel.SearchText) ||
+                ViewModel.SelectedStatuses.Count > 0 ||
+                ViewModel.SelectedProvinces.Count > 0 ||
+                ViewModel.SelectedCities.Count > 0 ||
+                ViewModel.SelectedLegalStatuses.Count > 0 ||
+                ViewModel.SelectedAccountStatuses.Count > 0 ||
+                (ViewModel.SelectedTabs.Count > 0 && !ViewModel.SelectedTabs.Contains("all"));
+
+            if (filterActive)
+            {
+                PersonsGrid.EmptyStateText = "موردی مطابق فیلتر پیدا نشد";
+                PersonsGrid.EmptyStateHintText = "فیلترها یا عبارت جستجو را تغییر دهید";
+            }
+            else
+            {
+                PersonsGrid.EmptyStateText = "هنوز شخصی ثبت نشده است";
+                PersonsGrid.EmptyStateHintText = "برای افزودن، از دکمه «+ شخص جدید» استفاده کنید";
+            }
         }
 
         private async void PersonListView_Loaded(object sender, RoutedEventArgs e)
@@ -200,8 +234,7 @@ namespace Taadol.Views
                     selectedItems.Add(item);
                 else
                 {
-                    MessageBox.Show("لطفاً یک شخص انتخاب کنید.", "خطا",
-                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    ToastManager.Warning("لطفاً یک شخص انتخاب کنید.");
                     return;
                 }
             }
@@ -221,7 +254,7 @@ namespace Taadol.Views
 
             try
             {
-                await ViewModel.DeleteSelectedAsync();
+                var (deletedCount, errors) = await ViewModel.DeleteSelectedAsync();
                 _isLoadedOnce = false;
 
                 // پنل‌های حذف‌شده‌ها حذف و بقیه‌ی انتخاب‌ها/جمع‌ها با لیست همگام شوند
@@ -229,13 +262,23 @@ namespace Taadol.Views
                 UpdateDetailPanels();
                 ViewModel.UpdateSummaryBar();
 
-                MessageBox.Show("عملیات حذف انجام شد.", "موفق",
-                    MessageBoxButton.OK, MessageBoxImage.Information);
+                if (errors.Count == 0)
+                {
+                    ToastManager.Success("عملیات حذف انجام شد.");
+                }
+                else
+                {
+                    var failed = string.Join("، ", errors.Take(3).Distinct());
+                    if (errors.Count > 3)
+                        failed += " و موارد دیگر";
+
+                    ToastManager.Warning(
+                        $"{ToPersianDigits(errors.Count)} مورد از اشخاص انتخاب‌شده حذف نشدند.{Environment.NewLine}{failed}");
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("خطا در حذف: " + ex.Message, "خطا",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                ToastManager.Error("خطا در حذف: " + ex.Message);
             }
         }
 
@@ -248,8 +291,7 @@ namespace Taadol.Views
             }
             else
             {
-                MessageBox.Show("لطفاً یک شخص انتخاب کنید.", "خطا",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                ToastManager.Warning("لطفاً یک شخص انتخاب کنید.");
             }
         }
 
@@ -343,12 +385,16 @@ namespace Taadol.Views
                 DetailPanelContainer.BeginAnimation(UIElement.OpacityProperty, fadeIn);
                 PanelHeaderText.BeginAnimation(UIElement.OpacityProperty, fadeIn);
                 BtnNewText.BeginAnimation(UIElement.OpacityProperty, fadeIn);
-                BtnToggleSidebar.Margin = new Thickness(332, 40, 0, 0);
+                var btnMarginAnim = new System.Windows.Media.Animation.ThicknessAnimation(
+                    new Thickness(332, 40, 0, 0), TimeSpan.FromMilliseconds(250));
+                btnMarginAnim.EasingFunction = ease;
+                BtnToggleSidebar.BeginAnimation(FrameworkElement.MarginProperty, btnMarginAnim);
                 DetailPanelColumn.BeginAnimation(System.Windows.Controls.ColumnDefinition.MaxWidthProperty, anim);
                 DetailPanelColumn.BeginAnimation(System.Windows.Controls.ColumnDefinition.MinWidthProperty, anim);
                 anim.Completed += (s, ev) =>
                 {
                     DetailPanelColumn.Width = new GridLength(340);
+                    BtnToggleSidebar.Margin = new Thickness(332, 40, 0, 0);
                 };
                 if (arrow != null) arrow.Angle = 0;
 
@@ -386,12 +432,16 @@ namespace Taadol.Views
                 DetailPanelContainer.BeginAnimation(UIElement.OpacityProperty, fadeOut);
                 PanelHeaderText.BeginAnimation(UIElement.OpacityProperty, fadeOut);
                 BtnNewText.BeginAnimation(UIElement.OpacityProperty, fadeOutBtnText);
-                BtnToggleSidebar.Margin = new Thickness(56, 40, 0, 0);
+                var btnMarginAnim = new System.Windows.Media.Animation.ThicknessAnimation(
+                    new Thickness(56, 40, 0, 0), TimeSpan.FromMilliseconds(250));
+                btnMarginAnim.EasingFunction = ease;
+                BtnToggleSidebar.BeginAnimation(FrameworkElement.MarginProperty, btnMarginAnim);
                 DetailPanelColumn.BeginAnimation(System.Windows.Controls.ColumnDefinition.MaxWidthProperty, anim);
                 DetailPanelColumn.BeginAnimation(System.Windows.Controls.ColumnDefinition.MinWidthProperty, anim);
                 anim.Completed += (s, ev) =>
                 {
                     DetailPanelColumn.Width = new GridLength(64);
+                    BtnToggleSidebar.Margin = new Thickness(56, 40, 0, 0);
 
                     // بعد از کامل‌شدن جمع‌شدن (متن دیگر نیست)، دکمه به حالت مربعی
                     // متمرکز فقط-آیکون می‌رود — بدون هیچ پرشی چون عرضش در این لحظه
@@ -556,13 +606,11 @@ namespace Taadol.Views
                 UpdateDetailPanels();
                 ViewModel.UpdateSummaryBar();
 
-                MessageBox.Show("عملیات حذف انجام شد.", "موفق",
-                    MessageBoxButton.OK, MessageBoxImage.Information);
+                ToastManager.Success("عملیات حذف انجام شد.");
             }
             catch (Exception ex)
             {
-                MessageBox.Show("خطا در حذف: " + ex.Message, "خطا",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                ToastManager.Error("خطا در حذف: " + ex.Message);
             }
         }
 
@@ -737,17 +785,20 @@ namespace Taadol.Views
             return sb.ToString();
         }
 
-        private void ActionButton_Loaded(object sender, RoutedEventArgs e) { }
-        private void ActionButton_Loaded_1(object sender, RoutedEventArgs e) { }
 
         private void BtnPrint_Click(object sender, RoutedEventArgs e)
         {
         }
 
-        private void PersonsGrid_Loaded(object sender, RoutedEventArgs e)
+        private static string ToPersianDigits(int number)
         {
-
+            string[] pd = { "۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹" };
+            var sb = new System.Text.StringBuilder();
+            foreach (char c in number.ToString())
+                sb.Append(char.IsDigit(c) ? pd[c - '0'] : c);
+            return sb.ToString();
         }
+
     }
 
     // ======================================================
@@ -765,12 +816,9 @@ namespace Taadol.Views
             get => _rowNumber;
             set
             {
-                if (_rowNumber != value)
-                {
-                    _rowNumber = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RowNumber)));
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RowNumberDisplay)));
-                }
+                _rowNumber = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RowNumber)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RowNumberDisplay)));
             }
         }
 

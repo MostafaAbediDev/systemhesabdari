@@ -1,0 +1,4 @@
+﻿RCLICK name='اریاگستر' at=1057,303
+after: alive=True responding=True memMB=219
+WIN[0] title='تعادل - نرم‌افزار حسابداری'
+CTXMENU_HITS=3

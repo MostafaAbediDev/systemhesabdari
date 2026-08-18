@@ -2,7 +2,10 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Threading;
 using Taadol.Controls;
 using Taadol.ViewModels;
 
@@ -11,17 +14,35 @@ namespace Taadol.Views
     public partial class BranchArchiveListView : UserControl
     {
         public BranchArchiveListViewModel ViewModel { get; }
+        private readonly DispatcherTimer _searchDebounceTimer;
         private bool _isLoadedOnce;
 
         public BranchArchiveListView()
         {
             InitializeComponent();
 
+            // ظاهر گرید آرشیو را دقیقاً شبیه جدول حساب‌های بانکی (BankAccountsTableControl) کن
+            ApplyBankTableStyle();
+
             ViewModel = new BranchArchiveListViewModel(App.ServiceProvider);
             DataContext = ViewModel;
 
-            HeaderSearchBox.TextChanged += (s, e) =>
+            // جستجو با Debounce: هر ضربه کلید مستقیم فیلتر سنگین را روی UI Thread اجرا نکند
+            _searchDebounceTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromMilliseconds(300)
+            };
+            _searchDebounceTimer.Tick += (s, e) =>
+            {
+                _searchDebounceTimer.Stop();
                 ViewModel.HandleSearchTextChanged(HeaderSearchBox.Text);
+            };
+
+            HeaderSearchBox.TextChanged += (s, e) =>
+            {
+                _searchDebounceTimer.Stop();
+                _searchDebounceTimer.Start();
+            };
 
             ArchivesGrid.NextPageRequested += (s, e) => ViewModel.GoToNextPage();
             ArchivesGrid.PreviousPageRequested += (s, e) => ViewModel.GoToPreviousPage();
@@ -57,6 +78,41 @@ namespace Taadol.Views
                 FilePicker.FileSelected += async (s, e) => await AddPickedFileAsync();
         }
 
+        // ─── ظاهر گرید شبیه جدول حساب‌های بانکی ───
+        // ردیف‌ها همه‌سفید (بدون یک‌درمیان) و هدر ستون‌های داخلی (چک‌باکس و شماره ردیف)
+        // هم خط زیرین نازک خاکستری بگیرند مثل بقیه ستون‌ها.
+        private void ApplyBankTableStyle()
+        {
+            // ردیف‌های یک‌درمیان خاکستری (#F8F8F8) خاموش می‌شود → همه ردیف‌ها سفید
+            ArchivesGrid.Grid.AlternationCount = 1;
+
+            // هدر ستون‌های داخلی: خط آبی ۲px → خاکستری ۱px (مثل جدول حساب‌های بانکی)
+            var gray = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E5E7EB"));
+            var builtInThicknesses = new[] { new Thickness(0, 0, 1, 1), new Thickness(0, 0, 1, 1) };
+            var cellStyle = (Style)FindResource("BankTableCellStyle");
+            for (int i = 0; i < 2 && i < ArchivesGrid.Grid.Columns.Count; i++)
+            {
+                var baseStyle = ArchivesGrid.Grid.Columns[i].HeaderStyle;
+                if (baseStyle == null) continue;
+                var s = new Style(typeof(DataGridColumnHeader), baseStyle);
+                s.Setters.Add(new Setter(Control.BorderBrushProperty, gray));
+                s.Setters.Add(new Setter(Control.BorderThicknessProperty, builtInThicknesses[i]));
+                ArchivesGrid.Grid.Columns[i].HeaderStyle = s;
+
+                // سلول‌های ستون‌های داخلی هم خط افقی خاکستری زیر ردیف بگیرند
+                ArchivesGrid.Grid.Columns[i].CellStyle = cellStyle;
+            }
+
+            // ستون شماره ردیف مثل بقیه فرم‌های گرید (۵۰px)
+            if (ArchivesGrid.Grid.Columns.Count > 1)
+            {
+                var rowNumberCol = ArchivesGrid.Grid.Columns[1];
+                rowNumberCol.Width = new DataGridLength(50);
+                rowNumberCol.MinWidth = 45;
+            }
+        }
+
+
         private void HeaderClose_Click(object sender, MouseButtonEventArgs e)
         {
             (Window.GetWindow(this) as MainWindow)?.CloseCurrentForm();
@@ -67,8 +123,6 @@ namespace Taadol.Views
             ToastManager.Warning("چاپ این بخش به‌زودی اضافه می‌شود.");
         }
 
-        private void ActionButton_Loaded(object sender, RoutedEventArgs e) { }
-        private void ActionButton_Loaded_1(object sender, RoutedEventArgs e) { }
 
         private async Task AddPickedFileAsync()
         {
@@ -78,8 +132,7 @@ namespace Taadol.Views
 
             if (branchId <= 0)
             {
-                MessageBox.Show("برای افزودن فایل، ابتدا یک شعبه انتخاب کنید.", "خطا",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                ToastManager.Warning("برای افزودن فایل، ابتدا یک شعبه انتخاب کنید.");
                 return;
             }
 
@@ -138,8 +191,7 @@ namespace Taadol.Views
             var selectedItems = ViewModel.GetSelectedItems();
             if (selectedItems.Count == 0)
             {
-                MessageBox.Show("لطفاً یک رکورد انتخاب کنید.", "خطا",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                ToastManager.Warning("لطفاً یک رکورد انتخاب کنید.");
                 return;
             }
 
@@ -168,12 +220,6 @@ namespace Taadol.Views
             {
                 ToastManager.Error("خطا در بروزرسانی: " + ex.Message);
             }
-        }
-
-        private void BtnSave_Click(object sender, RoutedEventArgs e)
-        {
-            // Save action - for now just show a message
-            MessageBox.Show("ذخیره شد", "موفقیت", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void CancelButton_Click(object sender, MouseButtonEventArgs e)

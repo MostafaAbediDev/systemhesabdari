@@ -1,0 +1,4 @@
+﻿CLICK BtnDashboard at=1800,176 rect=1688,154,223,44
+WIN[0] title='تعادل - نرم‌افزار حسابداری' cls='Window'
+DIALOG_PRESENT=False
+alive=True responding=True memMB=232

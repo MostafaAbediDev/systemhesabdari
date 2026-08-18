@@ -9,7 +9,7 @@
              FontFamily="{StaticResource IRANSans}"
              Background="Transparent">
 
-    <Border CornerRadius="12"
+    <Border CornerRadius="4"
             ClipToBounds="False"
             Background="#ffffff"
             VerticalAlignment="Stretch">
@@ -236,6 +236,7 @@
                                         <TextBlock Text="کد اقتصادی"
                                                    Style="{StaticResource FormLabel}" />
                                         <controls:ModernPersianTextBox Text="{Binding EconomicCode, UpdateSourceTrigger=PropertyChanged}"
+                                                                       InputType="Number"
                                                                        FlowDirection="LeftToRight"
                                                                        Placeholder="247000" />
                                     </StackPanel>
@@ -244,37 +245,18 @@
                                         <TextBlock Text="شماره ثبت"
                                                    Style="{StaticResource FormLabel}" />
                                         <controls:ModernPersianTextBox Text="{Binding RegisterNumber, UpdateSourceTrigger=PropertyChanged}"
-                                                                       FlowDirection="RightToLeft"
+                                                                       FlowDirection="LeftToRight"
                                                                        InputType="Number"
                                                                        Placeholder="2480" />
                                     </StackPanel>
-                                </Grid>
 
-                                <Grid Margin="0,5,0,4">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="1.5*" />
-                                        <ColumnDefinition Width="8" />
-                                        <ColumnDefinition Width="1.5*" />
-                                        <ColumnDefinition Width="8" />
-                                        <ColumnDefinition Width="1.5*" />
-                                    </Grid.ColumnDefinitions>
-
-                                    <StackPanel Grid.Column="0">
+                                    <StackPanel Grid.Column="4">
                                         <TextBlock Text="کد شعبه"
-                                                   Style="{StaticResource FormLabel}" />
-                                        <controls:ModernPersianTextBox Text="{Binding BranchCode, UpdateSourceTrigger=PropertyChanged}"
-                                                                       InputType="Number"
-                                                                       FlowDirection="LeftToRight"
-                                                                       Placeholder="کد شعبه" />
-                                    </StackPanel>
-
-                                    <StackPanel Grid.Column="2">
-                                        <TextBlock Text="شناسه ملی"
                                                    Style="{StaticResource FormLabel}" />
                                         <controls:ModernPersianTextBox Text="{Binding NationalId, UpdateSourceTrigger=PropertyChanged}"
                                                                        InputType="Number"
                                                                        FlowDirection="LeftToRight"
-                                                                       Placeholder="شناسه ملی را وارد کنید" />
+                                                                       Placeholder="554246" />
                                     </StackPanel>
                                 </Grid>
                             </StackPanel>
@@ -370,7 +352,7 @@
                                             <controls:ModernPersianTextBox Width="200"
                                                                            InputType="Number"
                                                                            MaxLength="11"
-                                                                           FlowDirection="RightToLeft"
+                                                                           FlowDirection="LeftToRight"
                                                                            Text="{Binding TelePhone, UpdateSourceTrigger=PropertyChanged}"
                                                                            Placeholder="071" />
                                         </StackPanel>
@@ -381,7 +363,7 @@
                                             <controls:ModernPersianTextBox Width="200"
                                                                            InputType="Number"
                                                                            MaxLength="11"
-                                                                           FlowDirection="RightToLeft"
+                                                                           FlowDirection="LeftToRight"
                                                                            Text="{Binding MobilePhone, UpdateSourceTrigger=PropertyChanged}"
                                                                            Placeholder="091" />
                                         </StackPanel>
@@ -390,7 +372,7 @@
                                             <TextBlock Text="ایمیل "
                                                        Style="{StaticResource FormLabel}" />
                                             <controls:ModernPersianTextBox Width="200"
-                                                                           InputType="Number"
+                                                                           InputType="Email"
                                                                            FlowDirection="LeftToRight"
                                                                            Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}"
                                                                            Placeholder="example@mail.com" />
@@ -433,7 +415,7 @@
                                         <controls:ModernPersianTextBox Text="{Binding PostCode, UpdateSourceTrigger=PropertyChanged}"
                                                                        InputType="Number"
                                                                        MaxLength="11"
-                                                                       FlowDirection="RightToLeft"
+                                                                       FlowDirection="LeftToRight"
                                                                        Placeholder="74100" />
                                     </StackPanel>
 
@@ -485,7 +467,7 @@
                                         <controls:ModernPersianTextBox x:Name="LatitudeField"
                                                                        Text="{Binding LatitudeText, UpdateSourceTrigger=PropertyChanged}"
                                                                        InputType="Text"
-                                                                       FlowDirection="RightToLeft"
+                                                                       FlowDirection="LeftToRight"
                                                                        Width="170"
                                                                        Placeholder="35.6892" />
                                     </StackPanel>
@@ -496,7 +478,7 @@
                                         <controls:ModernPersianTextBox x:Name="LongitudeField"
                                                                        Text="{Binding LongitudeText, UpdateSourceTrigger=PropertyChanged}"
                                                                        InputType="Text"
-                                                                       FlowDirection="RightToLeft"
+                                                                       FlowDirection="LeftToRight"
                                                                        Width="170"
                                                                        Placeholder="51.3890" />
                                     </StackPanel>
@@ -596,7 +578,7 @@
                     Margin="0,5,0,0"
                     BorderBrush="#E5E7EB"
                     BorderThickness="0,1,0,0"
-                    CornerRadius="0,0,12,12"
+                    CornerRadius="0,0,4,4"
                     Background="White">
                 <Grid Margin="16,10"
                       FlowDirection="RightToLeft">

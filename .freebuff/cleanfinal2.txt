@@ -1,0 +1,5 @@
+﻿INVOKED 'شخص جدید' (clean modal)
+DIALOG_PRESENT=False
+MODAL_CLOSED=False
+PERSON_NEW_VIEW_VISIBLE=True
+alive=True responding=True

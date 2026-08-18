@@ -8,6 +8,7 @@ using PersonManagement.Application.Contract.Persons;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Taadol.Models;
@@ -17,6 +18,10 @@ namespace Taadol.ViewModels
 {
     public partial class PersonListViewModel : ObservableObject
     {
+        // فرهنگ ثابت fa-IR برای فرمت مبلغ: رقم فارسی + جداکننده هزارگان «٬»
+        // (به فرهنگ سیستم وابسته نیست تا روی ویندوز انگلیسی «،» لاتین نمایش ندهد)
+        private static readonly CultureInfo AmountCulture = CultureInfo.GetCultureInfo("fa-IR");
+
         private readonly IServiceProvider _serviceProvider;
 
         private int _totalPages = 1;
@@ -182,7 +187,10 @@ namespace Taadol.ViewModels
                 var sp = scope.ServiceProvider;
 
                 var personApp = sp.GetRequiredService<IPersonApplication>();
-                var persons = personApp.GetPersons() ?? new List<PersonViewModel>();
+                var persons = (personApp.GetPersons() ?? new List<PersonViewModel>())
+                    .GroupBy(p => p.Id)
+                    .Select(g => g.First())
+                    .ToList();
                 var personIds = persons.Select(p => p.Id).ToList();
 
                 var allContacts = new List<PersonContactViewModel>();
@@ -299,7 +307,7 @@ namespace Taadol.ViewModels
                         TransactionType = p.CreditLimit > 0 ? "بدهکار" : (p.AvailableCredit > 0 ? "بستانکار" : ""),
                         TransactionDate = p.CreditLimit > 0 || p.AvailableCredit > 0 ? "—" : "",
                         AccountStatus = p.CreditLimit > 0 ? "بدهکار" : (p.AvailableCredit > 0 ? "بستانکار" : "بی حساب"),
-                        BalanceDisplay = p.CreditLimit > 0 ? p.CreditLimit.ToString("N0") : (p.AvailableCredit > 0 ? p.AvailableCredit.ToString("N0") : ""),
+                        BalanceDisplay = p.CreditLimit > 0 ? FormatAmount(p.CreditLimit) : (p.AvailableCredit > 0 ? FormatAmount(p.AvailableCredit) : ""),
                         IsLegal = p.IsLegal,
                         PersonType = p.PersonType,
                         IsSelected = selectedIds.Contains(p.Id),
@@ -312,10 +320,17 @@ namespace Taadol.ViewModels
                 UpdateTabCounts();
                 ApplyFilters();
             }
-            catch
+            catch (Exception ex)
             {
-                AllPersons = new ObservableCollection<PersonItem>();
-                ApplyFilters();
+                // خطا را بی‌صدا نبلع: اگر رفرش بعد از ثبت شکست بخورد،
+                // لیست قبلی حفظ می‌شود و کاربر پیام می‌گیرد (به‌جای «۰ از ۰» گمراه‌کننده).
+                System.Diagnostics.Debug.WriteLine($"[ERROR] PersonListViewModel.LoadDataAsync: {ex}");
+
+                if (AllPersons == null || AllPersons.Count == 0)
+                {
+                    AllPersons = new ObservableCollection<PersonItem>();
+                    ApplyFilters();
+                }
             }
             finally
             {
@@ -390,16 +405,6 @@ namespace Taadol.ViewModels
                 pageItems[i].RowNumber = ((CurrentPage - 1) * PageSize) + i + 1;
 
             FilteredPersons = new ObservableCollection<PersonItem>(pageItems);
-
-            int realCount = FilteredPersons.Count;
-            for (int i = realCount + 1; i <= PageSize; i++)
-            {
-                FilteredPersons.Add(new PersonItem
-                {
-                    RowNumber = 0,
-                    IsEmpty = true
-                });
-            }
 
             BuildPages();
             UpdatePageInfo();
@@ -528,7 +533,7 @@ namespace Taadol.ViewModels
             long totalCredit = 0;
             foreach (var p in validPersons)
             {
-                if (long.TryParse(p.BalanceDisplay?.Replace(",", "").Trim(), out long bal))
+                if (TryParseAmount(p.BalanceDisplay, out long bal))
                 {
                     if (p.AccountStatus == "بدهکار")
                         totalDebit += bal;
@@ -537,14 +542,14 @@ namespace Taadol.ViewModels
                 }
             }
 
-            TotalDebitText = $"{totalDebit.ToString("N0")} ریال";
-            TotalCreditText = $"{totalCredit.ToString("N0")} ریال";
+            TotalDebitText = $"{FormatAmount(totalDebit)} ریال";
+            TotalCreditText = $"{FormatAmount(totalCredit)} ریال";
 
             long selectedDebit = 0;
             long selectedCredit = 0;
             foreach (var p in selectedItems)
             {
-                if (long.TryParse(p.BalanceDisplay?.Replace(",", "").Trim(), out long bal))
+                if (TryParseAmount(p.BalanceDisplay, out long bal))
                 {
                     if (p.AccountStatus == "بدهکار")
                         selectedDebit += bal;
@@ -561,16 +566,22 @@ namespace Taadol.ViewModels
                 SelectedTotalTextColor = "#DC2626";
             else
                 SelectedTotalTextColor = "#374151";
-            SelectedTotalText = $"{Math.Abs(selectedNet).ToString("N0")} ریال";
+            SelectedTotalText = $"{FormatAmount(Math.Abs(selectedNet))} ریال";
             SelectedCountText = $"({selectedItems.Count})";
         }
 
-        public async Task DeleteSelectedAsync()
+        /// <summary>
+        /// حذف گروهی اشخاص انتخاب‌شده.
+        /// نتیجه هر حذف جمع‌آوری می‌شود تا کاربر نتیجه واقعی (موفق/ناموفق) را ببیند،
+        /// نه اینکه خطاها فقط در Debug نوشته شوند.
+        /// </summary>
+        public async Task<(int DeletedCount, List<string> Errors)> DeleteSelectedAsync()
         {
             var selectedItems = GetSelectedItems();
-            if (selectedItems.Count == 0) return;
+            if (selectedItems.Count == 0) return (0, new List<string>());
 
             var idsToDelete = selectedItems.Select(p => p.Id).ToList();
+            var errors = new List<string>();
 
             await Task.Run(() =>
             {
@@ -579,14 +590,13 @@ namespace Taadol.ViewModels
                 foreach (var id in idsToDelete)
                 {
                     var op = personApp.Remove(id);
-                    if (!op.IsSucceeded)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"Failed to delete person {id}: {op.Message}");
-                    }
+                    if (!op.IsSucceeded && !string.IsNullOrWhiteSpace(op.Message))
+                        errors.Add(op.Message);
                 }
             });
 
             await LoadDataAsync();
+            return (idsToDelete.Count - errors.Count, errors);
         }
 
         public async Task DeletePersonAsync(PersonItem item)
@@ -746,6 +756,52 @@ namespace Taadol.ViewModels
             foreach (char c in number.ToString())
                 result += persianDigits[int.Parse(c.ToString())];
             return result;
+        }
+
+        /// <summary>رقم‌های انگلیسی داخل رشته را به فارسی تبدیل می‌کند؛ بقیه دست‌نخورده می‌ماند.</summary>
+        private static string ToPersianDigits(string input)
+        {
+            if (string.IsNullOrEmpty(input)) return input;
+            var result = new char[input.Length];
+            for (int i = 0; i < input.Length; i++)
+            {
+                char c = input[i];
+                result[i] = c >= '0' && c <= '9' ? (char)('۰' + (c - '0')) : c;
+            }
+            return new string(result);
+        }
+
+        /// <summary>
+        /// فرمت ثابت مبلغ: رقم فارسی + جداکننده هزارگان «٬» (مستقل از فرهنگ سیستم).
+        /// مثال: 1234567 → «۱٬۲۳۴٬۵۶۷»
+        /// رقم‌ها همین‌جا فارسی می‌شوند (نه فقط در لایه رندر) تا سلول‌هایی که رفتار
+        /// NumberFontBehavior را ندارند (Run صریح) هم رقم فارسی نشان بدهند.
+        /// </summary>
+        private static string FormatAmount(decimal value)
+            => ToPersianDigits(value.ToString("N0", AmountCulture));
+
+        /// <summary>
+        /// پارس مبلغ نمایش‌داده‌شده (رقم فارسی/لاتین و جداکننده «٬» یا «،» لاتین را می‌پذیرد).
+        /// </summary>
+        private static bool TryParseAmount(string text, out long value)
+        {
+            value = 0;
+            if (string.IsNullOrWhiteSpace(text)) return false;
+            var normalized = ToAsciiDigits(text).Replace("٬", "").Replace(",", "").Trim();
+            return long.TryParse(normalized, out value);
+        }
+
+        /// <summary>رقم‌های فارسی داخل رشته را به انگلیسی برمی‌گرداند (برای Parse عددی).</summary>
+        private static string ToAsciiDigits(string input)
+        {
+            if (string.IsNullOrEmpty(input)) return input;
+            var result = new char[input.Length];
+            for (int i = 0; i < input.Length; i++)
+            {
+                char c = input[i];
+                result[i] = c >= '۰' && c <= '۹' ? (char)('0' + (c - '۰')) : c;
+            }
+            return new string(result);
         }
 
         private static string ToPersianNumber(int number) => ToPersianNumber((long)number);

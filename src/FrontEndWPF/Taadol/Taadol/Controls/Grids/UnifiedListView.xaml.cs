@@ -21,6 +21,9 @@ namespace Taadol.Controls
     {
         private bool _scrollWired = false;
         private bool _builtColumnsHandled = false;
+        // فقط بعد از اولین ست شدن ItemsSource پیام خالی نمایش داده می‌شود؛
+        // وگرنه قبل از شروع لود، فلش خالی وسط گرید دیده می‌شود.
+        private bool _itemsSourceEverSet = false;
 
         public UnifiedListView()
         {
@@ -63,7 +66,26 @@ namespace Taadol.Controls
                 {
                     var control = (UnifiedListView)d;
                     if (control.DataGridView != null)
+                    {
+                        // ابتدا ItemsSource را null کن تا کانتینرهای قدیمی (ردیف‌های صفحه قبلی)
+                        // کاملاً تخریب شوند؛ وگرنه با reuse شدن کانتینرها و اشتراک آیتم‌ها،
+                        // شماره ردیف قدیمی/تکراری نمایش داده می‌شود.
+                        control.DataGridView.ItemsSource = null;
                         control.DataGridView.ItemsSource = control.ItemsSource;
+
+                        // بعد از تغییر صفحه/فیلتر، وضعیت چک‌باکس سرستون باید دوباره محاسبه شود
+                        // (چک‌باکس هدر فقط وقتی روشن است که همه‌ی ردیف‌های همین صفحه انتخاب باشند).
+                        control.Dispatcher.BeginInvoke(new Action(() => control.RefreshVisualState()),
+                            DispatcherPriority.Background);
+
+                        // با تغییر صفحه/فیلتر، اسکرول عمودی باید به بالای لیست برگردد؛
+                        // وگرنه کاربر در وسط/انتهای صفحه‌ی قبلی می‌ماند و ردیف‌های خالی/بی‌ساختار را می‌بیند.
+                        control.Dispatcher.BeginInvoke(new Action(control.ScrollGridToTop),
+                            DispatcherPriority.Background);
+
+                        control._itemsSourceEverSet = true;
+                        control.UpdateEmptyState();
+                    }
                 }));
 
         public IEnumerable ItemsSource
@@ -108,12 +130,83 @@ namespace Taadol.Controls
                 {
                     var control = (UnifiedListView)d;
                     control.ShowLoading(e.NewValue as bool? == true);
+                    control.UpdateEmptyState();
                 }));
 
         public bool IsLoading
         {
             get => (bool)GetValue(IsLoadingProperty);
             set => SetValue(IsLoadingProperty, value);
+        }
+
+        // ══════════════════════════════════════════════════════
+        //  Empty State (وقتی هیچ رکورد واقعی‌ای وجود ندارد)
+        // ══════════════════════════════════════════════════════
+
+        /// <summary>
+        /// وقتی true باشد، اگر ItemsSource هیچ رکورد واقعی (غیر از ردیف‌های خالی پرکننده) نداشته باشد،
+        /// پیام خالی وسط گرید نمایش داده می‌شود. به‌طور پیش‌فرض true است تا همه لیست‌ها یکسان رفتار کنند.
+        /// </summary>
+        public static readonly DependencyProperty ShowEmptyStateProperty =
+            DependencyProperty.Register(nameof(ShowEmptyState), typeof(bool), typeof(UnifiedListView),
+                new PropertyMetadata(true, (d, _) => ((UnifiedListView)d).UpdateEmptyState()));
+
+        public bool ShowEmptyState
+        {
+            get => (bool)GetValue(ShowEmptyStateProperty);
+            set => SetValue(ShowEmptyStateProperty, value);
+        }
+
+        /// <summary>متن اصلی پیام خالی (فرم می‌تواند آن را سفارشی کند).</summary>
+        public static readonly DependencyProperty EmptyStateTextProperty =
+            DependencyProperty.Register(nameof(EmptyStateText), typeof(string), typeof(UnifiedListView),
+                new PropertyMetadata("موردی یافت نشد", (d, _) => ((UnifiedListView)d).ApplyEmptyStateTexts()));
+
+        public string EmptyStateText
+        {
+            get => (string)GetValue(EmptyStateTextProperty);
+            set => SetValue(EmptyStateTextProperty, value);
+        }
+
+        /// <summary>زیرنویس کوچک پیام خالی (فرم می‌تواند آن را سفارشی کند).</summary>
+        public static readonly DependencyProperty EmptyStateHintTextProperty =
+            DependencyProperty.Register(nameof(EmptyStateHintText), typeof(string), typeof(UnifiedListView),
+                new PropertyMetadata("برای افزودن، از دکمه «جدید» استفاده کنید", (d, _) => ((UnifiedListView)d).ApplyEmptyStateTexts()));
+
+        public string EmptyStateHintText
+        {
+            get => (string)GetValue(EmptyStateHintTextProperty);
+            set => SetValue(EmptyStateHintTextProperty, value);
+        }
+
+        private void ApplyEmptyStateTexts()
+        {
+            if (EmptyStateTextBlock != null)
+                EmptyStateTextBlock.Text = EmptyStateText ?? "";
+            if (EmptyStateHintBlock != null)
+                EmptyStateHintBlock.Text = EmptyStateHintText ?? "";
+        }
+
+        private void UpdateEmptyState()
+        {
+            if (EmptyStateOverlay == null) return;
+
+            var hasRealItems = false;
+            if (ItemsSource != null)
+            {
+                foreach (var item in ItemsSource)
+                {
+                    if (item is IListRowItem row && !row.IsEmpty)
+                    {
+                        hasRealItems = true;
+                        break;
+                    }
+                }
+            }
+
+            // لودینگ اولویت دارد؛ و پیام فقط بعد از اولین بارگذاری نمایش داده می‌شود
+            var show = ShowEmptyState && _itemsSourceEverSet && !hasRealItems && !IsLoading;
+            EmptyStateOverlay.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public static readonly DependencyProperty ShowRowNumberProperty =
@@ -287,7 +380,14 @@ namespace Taadol.Controls
             while (element != null)
             {
                 if (element is T match) return match;
-                element = VisualTreeHelper.GetParent(element);
+
+                // راست‌کلیک/کلیک روی متن سلول، OriginalSource را یک Run (ContentElement)
+                // می‌کند که Visual نیست؛ VisualTreeHelper.GetParent روی آن
+                // InvalidOperationException می‌اندازد (باگ Runtime تأییدشده).
+                // برای عناصر غیر-Visual از LogicalTree پدر را بالا می‌رویم.
+                element = element is Visual || element is System.Windows.Media.Media3D.Visual3D
+                    ? VisualTreeHelper.GetParent(element)
+                    : LogicalTreeHelper.GetParent(element);
             }
             return null;
         }
@@ -505,6 +605,14 @@ namespace Taadol.Controls
                 sv.ScrollChanged += (s, _) =>
                     Dispatcher.BeginInvoke(new Action(UpdateRowBorders), DispatcherPriority.Background);
             }
+        }
+
+        /// <summary>اسکرول عمودی گرید را به بالای لیست برمی‌گرداند (بعد از تغییر صفحه/فیلتر).</summary>
+        private void ScrollGridToTop()
+        {
+            if (DataGridView == null) return;
+            if (FindDescendantByName(DataGridView, "DG_ScrollViewer") is ScrollViewer sv)
+                sv.ScrollToVerticalOffset(0);
         }
     }
 }

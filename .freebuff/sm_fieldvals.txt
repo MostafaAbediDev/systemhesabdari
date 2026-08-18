@@ -1,0 +1,8 @@
+﻿FirstNameInput = [QA]
+LastNameInput = [Bulk2]
+NationalCodeInput = [۰۴۹۹۳۷۰۸۹۹]
+PhoneInput = []
+MobileInput = []
+EmailInput = []
+CreditLimitInput = NOT_PRESENT
+CodeInput = NOT_PRESENT

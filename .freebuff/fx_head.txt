@@ -1,0 +1,16 @@
+﻿type=ControlType.Text name='اریاگستر' id='PersonNameText' rect=1569,253,43,20
+type=ControlType.Text name='فعال' id='ActiveStatusText' rect=1537,255,20,15
+type=ControlType.Button name='' id='SelectAllBorder' rect=1288,252,20,20
+type=ControlType.Text name='#' id='' rect=1247,252,8,20
+type=ControlType.Text name='کد یکتا' id='' rect=1163,252,37,20
+type=ControlType.Text name='نام کامل / شرکت' id='' rect=1012,252,88,20
+type=ControlType.Text name='ویژگی' id='' rect=928,252,31,20
+type=ControlType.Button name='' id='' rect=904,254,16,16
+type=ControlType.Text name='ویژگی' id='' rect=928,252,31,20
+type=ControlType.Button name='' id='' rect=904,254,16,16
+type=ControlType.Text name='موبایل' id='' rect=731,252,36,20
+type=ControlType.Text name='شهر' id='' rect=640,252,21,20
+type=ControlType.Button name='' id='' rect=616,254,16,16
+type=ControlType.Text name='آخرین تراکنش' id='' rect=492,252,74,20
+type=ControlType.Text name='مانده / وضعیت حساب' id='' rect=206,252,119,20
+type=ControlType.Button name='' id='' rect=182,254,16,16

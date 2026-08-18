@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Threading;
 using Taadol.Controls;
 
 namespace Taadol.Views
@@ -26,9 +27,10 @@ namespace Taadol.Views
 
             LoadTestData();
 
-            ProductSearchBox.TextChanged += (s, e) =>
+            // جستجو با Debounce داخلی SearchBoxControl (پیش‌فرض ۳۰۰ms)
+            ProductSearchBox.SearchTextChanged += (s, text) =>
             {
-                _searchText = ProductSearchBox.Text.Trim();
+                _searchText = text.Trim();
                 ApplyFilter();
             };
 
@@ -51,8 +53,6 @@ namespace Taadol.Views
             ApplyFilter();
         }
 
-        private void ActionButton_Loaded(object sender, RoutedEventArgs e) { }
-        private void ActionButton_Loaded_1(object sender, RoutedEventArgs e) { }
 
         private void LoadTestData()
         {
@@ -367,16 +367,6 @@ namespace Taadol.Views
                 }
             }
 
-            int realCount = FilteredItems.Count;
-            for (int i = realCount + 1; i <= _pageSize; i++)
-            {
-                FilteredItems.Add(new ItemBase
-                {
-                    RowNumber = i,
-                    IsEmpty = true
-                });
-            }
-
             if (ProductsDataGrid != null)
             {
                 ProductsDataGrid.ItemsSource = FilteredItems;
@@ -444,7 +434,7 @@ namespace Taadol.Views
 
         private void BtnMore_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("منوی بیشتر", "عملیات", MessageBoxButton.OK, MessageBoxImage.Information);
+            ToastManager.Info("منوی بیشتر");
         }
 
         private void BtnDelete_Click(object sender, RoutedEventArgs e)
@@ -473,8 +463,7 @@ namespace Taadol.Views
             }
             else
             {
-                MessageBox.Show("لطفاً یک مورد انتخاب کنید.", "خطا",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                ToastManager.Warning("لطفاً یک مورد انتخاب کنید.");
             }
         }
 
@@ -482,38 +471,35 @@ namespace Taadol.Views
         {
             if (ProductsDataGrid.SelectedItem is ItemBase item && !item.IsEmpty)
             {
-                MessageBox.Show($"ویرایش: {item.Name}", "ویرایش مورد",
-                    MessageBoxButton.OK, MessageBoxImage.Information);
+                ToastManager.Info($"ویرایش: {item.Name}");
             }
             else
             {
-                MessageBox.Show("لطفاً یک مورد انتخاب کنید.", "خطا",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                ToastManager.Warning("لطفاً یک مورد انتخاب کنید.");
             }
         }
 
         private void BtnNew_Click(object sender, RoutedEventArgs e)
         {
             string typeText = _currentType == "products" ? "کالا" : "خدمت";
-            MessageBox.Show($"فرم {typeText} جدید", $"{typeText} جدید",
-                MessageBoxButton.OK, MessageBoxImage.Information);
+            ToastManager.Info($"فرم {typeText} جدید");
         }
 
         private void BtnNextPage_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("صفحه بعدی");
+            ToastManager.Info("صفحه بعدی");
         }
 
         private void BtnPrevPage_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("صفحه قبلی");
+            ToastManager.Info("صفحه قبلی");
         }
 
         private void BtnPage_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn && btn.Tag != null)
             {
-                MessageBox.Show($"صفحه {btn.Tag}");
+                ToastManager.Info($"صفحه {btn.Tag}");
             }
         }
 
@@ -557,7 +543,7 @@ namespace Taadol.Views
 
 
         public string RowNumberDisplay =>
-            RowNumber > 0 ? ToPersianNumber(RowNumber) : "";
+            RowNumber > 0 && !IsEmpty ? ToPersianNumber(RowNumber) : "";
 
         public string PurchasePriceFormatted =>
             IsEmpty || PurchasePrice == 0 ? "" : $"{PurchasePrice:N0} ریال";

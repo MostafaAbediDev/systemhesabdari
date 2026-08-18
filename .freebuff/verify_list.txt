@@ -1,0 +1,96 @@
+﻿WINDOW size=1936x1056
+ELEMENTS=94
+[0] ControlType.Custom | name='' | id='' | en=True | off=False
+[1] ControlType.Text | name='لیست اشخاص' | id='' | en=True | off=False
+[2] ControlType.Custom | name='' | id='Root' | en=True | off=False
+[3] ControlType.Text | name='حذف' | id='BtnText' | en=True | off=False
+[4] ControlType.Custom | name='' | id='Root' | en=True | off=False
+[5] ControlType.Text | name='چاپ' | id='BtnText' | en=True | off=False
+[6] ControlType.Custom | name='' | id='Root' | en=True | off=False
+[7] ControlType.Text | name='Excel' | id='BtnText' | en=True | off=False
+[8] ControlType.Custom | name='' | id='Root' | en=True | off=False
+[9] ControlType.Text | name='PDF' | id='BtnText' | en=True | off=False
+[10] ControlType.Custom | name='' | id='Root' | en=True | off=False
+[11] ControlType.Text | name='بروزرسانی' | id='BtnText' | en=True | off=False
+[12] ControlType.Text | name='اشخاص انتخاب شده' | id='PanelHeaderText' | en=True | off=False
+[13] ControlType.Text | name='' | id='SelectedCountText' | en=True | off=False
+[14] ControlType.Pane | name='' | id='DetailPanelScroll' | en=True | off=False
+[15] ControlType.Text | name='شخص جدید' | id='BtnNewText' | en=True | off=False
+[16] ControlType.Edit | name='' | id='SearchBox' | en=True | off=False
+[17] ControlType.Text | name='جستجو در نام ، شماره موبایل' | id='' | en=True | off=False
+[18] ControlType.Button | name='همه اشخاص' | id='tabAll' | en=True | off=False
+[19] ControlType.Button | name='مشتری' | id='tabCustomers' | en=True | off=False
+[20] ControlType.Button | name='تامین کننده' | id='tabSuppliers' | en=True | off=False
+[21] ControlType.Button | name='پرسنل' | id='tabPersonnel' | en=True | off=False
+[22] ControlType.Custom | name='' | id='PersonsGrid' | en=True | off=False
+[23] ControlType.DataGrid | name='' | id='DataGridView' | en=True | off=False
+[24] ControlType.Header | name='' | id='PART_ColumnHeadersPresenter' | en=True | off=False
+[25] ControlType.HeaderItem | name='' | id='' | en=True | off=False
+[26] ControlType.Button | name='' | id='SelectAllBorder' | en=True | off=False
+[27] ControlType.HeaderItem | name='#' | id='' | en=True | off=False
+[28] ControlType.Text | name='#' | id='' | en=True | off=False
+[29] ControlType.HeaderItem | name='کد یکتا' | id='' | en=True | off=False
+[30] ControlType.Text | name='کد یکتا' | id='' | en=True | off=False
+[31] ControlType.HeaderItem | name='نام کامل / شرکت' | id='' | en=True | off=False
+[32] ControlType.Text | name='نام کامل / شرکت' | id='' | en=True | off=False
+[33] ControlType.HeaderItem | name='' | id='' | en=True | off=False
+[34] ControlType.Text | name='ویژگی' | id='' | en=True | off=False
+[35] ControlType.Button | name='' | id='' | en=True | off=False
+[36] ControlType.HeaderItem | name='' | id='' | en=True | off=False
+[37] ControlType.Text | name='ویژگی' | id='' | en=True | off=False
+[38] ControlType.Button | name='' | id='' | en=True | off=False
+[39] ControlType.HeaderItem | name='موبایل' | id='' | en=True | off=False
+[40] ControlType.Text | name='موبایل' | id='' | en=True | off=False
+[41] ControlType.HeaderItem | name='' | id='' | en=True | off=False
+[42] ControlType.Text | name='شهر' | id='' | en=True | off=False
+[43] ControlType.Button | name='' | id='' | en=True | off=False
+[44] ControlType.HeaderItem | name='آخرین تراکنش' | id='' | en=True | off=False
+[45] ControlType.Text | name='آخرین تراکنش' | id='' | en=True | off=False
+[46] ControlType.HeaderItem | name='' | id='' | en=True | off=False
+[47] ControlType.Text | name='مانده / وضعیت حساب' | id='' | en=True | off=False
+[48] ControlType.Button | name='' | id='' | en=True | off=False
+[49] ControlType.Text | name='در حال بارگذاری اطلاعات' | id='' | en=True | off=False
+[50] ControlType.Text | name='لطفاً چند لحظه صبر کنید...' | id='' | en=True | off=False
+[51] ControlType.Custom | name='' | id='PaginationBar' | en=True | off=False
+[52] ControlType.Button | name='' | id='' | en=True | off=False
+[53] ControlType.List | name='' | id='PageButtonsItemsControl' | en=True | off=False
+[54] ControlType.Button | name='' | id='' | en=True | off=False
+[55] ControlType.Custom | name='' | id='PageSizeSelector' | en=True | off=False
+[56] ControlType.Text | name='۱۵' | id='SelectedText' | en=True | off=False
+[57] ControlType.Text | name='' | id='PageInfoText' | en=True | off=False
+[58] ControlType.Custom | name='' | id='RowContextMenu' | en=True | off=False
+[59] ControlType.Text | name='جمع بدهکار' | id='' | en=True | off=False
+[60] ControlType.Text | name='' | id='TotalDebitText' | en=True | off=False
+[61] ControlType.Text | name='جمع بستانکار' | id='' | en=True | off=False
+[62] ControlType.Text | name='' | id='TotalCreditText' | en=True | off=False
+[63] ControlType.Text | name='' | id='SelectedSummaryText' | en=True | off=False
+[64] ControlType.Text | name='۰ ریال' | id='SelectedTotalText' | en=True | off=False
+[65] ControlType.Button | name='' | id='BtnToggleSidebar' | en=True | off=False
+[66] ControlType.Text | name='راهنما  F1' | id='' | en=True | off=False
+[67] ControlType.Text | name='بروزرسانی  F5' | id='' | en=True | off=False
+[68] ControlType.Text | name='انتخاب ردیف  F8' | id='' | en=True | off=False
+[69] ControlType.Text | name='تمام صفحه  F11' | id='' | en=True | off=False
+[70] ControlType.Text | name='ذخیره نام جدید  F12' | id='' | en=True | off=False
+[71] ControlType.Text | name='شرکت های شما' | id='' | en=True | off=False
+[72] ControlType.ComboBox | name='' | id='CompanySelector' | en=True | off=False
+[73] ControlType.Edit | name='' | id='PART_EditableTextBox' | en=True | off=False
+[74] ControlType.Button | name='' | id='' | en=True | off=False
+[75] ControlType.Text | name='خروج از برنامه' | id='' | en=True | off=False
+[76] ControlType.Text | name='کاربر شماره یک' | id='' | en=True | off=False
+[77] ControlType.Text | name='حسابدار' | id='' | en=True | off=False
+[78] ControlType.Custom | name='' | id='Sidebar' | en=True | off=False
+[79] ControlType.Text | name='نرم افزار حسابداری تعادل' | id='LogoText' | en=True | off=False
+[80] ControlType.Custom | name='' | id='YearSelector' | en=True | off=False
+[81] ControlType.Text | name='شعبه ۵۰۰‏ | سال ۱۴۰۳‏' | id='YearText' | en=True | off=False
+[82] ControlType.Button | name='' | id='BtnToggleSidebar' | en=True | off=False
+[83] ControlType.Pane | name='' | id='' | en=True | off=False
+[84] ControlType.Button | name='' | id='BtnDashboard' | en=True | off=False
+[85] ControlType.Button | name='' | id='BtnProducts' | en=True | off=False
+[86] ControlType.Button | name='' | id='BtnPersons' | en=True | off=False
+[87] ControlType.Button | name='لیست اشخاص' | id='' | en=True | off=False
+[88] ControlType.Button | name='شخص جدید' | id='' | en=True | off=False
+[89] ControlType.Button | name='' | id='BtnBusinessInfo' | en=True | off=False
+[90] ControlType.Button | name='' | id='BtnWarehouse' | en=True | off=False
+[91] ControlType.Button | name='' | id='BtnBank' | en=True | off=False
+[92] ControlType.Button | name='' | id='BtnSales' | en=True | off=False
+[93] ControlType.Button | name='' | id='BtnReports' | en=True | off=False

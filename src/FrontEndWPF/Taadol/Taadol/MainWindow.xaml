@@ -187,6 +187,8 @@
         </Border>
 
         <!-- Toast Container — بالای صفحه، روی همه چیز -->
+        <!-- IsHitTestVisible=True ولی بدون Background: کلیک‌ها در ناحیه خالی رد می‌شوند
+             و فقط خود Toastها (که Background دارند) قابل کلیک‌اند (مثلاً دکمه بستن). -->
         <StackPanel x:Name="ToastContainer"
                     Grid.Row="0"
                     Grid.RowSpan="2"
@@ -195,7 +197,7 @@
                     VerticalAlignment="Top"
                     HorizontalAlignment="Center"
                     Margin="0,20,0,0"
-                    IsHitTestVisible="False"
+                    IsHitTestVisible="True"
                     Panel.ZIndex="99" />
 
         <!-- ═══ Modal Overlay — فقط روی ناحیه محتوای اصلی (Grid.Row=1, Grid.Column=1) ═══

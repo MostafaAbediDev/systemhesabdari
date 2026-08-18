@@ -102,7 +102,12 @@ namespace Taadol.Controls
             UpdatePlaceholderVisibility();
             UpdateSuffixVisibility();
             DataObject.AddPastingHandler(PART_TextBox, OnPaste);
-            Loaded += (s, e) => UpdateIconAndTextDirection();
+            Loaded += (s, e) =>
+            {
+                UpdateIconAndTextDirection();
+                // Loaded پدینگ را ریست می‌کند؛ اگر آیکون فعال بود دوباره جایش را باز کن
+                UpdatePaddingForIcon(ValidationState != ValidationState.None);
+            };
             UpdateIconAndTextDirection();
         }
 
@@ -262,52 +267,38 @@ namespace Taadol.Controls
 
             bool isRtl = this.FlowDirection == FlowDirection.RightToLeft;
 
-            // Error always visual RIGHT (opposite of icon, fixed position)
+            // در هر دو جهت، متن و کرسر از یک لبه شروع می‌شوند و پلیس‌هولدر دقیقاً
+            // هم‌تراز با همان لبه قرار می‌گیرد تا کرسر تکست‌باکس خالی دقیقاً از
+            // محل شروع هینت شروع شود. آیکون ولیدیشن همیشه سمت مخالف شروع متن است.
             if (isRtl)
             {
                 ValidationText.HorizontalAlignment = HorizontalAlignment.Left;
 
-                if (InputType == ModernTextBoxInputType.Number || InputType == ModernTextBoxInputType.Alphanumeric || InputType == ModernTextBoxInputType.Email)
-                {
-                    ValidationIconBorder.HorizontalAlignment = HorizontalAlignment.Left;
-                    ValidationIconBorder.Margin = new Thickness(10, 0, 0, 0);
-                    PART_TextBox.HorizontalContentAlignment = HorizontalAlignment.Right;
-                    PART_TextBox.Padding = new Thickness(12, 0, 16, 0);
-                    PlaceholderText.HorizontalAlignment = HorizontalAlignment.Right;
-                    PlaceholderText.Margin = new Thickness(0, 0, 16, 0);
-                }
-                else
-                {
-                    ValidationIconBorder.HorizontalAlignment = HorizontalAlignment.Right;
-                    ValidationIconBorder.Margin = new Thickness(0, 0, 10, 0);
-                    PART_TextBox.HorizontalContentAlignment = HorizontalAlignment.Left;
-                    PART_TextBox.Padding = new Thickness(16, 0, 12, 0);
-                    PlaceholderText.HorizontalAlignment = HorizontalAlignment.Left;
-                    PlaceholderText.Margin = new Thickness(16, 0, 0, 0);
-                }
+                // آیکون سمت مخالف شروع متن (سمت چپ) — در RTL با HA=Right چپ می‌نشیند
+                ValidationIconBorder.HorizontalAlignment = HorizontalAlignment.Right;
+                ValidationIconBorder.Margin = new Thickness(0, 0, 10, 0);
+                // ⚠️ در RTL، HorizontalAlignment/ContentAlignment سمنتیک برعکس دارد:
+                // HA=Right عنصر را چپ می‌گذارد و HA=Left راست.
+                PART_TextBox.HorizontalContentAlignment = HorizontalAlignment.Left;
+                PART_TextBox.Padding = new Thickness(16, 0, 12, 0);
+                PlaceholderText.HorizontalAlignment = HorizontalAlignment.Left;
+                PlaceholderText.Margin = new Thickness(16, 0, 0, 0);
             }
             else
             {
+                // پیام خطا همیشه سمت راست (مثل فیلدهای RTL/نام)
                 ValidationText.HorizontalAlignment = HorizontalAlignment.Right;
 
-                if (InputType == ModernTextBoxInputType.Number || InputType == ModernTextBoxInputType.Alphanumeric || InputType == ModernTextBoxInputType.Email)
-                {
-                    ValidationIconBorder.HorizontalAlignment = HorizontalAlignment.Left;
-                    ValidationIconBorder.Margin = new Thickness(8, 0, 0, 0);
-                    PART_TextBox.HorizontalContentAlignment = HorizontalAlignment.Left;
-                    PART_TextBox.Padding = new Thickness(12, 0, 12, 0);
-                    PlaceholderText.HorizontalAlignment = HorizontalAlignment.Left;
-                    PlaceholderText.Margin = new Thickness(12, 0, 0, 0);
-                }
-                else
-                {
-                    ValidationIconBorder.HorizontalAlignment = HorizontalAlignment.Right;
-                    ValidationIconBorder.Margin = new Thickness(0, 0, 4, 0);
-                    PART_TextBox.HorizontalContentAlignment = HorizontalAlignment.Right;
-                    PART_TextBox.Padding = new Thickness(12, 0, 16, 0);
-                    PlaceholderText.HorizontalAlignment = HorizontalAlignment.Right;
-                    PlaceholderText.Margin = new Thickness(0, 0, 16, 0);
-                }
+                // برای یکسان بودن جایگاه آیکون در همه‌ی فیلدها (مثل فیلدهای RTL)،
+                // آیکون در فیلدهای LTR هم سمت چپ می‌نشیند. چون متن این فیلدها سمت
+                // چپ است، هنگام نمایش آیکون پدینگ چپ اضافه می‌شود تا تداخل نشود
+                // (UpdatePaddingForIcon).
+                ValidationIconBorder.HorizontalAlignment = HorizontalAlignment.Left;
+                ValidationIconBorder.Margin = new Thickness(10, 0, 0, 0);
+                PART_TextBox.HorizontalContentAlignment = HorizontalAlignment.Left;
+                PART_TextBox.Padding = new Thickness(12, 0, 12, 0);
+                PlaceholderText.HorizontalAlignment = HorizontalAlignment.Left;
+                PlaceholderText.Margin = new Thickness(12, 0, 0, 0);
             }
 
             SuffixText.HorizontalAlignment = HorizontalAlignment.Left;
@@ -316,8 +307,7 @@ namespace Taadol.Controls
 
         private void UpdateValidationVisual()
         {
-            bool isIconVisible = ValidationState != ValidationState.None;
-            UpdatePaddingForIcon(isIconVisible);
+            UpdatePaddingForIcon(ValidationState != ValidationState.None);
 
             switch (ValidationState)
             {
@@ -354,37 +344,24 @@ namespace Taadol.Controls
             }
         }
 
+        /// <summary>
+        /// فقط در فیلدهای LTR: آیکون سمت چپ است و متن هم سمت چپ شروع می‌شود، پس وقتی
+        /// آیکون ظاهر می‌شود باید پدینگ چپ اضافه شود تا متن زیر آیکون نرود.
+        /// (در فیلدهای RTL متن سمت راست است و آیکون سمت چپ — تداخلی نیست.)
+        /// </summary>
         private void UpdatePaddingForIcon(bool iconVisible)
         {
-            if (InputType != ModernTextBoxInputType.Number) return;
+            if (this.FlowDirection != FlowDirection.LeftToRight) return;
 
-            bool isRtl = this.FlowDirection == FlowDirection.RightToLeft;
-
-            if (isRtl)
+            if (iconVisible)
             {
-                if (iconVisible)
-                {
-                    PART_TextBox.Padding = new Thickness(12, 0, 34, 0);
-                    PlaceholderText.Margin = new Thickness(0, 0, 34, 0);
-                }
-                else
-                {
-                    PART_TextBox.Padding = new Thickness(12, 0, 16, 0);
-                    PlaceholderText.Margin = new Thickness(0, 0, 16, 0);
-                }
+                PART_TextBox.Padding = new Thickness(34, 0, 12, 0);
+                PlaceholderText.Margin = new Thickness(34, 0, 0, 0);
             }
             else
             {
-                if (iconVisible)
-                {
-                    PART_TextBox.Padding = new Thickness(34, 0, 12, 0);
-                    PlaceholderText.Margin = new Thickness(34, 0, 0, 0);
-                }
-                else
-                {
-                    PART_TextBox.Padding = new Thickness(12, 0, 12, 0);
-                    PlaceholderText.Margin = new Thickness(12, 0, 0, 0);
-                }
+                PART_TextBox.Padding = new Thickness(12, 0, 12, 0);
+                PlaceholderText.Margin = new Thickness(12, 0, 0, 0);
             }
         }
 

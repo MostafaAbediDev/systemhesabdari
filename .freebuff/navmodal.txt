@@ -1,0 +1,5 @@
+﻿INVOKED submenu item 'لیست اشخاص'
+WIN[0] title='تعادل - نرم‌افزار حسابداری' cls='Window'
+DIALOG_PRESENT=False
+MODAL_STILL_OPEN=True
+alive=True responding=True

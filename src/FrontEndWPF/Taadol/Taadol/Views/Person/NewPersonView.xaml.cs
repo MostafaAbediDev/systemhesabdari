@@ -43,7 +43,7 @@ namespace Taadol.Views
     ///   - OperationResult.Id برنمی‌گرده.
     ///     → بعد از Create، با Search(NationalCode/EconomicCode) شخص جدید رو پیدا می‌کنیم.
     /// </summary>
-    public partial class NewPersonView : UserControl, INotifyPropertyChanged
+    public partial class NewPersonView : UserControl, INotifyPropertyChanged, IUnsavedChangesAware
     {
         // ===== Services (از DI رزولو می‌شوند) =====
         private readonly IPersonApplication _personApplication;
@@ -218,11 +218,13 @@ namespace Taadol.Views
                 CategorySearch?.LoadFromTreeDto(tree);
                 CategorySearch?.ClearSelection();
 
-                // اگه CategorySearch2/3 باید درخت جدا (دپارتمان/شغل) داشته باشن،
-                // باید GetTree جداگونه با PersonTypeId متفاوت صدا بزنید.
-                // اگه فعلاً همون درخت رو نشون میدن، همینطور لود کنید:
+                // دپارتمان و عنوان شغل هم فعلاً همان درخت را نشان می‌دهند؛
+                // اگر روزی درخت جدا (PersonTypeId متفاوت) لازم شد، GetTree جدا صدا زده شود.
                 CategorySearch2?.LoadFromTreeDto(tree);
                 CategorySearch2?.ClearSelection();
+
+                CategorySearc3?.LoadFromTreeDto(tree);
+                CategorySearc3?.ClearSelection();
             }
             catch (Exception ex)
             {
@@ -327,6 +329,10 @@ namespace Taadol.Views
         {
             InitializeComponent();
 
+            // رویدادهای جدول حساب‌های بانکی (کنترل مشترک) — در کد وصل می‌شوند چون delegate سفارشی دارد
+            BankAccountsTable.EditRequested += BankAccountsTable_EditRequested;
+            BankAccountsTable.RemoveRequested += BankAccountsTable_RemoveRequested;
+
             // شهرستان تا انتخاب استان غیرفعال است
             UpdateCityState();
             CityCombo.DropDownOpened += CityCombo_DropDownOpened;
@@ -388,17 +394,6 @@ namespace Taadol.Views
                 .FromProperty(TextBox.TextProperty, typeof(TextBox))
                 .AddValueChanged(CardNumberInput.PART_TextBox, (s, ev) => CardNumberInput_TextChanged());
         }
-        private void OnToggled(object sender, RoutedEventArgs e)
-        {
-            // sender همان کنترل ActiveToggleControl است
-            var toggle = sender as ActiveToggleControl;
-            if (toggle != null)
-            {
-                bool currentState = toggle.IsChecked;
-                // اقدامات مورد نظر شما
-                MessageBox.Show($"وضعیت جدید: {(currentState ? "روشن" : "خاموش")}");
-            }
-        }
         private void OnCategorySelected(CategorySearchControl.CategoryItem category)
         {
             _selectedPersonCategoryId = category.Id;
@@ -446,7 +441,7 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "خطا در لود شعبه‌ها", MessageBoxButton.OK, MessageBoxImage.Error);
+                ToastManager.Error("خطا در لود شعبه‌ها: " + ex.Message);
             }
             finally
             {
@@ -494,7 +489,7 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "خطا در لود انواع شخص", MessageBoxButton.OK, MessageBoxImage.Error);
+                ToastManager.Error("خطا در لود انواع شخص: " + ex.Message);
             }
         }
 
@@ -515,7 +510,7 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "خطا در لود انواع تماس", MessageBoxButton.OK, MessageBoxImage.Error);
+                ToastManager.Error("خطا در لود انواع تماس: " + ex.Message);
             }
         }
 
@@ -536,7 +531,7 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "خطا در لود استان‌ها", MessageBoxButton.OK, MessageBoxImage.Error);
+                ToastManager.Error("خطا در لود استان‌ها: " + ex.Message);
             }
         }
 
@@ -563,7 +558,7 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "خطا در لود شهرها", MessageBoxButton.OK, MessageBoxImage.Error);
+                ToastManager.Error("خطا در لود شهرها: " + ex.Message);
             }
         }
 
@@ -756,7 +751,7 @@ namespace Taadol.Views
         private bool _isLoading = true;
         private bool _userMadeChanges;
 
-        private bool HasUnsavedChanges() => _userMadeChanges;
+        public bool HasUnsavedChanges => _userMadeChanges;
 
         private void MarkUserChange()
         {
@@ -773,12 +768,13 @@ namespace Taadol.Views
             {
                 if (SaveButton != null) SaveButton.IsEnabled = false;
 
-                // 1) تأیید کاربر
+                // 1) اعتبارسنجی — اول بررسی کن، بعد تأیید بگیر؛
+                //    وگرنه با فرم خالی/نامعتبر پیام دروغین «بررسی شد» نشان داده می‌شود.
+                if (!ValidatePerson()) return;
+
+                // 2) تأیید کاربر
                 var dialog = new CustomConfirmDialog();
                 if (dialog.ShowDialog() != true) return;
-
-                // 2) اعتبارسنجی
-                if (!ValidatePerson()) return;
 
             // 3) ذخیره تمام اطلاعات در یک Task.Run با Scope جداگانه
             var isLegal = IsLegal;
@@ -933,24 +929,36 @@ namespace Taadol.Views
 
                 if (!saveResult.Success)
                 {
-                    MessageBox.Show(saveResult.Message, "خطا", MessageBoxButton.OK, MessageBoxImage.Error);
+                    ToastManager.Error(saveResult.Message);
                     return;
                 }
 
                 SavePersonPicture(saveResult.PersonId);
 
-                MessageBox.Show("ثبت شخص با موفقیت انجام شد.", "موفقیت", MessageBoxButton.OK, MessageBoxImage.Information);
-
-                // فرم در مودال باز شده است: فقط مودال بسته شود و گرید پشت آن رفرش شود
-                PersonSaved?.Invoke();
+                ToastManager.Success("ثبت شخص با موفقیت انجام شد.");
 
                 var mainWindow = Window.GetWindow(this) as MainWindow;
-                mainWindow?.CloseModal();
+
+                // تشخیص محل میزبانی فرم:
+                // 1) مودال (دکمه «+ شخص جدید» در لیست) → مودال بسته شود و گرید پشت آن رفرش شود
+                // 2) ناحیه اصلی (منوی «شخص جدید» در سایدبار) → به لیست اشخاص برگردد
+                //    تا فرم پُر در حالت قابل‌ثبت باقی نماند و ثبت تکراری رخ ندهد.
+                bool isModal = mainWindow?.ModalContent.Content == this;
+
+                if (isModal)
+                {
+                    PersonSaved?.Invoke();
+                    mainWindow?.CloseModal();
+                }
+                else
+                {
+                    mainWindow?.NavigateTo("person_list");
+                }
             }
             catch (Exception ex)
             {
                 var fullMessage = BuildFullExceptionMessage(ex);
-                MessageBox.Show("خطا در ثبت شخص: " + ex.Message, "خطا", MessageBoxButton.OK, MessageBoxImage.Error);
+                ToastManager.Error("خطا در ثبت شخص: " + ex.Message);
 
                 try
                 {
@@ -1059,37 +1067,73 @@ namespace Taadol.Views
         {
             if (SelectedBranchId <= 0)
             {
-                MessageBox.Show("لطفاً شعبه را انتخاب کنید.", "انتخاب شعبه", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ToastManager.Warning("لطفاً شعبه را انتخاب کنید.");
                 return false;
             }
 
             if (SelectedPersonTypeId <= 0)
             {
-                MessageBox.Show("لطفاً نوع شخص را انتخاب کنید.", "انتخاب نوع شخص", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ToastManager.Warning("لطفاً نوع شخص را انتخاب کنید.");
                 return false;
+            }
+
+            // شماره موبایل: خالی = بدون آیکون؛ پر = باید دقیقاً ۱۱ رقم باشد
+            if (string.IsNullOrWhiteSpace(Mobile))
+            {
+                MobileInput.ValidationState = Controls.ValidationState.None;
+                MobileInput.ValidationMessage = "";
+            }
+            else if (Mobile.Count(char.IsDigit) != 11)
+            {
+                MobileInput.ValidationState = Controls.ValidationState.Invalid;
+                MobileInput.ValidationMessage = "شماره موبایل باید ۱۱ رقم باشد.";
+                return false;
+            }
+            else
+            {
+                MobileInput.ValidationState = Controls.ValidationState.Valid;
+                MobileInput.ValidationMessage = "";
+            }
+
+            // شماره تلفن: خالی = بدون آیکون؛ پر = باید دقیقاً ۱۱ رقم باشد
+            if (string.IsNullOrWhiteSpace(Phone))
+            {
+                PhoneInput.ValidationState = Controls.ValidationState.None;
+                PhoneInput.ValidationMessage = "";
+            }
+            else if (Phone.Count(char.IsDigit) != 11)
+            {
+                PhoneInput.ValidationState = Controls.ValidationState.Invalid;
+                PhoneInput.ValidationMessage = "شماره تلفن باید ۱۱ رقم باشد.";
+                return false;
+            }
+            else
+            {
+                PhoneInput.ValidationState = Controls.ValidationState.Valid;
+                PhoneInput.ValidationMessage = "";
             }
 
             if (IsLegal)
             {
                 if (string.IsNullOrWhiteSpace(CompanyName))
                 {
-                    MessageBox.Show("نام شرکت را وارد کنید.", "نام شرکت", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    ToastManager.Warning("نام شرکت را وارد کنید.");
                     return false;
                 }
                 if (string.IsNullOrWhiteSpace(EconomicCode))
                 {
-                    MessageBox.Show("کد اقتصادی را وارد کنید.", "کد اقتصادی", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    ToastManager.Warning("کد اقتصادی را وارد کنید.");
                     return false;
                 }
 
                 if (string.IsNullOrWhiteSpace(ContactFirstName))
                 {
-                    MessageBox.Show("نام فرد رابط را وارد کنید.", "نام فرد رابط", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    ToastManager.Warning("نام فرد رابط را وارد کنید.");
                     return false;
                 }
                 if (string.IsNullOrWhiteSpace(ContactLastName))
                 {
-                    MessageBox.Show("نام خانوادگی فرد رابط را وارد کنید.", "نام خانوادگی فرد رابط", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    ToastManager.Warning("نام خانوادگی فرد رابط را وارد کنید.");
                     return false;
                 }
             }
@@ -1127,10 +1171,16 @@ namespace Taadol.Views
                     NationalCodeInput.ValidationMessage = "کد ملی را وارد کنید.";
                     hasError = true;
                 }
-                else if (!IsValidNationalCode(NationalCode))
+                else if (NationalCode.Count(char.IsDigit) != 10)
                 {
                     NationalCodeInput.ValidationState = Controls.ValidationState.Invalid;
                     NationalCodeInput.ValidationMessage = "کد ملی باید دقیقاً ۱۰ رقم باشد.";
+                    hasError = true;
+                }
+                else if (!IsValidNationalCode(NationalCode))
+                {
+                    NationalCodeInput.ValidationState = Controls.ValidationState.Invalid;
+                    NationalCodeInput.ValidationMessage = "کد ملی وارد شده صحیح نیست.";
                     hasError = true;
                 }
                 else
@@ -1143,7 +1193,7 @@ namespace Taadol.Views
             }
             if (!IsCodeAutomatic && string.IsNullOrWhiteSpace(ManualCode))
             {
-                MessageBox.Show("شناسه یکتای دستی را وارد کنید یا حالت اتوماتیک را فعال کنید.", "شناسه یکتا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ToastManager.Warning("شناسه یکتای دستی را وارد کنید یا حالت اتوماتیک را فعال کنید.");
                 return false;
             }
 
@@ -1152,26 +1202,20 @@ namespace Taadol.Views
                 ManualCode = GenerateNextUniqueCode();
                 if (string.IsNullOrWhiteSpace(ManualCode))
                 {
-                    MessageBox.Show("تولید شناسه یکتای اتوماتیک ناموفق بود. لطفاً حالت دستی را انتخاب کرده و کد را وارد کنید.", "خطا در تولید کد", MessageBoxButton.OK, MessageBoxImage.Error);
+                    ToastManager.Error("تولید شناسه یکتای اتوماتیک ناموفق بود. لطفاً حالت دستی را انتخاب کرده و کد را وارد کنید.");
                     return false;
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(Mobile) && !IsValidMobile(Mobile))
-            {
-                MessageBox.Show("فرمت موبایل صحیح نیست. مثال صحیح: 09121234567", "فرمت موبایل", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return false;
-            }
-
             if (!string.IsNullOrWhiteSpace(Email) && !IsValidEmail(Email))
             {
-                MessageBox.Show("فرمت ایمیل صحیح نیست. مثال صحیح: name@example.com", "فرمت ایمیل", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ToastManager.Warning("فرمت ایمیل صحیح نیست. مثال صحیح: name@example.com");
                 return false;
             }
 
             if (!string.IsNullOrWhiteSpace(MainShaba) && !IsValidShaba(MainShaba))
             {
-                MessageBox.Show("فرمت شبا صحیح نیست. باید با IR شروع و در مجموع ۲۶ کاراکتر باشد.", "فرمت شبا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ToastManager.Warning("فرمت شبا صحیح نیست. باید با IR شروع و در مجموع ۲۶ کاراکتر باشد.");
                 return false;
             }
 
@@ -1183,27 +1227,31 @@ namespace Taadol.Views
         // ======================================================
         private static bool IsValidNationalCode(string code)
         {
-            if (string.IsNullOrWhiteSpace(code)) return false;
-            code = code.Trim().Replace(" ", "").Replace("-", "");
-            if (code.Length != 10 || !code.All(char.IsDigit)) return false;
+            if (string.IsNullOrWhiteSpace(code))
+                return false;
 
-            int[] weights = { 10, 9, 8, 7, 6, 5, 4, 3, 2 };
-            int sum = 0;
-            for (int i = 0; i < 9; i++)
-                sum += (code[i] - '0') * weights[i];
+            code = code.Trim()
+                       .Replace(" ", "")
+                       .Replace("-", "");
 
-            int remainder = sum % 11;
-            int checkDigit = remainder < 2 ? remainder : 11 - remainder;
-            return checkDigit == (code[9] - '0');
-        }
+            // تبدیل ارقام فارسی به انگلیسی
+            var digits = new System.Text.StringBuilder();
 
-        private static bool IsValidMobile(string mobile)
-        {
-            if (string.IsNullOrWhiteSpace(mobile)) return false;
-            mobile = mobile.Trim().Replace(" ", "").Replace("-", "");
-            if (mobile.StartsWith("+98")) mobile = "0" + mobile.Substring(3);
-            else if (mobile.StartsWith("0098")) mobile = "0" + mobile.Substring(4);
-            return mobile.Length == 11 && mobile.StartsWith("09") && mobile.All(char.IsDigit);
+            foreach (char c in code)
+            {
+                if (c >= '۰' && c <= '۹')
+                    digits.Append((char)('0' + (c - '۰')));
+                else
+                    digits.Append(c);
+            }
+
+            code = digits.ToString();
+
+            // کد باید دقیقاً ۱۰ رقم باشد
+            if (code.Length != 10 || !code.All(char.IsDigit))
+                return false;
+
+            return true;
         }
 
         private static bool IsValidEmail(string email)
@@ -1482,7 +1530,7 @@ namespace Taadol.Views
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
-            if (HasUnsavedChanges())
+            if (HasUnsavedChanges)
             {
                 var result = MessageBox.Show(
                     "تغییراتی که ایجاد کرده‌اید ذخیره نشده است.\nآیا می‌خواهید آن‌ها را ذخیره کنید؟",
@@ -1529,13 +1577,13 @@ namespace Taadol.Views
         {
             if (!MainBankHasData())
             {
-                MessageBox.Show("لطفاً ابتدا اطلاعات حساب بانکی را وارد کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ToastManager.Warning("لطفاً ابتدا اطلاعات حساب بانکی را وارد کنید.");
                 return;
             }
 
             if (HasEmptyBankRow())
             {
-                MessageBox.Show("لطفاً ابتدا ردیف‌های قبلی را تکمیل کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ToastManager.Warning("لطفاً ابتدا ردیف‌های قبلی را تکمیل کنید.");
                 return;
             }
 
@@ -1571,7 +1619,7 @@ namespace Taadol.Views
         {
             if (HasEmptyBankRow())
             {
-                MessageBox.Show("لطفاً ابتدا ردیف‌های قبلی را تکمیل کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ToastManager.Warning("لطفاً ابتدا ردیف‌های قبلی را تکمیل کنید.");
                 return;
             }
             if (sender is Button btn && btn.DataContext is BankAccountRow currentRow)
@@ -1595,12 +1643,12 @@ namespace Taadol.Views
         {
             if (string.IsNullOrWhiteSpace(BankNameInput.Text))
             {
-                MessageBox.Show("لطفاً نام بانک را وارد کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ToastManager.Warning("لطفاً نام بانک را وارد کنید.");
                 return;
             }
             if (string.IsNullOrWhiteSpace(CardNumberInput.Text) && string.IsNullOrWhiteSpace(ShabaInput.Text))
             {
-                MessageBox.Show("لطفاً حداقل شماره کارت یا شماره شبا را وارد کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ToastManager.Warning("لطفاً حداقل شماره کارت یا شماره شبا را وارد کنید.");
                 return;
             }
 
@@ -1643,30 +1691,24 @@ namespace Taadol.Views
             ClearBankForm();
         }
 
-        private void EditBankAccount_Click(object sender, RoutedEventArgs e)
+        private void BankAccountsTable_EditRequested(object sender, BankAccountRow row)
         {
-            if (sender is Button btn && btn.DataContext is BankAccountRow row)
-            {
-                BankNameInput.Text = row.BankName;
-                CardNumberInput.Text = row.CardNumber;
-                var shaba = row.Shaba ?? "";
-                ShabaInput.Text = shaba.StartsWith("IR") ? shaba : "IR" + shaba;
-                AccountNumberInput.Text = row.AccountNumber;
-                DefaultAccountToggle.IsChecked = row.IsDefault;
-                SelectedBankBranchId = row.BankBranchId;
+            BankNameInput.Text = row.BankName;
+            CardNumberInput.Text = row.CardNumber;
+            var shaba = row.Shaba ?? "";
+            ShabaInput.Text = shaba.StartsWith("IR") ? shaba : "IR" + shaba;
+            AccountNumberInput.Text = row.AccountNumber;
+            DefaultAccountToggle.IsChecked = row.IsDefault;
+            SelectedBankBranchId = row.BankBranchId;
 
-                BankAccounts.Remove(row);
-                ReindexBankAccounts();
-            }
+            BankAccounts.Remove(row);
+            ReindexBankAccounts();
         }
 
-        private void RemoveBankAccountFromTable_Click(object sender, RoutedEventArgs e)
+        private void BankAccountsTable_RemoveRequested(object sender, BankAccountRow row)
         {
-            if (sender is Button btn && btn.DataContext is BankAccountRow row)
-            {
-                BankAccounts.Remove(row);
-                ReindexBankAccounts();
-            }
+            BankAccounts.Remove(row);
+            ReindexBankAccounts();
         }
 
         private void ReindexBankAccounts()
@@ -1846,16 +1888,7 @@ namespace Taadol.Views
             InventoryContent.Visibility = Visibility.Collapsed;
             TaxContent.Visibility = Visibility.Collapsed;
         }
-        private void TableContainerBorder_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            var border = (Border)sender;
-            double radius = border.CornerRadius.TopLeft; // چون همه گوشه‌ها 4 هستند
 
-            border.Clip = new RectangleGeometry(
-                new Rect(0, 0, border.ActualWidth, border.ActualHeight),
-                radius,
-                radius);
-        }
         private void TabInventory_Checked(object sender, RoutedEventArgs e)
         {
             if (TabPricing == null || TabTax == null) return;
@@ -1883,9 +1916,6 @@ namespace Taadol.Views
         // ======================================================
         //  Misc UI Handlers
         // ======================================================
-        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e) { }
-        private void MyDatePicker_DateChanged(object sender, RoutedEventArgs e) { }
-        private void Radio_Checked(object sender, RoutedEventArgs e) { }
         private void OnImageSelected(object sender, RoutedEventArgs e)
         {
             _selectedImagePath = PersonImagePicker?.ImagePath;
@@ -1897,12 +1927,6 @@ namespace Taadol.Views
             _selectedImagePath = null;
             MarkUserChange();
         }
-        private void ImagePickerControl_Loaded(object sender, RoutedEventArgs e) { }
-        private void TextBox_TextChanged_1(object sender, TextChangedEventArgs e) { }
-        private void TextBox_TextChanged_2(object sender, TextChangedEventArgs e) { }
-        private void TextBox_TextChanged_3(object sender, TextChangedEventArgs e) { }
-        private void Button_Click(object sender, RoutedEventArgs e) { }
-        private void ToggleSwitchControl_SelectionChanged(object sender, bool e) { }
 
         // ======================================================
         //  Close & Clear
@@ -1965,15 +1989,21 @@ namespace Taadol.Views
 
                 if (textBox == NationalCodeInput)
                 {
-                    if (IsValidNationalCode(text))
+                    if (string.IsNullOrWhiteSpace(text) || text.Length < 10)
+                    {
+                        // هنوز کامل نشده — آیکونی نشان نده
+                        textBox.ValidationState = Controls.ValidationState.None;
+                        textBox.ValidationMessage = "";
+                    }
+                    else if (IsValidNationalCode(text))
                     {
                         textBox.ValidationState = Controls.ValidationState.Valid;
                         textBox.ValidationMessage = "";
                     }
                     else
                     {
-                        textBox.ValidationState = Controls.ValidationState.None;
-                        textBox.ValidationMessage = "";
+                        textBox.ValidationState = Controls.ValidationState.Invalid;
+                        textBox.ValidationMessage = "کد ملی وارد شده صحیح نیست.";
                     }
                 }
                 else if (textBox == PhoneInput)

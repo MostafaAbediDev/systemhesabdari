@@ -30,6 +30,7 @@ namespace Taadol.Views
         private int _totalPages = 1;
         private int _filteredListCount = 0;
         private bool _isLoadedOnce = false;
+        private bool _sizeWired = false;
         private HashSet<string> _selectedStatuses = new();
         private HashSet<string> _selectedTitles = new();
 
@@ -47,6 +48,13 @@ namespace Taadol.Views
             PeriodsGrid.PageSizeRequested += (s, size) => ChangePageSize(size);
             PeriodsGrid.CheckedItemsChanged += (s, e) => UpdateSummary();
 
+            // منوی راست‌کلیک ردیف: ویرایش
+            PeriodsGrid.RowEditRequested += (s, item) =>
+            {
+                if (item is FinancialPeriodItem p && Window.GetWindow(this) is MainWindow mw)
+                    mw.NavigateToEditFinancialPeriod(long.Parse(p.UniqueId));
+            };
+
             // انتخاب همه = فقط همین صفحه؛ خاموش‌کردن هدر = پاک کردن انتخاب کل لیست
             PeriodsGrid.SelectAllToggled += (s, select) =>
             {
@@ -55,9 +63,10 @@ namespace Taadol.Views
                     item.IsSelected = false;
             };
 
-            PeriodSearchBox.TextChanged += (s, e) =>
+            // جستجو با Debounce داخلی SearchBoxControl (پیش‌فرض ۳۰۰ms)
+            PeriodSearchBox.SearchTextChanged += (s, text) =>
             {
-                _searchText = PeriodSearchBox.Text.Trim();
+                _searchText = text.Trim();
                 _currentPage = 1;
                 ApplyFilters();
             };
@@ -72,11 +81,6 @@ namespace Taadol.Views
             (Window.GetWindow(this) as MainWindow)?.CloseCurrentForm();
         }
 
-        private void BtnDelete_Click(object sender, RoutedEventArgs e)
-        {
-            ToastManager.Warning("حذف دوره مالی در این نسخه پشتیبانی نمی‌شود.");
-        }
-
         private void BtnPrint_Click(object sender, RoutedEventArgs e)
         {
             ToastManager.Warning("چاپ این بخش به‌زودی اضافه می‌شود.");
@@ -88,8 +92,51 @@ namespace Taadol.Views
             await LoadDataAsync();
         }
 
-        private void ActionButton_Loaded(object sender, RoutedEventArgs e) { }
-        private void ActionButton_Loaded_1(object sender, RoutedEventArgs e) { }
+        // فرم لیست باید همیشه کل فضای محتوا رو پر کنه حتی اگه ردیف جدول کم باشه
+        // (چون MainContent با Top/Left فقط اندازه محتوا رو می‌گیره) — مثل PersonListView
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                FillAvailableSpace();
+            }), DispatcherPriority.Background);
+        }
+
+        private void FillAvailableSpace()
+        {
+            if (Window.GetWindow(this) is not Window window) return;
+            if (window.FindName("MainContentBorder") is not Border border) return;
+
+            if (!_sizeWired)
+            {
+                _sizeWired = true;
+                border.SizeChanged += (s, _) => FillAvailableSpace();
+            }
+
+            var pad = border.Padding;
+            var margin = Margin;
+            var w = border.ActualWidth - pad.Left - pad.Right - margin.Left - margin.Right;
+            var h = border.ActualHeight - pad.Top - pad.Bottom - margin.Top - margin.Bottom;
+            Width = w > 0 ? w : 0;
+            Height = h > 0 ? h : 0;
+        }
+
+        /// <summary>
+        /// رفرش داده‌های گرید از بیرون (مثلاً بعد از بسته‌شدن فرم «ویرایش دوره مالی» در مودال).
+        /// </summary>
+        public async Task RefreshGridAsync()
+        {
+            _isLoadedOnce = false;
+            try
+            {
+                await LoadDataAsync();
+            }
+            catch (Exception ex)
+            {
+                ToastManager.Error("خطا در بروزرسانی: " + ex.Message);
+            }
+        }
+
 
         private async void FinancialPeriodListView_Loaded(object sender, RoutedEventArgs e)
         {
@@ -136,7 +183,7 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "خطا در لود دوره‌های مالی", MessageBoxButton.OK, MessageBoxImage.Error);
+                ToastManager.Error("خطا در لود دوره‌های مالی: " + ex.Message);
 
                 AllPeriods = new ObservableCollection<FinancialPeriodItem>();
 
@@ -156,7 +203,7 @@ namespace Taadol.Views
             {
                 FilteredPeriods.Add(new FinancialPeriodItem
                 {
-                    RowNumber = i,
+                    RowNumber = 0,
                     IsEmpty = true
                 });
             }
@@ -252,21 +299,25 @@ namespace Taadol.Views
 
             FilteredPeriods = new ObservableCollection<FinancialPeriodItem>(pageItems);
 
-            int realCount = FilteredPeriods.Count;
-
-            for (int i = realCount + 1; i <= _pageSize; i++)
-            {
-                FilteredPeriods.Add(new FinancialPeriodItem
-                {
-                    RowNumber = i,
-                    IsEmpty = true
-                });
-            }
-
             PeriodsGrid.ItemsSource = FilteredPeriods;
 
             BuildPaginationButtons();
             UpdateSummary();
+            UpdateTabCounts();
+        }
+
+        private void UpdateTabCounts()
+        {
+            if (tabAll == null || tabActive == null || tabInactive == null || AllPeriods == null)
+                return;
+
+            int total = AllPeriods.Count(p => !p.IsEmpty);
+            int active = AllPeriods.Count(p => !p.IsEmpty && p.Status == "فعال");
+            int inactive = AllPeriods.Count(p => !p.IsEmpty && p.Status == "غیرفعال");
+
+            tabAll.Tag = $"({ToPersianNumber(total)})";
+            tabActive.Tag = $"({ToPersianNumber(active)})";
+            tabInactive.Tag = $"({ToPersianNumber(inactive)})";
         }
 
         private void UpdateSummary()

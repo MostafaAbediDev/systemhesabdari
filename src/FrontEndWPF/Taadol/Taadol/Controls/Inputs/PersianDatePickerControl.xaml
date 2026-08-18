@@ -18,7 +18,7 @@
             <Setter Property="BorderThickness" Value="1.5"/>
             <Setter Property="Foreground" Value="#404040"/>
             <Setter Property="FontSize" Value="15"/>
-            <Setter Property="FontFamily" Value="{StaticResource IRANSans}"/>
+            <Setter Property="FontFamily" Value="{StaticResource Vazir}"/>
             <Setter Property="TextAlignment" Value="Center"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="MinHeight" Value="42"/>

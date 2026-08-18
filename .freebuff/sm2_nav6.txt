@@ -1,0 +1,4 @@
+﻿INVOKED 'شعبه جدید' at rect=1680,448,239,36
+DIALOG_PRESENT=False
+MODAL_OPEN=True
+alive=True responding=True

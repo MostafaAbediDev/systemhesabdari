@@ -115,6 +115,26 @@ namespace Taadol.Controls
             });
         }
 
+        /// <summary>
+        /// کش سراسری دوره‌های مالی را بی‌اعتبار می‌کند تا بار بعدی از دیتابیس خوانده شود.
+        /// بعد از ثبت یک دوره مالی جدید صدا زده شود.
+        /// </summary>
+        public static void InvalidateCache()
+        {
+            _cachedPeriods = null;
+        }
+
+        /// <summary>
+        /// دوره‌های مالی را از نو از دیتابیس می‌خواند (بعد از ثبت دوره جدید)
+        /// تا دوره تازه‌ثبت‌شده بدون ری‌استارت برنامه در انتخابگر دیده شود.
+        /// </summary>
+        public async Task RefreshAsync()
+        {
+            _isLoaded = true;
+            _cachedPeriods = null;
+            await LoadPeriodsAsync();
+        }
+
         // ======================================================
         //  Load
         // ======================================================

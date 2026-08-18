@@ -1,0 +1,8 @@
+﻿WINDOW size=420x260
+ELEMENTS=6
+[0] ControlType.Text | name='ثبت اطلاعات' | id='' | en=True | off=False
+[1] ControlType.Text | name='اطلاعات وارد شده بررسی شد. با ثبت، این مورد به سیستم اضافه می‌شود.' | id='' | en=True | off=False
+[2] ControlType.Button | name='ثبت اطلاعات' | id='' | en=True | off=False
+[3] ControlType.Text | name='ثبت اطلاعات' | id='' | en=True | off=False
+[4] ControlType.Button | name='منصرف شدم.' | id='' | en=True | off=False
+[5] ControlType.Text | name='منصرف شدم.' | id='' | en=True | off=False

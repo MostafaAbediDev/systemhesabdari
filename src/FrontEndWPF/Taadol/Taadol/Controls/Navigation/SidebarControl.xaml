@@ -9,7 +9,7 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/Taadol;component/Controls/SubmenuStyles1.xaml" />
+                <ResourceDictionary Source="/Taadol;component/Themes/SubmenuStyles1.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
         </ResourceDictionary>
@@ -260,6 +260,7 @@
                                                 </Grid.ColumnDefinitions>
                                                 <svg:SvgViewbox Width="18"
                                                                 Height="18"
+                                                                FlowDirection="LeftToRight"
                                                                 Source="/Assets/Icons/chart_u.svg"
                                                                 VerticalAlignment="Center"
                                                                 Margin="0,0,10,0" />
@@ -371,6 +372,7 @@
                                                 <svg:SvgViewbox Width="18"
                                                                 Height="18"
                                                                 Source="/Assets/Icons/profile_u.svg"
+                                                                FlowDirection="LeftToRight"
                                                                 VerticalAlignment="Center"
                                                                 Margin="0,0,10,0" />
                                                 <TextBlock x:Name="txtPersons"
@@ -601,6 +603,7 @@
                                                                 Height="18"
                                                                 Source="/Assets/Icons/buildings_u.svg"
                                                                 VerticalAlignment="Center"
+                                                                FlowDirection="LeftToRight"
                                                                 Margin="0,0,10,0" />
                                                 <TextBlock x:Name="txtWarehouse"
                                                            Grid.Column="1"
@@ -702,6 +705,7 @@
                                                 <svg:SvgViewbox Width="18"
                                                                 Height="18"
                                                                 Source="/Assets/Icons/dollar-circle_u.svg"
+                                                                FlowDirection="LeftToRight"
                                                                 VerticalAlignment="Center"
                                                                 Margin="0,0,10,0" />
                                                 <TextBlock x:Name="txtBank"
@@ -904,9 +908,10 @@
                                                     <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
                                                 <svg:SvgViewbox Width="18"
-                                                                Height="18"
+                                                                Height="18"  
                                                                 Source="/Assets/Icons/rep_u.svg"
                                                                 VerticalAlignment="Center"
+                                                                FlowDirection="LeftToRight"
                                                                 Margin="0,0,10,0" />
                                                 <TextBlock x:Name="txtReports"
                                                            Grid.Column="1"

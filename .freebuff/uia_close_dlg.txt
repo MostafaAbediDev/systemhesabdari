@@ -1,0 +1,30 @@
+﻿WINDOW size=1936x1056
+ELEMENTS=28
+[0] ControlType.Window | name='' | id='' | en=True | off=False
+[1] ControlType.Text | name='تأیید خروج' | id='DialogTitle' | en=True | off=False
+[2] ControlType.Text | name='آیا از خروج از برنامه مطمئن هستید؟' | id='DialogMessage' | en=True | off=False
+[3] ControlType.Button | name='خروج' | id='ConfirmButton' | en=True | off=False
+[4] ControlType.Text | name='خروج' | id='ConfirmText' | en=True | off=False
+[5] ControlType.Button | name='انصراف' | id='CancelButton' | en=True | off=False
+[6] ControlType.Text | name='انصراف' | id='CancelText' | en=True | off=False
+[7] ControlType.Text | name='شرکت های شما' | id='' | en=True | off=False
+[8] ControlType.ComboBox | name='' | id='CompanySelector' | en=True | off=False
+[9] ControlType.Edit | name='' | id='PART_EditableTextBox' | en=True | off=False
+[10] ControlType.Button | name='' | id='' | en=True | off=False
+[11] ControlType.Text | name='خروج از برنامه' | id='' | en=True | off=False
+[12] ControlType.Text | name='کاربر شماره یک' | id='' | en=True | off=False
+[13] ControlType.Text | name='حسابدار' | id='' | en=True | off=False
+[14] ControlType.Custom | name='' | id='Sidebar' | en=True | off=False
+[15] ControlType.Text | name='نرم افزار حسابداری تعادل' | id='LogoText' | en=True | off=False
+[16] ControlType.Custom | name='' | id='YearSelector' | en=True | off=False
+[17] ControlType.Text | name='شعبه ۵۰۰‏ | سال ۱۴۰۳‏' | id='YearText' | en=True | off=False
+[18] ControlType.Button | name='' | id='BtnToggleSidebar' | en=True | off=False
+[19] ControlType.Pane | name='' | id='' | en=True | off=False
+[20] ControlType.Button | name='' | id='BtnDashboard' | en=True | off=False
+[21] ControlType.Button | name='' | id='BtnProducts' | en=True | off=False
+[22] ControlType.Button | name='' | id='BtnPersons' | en=True | off=False
+[23] ControlType.Button | name='' | id='BtnBusinessInfo' | en=True | off=False
+[24] ControlType.Button | name='' | id='BtnWarehouse' | en=True | off=False
+[25] ControlType.Button | name='' | id='BtnBank' | en=True | off=False
+[26] ControlType.Button | name='' | id='BtnSales' | en=True | off=False
+[27] ControlType.Button | name='' | id='BtnReports' | en=True | off=False

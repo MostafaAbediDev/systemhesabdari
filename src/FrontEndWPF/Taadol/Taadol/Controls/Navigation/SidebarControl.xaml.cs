@@ -757,19 +757,6 @@ namespace Taadol.Controls
                 _activeSubMenuButton = null;
                 _activeSubMenuTag = null;
             }
-
-            if (DataContext is Taadol.ViewModels.SidebarViewModel vm)
-            {
-                foreach (var menu in vm.MenuItems)
-                {
-                    menu.IsSelected = false;
-                    foreach (var sub in menu.SubItems)
-                    {
-                        sub.IsSelected = false;
-                        sub.IsBold = false;
-                    }
-                }
-            }
         }
 
         private void SubMenuClick(object sender, RoutedEventArgs e)

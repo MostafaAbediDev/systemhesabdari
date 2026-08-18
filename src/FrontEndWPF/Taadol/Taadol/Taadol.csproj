@@ -76,17 +76,18 @@
     <None Remove="Assets\Icons\trash.svg" />
     <None Remove="Assets\Icons\user_blue.svg" />
     <None Remove="Assets\Icons\wh_check.svg" />
-    <None Remove="Fonts\IRANSansXFaNum-Black.ttf" />
-    <None Remove="Fonts\IRANSansXFaNum-Bold.ttf" />
-    <None Remove="Fonts\IRANSansXFaNum-DemiBold.ttf" />
-    <None Remove="Fonts\IRANSansXFaNum-ExtraBlack.ttf" />
-    <None Remove="Fonts\IRANSansXFaNum-ExtraBold.ttf" />
-    <None Remove="Fonts\IRANSansXFaNum-Heavy.ttf" />
-    <None Remove="Fonts\IRANSansXFaNum-Light.ttf" />
-    <None Remove="Fonts\IRANSansXFaNum-Medium.ttf" />
-    <None Remove="Fonts\IRANSansXFaNum-Regular.ttf" />
-    <None Remove="Fonts\IRANSansXFaNum-Thin.ttf" />
-    <None Remove="Fonts\IRANSansXFaNum-UltraLight.ttf" />
+    <None Remove="Fonts\IRANSans\IRANSansXFaNum-Black.ttf" />
+    <None Remove="Fonts\IRANSans\IRANSansXFaNum-Bold.ttf" />
+    <None Remove="Fonts\IRANSans\IRANSansXFaNum-DemiBold.ttf" />
+    <None Remove="Fonts\IRANSans\IRANSansXFaNum-ExtraBlack.ttf" />
+    <None Remove="Fonts\IRANSans\IRANSansXFaNum-ExtraBold.ttf" />
+    <None Remove="Fonts\IRANSans\IRANSansXFaNum-Heavy.ttf" />
+    <None Remove="Fonts\IRANSans\IRANSansXFaNum-Light.ttf" />
+    <None Remove="Fonts\IRANSans\IRANSansXFaNum-Medium.ttf" />
+    <None Remove="Fonts\IRANSans\IRANSansXFaNum-Regular.ttf" />
+    <None Remove="Fonts\IRANSans\IRANSansXFaNum-Thin.ttf" />
+    <None Remove="Fonts\IRANSans\IRANSansXFaNum-UltraLight.ttf" />
+    <None Remove="Fonts\Vazir\*.ttf" />
   </ItemGroup>
 
   <ItemGroup>
@@ -316,43 +317,46 @@
     <ProjectReference Include="..\..\..\..\PersonManagement.Configuration\PersonManagement.Configuration.csproj" />
     <ProjectReference Include="..\..\..\..\PersonManagement.Domain\PersonManagement.Domain.csproj" />
     <ProjectReference Include="..\..\..\..\PersonManagement.Infrastructure.EFCore\PersonManagement.Infrastructure.EFCore.csproj" />
-    <Resource Include="Fonts\IRANSansXFaNum-Black.ttf">
+    <Resource Include="Fonts\IRANSans\IRANSansXFaNum-Black.ttf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Fonts\IRANSansXFaNum-Bold.ttf">
+    <Resource Include="Fonts\IRANSans\IRANSansXFaNum-Bold.ttf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Fonts\IRANSansXFaNum-DemiBold.ttf">
+    <Resource Include="Fonts\IRANSans\IRANSansXFaNum-DemiBold.ttf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Fonts\IRANSansXFaNum-ExtraBlack.ttf">
+    <Resource Include="Fonts\IRANSans\IRANSansXFaNum-ExtraBlack.ttf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Fonts\IRANSansXFaNum-ExtraBold.ttf">
+    <Resource Include="Fonts\IRANSans\IRANSansXFaNum-ExtraBold.ttf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Fonts\IRANSansXFaNum-Heavy.ttf">
+    <Resource Include="Fonts\IRANSans\IRANSansXFaNum-Heavy.ttf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Fonts\IRANSansXFaNum-Light.ttf">
+    <Resource Include="Fonts\IRANSans\IRANSansXFaNum-Light.ttf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Fonts\IRANSansXFaNum-Medium.ttf">
+    <Resource Include="Fonts\IRANSans\IRANSansXFaNum-Medium.ttf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Fonts\IRANSansXFaNum-Regular.ttf">
+    <Resource Include="Fonts\IRANSans\IRANSansXFaNum-Regular.ttf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Fonts\IRANSansXFaNum-Thin.ttf">
+    <Resource Include="Fonts\IRANSans\IRANSansXFaNum-Thin.ttf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Fonts\IRANSansXFaNum-UltraLight.ttf">
+    <Resource Include="Fonts\IRANSans\IRANSansXFaNum-UltraLight.ttf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Fonts\Vazir\*.ttf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
 
   <ItemGroup>
-    <Page Update="Controls\SubmenuStyles1.xaml">
+    <Page Update="Themes\SubmenuStyles1.xaml">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Page>
   </ItemGroup>

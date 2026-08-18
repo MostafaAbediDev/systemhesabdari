@@ -1,0 +1,11 @@
+﻿x=1315 -> type=ControlType.Custom name='' id='RowContextMenu' rect=35,240,1286,648
+x=1323 -> type=ControlType.Custom name='' id='' rect=25,123,1640,892
+x=1331 -> type=ControlType.Custom name='' id='' rect=1327,237,328,359
+x=1339 -> type=ControlType.Custom name='' id='' rect=1327,237,328,359
+x=1347 -> type=ControlType.Custom name='' id='' rect=1327,237,328,359
+x=1355 -> type=ControlType.Custom name='' id='' rect=1327,237,328,359
+x=1363 -> type=ControlType.Custom name='' id='' rect=1327,237,328,359
+x=1371 -> type=ControlType.Custom name='' id='' rect=1327,237,328,359
+x=1379 -> type=ControlType.Custom name='' id='' rect=1327,237,328,359
+x=1387 -> type=ControlType.Custom name='' id='' rect=1327,237,328,359
+x=1395 -> type=ControlType.Custom name='' id='' rect=1327,237,328,359

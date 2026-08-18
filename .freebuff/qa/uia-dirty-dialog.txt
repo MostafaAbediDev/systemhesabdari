@@ -1,0 +1,12 @@
+﻿
+Window | 0 | Name=[ذخیره تغییرات] | AId=[]
+  Button | 1 | Name=[Yes] | AId=[6]
+  Button | 1 | Name=[No] | AId=[7]
+  Button | 1 | Name=[Cancel] | AId=[2]
+  Image | 1 | Name=[] | AId=[20]
+  Text | 1 | Name=[تغییراتی که ایجاد کرده‌اید ذخیره نشده است.
+آیا می‌خواهید آن‌ها را ذخیره کنید؟] | AId=[65535]
+  TitleBar | 1 | Name=[ذخیره تغییرات] | AId=[TitleBar]
+    MenuBar | 2 | Name=[System Menu Bar] | AId=[SystemMenuBar]
+      MenuItem | 3 | Name=[System] | AId=[Item 1]
+    Button | 2 | Name=[Close] | AId=[Close]

@@ -10,9 +10,7 @@
              mc:Ignorable="d"
              UseLayoutRounding="True"
              SnapsToDevicePixels="True"
-             TextOptions.TextFormattingMode="Display"
-           
-    FlowDirection="RightToLeft"
+             FlowDirection="RightToLeft"
              Loaded="BranchArchiveListView_Loaded"
              FontFamily="{StaticResource IRANSans}"
              Background="#FFFFFF">
@@ -36,7 +34,14 @@
             <Setter Property="Margin" Value="0,0,-31,0" />
             <Setter Property="Panel.ZIndex" Value="-1" />
         </Style>
-        
+
+        <!-- ظاهر ردیف‌ها شبیه جدول حساب‌های بانکی: خط افقی خاکستری زیر هر ردیف -->
+        <Style x:Key="BankTableCellStyle"
+               TargetType="DataGridCell"
+               BasedOn="{StaticResource UnifiedGridCellStyle}">
+            <Setter Property="BorderThickness" Value="0,0,1,1" />
+        </Style>
+
     </UserControl.Resources>
 
     <Border x:Name="RootBorder"
@@ -86,53 +91,6 @@
                                    VerticalAlignment="Center" />
                     </StackPanel>
 
-                    <StackPanel Grid.Column="2"
-                                Orientation="Horizontal"
-                                VerticalAlignment="Center"
-                                FlowDirection="LeftToRight">
-
-                        <controls:ActionButton Text="حذف"
-                                               TextColor="#DC2626"
-                                               BorderColor="#E9F0FF"
-                                               IconPath="/Assets/Icons/trash.svg"
-                                               Margin="10,0,0,0"
-                                               Click="BtnDelete_Click" />
-
-                        <controls:ActionButton Text="چاپ"
-                                               TextColor="#2563EB"
-                                               BorderColor="#E9F0FF"
-                                               IconPath="/Assets/Icons/printer.svg"
-                                               Margin="6,0,0,0"
-                                               Click="BtnPrint_Click"
-                                               Loaded="ActionButton_Loaded" />
-
-                        <controls:ActionButton Text="Excel"
-                                               TextColor="#374151"
-                                               BorderColor="#E5E7EB"
-                                               Margin="6,0,0,0" />
-
-                        <controls:ActionButton Text="PDF"
-                                               TextColor="#374151"
-                                               BorderColor="#E5E7EB"
-                                               Margin="6,0,0,0" />
-
-                        <controls:ActionButton Text="بروزرسانی"
-                                               TextColor="#2563EB"
-                                               IconPath="/Assets/Icons/arrow-reload-horizontal-2.svg"
-                                               Margin="6,0,0,0"
-                                               
-                                               Click="BtnRefresh_Click"
-                                               Loaded="ActionButton_Loaded_1" />
-
-                        <!-- X بستن -->
-                        <Border Cursor="Hand"
-                                Background="Transparent"
-                                Padding="6"
-                                VerticalAlignment="Center"
-                                Margin="6,0,0,0">
-                           
-                        </Border>
-                    </StackPanel>
                 </Grid>
             </Border>
 
@@ -265,7 +223,7 @@
                         Background="#ffffff"
                         BorderBrush="#E5E7EB"
                         BorderThickness="0,0,0,1"
-                        Padding="12,0,0,6">
+                        Padding="0,0,10,12">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
@@ -365,7 +323,41 @@
                             </Grid>
                         </Border>
 
-                        <!-- دکمه‌ها -->
+                        <StackPanel Grid.Column="2"
+                                    Orientation="Horizontal"
+                                    VerticalAlignment="Center"
+                                    FlowDirection="LeftToRight">
+
+                            <controls:ActionButton Text="حذف"
+                                                   TextColor="#DC2626"
+                                                   BorderColor="#E9F0FF"
+                                                   IconPath="/Assets/Icons/trash.svg"
+                                                   Margin="10,0,0,0"
+                                                   Click="BtnDelete_Click" />
+
+                            <controls:ActionButton Text="چاپ"
+                                                   TextColor="#2563EB"
+                                                   BorderColor="#E9F0FF"
+                                                   IconPath="/Assets/Icons/printer.svg"
+                                                   Margin="6,0,0,0"
+                                                   Click="BtnPrint_Click" />
+
+                            <controls:ActionButton Text="Excel"
+                                                   TextColor="#374151"
+                                                   BorderColor="#E5E7EB"
+                                                   Margin="6,0,0,0" />
+
+                            <controls:ActionButton Text="PDF"
+                                                   TextColor="#374151"
+                                                   BorderColor="#E5E7EB"
+                                                   Margin="6,0,0,0" />
+
+                            <controls:ActionButton Text="بروزرسانی"
+                                                   TextColor="#2563EB"
+                                                   IconPath="/Assets/Icons/arrow-reload-horizontal-2.svg"
+                                                   Margin="6,0,0,0"
+                                                   Click="BtnRefresh_Click" />
+                        </StackPanel>
                     </Grid>
                 </Border>
 
@@ -384,10 +376,13 @@
                             <DataGridTextColumn Header="تاریخ بارگذاری" Width="200" MinWidth="160"
                                                 Binding="{Binding CreationDate}"
                                                 ElementStyle="{StaticResource BaseTextColumnStyle}">
+                                <DataGridTextColumn.CellStyle>
+                                    <Style TargetType="DataGridCell" BasedOn="{StaticResource BankTableCellStyle}" />
+                                </DataGridTextColumn.CellStyle>
                                 <DataGridTextColumn.HeaderStyle>
                                     <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource UnifiedGridColumnHeaderStyle}">
-                                        <Setter Property="BorderThickness" Value="0,0,1,2" />
-                                        <Setter Property="BorderBrush" Value="#E0E7FF" />
+                                        <Setter Property="BorderThickness" Value="0,0,1,1" />
+                                        <Setter Property="BorderBrush" Value="#E5E7EB" />
                                     </Style>
                                 </DataGridTextColumn.HeaderStyle>
                             </DataGridTextColumn>
@@ -396,10 +391,13 @@
                             <DataGridTextColumn Header="شرکت" Width="180" MinWidth="140"
                                                 Binding="{Binding CompanyName}"
                                                 ElementStyle="{StaticResource BaseTextColumnStyle}">
+                                <DataGridTextColumn.CellStyle>
+                                    <Style TargetType="DataGridCell" BasedOn="{StaticResource BankTableCellStyle}" />
+                                </DataGridTextColumn.CellStyle>
                                 <DataGridTextColumn.HeaderStyle>
                                     <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource UnifiedGridColumnHeaderStyle}">
-                                        <Setter Property="BorderThickness" Value="0,0,1,2" />
-                                        <Setter Property="BorderBrush" Value="#E0E7FF" />
+                                        <Setter Property="BorderThickness" Value="0,0,1,1" />
+                                        <Setter Property="BorderBrush" Value="#E5E7EB" />
                                     </Style>
                                 </DataGridTextColumn.HeaderStyle>
                             </DataGridTextColumn>
@@ -408,10 +406,13 @@
                             <DataGridTextColumn Header="شعبه" Width="180" MinWidth="140"
                                                 Binding="{Binding BranchTitle}"
                                                 ElementStyle="{StaticResource FullNameColumnStyle}">
+                                <DataGridTextColumn.CellStyle>
+                                    <Style TargetType="DataGridCell" BasedOn="{StaticResource BankTableCellStyle}" />
+                                </DataGridTextColumn.CellStyle>
                                 <DataGridTextColumn.HeaderStyle>
                                     <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource UnifiedGridColumnHeaderStyle}">
-                                        <Setter Property="BorderThickness" Value="0,0,1,2" />
-                                        <Setter Property="BorderBrush" Value="#E0E7FF" />
+                                        <Setter Property="BorderThickness" Value="0,0,1,1" />
+                                        <Setter Property="BorderBrush" Value="#E5E7EB" />
                                     </Style>
                                 </DataGridTextColumn.HeaderStyle>
                             </DataGridTextColumn>
@@ -420,20 +421,26 @@
                             <DataGridTextColumn Header="عنوان فایل" Width="200" MinWidth="160"
                                                 Binding="{Binding Title}"
                                                 ElementStyle="{StaticResource FullNameColumnStyle}">
+                                <DataGridTextColumn.CellStyle>
+                                    <Style TargetType="DataGridCell" BasedOn="{StaticResource BankTableCellStyle}" />
+                                </DataGridTextColumn.CellStyle>
                                 <DataGridTextColumn.HeaderStyle>
                                     <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource UnifiedGridColumnHeaderStyle}">
-                                        <Setter Property="BorderThickness" Value="0,0,1,2" />
-                                        <Setter Property="BorderBrush" Value="#E0E7FF" />
+                                        <Setter Property="BorderThickness" Value="0,0,1,1" />
+                                        <Setter Property="BorderBrush" Value="#E5E7EB" />
                                     </Style>
                                 </DataGridTextColumn.HeaderStyle>
                             </DataGridTextColumn>
 
                             <!-- ایکون فایل -->
                             <DataGridTemplateColumn Header="فایل" Width="80" MinWidth="60">
+                                <DataGridTemplateColumn.CellStyle>
+                                    <Style TargetType="DataGridCell" BasedOn="{StaticResource BankTableCellStyle}" />
+                                </DataGridTemplateColumn.CellStyle>
                                 <DataGridTemplateColumn.HeaderStyle>
                                     <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource UnifiedGridColumnHeaderStyle}">
-                                        <Setter Property="BorderThickness" Value="0,0,1,2" />
-                                        <Setter Property="BorderBrush" Value="#E0E7FF" />
+                                        <Setter Property="BorderThickness" Value="0,0,1,1" />
+                                        <Setter Property="BorderBrush" Value="#E5E7EB" />
                                     </Style>
                                 </DataGridTemplateColumn.HeaderStyle>
                                 <DataGridTemplateColumn.CellTemplate>
@@ -452,13 +459,11 @@
                                                 ElementStyle="{StaticResource BaseTextColumnStyle}">
                                 <DataGridTextColumn.HeaderStyle>
                                     <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource UnifiedGridColumnHeaderStyle}">
-                                        <Setter Property="BorderThickness" Value="0,0,1,2" />
+                                        <Setter Property="BorderThickness" Value="0,0,1,1" />
                                     </Style>
                                 </DataGridTextColumn.HeaderStyle>
                                 <DataGridTextColumn.CellStyle>
-                                    <Style TargetType="DataGridCell" BasedOn="{StaticResource UnifiedGridCellStyle}">
-                                        <Setter Property="BorderThickness" Value="0,0,1,0" />
-                                    </Style>
+                                    <Style TargetType="DataGridCell" BasedOn="{StaticResource BankTableCellStyle}" />
                                 </DataGridTextColumn.CellStyle>
                             </DataGridTextColumn>
                         </controls:UnifiedListView.Columns>
@@ -484,7 +489,7 @@
                         <!-- تعداد انتخاب شده -->
                         <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
                             <TextBlock x:Name="SelectedSummaryText"
-                                       Text="آرشیو انتخاب شده (0)"
+                                       Text="آرشیو انتخاب شده (۰)"
                                        FontSize="14" FontWeight="SemiBold"
                                        Foreground="#1F2937"
                                        VerticalAlignment="Center" />
@@ -514,29 +519,14 @@
                     Margin="0,10,0,0"
                     BorderBrush="#E5E7EB"
                     BorderThickness="0,1,0,0"
-                    CornerRadius="0,0,12,12"
+                    CornerRadius="0,0,4,4"
                     Background="White"
                     SnapsToDevicePixels="True"
                     UseLayoutRounding="True">
+                <!-- آرشیوها هنگام انتخاب فایل ذخیره می‌شوند؛ پس دکمه‌های ذخیره/ذخیره موقت
+                     (که هیچ عملی انجام نمی‌دادند) حذف شده‌اند و فقط «انصراف» (پاک‌کردن فیلترها) مانده است. -->
                 <Grid Margin="16,10" FlowDirection="RightToLeft">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width=".25*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width=".15*" />
-                    </Grid.ColumnDefinitions>
-
-                    <!-- سمت راست: ذخیره -->
-                    <controls:IconButton Grid.Column="0"
-                                         x:Name="SaveButton"
-                                         ButtonText="ذخیره"
-                                         IconSource="/Assets/Icons/save.svg"
-                                         ButtonCommand="{Binding SaveCommand}"
-                                         ButtonBackground="#2667FF"
-                                         CornerRadius="4" />
-
-                    <!-- وسط: انصراف -->
-                    <StackPanel Grid.Column="1"
-                                Orientation="Horizontal"
+                    <StackPanel Orientation="Horizontal"
                                 Margin="0,0,20,0"
                                 VerticalAlignment="Center"
                                 HorizontalAlignment="Right"
@@ -552,18 +542,6 @@
                                    Foreground="#2667FF"
                                    VerticalAlignment="Center" />
                     </StackPanel>
-
-                    <!-- سمت چپ: ذخیره موقت -->
-                    <controls:CustomOutlinedButton Grid.Column="2"
-                                                   Text="ذخیره موقت"
-                                                   HorizontalAlignment="Stretch"
-                                                   BorderBrush="#2667FF"
-                                                   Foreground="#2667FF">
-                        <controls:CustomOutlinedButton.Icon>
-                            <svg:SvgViewbox Source="/Assets/Icons/Black.svg"
-                                            Width="16" Height="16" />
-                        </controls:CustomOutlinedButton.Icon>
-                    </controls:CustomOutlinedButton>
                 </Grid>
             </Border>
 

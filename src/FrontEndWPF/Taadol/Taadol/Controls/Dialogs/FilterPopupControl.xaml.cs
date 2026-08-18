@@ -111,8 +111,7 @@ namespace Taadol.Controls
             // اگه گزینه‌ای وجود نداره، پیام بده
             if (Options == null || Options.Count == 0)
             {
-                MessageBox.Show("مقداری برای فیلتر کردن وجود ندارد.", Title,
-                    MessageBoxButton.OK, MessageBoxImage.Information);
+                ToastManager.Info("مقداری برای فیلتر کردن وجود ندارد.");
                 return;
             }
 
@@ -122,6 +121,9 @@ namespace Taadol.Controls
 
             // ساخت چک‌باکس‌ها
             BuildCheckBoxes();
+
+            // «همه» از اول فعال باشد؛ به‌محض انتخاب هر گزینه‌ای خاموش می‌شود
+            SelectAllToggle.IsChecked = SelectedOptions.Count == 0;
 
             // ★ مهم: RootCard در XAML به‌عنوان Content اصلی UserControl ست شده.
             // برای قرار دادنش در Popup، اول باید از UserControl جدا (detach) بشه.
@@ -200,24 +202,37 @@ namespace Taadol.Controls
         }
         private void SelectAllToggle_Checked(object sender, RoutedEventArgs e)
         {
+            // «همه» یعنی هیچ فیلتری اعمال نشود → همه‌ی گزینه‌ها خاموش می‌شوند
             _suppressSelectAllSync = true;
             foreach (var kvp in _toggleMap)
             {
                 if (kvp.Value.Visibility == Visibility.Visible)
-                    kvp.Value.IsChecked = true;
+                    kvp.Value.IsChecked = false;
             }
             _suppressSelectAllSync = false;
+
+            // در حالت اعمال فوری، فیلتر بلافاصله پاک شود
+            if (ImmediateApply)
+            {
+                SelectedOptions.Clear();
+                SelectionChanged?.Invoke(new List<string>());
+            }
         }
+
         private void SelectAllToggle_Unchecked(object sender, RoutedEventArgs e)
         {
-            _suppressSelectAllSync = true;
-            foreach (var kvp in _toggleMap)
-                kvp.Value.IsChecked = false;
-            _suppressSelectAllSync = false;
+            // وقتی «همه» خاموش می‌شود (کاربر گزینه‌ای را انتخاب کرده) کاری نمی‌کنیم؛
+            // انتخاب گزینه‌ها توسط خودشان مدیریت می‌شود. اما اگر کاربر «همه» را
+            // کلیک کند و هیچ گزینه‌ای فعال نباشد، دوباره روشنش می‌کنیم تا حالت
+            // «هیچ فیلتری فعال نیست» پیش نیاید.
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                if (_toggleMap.Values.All(t => t.IsChecked != true))
+                    SelectAllToggle.IsChecked = true;
+            }), System.Windows.Threading.DispatcherPriority.Background);
         }
-        private bool _suppressSelectAllSync = false;
 
-       
+        private bool _suppressSelectAllSync = false;
 
         private void SyncSelectAllToggle()
         {
@@ -227,9 +242,10 @@ namespace Taadol.Controls
                 .Where(t => t.Visibility == Visibility.Visible)
                 .ToList();
 
+            // «همه» فقط وقتی فعال است که هیچ گزینه‌ای انتخاب نشده باشد
             _suppressSelectAllSync = true;
-            SelectAllToggle.IsChecked = visibleItems.Count > 0
-                                        && visibleItems.All(t => t.IsChecked == true);
+            SelectAllToggle.IsChecked = visibleItems.Count == 0
+                                        || !visibleItems.Any(t => t.IsChecked == true);
             _suppressSelectAllSync = false;
         }
         private void SetChipChecked(Border chip, TextBlock check, bool isChecked)

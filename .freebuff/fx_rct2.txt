@@ -1,0 +1,6 @@
+﻿CELL name='PE-۲۲۹۴۹' rect=1153,293,57,20
+RCLICK at=1182,303
+WINCOUNT=1
+  WIN[0] title='تعادل - نرم‌افزار حسابداری' class='Window'
+    menuItems=0
+MAIN_TREE_MENUITEMS=0

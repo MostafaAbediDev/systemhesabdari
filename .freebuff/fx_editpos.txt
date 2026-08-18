@@ -1,0 +1,8 @@
+﻿id=PersonNameText name='اریاگستر' rect=1569,253,43,20
+id=ActiveStatusText name='فعال' rect=1537,255,20,15
+hit x=1632,y=263 => type=ControlType.Custom name='' id=''
+hit x=1652,y=263 => type=ControlType.Custom name='' id=''
+hit x=1672,y=263 => type=ControlType.Window name='تعادل - نرم‌افزار حسابداری' id=''
+hit x=1692,y=263 => type=ControlType.Button name='' id='BtnPersons'
+hit x=1712,y=263 => type=ControlType.Button name='' id='BtnPersons'
+hit x=1732,y=263 => type=ControlType.Button name='' id='BtnPersons'

@@ -1,11 +1,14 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:Taadol.Controls">
 
     <!-- ═══ استایل متن ستون‌های گرید (مشترک در همه فرم‌های لیست) ═══ -->
     <Style x:Key="BaseTextColumnStyle"
            TargetType="TextBlock">
         <Setter Property="FontFamily"
                 Value="{StaticResource IRANSans}" />
+        <Setter Property="controls:NumberFontBehavior.Apply"
+                Value="True" />
         <Setter Property="FontSize"
                 Value="13" />
         <Setter Property="HorizontalAlignment"
@@ -21,6 +24,19 @@
            BasedOn="{StaticResource BaseTextColumnStyle}">
         <Setter Property="FlowDirection"
                 Value="LeftToRight" />
+    </Style>
+
+    <!-- استایل ستون‌های عددی: اعداد با وزیر -->
+    <Style x:Key="NumberColumnStyle"
+           TargetType="TextBlock"
+           BasedOn="{StaticResource BaseTextColumnStyle}">
+        <Setter Property="FontFamily" Value="{StaticResource Vazir}" />
+    </Style>
+
+    <Style x:Key="LtrNumberColumnStyle"
+           TargetType="TextBlock"
+           BasedOn="{StaticResource NumberColumnStyle}">
+        <Setter Property="FlowDirection" Value="LeftToRight" />
     </Style>
 
     <Style x:Key="RowNumberColumnStyle"
@@ -58,7 +74,7 @@
         <Setter Property="FontFamily"
                 Value="{StaticResource IRANSans}" />
         <Setter Property="Padding"
-                Value="10,0" />
+                Value="8,0" />
         <Setter Property="BorderBrush"
                 Value="#E5E7EB" />
         <Setter Property="BorderThickness"
@@ -92,8 +108,11 @@
                 Value="#374151" />
         <Setter Property="FontSize"
                 Value="13" />
+        <!-- جداکننده عمودی ستون‌ها: فقط روی ردیف‌های پر (ردیف‌های خالی خط ندارند) -->
+        <Setter Property="BorderBrush"
+                Value="#E5E7EB" />
         <Setter Property="BorderThickness"
-                Value="0" />
+                Value="0,0,1,0" />
         <Setter Property="Padding"
                 Value="8,0" />
         <Setter Property="Template">
@@ -117,6 +136,13 @@
                 <Setter Property="Foreground"
                         Value="#1F2937" />
             </Trigger>
+
+            <!-- ردیف‌های خالی (پرکننده صفحه) خط عمودی ندارند -->
+            <DataTrigger Binding="{Binding IsEmpty}"
+                         Value="True">
+                <Setter Property="BorderThickness"
+                        Value="0" />
+            </DataTrigger>
         </Style.Triggers>
     </Style>
 
@@ -149,10 +175,10 @@
 
             <DataTrigger Binding="{Binding IsEmpty}"
                          Value="True">
-                <Setter Property="Background"
-                        Value="White" />
-                <Setter Property="Cursor"
-                        Value="Arrow" />
+                <Setter Property="Height"
+                        Value="0" />
+                <Setter Property="Visibility"
+                        Value="Collapsed" />
             </DataTrigger>
 
             <DataTrigger Binding="{Binding RowBackground}"

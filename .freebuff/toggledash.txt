@@ -1,0 +1,1 @@
+﻿CLICK BtnDashboard at=1800,176

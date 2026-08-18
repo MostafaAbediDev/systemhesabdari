@@ -1,0 +1,4 @@
+﻿TAB id=tabAll name='همه اشخاص' toggle=On rect=724,194,226,40
+TAB id=tabCustomers name='مشتری' toggle=Off rect=494,194,226,40
+TAB id=tabSuppliers name='تامین کننده' toggle=Off rect=265,194,225,40
+TAB id=tabPersonnel name='پرسنل' toggle=Off rect=35,194,226,40

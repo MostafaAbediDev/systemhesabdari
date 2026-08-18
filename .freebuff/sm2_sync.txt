@@ -1,0 +1,5 @@
+﻿SYNC_EVENT_FIRED=False
+TAB id=tabAll toggle=On
+TAB id=tabCustomers toggle=Off
+TAB id=tabSuppliers toggle=Off
+TAB id=tabPersonnel toggle=Off

@@ -1,0 +1,11 @@
+﻿INVOKED submenu item 'شخص جدید'
+WIN[0] title='تعادل - نرم‌افزار حسابداری' cls='Window'
+TREE: name='تغییرات ذخیره‌نشده'
+TREE: name='فرم بازشده تغییرات ذخیره‌نشده دارد. آیا بدون ذخیره از آن خارج می‌شوید؟'
+TREE: name='خروج از فرم'
+TREE: name='خروج از فرم'
+TREE: name='بازگشت'
+TREE: name='بازگشت'
+DIALOG_PRESENT=True
+MODAL_STILL_OPEN=True
+alive=True responding=True

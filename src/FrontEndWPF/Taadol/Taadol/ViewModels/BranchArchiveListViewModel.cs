@@ -8,9 +8,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Taadol.Controls;
 using Taadol.Models;
 
 namespace Taadol.ViewModels
@@ -28,9 +30,6 @@ namespace Taadol.ViewModels
             FilteredArchives = new ObservableCollection<BranchArchiveItem>();
             Pages = new ObservableCollection<ArchivePageItem>();
         }
-
-        [RelayCommand]
-        private void Save() { }
 
         [ObservableProperty] private ObservableCollection<BranchArchiveItem> _allArchives;
         [ObservableProperty] private ObservableCollection<BranchArchiveItem> _filteredArchives;
@@ -50,6 +49,31 @@ namespace Taadol.ViewModels
         [ObservableProperty] private BranchFilterItem _selectedBranch;
 
         private List<long> _companyBranchIds = new();
+
+        // تبدیل تاریخ میلادی دریافتی از سرویس به تاریخ شمسی (همان الگوی لیست‌های دیگر)
+        private string ToPersianDate(object dateValue)
+        {
+            if (dateValue == null)
+                return "—";
+
+            DateTime date;
+            if (dateValue is DateTime dt)
+            {
+                date = dt;
+            }
+            else
+            {
+                if (!DateTime.TryParse(dateValue.ToString(), out date))
+                    return "—";
+            }
+
+            PersianCalendar pc = new PersianCalendar();
+            int year = pc.GetYear(date);
+            int month = pc.GetMonth(date);
+            int day = pc.GetDayOfMonth(date);
+
+            return $"{year:0000}/{month:00}/{day:00}";
+        }
 
         public List<BranchArchiveItem> GetSelectedItems()
         {
@@ -136,7 +160,7 @@ namespace Taadol.ViewModels
                         File = string.IsNullOrWhiteSpace(a.File) ? "—" : a.File,
                         BranchTitle = string.IsNullOrWhiteSpace(branchName) ? "—" : branchName,
                         CompanyName = string.IsNullOrWhiteSpace(companyName) ? "—" : companyName,
-                        CreationDate = string.IsNullOrWhiteSpace(a.CreationDate) ? "—" : a.CreationDate,
+                        CreationDate = string.IsNullOrWhiteSpace(a.CreationDate) ? "—" : ToPersianDate(a.CreationDate),
                         IsEmpty = false
                     };
                 }).ToList();
@@ -147,8 +171,7 @@ namespace Taadol.ViewModels
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.Message, "خطا در لود آرشیو شعبه",
-                    System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                ToastManager.Error("خطا در لود آرشیو شعبه: " + ex.Message);
                 AllArchives = new ObservableCollection<BranchArchiveItem>();
                 ApplyFilters();
             }
@@ -240,12 +263,6 @@ namespace Taadol.ViewModels
 
             FilteredArchives = new ObservableCollection<BranchArchiveItem>(pageItems);
 
-            int realCount = FilteredArchives.Count;
-            for (int i = realCount + 1; i <= PageSize; i++)
-            {
-                FilteredArchives.Add(new BranchArchiveItem { RowNumber = 0, IsEmpty = true });
-            }
-
             BuildPages();
             UpdatePageInfo();
             UpdateSelectedCount();
@@ -292,8 +309,7 @@ namespace Taadol.ViewModels
         {
             if (string.IsNullOrWhiteSpace(filePath))
             {
-                System.Windows.MessageBox.Show("ابتدا یک فایل انتخاب کنید.", "خطا",
-                    System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+                ToastManager.Warning("ابتدا یک فایل انتخاب کنید.");
                 return;
             }
 
@@ -360,12 +376,9 @@ namespace Taadol.ViewModels
             get => _rowNumber;
             set
             {
-                if (_rowNumber != value)
-                {
-                    _rowNumber = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RowNumber)));
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RowNumberDisplay)));
-                }
+                _rowNumber = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RowNumber)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RowNumberDisplay)));
             }
         }
 

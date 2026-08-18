@@ -1,0 +1,404 @@
+﻿RCLICK 'اریاگستر' at=1057,303
+ELEMENTS=425
+[0] ControlType.Window | name='خطا' | id='' | rect=848,471 x | off=False
+[1] ControlType.Pane | name='OK' | id='2' | rect=990,590 x | off=False
+[2] ControlType.Pane | name='' | id='20' | rect=877,525 x | off=False
+[3] ControlType.Pane | name='لطفاً یک شخص انتخاب کنید.' | id='65535' | rect=918,535 x | off=False
+[5] ControlType.Text | name='لیست اشخاص' | id='' | rect=1501,140 x | off=False
+[6] ControlType.Custom | name='' | id='Root' | rect=35,135 x | off=False
+[7] ControlType.Text | name='حذف' | id='BtnText' | rect=48,146 x | off=False
+[8] ControlType.Custom | name='' | id='Root' | rect=115,135 x | off=False
+[9] ControlType.Text | name='چاپ' | id='BtnText' | rect=128,146 x | off=False
+[10] ControlType.Custom | name='' | id='Root' | rect=190,135 x | off=False
+[11] ControlType.Text | name='Excel' | id='BtnText' | rect=203,146 x | off=False
+[12] ControlType.Custom | name='' | id='Root' | rect=251,135 x | off=False
+[13] ControlType.Text | name='PDF' | id='BtnText' | rect=264,146 x | off=False
+[14] ControlType.Custom | name='' | id='Root' | rect=305,135 x | off=False
+[15] ControlType.Text | name='بروزرسانی' | id='BtnText' | rect=318,146 x | off=False
+[16] ControlType.Text | name='اشخاص انتخاب شده' | id='PanelHeaderText' | rect=1516,200 x | off=False
+[17] ControlType.Text | name='(۰)' | id='SelectedCountText' | rect=1491,200 x | off=False
+[18] ControlType.Pane | name='' | id='DetailPanelScroll' | rect=1327,237 x | off=False
+[19] ControlType.Text | name='شخص جدید' | id='BtnNewText' | rect=1448,944 x | off=False
+[20] ControlType.Edit | name='' | id='SearchBox' | rect=995,199 x | off=False
+[21] ControlType.Text | name='جستجو در نام ، شماره موبایل' | id='' | rect=995,205 x | off=False
+[22] ControlType.Button | name='همه اشخاص' | id='tabAll' | rect=724,194 x | off=False
+[23] ControlType.Button | name='مشتری' | id='tabCustomers' | rect=494,194 x | off=False
+[24] ControlType.Button | name='تامین کننده' | id='tabSuppliers' | rect=265,194 x | off=False
+[25] ControlType.Button | name='پرسنل' | id='tabPersonnel' | rect=35,194 x | off=False
+[26] ControlType.Custom | name='' | id='PersonsGrid' | rect=25,240 x | off=False
+[27] ControlType.DataGrid | name='' | id='DataGridView' | rect=36,241 x | off=False
+[28] ControlType.Header | name='' | id='PART_ColumnHeadersPresenter' | rect=36,241 x | off=False
+[30] ControlType.Button | name='' | id='SelectAllBorder' | rect=1288,252 x | off=False
+[31] ControlType.HeaderItem | name='#' | id='' | rect=1226,241 x | off=False
+[32] ControlType.Text | name='#' | id='' | rect=1247,252 x | off=False
+[33] ControlType.HeaderItem | name='کد یکتا' | id='' | rect=1136,241 x | off=False
+[34] ControlType.Text | name='کد یکتا' | id='' | rect=1163,252 x | off=False
+[35] ControlType.HeaderItem | name='نام کامل / شرکت' | id='' | rect=976,241 x | off=False
+[36] ControlType.Text | name='نام کامل / شرکت' | id='' | rect=1012,252 x | off=False
+[38] ControlType.Text | name='ویژگی' | id='' | rect=928,252 x | off=False
+[41] ControlType.Text | name='ویژگی' | id='' | rect=928,252 x | off=False
+[43] ControlType.HeaderItem | name='موبایل' | id='' | rect=691,241 x | off=False
+[44] ControlType.Text | name='موبایل' | id='' | rect=731,252 x | off=False
+[46] ControlType.Text | name='شهر' | id='' | rect=640,252 x | off=False
+[48] ControlType.HeaderItem | name='آخرین تراکنش' | id='' | rect=471,241 x | off=False
+[49] ControlType.Text | name='آخرین تراکنش' | id='' | rect=492,252 x | off=False
+[51] ControlType.Text | name='مانده / وضعیت حساب' | id='' | rect=206,252 x | off=False
+[53] ControlType.DataItem | name='Taadol.Views.PersonItem' | id='' | rect=36,285 x | off=False
+[54] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 0' | id='' | rect=1276,285 x | off=False
+[55] ControlType.Button | name='' | id='RowToggle' | rect=1288,293 x | off=False
+[56] ControlType.Custom | name='۱' | id='' | rect=1226,285 x | off=False
+[57] ControlType.Text | name='۱' | id='' | rect=1249,293 x | off=False
+[58] ControlType.Custom | name='PE-۲۲۹۴۹' | id='' | rect=1136,285 x | off=False
+[59] ControlType.Text | name='PE-۲۲۹۴۹' | id='' | rect=1153,293 x | off=False
+[60] ControlType.Custom | name='اریاگستر' | id='' | rect=976,285 x | off=False
+[61] ControlType.Text | name='اریاگستر' | id='' | rect=1036,293 x | off=False
+[62] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 4' | id='' | rect=886,285 x | off=False
+[63] ControlType.Text | name='فعال' | id='' | rect=920,295 x | off=False
+[64] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 5' | id='' | rect=806,285 x | off=False
+[65] ControlType.Text | name='حقوقی' | id='' | rect=828,293 x | off=False
+[66] ControlType.Custom | name='—' | id='' | rect=691,285 x | off=False
+[67] ControlType.Text | name='—' | id='' | rect=743,293 x | off=False
+[68] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 7' | id='' | rect=586,285 x | off=False
+[69] ControlType.Text | name='—' | id='' | rect=632,293 x | off=False
+[70] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 8' | id='' | rect=471,285 x | off=False
+[72] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 9' | id='' | rect=36,285 x | off=False
+[73] ControlType.Text | name=' بی حساب' | id='' | rect=226,293 x | off=False
+[74] ControlType.DataItem | name='Taadol.Views.PersonItem' | id='' | rect=36,321 x | off=False
+[75] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 0' | id='' | rect=1276,321 x | off=False
+[76] ControlType.Button | name='' | id='RowToggle' | rect=1288,329 x | off=False
+[77] ControlType.Custom | name='۲' | id='' | rect=1226,321 x | off=False
+[78] ControlType.Text | name='۲' | id='' | rect=1248,329 x | off=False
+[79] ControlType.Custom | name='PE-۶۲۵۲۸' | id='' | rect=1136,321 x | off=False
+[80] ControlType.Text | name='PE-۶۲۵۲۸' | id='' | rect=1154,329 x | off=False
+[81] ControlType.Custom | name='ثصقصثق ثصقصثقصثق' | id='' | rect=976,321 x | off=False
+[82] ControlType.Text | name='ثصقصثق ثصقصثقصثق' | id='' | rect=996,329 x | off=False
+[83] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 4' | id='' | rect=886,321 x | off=False
+[84] ControlType.Text | name='فعال' | id='' | rect=920,331 x | off=False
+[85] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 5' | id='' | rect=806,321 x | off=False
+[86] ControlType.Text | name='حقیقی' | id='' | rect=829,329 x | off=False
+[87] ControlType.Custom | name='۰۹۱۷۴۵۴۴۵۴۵' | id='' | rect=691,321 x | off=False
+[88] ControlType.Text | name='۰۹۱۷۴۵۴۴۵۴۵' | id='' | rect=709,329 x | off=False
+[89] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 7' | id='' | rect=586,321 x | off=False
+[90] ControlType.Text | name='آذرشهر' | id='' | rect=622,329 x | off=False
+[91] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 8' | id='' | rect=471,321 x | off=False
+[93] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 9' | id='' | rect=36,321 x | off=False
+[94] ControlType.Text | name=' بی حساب' | id='' | rect=226,329 x | off=False
+[95] ControlType.DataItem | name='Taadol.Views.PersonItem' | id='' | rect=36,357 x | off=False
+[96] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 0' | id='' | rect=1276,357 x | off=False
+[97] ControlType.Button | name='' | id='RowToggle' | rect=1288,365 x | off=False
+[98] ControlType.Custom | name='۳' | id='' | rect=1226,357 x | off=False
+[99] ControlType.Text | name='۳' | id='' | rect=1247,365 x | off=False
+[100] ControlType.Custom | name='PE-۶۴۲۳۳' | id='' | rect=1136,357 x | off=False
+[101] ControlType.Text | name='PE-۶۴۲۳۳' | id='' | rect=1152,365 x | off=False
+[102] ControlType.Custom | name='یسبسیبسیب یسبسیبسیب' | id='' | rect=976,357 x | off=False
+[103] ControlType.Text | name='یسبسیبسیب یسبسیبسیب' | id='' | rect=988,365 x | off=False
+[104] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 4' | id='' | rect=886,357 x | off=False
+[105] ControlType.Text | name='فعال' | id='' | rect=920,367 x | off=False
+[106] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 5' | id='' | rect=806,357 x | off=False
+[107] ControlType.Text | name='حقیقی' | id='' | rect=829,365 x | off=False
+[108] ControlType.Custom | name='—' | id='' | rect=691,357 x | off=False
+[109] ControlType.Text | name='—' | id='' | rect=743,365 x | off=False
+[110] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 7' | id='' | rect=586,357 x | off=False
+[111] ControlType.Text | name='ارومیه  ۵' | id='' | rect=616,365 x | off=False
+[112] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 8' | id='' | rect=471,357 x | off=False
+[114] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 9' | id='' | rect=36,357 x | off=False
+[115] ControlType.Text | name=' بی حساب' | id='' | rect=226,365 x | off=False
+[116] ControlType.DataItem | name='Taadol.Views.PersonItem' | id='' | rect=36,393 x | off=False
+[117] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 0' | id='' | rect=1276,393 x | off=False
+[118] ControlType.Button | name='' | id='RowToggle' | rect=1288,401 x | off=False
+[119] ControlType.Custom | name='۴' | id='' | rect=1226,393 x | off=False
+[120] ControlType.Text | name='۴' | id='' | rect=1248,401 x | off=False
+[121] ControlType.Custom | name='PE-۰۰۵۰۰' | id='' | rect=1136,393 x | off=False
+[122] ControlType.Text | name='PE-۰۰۵۰۰' | id='' | rect=1156,401 x | off=False
+[123] ControlType.Custom | name='امیرعلی فراهانی' | id='' | rect=976,393 x | off=False
+[124] ControlType.Text | name='امیرعلی فراهانی' | id='' | rect=1016,401 x | off=False
+[125] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 4' | id='' | rect=886,393 x | off=False
+[126] ControlType.Text | name='فعال' | id='' | rect=920,403 x | off=False
+[127] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 5' | id='' | rect=806,393 x | off=False
+[128] ControlType.Text | name='حقیقی' | id='' | rect=829,401 x | off=False
+[129] ControlType.Custom | name='—' | id='' | rect=691,393 x | off=False
+[130] ControlType.Text | name='—' | id='' | rect=743,401 x | off=False
+[131] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 7' | id='' | rect=586,393 x | off=False
+[132] ControlType.Text | name='خاکعلی' | id='' | rect=620,401 x | off=False
+[133] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 8' | id='' | rect=471,393 x | off=False
+[134] ControlType.Text | name='—' | id='' | rect=533,402 x | off=False
+[135] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 9' | id='' | rect=36,393 x | off=False
+[136] ControlType.Text | name='۱۰,۴۹۹,۰۰۰ بستانکار' | id='' | rect=203,401 x | off=False
+[137] ControlType.DataItem | name='Taadol.Views.PersonItem' | id='' | rect=36,429 x | off=False
+[138] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 0' | id='' | rect=1276,429 x | off=False
+[139] ControlType.Button | name='' | id='RowToggle' | rect=1288,437 x | off=False
+[140] ControlType.Custom | name='۵' | id='' | rect=1226,429 x | off=False
+[141] ControlType.Text | name='۵' | id='' | rect=1248,437 x | off=False
+[142] ControlType.Custom | name='PE-۰۰۴۹۷' | id='' | rect=1136,429 x | off=False
+[143] ControlType.Text | name='PE-۰۰۴۹۷' | id='' | rect=1155,437 x | off=False
+[144] ControlType.Custom | name='کیان' | id='' | rect=976,429 x | off=False
+[145] ControlType.Text | name='کیان' | id='' | rect=1044,437 x | off=False
+[146] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 4' | id='' | rect=886,429 x | off=False
+[147] ControlType.Text | name='فعال' | id='' | rect=920,439 x | off=False
+[148] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 5' | id='' | rect=806,429 x | off=False
+[149] ControlType.Text | name='حقوقی' | id='' | rect=828,437 x | off=False
+[150] ControlType.Custom | name='۰۹۰۰۰۰۰۱۴۹۷' | id='' | rect=691,429 x | off=False
+[151] ControlType.Text | name='۰۹۰۰۰۰۰۱۴۹۷' | id='' | rect=715,437 x | off=False
+[152] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 7' | id='' | rect=586,429 x | off=False
+[153] ControlType.Text | name='اسفرورین' | id='' | rect=615,437 x | off=False
+[154] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 8' | id='' | rect=471,429 x | off=False
+[155] ControlType.Text | name='—' | id='' | rect=533,438 x | off=False
+[156] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 9' | id='' | rect=36,429 x | off=False
+[157] ControlType.Text | name='۱۰,۴۹۶,۰۰۰ بدهکار' | id='' | rect=207,437 x | off=False
+[158] ControlType.DataItem | name='Taadol.Views.PersonItem' | id='' | rect=36,465 x | off=False
+[159] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 0' | id='' | rect=1276,465 x | off=False
+[160] ControlType.Button | name='' | id='RowToggle' | rect=1288,473 x | off=False
+[161] ControlType.Custom | name='۶' | id='' | rect=1226,465 x | off=False
+[162] ControlType.Text | name='۶' | id='' | rect=1248,473 x | off=False
+[163] ControlType.Custom | name='PE-۰۰۴۹۵' | id='' | rect=1136,465 x | off=False
+[164] ControlType.Text | name='PE-۰۰۴۹۵' | id='' | rect=1155,473 x | off=False
+[165] ControlType.Custom | name='آرین' | id='' | rect=976,465 x | off=False
+[166] ControlType.Text | name='آرین' | id='' | rect=1046,473 x | off=False
+[167] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 4' | id='' | rect=886,465 x | off=False
+[168] ControlType.Text | name='فعال' | id='' | rect=920,475 x | off=False
+[169] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 5' | id='' | rect=806,465 x | off=False
+[170] ControlType.Text | name='حقوقی' | id='' | rect=828,473 x | off=False
+[171] ControlType.Custom | name='—' | id='' | rect=691,465 x | off=False
+[172] ControlType.Text | name='—' | id='' | rect=743,473 x | off=False
+[173] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 7' | id='' | rect=586,465 x | off=False
+[174] ControlType.Text | name='آبگرم' | id='' | rect=626,473 x | off=False
+[175] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 8' | id='' | rect=471,465 x | off=False
+[176] ControlType.Text | name='—' | id='' | rect=533,474 x | off=False
+[177] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 9' | id='' | rect=36,465 x | off=False
+[178] ControlType.Text | name='۱۰,۴۹۴,۰۰۰ بدهکار' | id='' | rect=206,473 x | off=False
+[179] ControlType.DataItem | name='Taadol.Views.PersonItem' | id='' | rect=36,501 x | off=False
+[180] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 0' | id='' | rect=1276,501 x | off=False
+[181] ControlType.Button | name='' | id='RowToggle' | rect=1288,509 x | off=False
+[182] ControlType.Custom | name='۷' | id='' | rect=1226,501 x | off=False
+[183] ControlType.Text | name='۷' | id='' | rect=1248,509 x | off=False
+[184] ControlType.Custom | name='PE-۰۰۴۹۴' | id='' | rect=1136,501 x | off=False
+[185] ControlType.Text | name='PE-۰۰۴۹۴' | id='' | rect=1155,509 x | off=False
+[186] ControlType.Custom | name='کیان زارعی' | id='' | rect=976,501 x | off=False
+[187] ControlType.Text | name='کیان زارعی' | id='' | rect=1030,509 x | off=False
+[188] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 4' | id='' | rect=886,501 x | off=False
+[189] ControlType.Text | name='فعال' | id='' | rect=920,511 x | off=False
+[190] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 5' | id='' | rect=806,501 x | off=False
+[191] ControlType.Text | name='حقیقی' | id='' | rect=829,509 x | off=False
+[192] ControlType.Custom | name='—' | id='' | rect=691,501 x | off=False
+[193] ControlType.Text | name='—' | id='' | rect=743,509 x | off=False
+[194] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 7' | id='' | rect=586,501 x | off=False
+[195] ControlType.Text | name='وراوی' | id='' | rect=625,509 x | off=False
+[196] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 8' | id='' | rect=471,501 x | off=False
+[197] ControlType.Text | name='—' | id='' | rect=533,510 x | off=False
+[198] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 9' | id='' | rect=36,501 x | off=False
+[199] ControlType.Text | name='۱۰,۴۹۳,۰۰۰ بدهکار' | id='' | rect=206,509 x | off=False
+[200] ControlType.DataItem | name='Taadol.Views.PersonItem' | id='' | rect=36,537 x | off=False
+[201] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 0' | id='' | rect=1276,537 x | off=False
+[202] ControlType.Button | name='' | id='RowToggle' | rect=1288,545 x | off=False
+[203] ControlType.Custom | name='۸' | id='' | rect=1226,537 x | off=False
+[204] ControlType.Text | name='۸' | id='' | rect=1248,545 x | off=False
+[205] ControlType.Custom | name='PE-۰۰۴۹۳' | id='' | rect=1136,537 x | off=False
+[206] ControlType.Text | name='PE-۰۰۴۹۳' | id='' | rect=1154,545 x | off=False
+[207] ControlType.Custom | name='محمدرضا' | id='' | rect=976,537 x | off=False
+[208] ControlType.Text | name='محمدرضا' | id='' | rect=1032,545 x | off=False
+[209] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 4' | id='' | rect=886,537 x | off=False
+[210] ControlType.Text | name='فعال' | id='' | rect=920,547 x | off=False
+[211] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 5' | id='' | rect=806,537 x | off=False
+[212] ControlType.Text | name='حقوقی' | id='' | rect=828,545 x | off=False
+[213] ControlType.Custom | name='—' | id='' | rect=691,537 x | off=False
+[214] ControlType.Text | name='—' | id='' | rect=743,545 x | off=False
+[215] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 7' | id='' | rect=586,537 x | off=False
+[216] ControlType.Text | name='نورآباد' | id='' | rect=624,545 x | off=False
+[217] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 8' | id='' | rect=471,537 x | off=False
+[218] ControlType.Text | name='—' | id='' | rect=533,546 x | off=False
+[219] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 9' | id='' | rect=36,537 x | off=False
+[220] ControlType.Text | name='۱۰,۴۹۲,۰۰۰ بدهکار' | id='' | rect=206,545 x | off=False
+[221] ControlType.DataItem | name='Taadol.Views.PersonItem' | id='' | rect=36,573 x | off=False
+[222] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 0' | id='' | rect=1276,573 x | off=False
+[223] ControlType.Button | name='' | id='RowToggle' | rect=1288,581 x | off=False
+[224] ControlType.Custom | name='۹' | id='' | rect=1226,573 x | off=False
+[225] ControlType.Text | name='۹' | id='' | rect=1248,581 x | off=False
+[226] ControlType.Custom | name='PE-۰۰۴۹۱' | id='' | rect=1136,573 x | off=False
+[227] ControlType.Text | name='PE-۰۰۴۹۱' | id='' | rect=1156,581 x | off=False
+[228] ControlType.Custom | name='محمدرضا' | id='' | rect=976,573 x | off=False
+[229] ControlType.Text | name='محمدرضا' | id='' | rect=1032,581 x | off=False
+[230] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 4' | id='' | rect=886,573 x | off=False
+[231] ControlType.Text | name='فعال' | id='' | rect=920,583 x | off=False
+[232] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 5' | id='' | rect=806,573 x | off=False
+[233] ControlType.Text | name='حقوقی' | id='' | rect=828,581 x | off=False
+[234] ControlType.Custom | name='—' | id='' | rect=691,573 x | off=False
+[235] ControlType.Text | name='—' | id='' | rect=743,581 x | off=False
+[236] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 7' | id='' | rect=586,573 x | off=False
+[237] ControlType.Text | name='میمند' | id='' | rect=624,581 x | off=False
+[238] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 8' | id='' | rect=471,573 x | off=False
+[239] ControlType.Text | name='—' | id='' | rect=533,582 x | off=False
+[240] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 9' | id='' | rect=36,573 x | off=False
+[241] ControlType.Text | name='۱۰,۴۹۰,۰۰۰ بدهکار' | id='' | rect=208,581 x | off=False
+[242] ControlType.DataItem | name='Taadol.Views.PersonItem' | id='' | rect=36,609 x | off=False
+[243] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 0' | id='' | rect=1276,609 x | off=False
+[244] ControlType.Button | name='' | id='RowToggle' | rect=1288,617 x | off=False
+[245] ControlType.Custom | name='۱۰' | id='' | rect=1226,609 x | off=False
+[246] ControlType.Text | name='۱۰' | id='' | rect=1246,617 x | off=False
+[247] ControlType.Custom | name='PE-۰۰۴۹۰' | id='' | rect=1136,609 x | off=False
+[248] ControlType.Text | name='PE-۰۰۴۹۰' | id='' | rect=1156,617 x | off=False
+[249] ControlType.Custom | name='امیر نصیری' | id='' | rect=976,609 x | off=False
+[250] ControlType.Text | name='امیر نصیری' | id='' | rect=1027,617 x | off=False
+[251] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 4' | id='' | rect=886,609 x | off=False
+[252] ControlType.Text | name='فعال' | id='' | rect=920,619 x | off=False
+[253] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 5' | id='' | rect=806,609 x | off=False
+[254] ControlType.Text | name='حقیقی' | id='' | rect=829,617 x | off=False
+[255] ControlType.Custom | name='—' | id='' | rect=691,609 x | off=False
+[256] ControlType.Text | name='—' | id='' | rect=743,617 x | off=False
+[257] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 7' | id='' | rect=586,609 x | off=False
+[258] ControlType.Text | name='مهر' | id='' | rect=630,617 x | off=False
+[259] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 8' | id='' | rect=471,609 x | off=False
+[260] ControlType.Text | name='—' | id='' | rect=533,618 x | off=False
+[261] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 9' | id='' | rect=36,609 x | off=False
+[262] ControlType.Text | name='۱۰,۴۸۹,۰۰۰ بدهکار' | id='' | rect=207,617 x | off=False
+[263] ControlType.DataItem | name='Taadol.Views.PersonItem' | id='' | rect=36,645 x | off=False
+[264] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 0' | id='' | rect=1276,645 x | off=False
+[265] ControlType.Button | name='' | id='RowToggle' | rect=1288,653 x | off=False
+[266] ControlType.Custom | name='۱۱' | id='' | rect=1226,645 x | off=False
+[267] ControlType.Text | name='۱۱' | id='' | rect=1247,653 x | off=False
+[268] ControlType.Custom | name='PE-۰۰۴۸۸' | id='' | rect=1136,645 x | off=False
+[269] ControlType.Text | name='PE-۰۰۴۸۸' | id='' | rect=1154,653 x | off=False
+[270] ControlType.Custom | name='بهنام بهرامی' | id='' | rect=976,645 x | off=False
+[271] ControlType.Text | name='بهنام بهرامی' | id='' | rect=1025,653 x | off=False
+[272] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 4' | id='' | rect=886,645 x | off=False
+[273] ControlType.Text | name='فعال' | id='' | rect=920,655 x | off=False
+[274] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 5' | id='' | rect=806,645 x | off=False
+[275] ControlType.Text | name='حقیقی' | id='' | rect=829,653 x | off=False
+[276] ControlType.Custom | name='—' | id='' | rect=691,645 x | off=False
+[277] ControlType.Text | name='—' | id='' | rect=743,653 x | off=False
+[278] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 7' | id='' | rect=586,645 x | off=False
+[279] ControlType.Text | name='مزایجان' | id='' | rect=618,653 x | off=False
+[280] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 8' | id='' | rect=471,645 x | off=False
+[281] ControlType.Text | name='—' | id='' | rect=533,654 x | off=False
+[282] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 9' | id='' | rect=36,645 x | off=False
+[283] ControlType.Text | name='۱۰,۴۸۷,۰۰۰ بدهکار' | id='' | rect=206,653 x | off=False
+[284] ControlType.DataItem | name='Taadol.Views.PersonItem' | id='' | rect=36,681 x | off=False
+[285] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 0' | id='' | rect=1276,681 x | off=False
+[286] ControlType.Button | name='' | id='RowToggle' | rect=1288,689 x | off=False
+[287] ControlType.Custom | name='۱۲' | id='' | rect=1226,681 x | off=False
+[288] ControlType.Text | name='۱۲' | id='' | rect=1246,689 x | off=False
+[289] ControlType.Custom | name='PE-۰۰۴۸۶' | id='' | rect=1136,681 x | off=False
+[290] ControlType.Text | name='PE-۰۰۴۸۶' | id='' | rect=1156,689 x | off=False
+[291] ControlType.Custom | name='رضا یوسفی' | id='' | rect=976,681 x | off=False
+[292] ControlType.Text | name='رضا یوسفی' | id='' | rect=1028,689 x | off=False
+[293] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 4' | id='' | rect=886,681 x | off=False
+[294] ControlType.Text | name='فعال' | id='' | rect=920,691 x | off=False
+[295] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 5' | id='' | rect=806,681 x | off=False
+[296] ControlType.Text | name='حقیقی' | id='' | rect=829,689 x | off=False
+[297] ControlType.Custom | name='—' | id='' | rect=691,681 x | off=False
+[298] ControlType.Text | name='—' | id='' | rect=743,689 x | off=False
+[299] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 7' | id='' | rect=586,681 x | off=False
+[300] ControlType.Text | name='مادرسلیمان' | id='' | rect=610,689 x | off=False
+[301] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 8' | id='' | rect=471,681 x | off=False
+[302] ControlType.Text | name='—' | id='' | rect=533,690 x | off=False
+[303] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 9' | id='' | rect=36,681 x | off=False
+[304] ControlType.Text | name='۱۰,۴۸۵,۰۰۰ بدهکار' | id='' | rect=206,689 x | off=False
+[305] ControlType.DataItem | name='Taadol.Views.PersonItem' | id='' | rect=36,717 x | off=False
+[306] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 0' | id='' | rect=1276,717 x | off=False
+[307] ControlType.Button | name='' | id='RowToggle' | rect=1288,725 x | off=False
+[308] ControlType.Custom | name='۱۳' | id='' | rect=1226,717 x | off=False
+[309] ControlType.Text | name='۱۳' | id='' | rect=1244,725 x | off=False
+[310] ControlType.Custom | name='PE-۰۰۴۸۴' | id='' | rect=1136,717 x | off=False
+[311] ControlType.Text | name='PE-۰۰۴۸۴' | id='' | rect=1155,725 x | off=False
+[312] ControlType.Custom | name='پویا قاسمی' | id='' | rect=976,717 x | off=False
+[313] ControlType.Text | name='پویا قاسمی' | id='' | rect=1028,725 x | off=False
+[314] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 4' | id='' | rect=886,717 x | off=False
+[315] ControlType.Text | name='فعال' | id='' | rect=920,727 x | off=False
+[316] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 5' | id='' | rect=806,717 x | off=False
+[317] ControlType.Text | name='حقیقی' | id='' | rect=829,725 x | off=False
+[318] ControlType.Custom | name='—' | id='' | rect=691,717 x | off=False
+[319] ControlType.Text | name='—' | id='' | rect=743,725 x | off=False
+[320] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 7' | id='' | rect=586,717 x | off=False
+[321] ControlType.Text | name='لار' | id='' | rect=633,725 x | off=False
+[322] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 8' | id='' | rect=471,717 x | off=False
+[323] ControlType.Text | name='—' | id='' | rect=533,726 x | off=False
+[324] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 9' | id='' | rect=36,717 x | off=False
+[325] ControlType.Text | name='۱۰,۴۸۳,۰۰۰ بدهکار' | id='' | rect=206,725 x | off=False
+[326] ControlType.DataItem | name='Taadol.Views.PersonItem' | id='' | rect=36,753 x | off=False
+[327] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 0' | id='' | rect=1276,753 x | off=False
+[328] ControlType.Button | name='' | id='RowToggle' | rect=1288,761 x | off=False
+[329] ControlType.Custom | name='۱۴' | id='' | rect=1226,753 x | off=False
+[330] ControlType.Text | name='۱۴' | id='' | rect=1246,761 x | off=False
+[331] ControlType.Custom | name='PE-۰۰۴۸۳' | id='' | rect=1136,753 x | off=False
+[332] ControlType.Text | name='PE-۰۰۴۸۳' | id='' | rect=1154,761 x | off=False
+[333] ControlType.Custom | name='اشکان' | id='' | rect=976,753 x | off=False
+[334] ControlType.Text | name='اشکان' | id='' | rect=1040,761 x | off=False
+[335] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 4' | id='' | rect=886,753 x | off=False
+[336] ControlType.Text | name='فعال' | id='' | rect=920,763 x | off=False
+[337] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 5' | id='' | rect=806,753 x | off=False
+[338] ControlType.Text | name='حقوقی' | id='' | rect=828,761 x | off=False
+[339] ControlType.Custom | name='—' | id='' | rect=691,753 x | off=False
+[340] ControlType.Text | name='—' | id='' | rect=743,761 x | off=False
+[341] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 7' | id='' | rect=586,753 x | off=False
+[342] ControlType.Text | name='گراش' | id='' | rect=625,761 x | off=False
+[343] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 8' | id='' | rect=471,753 x | off=False
+[344] ControlType.Text | name='—' | id='' | rect=533,762 x | off=False
+[345] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 9' | id='' | rect=36,753 x | off=False
+[346] ControlType.Text | name='۱۰,۴۸۲,۰۰۰ بدهکار' | id='' | rect=207,761 x | off=False
+[347] ControlType.DataItem | name='Taadol.Views.PersonItem' | id='' | rect=36,789 x | off=False
+[348] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 0' | id='' | rect=1276,789 x | off=False
+[349] ControlType.Button | name='' | id='RowToggle' | rect=1288,797 x | off=False
+[350] ControlType.Custom | name='۱۵' | id='' | rect=1226,789 x | off=False
+[351] ControlType.Text | name='۱۵' | id='' | rect=1246,797 x | off=False
+[352] ControlType.Custom | name='PE-۰۰۴۸۲' | id='' | rect=1136,789 x | off=False
+[353] ControlType.Text | name='PE-۰۰۴۸۲' | id='' | rect=1156,797 x | off=False
+[354] ControlType.Custom | name='اشکان قاسمی' | id='' | rect=976,789 x | off=False
+[355] ControlType.Text | name='اشکان قاسمی' | id='' | rect=1021,797 x | off=False
+[356] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 4' | id='' | rect=886,789 x | off=False
+[357] ControlType.Text | name='فعال' | id='' | rect=920,799 x | off=False
+[358] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 5' | id='' | rect=806,789 x | off=False
+[359] ControlType.Text | name='حقیقی' | id='' | rect=829,797 x | off=False
+[360] ControlType.Custom | name='۰۹۰۰۰۰۰۱۴۸۲' | id='' | rect=691,789 x | off=False
+[361] ControlType.Text | name='۰۹۰۰۰۰۰۱۴۸۲' | id='' | rect=715,797 x | off=False
+[362] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 7' | id='' | rect=586,789 x | off=False
+[363] ControlType.Text | name='کوپن' | id='' | rect=626,797 x | off=False
+[364] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 8' | id='' | rect=471,789 x | off=False
+[365] ControlType.Text | name='—' | id='' | rect=533,798 x | off=False
+[366] ControlType.Custom | name='Item: Taadol.Views.PersonItem, Column Display Index: 9' | id='' | rect=36,789 x | off=False
+[367] ControlType.Text | name='۱۰,۴۸۱,۰۰۰ بدهکار' | id='' | rect=208,797 x | off=False
+[368] ControlType.Custom | name='' | id='PaginationBar' | rect=35,888 x | off=False
+[370] ControlType.List | name='' | id='PageButtonsItemsControl' | rect=1099,896 x | off=False
+[371] ControlType.DataItem | name='Taadol.Views.PageItem' | id='' | rect=1099,896 x | off=False
+[373] ControlType.DataItem | name='Taadol.Views.PageItem' | id='' | rect=1127,896 x | off=False
+[375] ControlType.DataItem | name='Taadol.Views.PageItem' | id='' | rect=1155,896 x | off=False
+[377] ControlType.DataItem | name='Taadol.Views.PageItem' | id='' | rect=1183,896 x | off=False
+[379] ControlType.DataItem | name='Taadol.Views.PageItem' | id='' | rect=1211,896 x | off=False
+[381] ControlType.DataItem | name='Taadol.Views.PageItem' | id='' | rect=1239,896 x | off=False
+[383] ControlType.DataItem | name='Taadol.Views.PageItem' | id='' | rect=1267,896 x | off=False
+[386] ControlType.Custom | name='' | id='PageSizeSelector' | rect=166,893 x | off=False
+[387] ControlType.Text | name='۱۵' | id='SelectedText' | rect=191,899 x | off=False
+[388] ControlType.Text | name='نمایش ۱۵ از ۴۹۵ مورد' | id='PageInfoText' | rect=43,900 x | off=False
+[389] ControlType.Custom | name='' | id='RowContextMenu' | rect=35,240 x | off=False
+[390] ControlType.Text | name='جمع بدهکار' | id='' | rect=173,942 x | off=False
+[391] ControlType.Text | name='۵,۰۳۰,۸۱۲,۰۰۰ ریال' | id='TotalDebitText' | rect=60,941 x | off=False
+[392] ControlType.Text | name='جمع بستانکار' | id='' | rect=699,942 x | off=False
+[393] ControlType.Text | name='۱۰,۴۹۹,۰۰۰ ریال' | id='TotalCreditText' | rect=606,941 x | off=False
+[394] ControlType.Text | name='جمع اشخاص انتخاب شده (۰)' | id='SelectedSummaryText' | rect=1136,941 x | off=False
+[395] ControlType.Text | name='۰ ریال' | id='SelectedTotalText' | rect=1095,941 x | off=False
+[396] ControlType.Button | name='' | id='BtnToggleSidebar' | rect=1309,228 x | off=False
+[397] ControlType.Text | name='راهنما  F1' | id='' | rect=554,988 x | off=False
+[398] ControlType.Text | name='بروزرسانی  F5' | id='' | rect=444,988 x | off=False
+[399] ControlType.Text | name='انتخاب ردیف  F8' | id='' | rect=315,988 x | off=False
+[400] ControlType.Text | name='تمام صفحه  F11' | id='' | rect=190,988 x | off=False
+[401] ControlType.Text | name='ذخیره نام جدید  F12' | id='' | rect=41,988 x | off=False
+[402] ControlType.Text | name='شرکت های شما' | id='' | rect=1575,45 x | off=False
+[403] ControlType.ComboBox | name='' | id='CompanySelector' | rect=1419,69 x | off=False
+[404] ControlType.Edit | name='' | id='PART_EditableTextBox' | rect=1463,77 x | off=False
+[406] ControlType.Text | name='خروج از برنامه' | id='' | rect=66,65 x | off=False
+[407] ControlType.Text | name='کاربر شماره یک' | id='' | rect=253,53 x | off=False
+[408] ControlType.Text | name='حسابدار' | id='' | rect=302,77 x | off=False
+[409] ControlType.Custom | name='' | id='Sidebar' | rect=1680,23 x | off=False
+[410] ControlType.Text | name='نرم افزار حسابداری تعادل' | id='LogoText' | rect=1680,79 x | off=False
+[411] ControlType.Custom | name='' | id='YearSelector' | rect=1680,106 x | off=False
+[412] ControlType.Text | name='شعبه ۵۰۰‏ | سال ۱۴۰۳‏' | id='YearText' | rect=1712,115 x | off=False
+[413] ControlType.Button | name='' | id='BtnToggleSidebar' | rect=1662,111 x | off=False
+[415] ControlType.Button | name='' | id='BtnDashboard' | rect=1688,154 x | off=False
+[416] ControlType.Button | name='' | id='BtnProducts' | rect=1688,208 x | off=False
+[417] ControlType.Button | name='' | id='BtnPersons' | rect=1688,262 x | off=False
+[418] ControlType.Button | name='لیست اشخاص' | id='' | rect=1680,322 x | off=False
+[419] ControlType.Button | name='شخص جدید' | id='' | rect=1680,358 x | off=False
+[420] ControlType.Button | name='' | id='BtnBusinessInfo' | rect=1688,410 x | off=False
+[421] ControlType.Button | name='' | id='BtnWarehouse' | rect=1680,464 x | off=False
+[422] ControlType.Button | name='' | id='BtnBank' | rect=1680,518 x | off=False
+[423] ControlType.Button | name='' | id='BtnSales' | rect=1680,572 x | off=False
+[424] ControlType.Button | name='' | id='BtnReports' | rect=1680,626 x | off=False
+alive=True responding=True

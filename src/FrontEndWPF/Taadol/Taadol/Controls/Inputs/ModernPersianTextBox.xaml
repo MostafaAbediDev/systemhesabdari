@@ -1,7 +1,8 @@
 ﻿<UserControl x:Class="Taadol.Controls.ModernPersianTextBox"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:svg="http://sharpvectors.codeplex.com/svgc/">
+             xmlns:svg="http://sharpvectors.codeplex.com/svgc/"
+             FlowDirection="RightToLeft">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -18,7 +19,7 @@
                 Height="45">
             <Grid>
                 <TextBox x:Name="PART_TextBox"
-                         FontFamily="{StaticResource IRANSans}"
+                         FontFamily="{StaticResource Vazir}"
                          FontSize="14"
                          Foreground="#2C3E50"
                          Background="Transparent"
@@ -48,6 +49,7 @@
                                                 </Grid.RowDefinitions>
                                                 <ScrollContentPresenter x:Name="PART_ScrollContentPresenter"
                                                                         Grid.Row="0"
+                                                                        Margin="{TemplateBinding Padding}"
                                                                         CanContentScroll="{TemplateBinding CanContentScroll}"
                                                                         CanHorizontallyScroll="False"
                                                                         CanVerticallyScroll="False"

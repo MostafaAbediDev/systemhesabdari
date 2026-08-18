@@ -1,0 +1,5 @@
+﻿INVOKED CancelButton (بازگشت)
+DIALOG_PRESENT=False
+MODAL_STILL_OPEN=True
+FIRSTNAME_VALUE='QA'
+alive=True responding=True

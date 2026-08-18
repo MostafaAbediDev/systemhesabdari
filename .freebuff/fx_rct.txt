@@ -1,0 +1,6 @@
+﻿CELL name='#' rect=1247,252,8,20
+RCLICK at=1251,262
+WINCOUNT=1
+  WIN[0] title='تعادل - نرم‌افزار حسابداری' class='Window'
+    menuElements=0
+MAIN_TREE_MENUITEMS=0

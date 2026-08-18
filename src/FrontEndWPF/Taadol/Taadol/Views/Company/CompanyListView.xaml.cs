@@ -6,6 +6,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Threading.Tasks;
+using System.Windows.Threading;
 using GeneralInfoManagement.Application.Contract.Company;
 using Microsoft.Extensions.DependencyInjection;
 using System.Globalization;
@@ -28,6 +30,7 @@ namespace Taadol.Views
         private int _totalPages = 1;
         private int filteredListCount = 0;
         private bool _isLoadedOnce = false;
+        private bool _sizeWired = false;
         private HashSet<string> _selectedStatuses = new();
         private HashSet<string> _selectedTitles = new();
 
@@ -53,7 +56,13 @@ namespace Taadol.Views
                     item.IsSelected = false;
             };
 
-            // منوی راست‌کلیک ردیف: فقط حذف (ویرایش در این فرم وجود ندارد)
+            // منوی راست‌کلیک ردیف: ویرایش و حذف
+            CompaniesGrid.RowEditRequested += (s, item) =>
+            {
+                if (item is CompanyItem c && Window.GetWindow(this) is MainWindow mw)
+                    mw.NavigateToEditCompany(c.Id);
+            };
+
             CompaniesGrid.RowDeleteRequested += (s, item) =>
             {
                 if (item is not CompanyItem c) return;
@@ -64,9 +73,10 @@ namespace Taadol.Views
                 BtnDelete_Click(this, new RoutedEventArgs());
             };
 
-            CompanySearchBox.TextChanged += (s, e) =>
+            // جستجو با Debounce داخلی SearchBoxControl (پیش‌فرض ۳۰۰ms)
+            CompanySearchBox.SearchTextChanged += (s, text) =>
             {
-                _searchText = CompanySearchBox.Text.Trim();
+                _searchText = text.Trim();
                 _currentPage = 1;
                 ApplyFilters();
             };
@@ -92,8 +102,51 @@ namespace Taadol.Views
             await LoadDataAsync();
         }
 
-        private void ActionButton_Loaded(object sender, RoutedEventArgs e) { }
-        private void ActionButton_Loaded_1(object sender, RoutedEventArgs e) { }
+        // فرم لیست باید همیشه کل فضای محتوا رو پر کنه حتی اگه ردیف جدول کم باشه
+        // (چون MainContent با Top/Left فقط اندازه محتوا رو می‌گیره) — مثل PersonListView
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                FillAvailableSpace();
+            }), DispatcherPriority.Background);
+        }
+
+        private void FillAvailableSpace()
+        {
+            if (Window.GetWindow(this) is not Window window) return;
+            if (window.FindName("MainContentBorder") is not Border border) return;
+
+            if (!_sizeWired)
+            {
+                _sizeWired = true;
+                border.SizeChanged += (s, _) => FillAvailableSpace();
+            }
+
+            var pad = border.Padding;
+            var margin = Margin;
+            var w = border.ActualWidth - pad.Left - pad.Right - margin.Left - margin.Right;
+            var h = border.ActualHeight - pad.Top - pad.Bottom - margin.Top - margin.Bottom;
+            Width = w > 0 ? w : 0;
+            Height = h > 0 ? h : 0;
+        }
+
+        /// <summary>
+        /// رفرش داده‌های گرید از بیرون (مثلاً بعد از بسته‌شدن فرم «ویرایش شرکت» در مودال).
+        /// </summary>
+        public async Task RefreshGridAsync()
+        {
+            _isLoadedOnce = false;
+            try
+            {
+                await LoadDataAsync();
+            }
+            catch (Exception ex)
+            {
+                ToastManager.Error("خطا در بروزرسانی: " + ex.Message);
+            }
+        }
+
 
         private async void CompanyListView_Loaded(object sender, RoutedEventArgs e)
         {
@@ -125,7 +178,7 @@ namespace Taadol.Views
                         RegisterDate = ToPersianDate(c.CreationDate),
                         Title = c.Title,
                         LegalName = c.LegalName,
-                    //    Status = c.IsActive ? "فعال" : "غیرفعال",
+                        Status = c.IsActive ? "فعال" : "غیرفعال",
                         IsEmpty = false
                     }).ToList();
                 });
@@ -136,7 +189,7 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "خطا در لود شرکت‌ها", MessageBoxButton.OK, MessageBoxImage.Error);
+                ToastManager.Error("خطا در لود شرکت‌ها: " + ex.Message);
 
                 AllCompanies = new ObservableCollection<CompanyItem>();
 
@@ -156,7 +209,7 @@ namespace Taadol.Views
             {
                 FilteredCompanies.Add(new CompanyItem
                 {
-                    RowNumber = i,
+                    RowNumber = 0,
                     IsEmpty = true
                 });
             }
@@ -248,21 +301,25 @@ namespace Taadol.Views
 
             FilteredCompanies = new ObservableCollection<CompanyItem>(pageItems);
 
-            int realCount = FilteredCompanies.Count;
-
-            for (int i = realCount + 1; i <= _pageSize; i++)
-            {
-                FilteredCompanies.Add(new CompanyItem
-                {
-                    RowNumber = 0,
-                    IsEmpty = true
-                });
-            }
-
             CompaniesGrid.ItemsSource = FilteredCompanies;
 
             BuildPaginationButtons();
             UpdateSummary();
+            UpdateTabCounts();
+        }
+
+        private void UpdateTabCounts()
+        {
+            if (tabAll == null || tabActive == null || tabInactive == null || AllCompanies == null)
+                return;
+
+            int total = AllCompanies.Count(c => !c.IsEmpty);
+            int active = AllCompanies.Count(c => !c.IsEmpty && c.Status == "فعال");
+            int inactive = AllCompanies.Count(c => !c.IsEmpty && c.Status == "غیرفعال");
+
+            tabAll.Tag = $"({ToPersianNumber(total)})";
+            tabActive.Tag = $"({ToPersianNumber(active)})";
+            tabInactive.Tag = $"({ToPersianNumber(inactive)})";
         }
 
         private void UpdateSummary()
@@ -470,7 +527,7 @@ namespace Taadol.Views
 
             if (selectedItems.Count == 0)
             {
-                MessageBox.Show("لطفاً یک شرکت انتخاب کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ToastManager.Warning("لطفاً یک شرکت انتخاب کنید.");
                 return;
             }
 
@@ -492,14 +549,14 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show("خطا در حذف: " + ex.Message, "خطا", MessageBoxButton.OK, MessageBoxImage.Error);
+                ToastManager.Error("خطا در حذف: " + ex.Message);
                 return;
             }
 
             _currentPage = 1;
             LoadDataAsync();
 
-            MessageBox.Show("عملیات حذف انجام شد.", "موفق", MessageBoxButton.OK, MessageBoxImage.Information);
+            ToastManager.Success("عملیات حذف انجام شد.");
         }
 
 

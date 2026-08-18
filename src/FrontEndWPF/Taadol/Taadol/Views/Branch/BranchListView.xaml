@@ -8,12 +8,17 @@
               xmlns:local="clr-namespace:Taadol.Views"
               mc:Ignorable="d"
               FlowDirection="RightToLeft"
+              Loaded="UserControl_Loaded"
               Padding="0"
               FontFamily="{StaticResource IRANSans}"      
               Background="#FFFFFF">
 
-    <Border Background="White"
-            CornerRadius="12"
+    <Border x:Name="RootBorder"
+            Margin="0"
+            Background="#FFFFFF"
+            CornerRadius="4"
+            BorderBrush="#E5E7EB"
+            BorderThickness="0"
             ClipToBounds="True">
         <Grid>
             <Grid.RowDefinitions>
@@ -27,7 +32,7 @@
             <Border Grid.Row="0"
                     BorderBrush="#E5E7EB"
                     BorderThickness="0,0,0,1"
-                    Padding="0,12"
+                    Padding="0,12,10,12"
                     Background="White">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -73,8 +78,7 @@
                                                BorderColor="#E9F0FF"
                                                IconPath="/Assets/Icons/printer.svg"
                                                Margin="6,0,0,0"
-                                               Click="BtnPrint_Click"
-                                               Loaded="ActionButton_Loaded" />
+                                               Click="BtnPrint_Click" />
 
                         <controls:ActionButton Text="Excel"
                                                TextColor="#374151"
@@ -91,8 +95,7 @@
                                                IconPath="/Assets/Icons/arrow-reload-horizontal-2.svg"
                                                Margin="6,0,0,0"
                                                
-                                               Click="BtnRefresh_Click"
-                                               Loaded="ActionButton_Loaded_1" />
+                                               Click="BtnRefresh_Click" />
 
                         <!-- X بستن -->
                         <Border Cursor="Hand"
@@ -111,7 +114,7 @@
                     BorderBrush="#E5E7EB"
                     BorderThickness="0,0,0,0"
                     Background="#ffffff"
-                    Padding="15,6,25,6"
+                    Padding="10,6,20,6"
                     Margin="0">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -126,104 +129,16 @@
                     </Grid.ColumnDefinitions>
 
                     <!-- جستجو -->
-                    <Border Grid.Column="0"
-                            Background="#FFFFFF"
-                            BorderBrush="#E5E7EB"
-                            BorderThickness="1"
-                            CornerRadius="4"
-                            Margin="0,0,4,0"
-                            Height="40"
-                            Padding="5,0"
-                            VerticalAlignment="Center"
-                            HorizontalAlignment="Stretch">
-                        <Grid FlowDirection="RightToLeft">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-
-                            <Grid Grid.Column="0"
-                                  VerticalAlignment="Center"
-                                  Margin="0,0,8,0"
-                                  Height="30">
-                                <TextBlock Text="جستجو در نام شعبه"
-                                           FontSize="12"
-                                           Foreground="#94A3B8"
-                                           FontFamily="{StaticResource IRANSans}"
-                                           FlowDirection="RightToLeft"
-                                           VerticalAlignment="Center"
-                                           TextTrimming="CharacterEllipsis"
-                                           IsHitTestVisible="False"
-                                           Panel.ZIndex="1">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Visibility"
-                                                    Value="Collapsed" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Text, ElementName=BranchSearchBox}"
-                                                             Value="">
-                                                    <Setter Property="Visibility"
-                                                            Value="Visible" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                                <TextBox x:Name="BranchSearchBox"
-                                         Height="30"
-                                         FontSize="12"
-                                         Foreground="#1F2937"
-                                         CaretBrush="#3B82F6"
-                                         Background="Transparent"
-                                         BorderThickness="0"
-                                         Padding="0,2"
-                                         VerticalAlignment="Center"
-                                         VerticalContentAlignment="Center"
-                                         FlowDirection="RightToLeft"
-                                         FontFamily="{StaticResource IRANSans}"
-                                         TextAlignment="Left">
-                                    <TextBox.Style>
-                                        <Style TargetType="TextBox">
-                                            <Setter Property="Template">
-                                                <Setter.Value>
-                                                    <ControlTemplate TargetType="TextBox">
-                                                        <Border Background="{TemplateBinding Background}"
-                                                                BorderThickness="0"
-                                                                CornerRadius="4">
-                                                            <ScrollViewer x:Name="PART_ContentHost"
-                                                                          Focusable="False"
-                                                                          HorizontalScrollBarVisibility="Hidden"
-                                                                          VerticalScrollBarVisibility="Hidden" />
-                                                        </Border>
-                                                    </ControlTemplate>
-                                                </Setter.Value>
-                                            </Setter>
-                                        </Style>
-                                    </TextBox.Style>
-                                </TextBox>
-                            </Grid>
-
-                            <StackPanel Grid.Column="1"
-                                        Orientation="Horizontal"
-                                        VerticalAlignment="Center">
-                                <Border Width="1"
-                                        Height="14"
-                                        Background="#BED1FF"
-                                        VerticalAlignment="Center" />
-                                <svg:SvgViewbox Width="14"
-                                                Height="14"
-                                                FlowDirection="LeftToRight"
-                                                Source="/Assets/Icons/search.svg"
-                                                VerticalAlignment="Center"
-                                                Margin="8,0,0,0" />
-                            </StackPanel>
-                        </Grid>
-                    </Border>
+                    <controls:SearchBoxControl x:Name="BranchSearchBox"
+                                               Grid.Column="0"
+                                               Margin="0,0,4,0"
+                                               Placeholder="جستجو در نام شعبه" />
 
                     <!-- تب‌ها -->
                     <ToggleButton x:Name="tabAll"
                                   Grid.Column="1"
                                   Style="{StaticResource FilterTabStyle2}"
+                                  controls:FilterTabBehavior.ShowClose="False"
                                   Content="همه شعبه‌ها"
                                   Tag="()"
                                   IsChecked="True"
@@ -235,7 +150,7 @@
                                   Grid.Column="2"
                                   Style="{StaticResource FilterTabStyle2}"
                                   Content="فعال"
-                                  Tag="(۱۰)"
+                                  Tag="()"
                                   HorizontalAlignment="Stretch"
                                   Click="FilterTab_Click"
                                   Margin="4,0,0,0" />
@@ -244,7 +159,7 @@
                                   Grid.Column="3"
                                   Style="{StaticResource FilterTabStyle2}"
                                   Content="غیرفعال"
-                                  Tag="(۲)"
+                                  Tag="()"
                                   HorizontalAlignment="Stretch"
                                   Click="FilterTab_Click"
                                   Margin="4,0,0,0" />
@@ -255,7 +170,7 @@
                         <Border Grid.Row="2"
                     Background="Transparent"
                     ClipToBounds="False"
-                    Padding="15,0">
+                    Padding="10,0,10,0">
                 <controls:UnifiedListView x:Name="BranchesGrid"
                                            Padding="0,0,10,0">
                     <controls:UnifiedListView.Columns>
@@ -265,20 +180,32 @@
                                             ElementStyle="{StaticResource BaseTextColumnStyle}">
                             <DataGridTextColumn.HeaderStyle>
                                 <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource UnifiedGridColumnHeaderStyle}">
-                                    <Setter Property="BorderThickness" Value="0,0,1,2" />
-                                    <Setter Property="BorderBrush" Value="#E0E7FF" />
+                                    <Setter Property="BorderThickness" Value="0,0,1,1" />
+                                    <Setter Property="BorderBrush" Value="#E5E7EB" />
                                 </Style>
                             </DataGridTextColumn.HeaderStyle>
                         </DataGridTextColumn>
 
                         <!-- شناسه یکتا -->
                         <DataGridTextColumn Header="شناسه یکتا" Width="100" MinWidth="90"
-                                            Binding="{Binding UniqueId}"
+                                            Binding="{Binding BranchCode}"
                                             ElementStyle="{StaticResource BaseTextColumnStyle}">
                             <DataGridTextColumn.HeaderStyle>
                                 <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource UnifiedGridColumnHeaderStyle}">
-                                    <Setter Property="BorderThickness" Value="0,0,1,2" />
-                                    <Setter Property="BorderBrush" Value="#E0E7FF" />
+                                    <Setter Property="BorderThickness" Value="0,0,1,1" />
+                                    <Setter Property="BorderBrush" Value="#E5E7EB" />
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                        </DataGridTextColumn>
+
+                        <!-- کد شعبه -->
+                        <DataGridTextColumn Header="کد شعبه" Width="100" MinWidth="90"
+                                            Binding="{Binding NationalId}"
+                                            ElementStyle="{StaticResource BaseTextColumnStyle}">
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource UnifiedGridColumnHeaderStyle}">
+                                    <Setter Property="BorderThickness" Value="0,0,1,1" />
+                                    <Setter Property="BorderBrush" Value="#E5E7EB" />
                                 </Style>
                             </DataGridTextColumn.HeaderStyle>
                         </DataGridTextColumn>
@@ -287,8 +214,8 @@
                         <DataGridTemplateColumn Header="نوع شعبه" Width="100" MinWidth="90">
                             <DataGridTemplateColumn.HeaderStyle>
                                 <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource UnifiedGridColumnHeaderStyle}">
-                                    <Setter Property="BorderThickness" Value="0,0,1,2" />
-                                    <Setter Property="BorderBrush" Value="#E0E7FF" />
+                                    <Setter Property="BorderThickness" Value="0,0,1,1" />
+                                    <Setter Property="BorderBrush" Value="#E5E7EB" />
                                 </Style>
                             </DataGridTemplateColumn.HeaderStyle>
                             <DataGridTemplateColumn.CellTemplate>
@@ -299,6 +226,9 @@
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding BranchType}" Value="اصلی">
                                                         <Setter Property="Background" Value="#DCFCE7" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding BranchType}" Value="فرعی">
+                                                        <Setter Property="Background" Value="#E5E7EC" />
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
@@ -312,6 +242,9 @@
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding BranchType}" Value="اصلی">
                                                             <Setter Property="Foreground" Value="#166534" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding BranchType}" Value="فرعی">
+                                                            <Setter Property="Foreground" Value="#66718E" />
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
@@ -328,8 +261,8 @@
                                             ElementStyle="{StaticResource BaseTextColumnStyle}">
                             <DataGridTextColumn.HeaderStyle>
                                 <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource UnifiedGridColumnHeaderStyle}">
-                                    <Setter Property="BorderThickness" Value="0,0,1,2" />
-                                    <Setter Property="BorderBrush" Value="#E0E7FF" />
+                                    <Setter Property="BorderThickness" Value="0,0,1,1" />
+                                    <Setter Property="BorderBrush" Value="#E5E7EB" />
                                 </Style>
                             </DataGridTextColumn.HeaderStyle>
                             <DataGridTextColumn.HeaderTemplate>
@@ -374,8 +307,8 @@
                                             ElementStyle="{StaticResource FullNameColumnStyle}">
                             <DataGridTextColumn.HeaderStyle>
                                 <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource UnifiedGridColumnHeaderStyle}">
-                                    <Setter Property="BorderThickness" Value="0,0,1,2" />
-                                    <Setter Property="BorderBrush" Value="#E0E7FF" />
+                                    <Setter Property="BorderThickness" Value="0,0,1,1" />
+                                    <Setter Property="BorderBrush" Value="#E5E7EB" />
                                 </Style>
                             </DataGridTextColumn.HeaderStyle>
                         </DataGridTextColumn>
@@ -386,32 +319,21 @@
                                             ElementStyle="{StaticResource BaseTextColumnStyle}">
                             <DataGridTextColumn.HeaderStyle>
                                 <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource UnifiedGridColumnHeaderStyle}">
-                                    <Setter Property="BorderThickness" Value="0,0,1,2" />
-                                    <Setter Property="BorderBrush" Value="#E0E7FF" />
+                                    <Setter Property="BorderThickness" Value="0,0,1,1" />
+                                    <Setter Property="BorderBrush" Value="#E5E7EB" />
                                 </Style>
                             </DataGridTextColumn.HeaderStyle>
                         </DataGridTextColumn>
 
-                        <!-- کد شعبه -->
-                        <DataGridTextColumn Header="کد شعبه" Width="85" MinWidth="75"
-                                            Binding="{Binding BranchCode}"
-                                            ElementStyle="{StaticResource BaseTextColumnStyle}">
-                            <DataGridTextColumn.HeaderStyle>
-                                <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource UnifiedGridColumnHeaderStyle}">
-                                    <Setter Property="BorderThickness" Value="0,0,1,2" />
-                                    <Setter Property="BorderBrush" Value="#E0E7FF" />
-                                </Style>
-                            </DataGridTextColumn.HeaderStyle>
-                        </DataGridTextColumn>
 
                         <!-- استان -->
-                        <DataGridTextColumn Header="استان" Width="100" MinWidth="90"
+                        <DataGridTextColumn Header="استان" Width="1*" MinWidth="90"
                                             Binding="{Binding Province}"
                                             ElementStyle="{StaticResource BaseTextColumnStyle}">
                             <DataGridTextColumn.HeaderStyle>
                                 <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource UnifiedGridColumnHeaderStyle}">
-                                    <Setter Property="BorderThickness" Value="0,0,1,2" />
-                                    <Setter Property="BorderBrush" Value="#E0E7FF" />
+                                    <Setter Property="BorderThickness" Value="0,0,1,1" />
+                                    <Setter Property="BorderBrush" Value="#E5E7EB" />
                                 </Style>
                             </DataGridTextColumn.HeaderStyle>
                             <DataGridTextColumn.HeaderTemplate>
@@ -451,13 +373,13 @@
                         </DataGridTextColumn>
 
                         <!-- شهر -->
-                        <DataGridTextColumn Header="شهر" Width="85" MinWidth="75"
+                        <DataGridTextColumn Header="شهر" Width="1*" MinWidth="75"
                                             Binding="{Binding City}"
                                             ElementStyle="{StaticResource BaseTextColumnStyle}">
                             <DataGridTextColumn.HeaderStyle>
                                 <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource UnifiedGridColumnHeaderStyle}">
-                                    <Setter Property="BorderThickness" Value="0,0,1,2" />
-                                    <Setter Property="BorderBrush" Value="#E0E7FF" />
+                                    <Setter Property="BorderThickness" Value="0,0,1,1" />
+                                    <Setter Property="BorderBrush" Value="#E5E7EB" />
                                 </Style>
                             </DataGridTextColumn.HeaderStyle>
                             <DataGridTextColumn.HeaderTemplate>
@@ -502,8 +424,8 @@
                                             ElementStyle="{StaticResource LtrTextColumnStyle}">
                             <DataGridTextColumn.HeaderStyle>
                                 <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource UnifiedGridColumnHeaderStyle}">
-                                    <Setter Property="BorderThickness" Value="0,0,1,2" />
-                                    <Setter Property="BorderBrush" Value="#E0E7FF" />
+                                    <Setter Property="BorderThickness" Value="0,0,1,1" />
+                                    <Setter Property="BorderBrush" Value="#E5E7EB" />
                                 </Style>
                             </DataGridTextColumn.HeaderStyle>
                         </DataGridTextColumn>
@@ -514,20 +436,20 @@
                                             ElementStyle="{StaticResource LtrTextColumnStyle}">
                             <DataGridTextColumn.HeaderStyle>
                                 <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource UnifiedGridColumnHeaderStyle}">
-                                    <Setter Property="BorderThickness" Value="0,0,1,2" />
-                                    <Setter Property="BorderBrush" Value="#E0E7FF" />
+                                    <Setter Property="BorderThickness" Value="0,0,1,1" />
+                                    <Setter Property="BorderBrush" Value="#E5E7EB" />
                                 </Style>
                             </DataGridTextColumn.HeaderStyle>
                         </DataGridTextColumn>
 
                         <!-- آدرس -->
-                        <DataGridTextColumn Header="آدرس" Width="200" MinWidth="170"
+                        <DataGridTextColumn Header="آدرس" Width="2*" MinWidth="170"
                                             Binding="{Binding Address}"
                                             ElementStyle="{StaticResource BaseTextColumnStyle}">
                             <DataGridTextColumn.HeaderStyle>
                                 <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource UnifiedGridColumnHeaderStyle}">
-                                    <Setter Property="BorderThickness" Value="0,0,1,2" />
-                                    <Setter Property="BorderBrush" Value="#E0E7FF" />
+                                    <Setter Property="BorderThickness" Value="0,0,1,1" />
+                                    <Setter Property="BorderBrush" Value="#E5E7EB" />
                                 </Style>
                             </DataGridTextColumn.HeaderStyle>
                             <DataGridTextColumn.CellStyle>
@@ -538,11 +460,11 @@
                         </DataGridTextColumn>
 
                         <!-- وضعیت -->
-                        <DataGridTemplateColumn Header="وضعیت" Width="80" MinWidth="70">
+                        <DataGridTemplateColumn Header="وضعیت" Width="110" MinWidth="95">
                             <DataGridTemplateColumn.HeaderStyle>
                                 <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource UnifiedGridColumnHeaderStyle}">
-                                    <Setter Property="BorderThickness" Value="0,0,1,2" />
-                                    <Setter Property="BorderBrush" Value="#E0E7FF" />
+                                    <Setter Property="BorderThickness" Value="0,0,1,1" />
+                                    <Setter Property="BorderBrush" Value="#E5E7EB" />
                                 </Style>
                             </DataGridTemplateColumn.HeaderStyle>
                             <DataGridTemplateColumn.HeaderTemplate>
@@ -589,7 +511,7 @@
                                                         <Setter Property="Background" Value="#DCFCE7" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Status}" Value="غیرفعال">
-                                                        <Setter Property="Background" Value="#FEE2E2" />
+                                                        <Setter Property="Background" Value="#E5E7EC" />
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
@@ -605,7 +527,7 @@
                                                             <Setter Property="Foreground" Value="#166534" />
                                                         </DataTrigger>
                                                         <DataTrigger Binding="{Binding Status}" Value="غیرفعال">
-                                                            <Setter Property="Foreground" Value="#991B1B" />
+                                                            <Setter Property="Foreground" Value="#66718E" />
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>

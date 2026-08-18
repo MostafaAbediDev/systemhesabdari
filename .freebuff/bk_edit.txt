@@ -1,0 +1,5 @@
+﻿RCLICK 'اریاگستر' at=1059,321
+MENU_ITEM_NOT_FOUND 'ویرایش'
+after: alive=True responding=True memMB=232
+WINCOUNT=1
+  WIN[0] title='تعادل - نرم‌افزار حسابداری'

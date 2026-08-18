@@ -16,7 +16,7 @@
     </UserControl.Resources>
 
     <Border Background="White"
-            CornerRadius="12"
+            CornerRadius="4"
             ClipToBounds="True">
 
         <Grid>
@@ -79,8 +79,7 @@
                                                BorderColor="#E9F0FF"
                                                IconPath="/Assets/Icons/printer.svg"
                                                Margin="6,0,0,0"
-                                               Click="BtnPrint_Click"
-                                               Loaded="ActionButton_Loaded" />
+                                               Click="BtnPrint_Click" />
 
                         <controls:ActionButton Text="Excel"
                                                TextColor="#374151"
@@ -97,8 +96,7 @@
                                                IconPath="/Assets/Icons/arrow-reload-horizontal-2.svg"
                                                Margin="6,0,0,0"
                                                
-                                               Click="BtnRefresh_Click"
-                                               Loaded="ActionButton_Loaded_1" />
+                                               Click="BtnRefresh_Click" />
 
                         <!-- X بستن -->
                         <Border Cursor="Hand"
@@ -132,99 +130,10 @@
                     </Grid.ColumnDefinitions>
 
                     <!-- جستجو -->
-                    <Border Grid.Column="0"
-                            Background="#FFFFFF"
-                            BorderBrush="#E5E7EB"
-                            BorderThickness="1"
-                            CornerRadius="4"
-                            Margin="0,0,4,0"
-                            Height="40"
-                            Padding="5,0"
-                            VerticalAlignment="Center"
-                            HorizontalAlignment="Stretch">
-                        <Grid FlowDirection="RightToLeft">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-
-                            <Grid Grid.Column="0"
-                                  VerticalAlignment="Center"
-                                  Margin="0,0,8,0"
-                                  Height="30">
-                                <TextBlock Text="جستجو در نام ، کد"
-                                           FontSize="12"
-                                           Foreground="#94A3B8"
-                                           FontFamily="{StaticResource IRANSans}"
-                                           FlowDirection="RightToLeft"
-                                           VerticalAlignment="Center"
-                                           TextTrimming="CharacterEllipsis"
-                                           IsHitTestVisible="False"
-                                           Panel.ZIndex="1">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Visibility"
-                                                    Value="Collapsed" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Text, ElementName=ProductSearchBox}"
-                                                             Value="">
-                                                    <Setter Property="Visibility"
-                                                            Value="Visible" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                                <TextBox x:Name="ProductSearchBox"
-                                         Height="30"
-                                         FontSize="12"
-                                         Foreground="#1F2937"
-                                         CaretBrush="#3B82F6"
-                                         Background="Transparent"
-                                         BorderThickness="0"
-                                         Padding="0,2"
-                                         VerticalAlignment="Center"
-                                         VerticalContentAlignment="Center"
-                                         FlowDirection="RightToLeft"
-                                         FontFamily="{StaticResource IRANSans}"
-                                         TextAlignment="Left">
-                                    <TextBox.Style>
-                                        <Style TargetType="TextBox">
-                                            <Setter Property="Template">
-                                                <Setter.Value>
-                                                    <ControlTemplate TargetType="TextBox">
-                                                        <Border Background="{TemplateBinding Background}"
-                                                                BorderThickness="0"
-                                                                CornerRadius="4">
-                                                            <ScrollViewer x:Name="PART_ContentHost"
-                                                                          Focusable="False"
-                                                                          HorizontalScrollBarVisibility="Hidden"
-                                                                          VerticalScrollBarVisibility="Hidden" />
-                                                        </Border>
-                                                    </ControlTemplate>
-                                                </Setter.Value>
-                                            </Setter>
-                                        </Style>
-                                    </TextBox.Style>
-                                </TextBox>
-                            </Grid>
-
-                            <StackPanel Grid.Column="1"
-                                        Orientation="Horizontal"
-                                        VerticalAlignment="Center">
-                                <Border Width="1"
-                                        Height="14"
-                                        Background="#BED1FF"
-                                        VerticalAlignment="Center" />
-                                <svg:SvgViewbox Width="14"
-                                                Height="14"
-                                                FlowDirection="LeftToRight"
-                                                Source="/Assets/Icons/search.svg"
-                                                VerticalAlignment="Center"
-                                                Margin="8,0,0,0" />
-                            </StackPanel>
-                        </Grid>
-                    </Border>
+                    <controls:SearchBoxControl x:Name="ProductSearchBox"
+                                               Grid.Column="0"
+                                               Margin="0,0,4,0"
+                                               Placeholder="جستجو در نام ، کد" />
 
                     <!-- تب‌های نوع -->
                     <ToggleButton x:Name="tabAllTypes"
@@ -268,6 +177,7 @@
                             VerticalAlignment="Center">
                     <ToggleButton x:Name="tabAll"
                                   Style="{StaticResource FilterTabStyle2}"
+                                  controls:FilterTabBehavior.ShowClose="False"
                                   Content="همه"
                                   IsChecked="True"
                                   HorizontalAlignment="Stretch"
@@ -355,6 +265,7 @@
                               SelectionMode="Single"
                               AlternationCount="2"
                               IsReadOnly="True"
+                              VirtualizingPanel.VirtualizationMode="Standard"
                               ScrollViewer.HorizontalScrollBarVisibility="Auto"
                               ScrollViewer.VerticalScrollBarVisibility="Hidden"
                               FontFamily="{StaticResource IRANSans}"
@@ -549,7 +460,7 @@
                                                         <DataTrigger Binding="{Binding Status}"
                                                                      Value="غیرفعال">
                                                             <Setter Property="Background"
-                                                                    Value="#FEE2E2" />
+                                                                    Value="#E5E7EC" />
                                                         </DataTrigger>
                                                         <DataTrigger Binding="{Binding Status}"
                                                                      Value="فعال">
@@ -569,7 +480,7 @@
                                                             <DataTrigger Binding="{Binding Status}"
                                                                          Value="غیرفعال">
                                                                 <Setter Property="Foreground"
-                                                                        Value="#991B1B" />
+                                                                        Value="#66718E" />
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding Status}"
                                                                          Value="فعال">

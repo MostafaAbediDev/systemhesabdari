@@ -999,7 +999,13 @@ namespace Taadol.Controls
             {
                 if (child is TreeViewItem item)
                     return item;
-                child = VisualTreeHelper.GetParent(child);
+
+                // کلیک روی متن گره، OriginalSource را یک Run (ContentElement) می‌کند که
+                // Visual نیست؛ VisualTreeHelper.GetParent روی آن InvalidOperationException
+                // می‌اندازد. برای عناصر غیر-Visual از LogicalTree بالا می‌رویم.
+                child = child is Visual || child is System.Windows.Media.Media3D.Visual3D
+                    ? VisualTreeHelper.GetParent(child)
+                    : LogicalTreeHelper.GetParent(child);
             }
             return null;
         }

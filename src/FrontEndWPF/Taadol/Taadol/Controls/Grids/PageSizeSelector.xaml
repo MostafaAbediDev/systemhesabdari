@@ -35,7 +35,7 @@
                            Foreground="#2563EB"
                            FontFamily="{StaticResource IRANSans}"
                            VerticalAlignment="Center"
-                           Text="15" />
+                           Text="۱۵" />
 
                 <svg:SvgViewbox x:Name="ArrowIcon"
                                 Grid.Column="1"

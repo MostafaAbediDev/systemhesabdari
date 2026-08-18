@@ -1,0 +1,7 @@
+﻿INPUT_REACHED_TAB=False
+TAB id=tabAll toggle=On
+TAB id=tabCustomers toggle=Off
+TAB id=tabSuppliers toggle=Off
+TAB id=tabPersonnel toggle=Off
+TAB id=TabPricing toggle=N/A
+TAB id=TabInventory toggle=N/A

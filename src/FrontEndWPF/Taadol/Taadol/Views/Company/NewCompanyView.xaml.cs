@@ -114,13 +114,13 @@ namespace Taadol.Views
         {
             if (string.IsNullOrWhiteSpace(CompanyName))
             {
-                MessageBox.Show("نام شرکت / کسب‌وکار را وارد کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ToastManager.Warning("نام شرکت / کسب‌وکار را وارد کنید.");
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(OfficialName))
             {
-                MessageBox.Show("نام رسمی ثبتی را وارد کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ToastManager.Warning("نام رسمی ثبتی را وارد کنید.");
                 return;
             }
 
@@ -132,7 +132,7 @@ namespace Taadol.Views
 
             if (!FoundingDate.HasValue)
             {
-                MessageBox.Show("تاریخ تاسیس را انتخاب کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ToastManager.Warning("تاریخ تاسیس را انتخاب کنید.");
                 return;
             }
             var command = new CreateCompanies
@@ -149,20 +149,14 @@ namespace Taadol.Views
 
             if (!IsOperationSucceeded(operation))
             {
-                MessageBox.Show(
-                    string.IsNullOrWhiteSpace(message) ? "ثبت شرکت انجام نشد." : message,
-                    "خطا",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
+                ToastManager.Warning(
+                    string.IsNullOrWhiteSpace(message) ? "ثبت شرکت انجام نشد." : message);
 
                 return;
             }
 
-            MessageBox.Show(
-                string.IsNullOrWhiteSpace(message) ? "شرکت با موفقیت ثبت شد." : message,
-                "موفق",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+            ToastManager.Success(
+                string.IsNullOrWhiteSpace(message) ? "شرکت با موفقیت ثبت شد." : message);
 
             // بعد از ثبت، فرم باز می‌ماند و فقط فیلدها پاک می‌شوند (بدون رفتن به لیست شرکت‌ها)
             ClearForm();
@@ -271,9 +265,10 @@ namespace Taadol.Views
         private void DatePicker_DateChanged(object sender, RoutedEventArgs e)
         {
             var picker = sender as PersianDatePickerControl;
-            if (picker == null || !picker.SelectedDate.HasValue) return;
+            if (picker == null) return;
 
-            FoundingDate = picker.SelectedDate.Value;
+            // اگر فیلدهای تاریخ پاک شوند مقدار null می‌شود تا ذخیره با تاریخ قبلی رخ ندهد
+            FoundingDate = picker.SelectedDate;
         }
 
         private void OnImageSelected(object sender, RoutedEventArgs e)

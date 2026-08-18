@@ -71,7 +71,9 @@
         </ControlTemplate>
     </UserControl.Resources>
 
-    <Grid>
+    <!-- ارتفاع گرید ثابت می‌ماند حتی وقتی ردیف کم است؛ با تغییر تعداد ردیف
+         فرم نه کوچک می‌شود نه بزرگ (مثل لیست اشخاص). -->
+    <Grid MinHeight="480">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
@@ -99,8 +101,7 @@
                           UseLayoutRounding="True"
                           AutoGenerateColumns="False"
                           HeadersVisibility="Column"
-                          GridLinesVisibility="Vertical"
-                          VerticalGridLinesBrush="#E5E7EB"
+                          GridLinesVisibility="None"
                           HorizontalGridLinesBrush="Transparent"
                           RowHeight="36"
                           Background="White"
@@ -112,6 +113,7 @@
                           SelectionMode="Extended"
                           AlternationCount="2"
                           IsReadOnly="True"
+                          VirtualizingPanel.VirtualizationMode="Standard"
                           ScrollViewer.HorizontalScrollBarVisibility="Auto"
                           ScrollViewer.VerticalScrollBarVisibility="Auto"
                           ColumnHeaderStyle="{StaticResource UnifiedGridColumnHeaderStyle}"
@@ -127,8 +129,10 @@
                             <Style.Triggers>
                                 <Trigger Property="Orientation"
                                          Value="Horizontal">
+                                    <!-- اسکرولبار افقی باید دیده شود تا کاربر بفهمد
+                                         در پنجره کوچک می‌تواند به ستون‌های آخر برسد -->
                                     <Setter Property="Height"
-                                            Value="8" />
+                                            Value="10" />
                                 </Trigger>
                             </Style.Triggers>
                         </Style>
@@ -138,8 +142,8 @@
                     <DataGrid.Columns>
                         <!-- 1️⃣ چک‌باکس -->
                         <DataGridTemplateColumn Header=""
-                                                Width="55"
-                                                MinWidth="50">
+                                                Width="44"
+                                                MinWidth="40">
                             <DataGridTemplateColumn.HeaderTemplate>
                                 <DataTemplate>
                                     <ToggleButton x:Name="SelectAllBorder"
@@ -156,13 +160,14 @@
                                 <Style TargetType="DataGridColumnHeader"
                                        BasedOn="{StaticResource UnifiedGridColumnHeaderStyle}">
                                     <Setter Property="BorderThickness"
-                                            Value="0,0,0,2" />
+                                            Value="0,0,0,1" />
                                     <Setter Property="BorderBrush"
-                                            Value="#E0E7FF" />
+                                            Value="#E5E7EB" />
                                 </Style>
                             </DataGridTemplateColumn.HeaderStyle>
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
+                                    <!-- ردیف‌های خالی (پرکننده صفحه) چک‌باکس ندارند -->
                                     <ToggleButton x:Name="RowToggle"
                                                   Cursor="Hand"
                                                   Padding="0"
@@ -171,7 +176,19 @@
                                                   VerticalAlignment="Center"
                                                   Template="{StaticResource GridCheckBoxTemplate}"
                                                   Checked="RowToggle_Checked"
-                                                  Unchecked="RowToggle_Unchecked" />
+                                                  Unchecked="RowToggle_Unchecked">
+                                        <ToggleButton.Style>
+                                            <Style TargetType="ToggleButton">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsEmpty}"
+                                                                 Value="True">
+                                                        <Setter Property="Visibility"
+                                                                Value="Hidden" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ToggleButton.Style>
+                                    </ToggleButton>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
@@ -186,9 +203,9 @@
                                 <Style TargetType="DataGridColumnHeader"
                                        BasedOn="{StaticResource UnifiedGridColumnHeaderStyle}">
                                     <Setter Property="BorderThickness"
-                                            Value="1,0,1,2" />
+                                            Value="1,0,1,1" />
                                     <Setter Property="BorderBrush"
-                                            Value="#E0E7FF" />
+                                            Value="#E5E7EB" />
                                 </Style>
                             </DataGridTextColumn.HeaderStyle>
                         </DataGridTextColumn>
@@ -381,6 +398,45 @@
                         </Grid.Triggers>
                     </Grid>
                 </Border>
+            </Border>
+
+            <!-- ═══ Empty State — وقتی هیچ رکورد واقعی‌ای (غیر از ردیف‌های خالی پرکننده) وجود ندارد ═══ -->
+            <Border x:Name="EmptyStateOverlay"
+                    Background="#FDFDFE"
+                    Visibility="Collapsed"
+                    Panel.ZIndex="20">
+                <StackPanel HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Margin="24">
+                    <Border Width="76"
+                            Height="76"
+                            CornerRadius="38"
+                            Background="#F1F5FF"
+                            HorizontalAlignment="Center"
+                            Margin="0,0,0,16">
+                        <svg:SvgViewbox x:Name="EmptyStateIcon"
+                                        Width="30"
+                                        Height="30"
+                                        Source="/Assets/Icons/search.svg"
+                                        FlowDirection="LeftToRight"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center" />
+                    </Border>
+                    <TextBlock x:Name="EmptyStateTextBlock"
+                               Text="{Binding EmptyStateText, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                               FontFamily="{StaticResource IRANSans}"
+                               FontSize="15"
+                               FontWeight="Bold"
+                               Foreground="#64748B"
+                               HorizontalAlignment="Center" />
+                    <TextBlock x:Name="EmptyStateHintBlock"
+                               Text="{Binding EmptyStateHintText, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                               FontFamily="{StaticResource IRANSans}"
+                               FontSize="12.5"
+                               Foreground="#94A3B8"
+                               Margin="0,6,0,0"
+                               HorizontalAlignment="Center" />
+                </StackPanel>
             </Border>
         </Grid>
 

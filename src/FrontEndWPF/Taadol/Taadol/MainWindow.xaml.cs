@@ -64,23 +64,23 @@ namespace Taadol
 
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (ModalOverlay?.Visibility == Visibility.Visible && ModalContent.Content is EditPersonView editView)
+            // هر فرم مودالی که تغییرات ذخیره‌نشده دارد (ویرایش شخص، ویرایش شرکت و...) محافظت شود
+            if (ModalOverlay?.Visibility == Visibility.Visible &&
+                ModalContent.Content is IUnsavedChangesAware dirtyModal &&
+                dirtyModal.HasUnsavedChanges)
             {
-                if (editView.IsDirty)
-                {
-                    var result = Controls.ModernDialog.ShowConfirm(
-                        "تأیید خروج",
-                        "شما تغییرات ذخیره‌نشده دارید. آیا از خروج مطمئن هستید؟",
-                        Controls.ModernDialog.DialogType.Warning,
-                        "خروج",
-                        "انصراف",
-                        this);
+                var result = Controls.ModernDialog.ShowConfirm(
+                    "تأیید خروج",
+                    "شما تغییرات ذخیره‌نشده دارید. آیا از خروج مطمئن هستید؟",
+                    Controls.ModernDialog.DialogType.Warning,
+                    "خروج",
+                    "انصراف",
+                    this);
 
-                    if (!result)
-                    {
-                        e.Cancel = true;
-                        return;
-                    }
+                if (!result)
+                {
+                    e.Cancel = true;
+                    return;
                 }
 
                 CloseModal();
@@ -126,6 +126,44 @@ namespace Taadol
 
         private void OnSubMenuClicked(string tag)
         {
+            // اگر مودالی باز است (مثلاً «شخص جدید» از دکمه لیست) و تغییرات ذخیره‌نشده دارد،
+            // قبل از ناوبری هشدار بده تا اطلاعات کاربر بی‌صدا از بین نرود.
+            if (ModalOverlay?.Visibility == Visibility.Visible &&
+                ModalContent.Content is IUnsavedChangesAware dirtyModal &&
+                dirtyModal.HasUnsavedChanges)
+            {
+                var confirmNav = Controls.ModernDialog.ShowConfirm(
+                    "تغییرات ذخیره‌نشده",
+                    "فرم بازشده تغییرات ذخیره‌نشده دارد. آیا بدون ذخیره از آن خارج می‌شوید؟",
+                    Controls.ModernDialog.DialogType.Warning,
+                    "خروج از فرم",
+                    "بازگشت",
+                    this);
+
+                if (!confirmNav)
+                    return; // ناوبری لغو شد؛ مودال و اطلاعات کاربر می‌ماند
+            }
+
+            // مودال بدون تغییرات (یا تأییدشده) هنگام ناوبری بسته شود تا روی صفحه جدید معلق نماند
+            if (ModalOverlay?.Visibility == Visibility.Visible)
+                CloseModal();
+
+            // اگر فرم فعلی (مثلاً «شخص جدید» از سایدبار) تغییرات ذخیره‌نشده دارد،
+            // قبل از ناوبری هشدار بده تا اطلاعات کاربر بی‌صدا از بین نرود.
+            if (MainContent.Content is IUnsavedChangesAware dirtyForm && dirtyForm.HasUnsavedChanges)
+            {
+                var confirmNav = Controls.ModernDialog.ShowConfirm(
+                    "تغییرات ذخیره‌نشده",
+                    "فرم فعلی تغییرات ذخیره‌نشده دارد. آیا بدون ذخیره از آن خارج می‌شوید؟",
+                    Controls.ModernDialog.DialogType.Warning,
+                    "خروج از فرم",
+                    "بازگشت",
+                    this);
+
+                if (!confirmNav)
+                    return; // ناوبری لغو شد؛ فرم و اطلاعات کاربر می‌ماند
+            }
+
             MainContentBorder.Visibility = Visibility.Visible;
 
             _nav.Navigate(tag);
@@ -188,6 +226,45 @@ namespace Taadol
         }
 
         /// <summary>
+        /// فرم «ویرایش شرکت» را به‌صورت مودال روی محتوای فعلی باز می‌کند (گرید پشت آن می‌ماند).
+        /// اگر ذخیره شود، گرید لیست پشت مودال رفرش می‌شود.
+        /// </summary>
+        public void NavigateToEditCompany(long companyId)
+        {
+            var editView = new EditCompanyView(companyId);
+            ModalContent.Content = editView;
+            ModalOverlay.BeginAnimation(UIElement.OpacityProperty, null);
+            ModalOverlay.Opacity = 1;
+            ModalOverlay.Visibility = Visibility.Visible;
+        }
+
+        /// <summary>
+        /// فرم «ویرایش دوره مالی» را به‌صورت مودال روی محتوای فعلی باز می‌کند (گرید پشت آن می‌ماند).
+        /// اگر ذخیره شود، گرید لیست پشت مودال رفرش می‌شود.
+        /// </summary>
+        public void NavigateToEditFinancialPeriod(long periodId)
+        {
+            var editView = new EditFinancialPeriodView(periodId);
+            ModalContent.Content = editView;
+            ModalOverlay.BeginAnimation(UIElement.OpacityProperty, null);
+            ModalOverlay.Opacity = 1;
+            ModalOverlay.Visibility = Visibility.Visible;
+        }
+
+        /// <summary>
+        /// فرم «ویرایش شعبه» را به‌صورت مودال روی محتوای فعلی باز می‌کند (گرید پشت آن می‌ماند).
+        /// اگر ذخیره شود، گرید لیست پشت مودال رفرش می‌شود.
+        /// </summary>
+        public void NavigateToEditBranch(long branchId)
+        {
+            var editView = new EditBranchView(branchId);
+            ModalContent.Content = editView;
+            ModalOverlay.BeginAnimation(UIElement.OpacityProperty, null);
+            ModalOverlay.Opacity = 1;
+            ModalOverlay.Visibility = Visibility.Visible;
+        }
+
+        /// <summary>
         /// فرم «شخص جدید» را به‌صورت مودال روی محتوای فعلی باز می‌کند (گرید پشت آن می‌ماند).
         /// اگر شخصی ذخیره شود، گرید لیست پشت مودال رفرش می‌شود.
         /// </summary>
@@ -245,18 +322,10 @@ namespace Taadol
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            bool confirmed = Controls.ModernDialog.ShowConfirm(
-                "تأیید خروج",
-                "آیا از خروج از برنامه مطمئن هستید؟",
-                Controls.ModernDialog.DialogType.Warning,
-                "خروج",
-                "انصراف",
-                this);
-
-            if (confirmed)
-            {
-                Application.Current.Shutdown();
-            }
+            // تأیید خروج فقط یک‌بار و متمرکز در MainWindow_Closing انجام می‌شود
+            // (شامل هشدار تغییرات ذخیره‌نشده در مودال). این‌جا فقط Close صدا زده می‌شود
+            // تا دیالوگ تأیید دوباره (و حتی سومی) نمایش داده نشود.
+            Close();
         }
     }
 }

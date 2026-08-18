@@ -1,0 +1,5 @@
+﻿RCLICK 'QA FinalTest۲' at=1057,303
+CTX_DELETE_NOT_FOUND
+after: alive=True responding=True memMB=255
+WIN[0] title='تعادل - نرم‌افزار حسابداری'
+NO_CONFIRM_TEXT

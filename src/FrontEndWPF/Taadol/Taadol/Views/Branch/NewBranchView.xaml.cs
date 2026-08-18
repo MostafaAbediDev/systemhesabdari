@@ -26,8 +26,6 @@ namespace Taadol.Views
         private readonly IBranchApplication _branchApplication;
         private readonly ICompanyApplication _companyApplication;
         private bool _isCodeAutomatic = true;
-        private bool _isBranchCodeManual = false;
-        private string _branchCode;
         private bool _isLoadedOnce = false;
         public ObservableCollection<CityComboItem> Cities { get; set; } = new();
 
@@ -141,7 +139,7 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "خطا در لود استان‌ها", MessageBoxButton.OK, MessageBoxImage.Error);
+                ToastManager.Error("خطا در لود استان‌ها: " + ex.Message);
             }
             finally
             {
@@ -260,7 +258,7 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "خطا در لود اطلاعات", MessageBoxButton.OK, MessageBoxImage.Error);
+                ToastManager.Error("خطا در لود اطلاعات: " + ex.Message);
             }
             finally
             {
@@ -351,49 +349,6 @@ namespace Taadol.Views
                 .Replace("۹", "9");
         }
 
-        public string BranchCode
-        {
-            get => _branchCode;
-            set
-            {
-                _branchCode = value;
-                OnPropertyChanged(nameof(BranchCode));
-            }
-        }
-
-        public bool IsBranchCodeManual
-        {
-            get => _isBranchCodeManual;
-            set
-            {
-                _isBranchCodeManual = value;
-                OnPropertyChanged(nameof(IsBranchCodeManual));
-            }
-        }
-        private string GenerateNextBranchCode()
-        {
-            try
-            {
-                var branches = _branchApplication.GetBranches();
-
-                long maxCode = 0;
-
-                foreach (var branch in branches)
-                {
-                    if (long.TryParse(branch.Code, out var code))
-                    {
-                        if (code > maxCode)
-                            maxCode = code;
-                    }
-                }
-
-                return (maxCode + 1).ToString();
-            }
-            catch
-            {
-                return "1";
-            }
-        }
         private string _uniqueCode;
         private bool _isUniqueCodeManual;
 
@@ -617,33 +572,33 @@ namespace Taadol.Views
         {
             if (!string.IsNullOrEmpty(Email) && !IsValidEmail(Email))
             {
-                MessageBox.Show("ایمیل وارد شده معتبر نیست.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ToastManager.Warning("ایمیل وارد شده معتبر نیست.");
                 return;
             }
             double parsedLat = double.TryParse(LatitudeText, out var lat) ? lat : double.NaN;
             double parsedLng = double.TryParse(LongitudeText, out var lng) ? lng : double.NaN;
             if (!IsValidPhone(MobilePhone))
             {
-                MessageBox.Show("شماره موبایل وارد شده معتبر نیست.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ToastManager.Warning("شماره موبایل وارد شده معتبر نیست.");
                 return;
             }
 
             if (!IsValidPhone(TelePhone))
             {
-                MessageBox.Show("شماره تلفن وارد شده معتبر نیست.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ToastManager.Warning("شماره تلفن وارد شده معتبر نیست.");
                 return;
             }
             // بررسی محدوده معتبر مختصات
           
             if (SelectedCompanyId <= 0)
             {
-                MessageBox.Show("لطفاً شرکت را انتخاب کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ToastManager.Warning("لطفاً شرکت را انتخاب کنید.");
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(BranchName))
             {
-                MessageBox.Show("نام شعبه را وارد کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ToastManager.Warning("نام شعبه را وارد کنید.");
                 return;
             }
             if (_isCodeAutomatic)
@@ -676,30 +631,20 @@ namespace Taadol.Views
 
                 CityId = SelectedCityId,
                 ProvinceId = SelectedProvinceId,
-                IsMain = BranchType == "Main"
+                IsMain = IsMainBranch
 
 
             };
             try
             {
-                MessageBox.Show(
-    $"CompanyId: {command.CompanyId}\n" +
-    $"CityId: {command.CityId}\n" +
-    $"ProvinceId: {command.ProvinceId}\n" +
-    $"Title: {command.Title}",
-    "مقادیر ارسالی به ثبت شعبه"
-);
                 var operation = _branchApplication.Create(command);
 
                 var message = GetOperationMessage(operation);
 
                 if (!IsOperationSucceeded(operation))
                 {
-                    MessageBox.Show(
-                        string.IsNullOrWhiteSpace(message) ? "ثبت شعبه انجام نشد." : message,
-                        "خطا",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Warning);
+                    ToastManager.Warning(
+                        string.IsNullOrWhiteSpace(message) ? "ثبت شعبه انجام نشد." : message);
 
                     return;
                 }
@@ -716,11 +661,8 @@ namespace Taadol.Views
 
                     if (savedBranch == null)
                     {
-                        MessageBox.Show(
-                            "شعبه ثبت شد، ولی برای فعال‌سازی پیدا نشد.",
-                            "خطا در فعال‌سازی",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Warning);
+                        ToastManager.Warning(
+                            "شعبه ثبت شد، ولی برای فعال‌سازی پیدا نشد.");
 
                         return;
                     }
@@ -729,20 +671,13 @@ namespace Taadol.Views
 
                     if (!IsOperationSucceeded(activateResult))
                     {
-                        MessageBox.Show(
-                            GetOperationMessage(activateResult),
-                            "خطا در فعال‌سازی شعبه",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Warning);
+                        ToastManager.Warning(
+                            GetOperationMessage(activateResult));
 
                         return;
                     }
                 }
-                MessageBox.Show(
-                    "شعبه با موفقیت ثبت شد.",
-                    "موفق",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
+                ToastManager.Success("شعبه با موفقیت ثبت شد.");
 
                 ClearForm();
                 NavigateToBranchList();
@@ -751,12 +686,7 @@ namespace Taadol.Views
             {
                 var realError = ex.GetBaseException().Message;
 
-                MessageBox.Show(
-                    realError,
-                    "خطای  ثبت شعبه",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error
-                );
+                ToastManager.Error(realError);
             }
         }
 
@@ -766,7 +696,6 @@ namespace Taadol.Views
             EconomicCode = "";
             NationalId = "";
             RegisterNumber = "";
-            BranchCode = "";
             TelePhone = "";
             MobilePhone = "";
             Email = "";
@@ -815,16 +744,16 @@ namespace Taadol.Views
         }
         private void BranchTypeToggle_SelectionChanged(object sender, bool isFirstSelected)
         {
-            BranchType = isFirstSelected ? "Main" : "Sub";
+            IsMainBranch = isFirstSelected;
         }
-        private string _branchType = "Main"; // Main = اصلی، Sub = فرعی
-        public string BranchType
+        private bool _isMainBranch = true; // true = اصلی، false = فرعی
+        public bool IsMainBranch
         {
-            get => _branchType;
+            get => _isMainBranch;
             set
             {
-                _branchType = value;
-                OnPropertyChanged(nameof(BranchType));
+                _isMainBranch = value;
+                OnPropertyChanged(nameof(IsMainBranch));
             }
         }
         private string GetOperationMessage(object operation)

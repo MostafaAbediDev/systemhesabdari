@@ -1,7 +1,6 @@
 <UserControl x:Class="Taadol.Controls.RowContextMenuControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:svg="http://sharpvectors.codeplex.com/svgc/"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
@@ -26,7 +25,7 @@
                 BorderThickness="1"
                 CornerRadius="4"
                 Padding="0"
-                MinWidth="145">
+                MinWidth="105">
             <Border.RenderTransform>
                 <TranslateTransform x:Name="PositionTransform" />
             </Border.RenderTransform>
@@ -50,7 +49,7 @@
                                     Background="Transparent"
                                     CornerRadius="4"
                                     Padding="12,9">
-                                <ContentPresenter HorizontalAlignment="Center"
+                                <ContentPresenter HorizontalAlignment="Left"
                                                   VerticalAlignment="Center" />
                             </Border>
                             <ControlTemplate.Triggers>
@@ -63,17 +62,10 @@
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
                     </Button.Template>
-                    <StackPanel Orientation="Horizontal">
-                        <svg:SvgViewbox Width="16"
-                                        Height="16"
-                                        Source="/Assets/Icons/editblue.svg"
-                                        FlowDirection="LeftToRight" />
-                        <TextBlock Text="ویرایش"
-                                   FontSize="14"
-                                   FontWeight="Medium"
-                                   Foreground="#0D2159"
-                                   Margin="14,0,0,0" />
-                    </StackPanel>
+                    <TextBlock Text="ویرایش"
+                               FontSize="14"
+                               FontWeight="Medium"
+                               Foreground="#0D2159" />
                 </Button>
 
                 <Border x:Name="DividerBorder"
@@ -93,7 +85,7 @@
                                     Background="Transparent"
                                     CornerRadius="4"
                                     Padding="12,9">
-                                <ContentPresenter HorizontalAlignment="Center"
+                                <ContentPresenter HorizontalAlignment="Left"
                                                   VerticalAlignment="Center" />
                             </Border>
                             <ControlTemplate.Triggers>
@@ -106,17 +98,10 @@
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
                     </Button.Template>
-                    <StackPanel Orientation="Horizontal">
-                        <svg:SvgViewbox Width="16"
-                                        Height="16"
-                                        Source="/Assets/Icons/trash.svg"
-                                        FlowDirection="LeftToRight" />
-                        <TextBlock Text="حذف"
-                                   FontSize="14"
-                                   FontWeight="Medium"
-                                   Foreground="#DC2626"
-                                   Margin="15,0,14,0" />
-                    </StackPanel>
+                    <TextBlock Text="حذف"
+                               FontSize="14"
+                               FontWeight="Medium"
+                               Foreground="#DC2626" />
                 </Button>
             </StackPanel>
         </Border>

@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Globalization;
 using System.Threading.Tasks;
 using System.Windows.Threading;
+using System.Windows.Media;
 using Taadol.Controls;
 using Taadol.Models;
 
@@ -29,6 +30,7 @@ namespace Taadol.Views
         private int _currentPage = 1;
         private int _totalPages = 1;
         private bool _isLoadedOnce = false;
+        private bool _sizeWired = false;
         private HashSet<string> _selectedStatuses = new();
         private HashSet<string> _selectedCompanyNames = new();
         private HashSet<string> _selectedProvinces = new();
@@ -37,6 +39,8 @@ namespace Taadol.Views
         public BranchListView()
         {
             InitializeComponent();
+
+            ApplyGrayHeaders();
 
             _branchApplication = App.ServiceProvider.GetRequiredService<IBranchApplication>();
 
@@ -56,7 +60,13 @@ namespace Taadol.Views
                     item.IsSelected = false;
             };
 
-            // منوی راست‌کلیک ردیف: فقط حذف (ویرایش در این فرم وجود ندارد)
+            // منوی راست‌کلیک ردیف: ویرایش و حذف
+            BranchesGrid.RowEditRequested += (s, item) =>
+            {
+                if (item is BranchItem b && Window.GetWindow(this) is MainWindow mw)
+                    mw.NavigateToEditBranch(long.Parse(b.UniqueId));
+            };
+
             BranchesGrid.RowDeleteRequested += (s, item) =>
             {
                 if (item is not BranchItem b) return;
@@ -67,9 +77,10 @@ namespace Taadol.Views
                 BtnDelete_Click(this, new RoutedEventArgs());
             };
 
-            BranchSearchBox.TextChanged += (s, e) =>
+            // جستجو با Debounce داخلی SearchBoxControl (پیش‌فرض ۳۰۰ms)
+            BranchSearchBox.SearchTextChanged += (s, text) =>
             {
-                _searchText = BranchSearchBox.Text.Trim();
+                _searchText = text.Trim();
                 _currentPage = 1;
                 ApplyFilters();
             };
@@ -77,6 +88,24 @@ namespace Taadol.Views
             FillEmptyRows();
 
             Loaded += BranchListView_Loaded;
+        }
+
+        // ─── هدر ستون‌های داخلی (چک‌باکس و شماره ردیف) را خاکستری می‌کند ───
+        // تا با بقیه ستون‌ها و بردرهای فرم (E5E7EB) هماهنگ باشد، مثل جدول حساب‌های بانکی.
+        private void ApplyGrayHeaders()
+        {
+            var gray = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E5E7EB"));
+
+            for (int i = 0; i < 2 && i < BranchesGrid.Grid.Columns.Count; i++)
+            {
+                var baseStyle = BranchesGrid.Grid.Columns[i].HeaderStyle;
+                if (baseStyle == null) continue;
+
+                var s = new Style(typeof(DataGridColumnHeader), baseStyle);
+                s.Setters.Add(new Setter(Control.BorderBrushProperty, gray));
+                s.Setters.Add(new Setter(Control.BorderThicknessProperty, new Thickness(0, 0, 1, 1)));
+                BranchesGrid.Grid.Columns[i].HeaderStyle = s;
+            }
         }
 
         private void HeaderClose_Click(object sender, MouseButtonEventArgs e)
@@ -95,8 +124,22 @@ namespace Taadol.Views
             await LoadDataAsync();
         }
 
-        private void ActionButton_Loaded(object sender, RoutedEventArgs e) { }
-        private void ActionButton_Loaded_1(object sender, RoutedEventArgs e) { }
+        /// <summary>
+        /// رفرش داده‌های گرید از بیرون (مثلاً بعد از بسته‌شدن فرم «ویرایش شعبه» در مودال).
+        /// </summary>
+        public async Task RefreshGridAsync()
+        {
+            _isLoadedOnce = false;
+            try
+            {
+                await LoadDataAsync();
+            }
+            catch (Exception ex)
+            {
+                ToastManager.Error("خطا در بروزرسانی: " + ex.Message);
+            }
+        }
+
 
         private async void BranchListView_Loaded(object sender, RoutedEventArgs e)
         {
@@ -128,11 +171,12 @@ namespace Taadol.Views
                         RowNumber = index + 1,
                         RegisterDate = ToPersianDate(b.CreatedAt),
                         UniqueId = b.Id.ToString(),
-                        BranchType = "—",
+                        BranchType = b.IsMain ? "اصلی" : "فرعی",
                         CompanyName = b.CompanyName ?? "—",
                         BranchName = b.Title,
                         RegistrationNumber = b.RegisterNumber,
                         BranchCode = b.Code,
+                        NationalId = b.NationalId,
                         Province = b.ProvinceName,
                         City = b.CityName,
                         Phone = b.TelePhone,
@@ -149,7 +193,7 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "خطا در لود شعبه‌ها", MessageBoxButton.OK, MessageBoxImage.Error);
+                ToastManager.Error("خطا در لود شعبه‌ها: " + ex.Message);
 
                 AllBranches = new ObservableCollection<BranchItem>();
 
@@ -169,7 +213,7 @@ namespace Taadol.Views
             {
                 FilteredBranches.Add(new BranchItem
                 {
-                    RowNumber = i,
+                    RowNumber = 0,
                     IsEmpty = true
                 });
             }
@@ -229,6 +273,7 @@ namespace Taadol.Views
                 query = query.Where(b =>
                     (b.BranchName != null && b.BranchName.Contains(_searchText, StringComparison.OrdinalIgnoreCase)) ||
                     (b.BranchCode != null && b.BranchCode.Contains(_searchText, StringComparison.OrdinalIgnoreCase)) ||
+                    (b.NationalId != null && b.NationalId.Contains(_searchText, StringComparison.OrdinalIgnoreCase)) ||
                     (b.RegistrationNumber != null && b.RegistrationNumber.Contains(_searchText, StringComparison.OrdinalIgnoreCase)));
             }
 
@@ -246,6 +291,8 @@ namespace Taadol.Views
 
             var filteredList = query.ToList();
             filteredListCount = filteredList.Count;
+
+            UpdateTabCounts();
 
             _totalPages = (int)Math.Ceiling(filteredList.Count / (double)_pageSize);
 
@@ -273,21 +320,24 @@ namespace Taadol.Views
 
             FilteredBranches = new ObservableCollection<BranchItem>(pageItems);
 
-            int realCount = FilteredBranches.Count;
-
-            for (int i = realCount + 1; i <= _pageSize; i++)
-            {
-                FilteredBranches.Add(new BranchItem
-                {
-                    RowNumber = i,
-                    IsEmpty = true
-                });
-            }
-
             BranchesGrid.ItemsSource = FilteredBranches;
 
             BuildPaginationButtons();
             UpdateSummary();
+        }
+
+        private void UpdateTabCounts()
+        {
+            if (tabAll == null || tabActive == null || tabInactive == null || AllBranches == null)
+                return;
+
+            int total = AllBranches.Count(b => !b.IsEmpty);
+            int active = AllBranches.Count(b => !b.IsEmpty && b.Status == "فعال");
+            int inactive = AllBranches.Count(b => !b.IsEmpty && b.Status == "غیرفعال");
+
+            tabAll.Tag = $"({ToPersianNumber(total)})";
+            tabActive.Tag = $"({ToPersianNumber(active)})";
+            tabInactive.Tag = $"({ToPersianNumber(inactive)})";
         }
 
         private void UpdateSummary()
@@ -534,7 +584,7 @@ namespace Taadol.Views
 
             if (selectedItems.Count == 0)
             {
-                MessageBox.Show("لطفاً یک شعبه انتخاب کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ToastManager.Warning("لطفاً یک شعبه انتخاب کنید.");
                 return;
             }
 
@@ -554,17 +604,46 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show("خطا در حذف: " + ex.Message, "خطا", MessageBoxButton.OK, MessageBoxImage.Error);
+                ToastManager.Error("خطا در حذف: " + ex.Message);
                 return;
             }
 
             _currentPage = 1;
             await LoadDataAsync();
 
-            MessageBox.Show("شعبه‌های انتخاب‌شده حذف شدند.", "حذف", MessageBoxButton.OK, MessageBoxImage.Information);
+            ToastManager.Success("شعبه‌های انتخاب‌شده حذف شدند.");
         }
 
 
+
+        // فرم لیست باید همیشه کل فضای محتوا رو پر کنه حتی اگه ردیف جدول کم باشه
+        // (چون MainContent با Top/Left فقط اندازه محتوا رو می‌گیره) — مثل PersonListView
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                FillAvailableSpace();
+            }), DispatcherPriority.Background);
+        }
+
+        private void FillAvailableSpace()
+        {
+            if (Window.GetWindow(this) is not Window window) return;
+            if (window.FindName("MainContentBorder") is not Border border) return;
+
+            if (!_sizeWired)
+            {
+                _sizeWired = true;
+                border.SizeChanged += (s, _) => FillAvailableSpace();
+            }
+
+            var pad = border.Padding;
+            var margin = Margin;
+            var w = border.ActualWidth - pad.Left - pad.Right - margin.Left - margin.Right;
+            var h = border.ActualHeight - pad.Top - pad.Bottom - margin.Top - margin.Bottom;
+            Width = w > 0 ? w : 0;
+            Height = h > 0 ? h : 0;
+        }
 
         private void GoToNextPage()
         {
@@ -622,6 +701,7 @@ namespace Taadol.Views
         public string BranchName { get; set; }
         public string RegistrationNumber { get; set; }
         public string BranchCode { get; set; }
+        public string NationalId { get; set; }
         public string Province { get; set; }
         public string City { get; set; }
         public string Phone { get; set; }

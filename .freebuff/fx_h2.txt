@@ -1,0 +1,6 @@
+﻿TOP type=ControlType.Custom name='' id='' off=False
+  ANC[0] ControlType.Custom name='' id='' en=True off=False
+  ANC[1] ControlType.Pane name='' id='DetailPanelScroll' en=True off=False
+  ANC[2] ControlType.Custom name='' id='' en=True off=False
+  ANC[3] ControlType.Window name='تعادل - نرم‌افزار حسابداری' id='' en=True off=False
+  ANC[4] ControlType.Pane name='' id='' en=True off=False

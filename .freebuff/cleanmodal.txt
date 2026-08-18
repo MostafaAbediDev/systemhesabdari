@@ -1,0 +1,6 @@
+﻿OPEN_FAIL: Exception calling "GetCurrentPattern" with "1" argument(s): "Unsupported Pattern."
+INVOKED 'لیست اشخاص' (clean modal)
+DIALOG_PRESENT=False
+MODAL_CLOSED=True
+PERSON_LIST_VISIBLE=True
+alive=True responding=True

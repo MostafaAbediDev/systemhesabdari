@@ -48,7 +48,7 @@ namespace Taadol.Controls
             DividerBorder.Visibility = showEdit && showDelete ? Visibility.Visible : Visibility.Collapsed;
 
             // کمی پایین‌تر/راست‌تر از نشانگر تا زیر دست نرود و از لبه‌ی پنجره بیرون نزند
-            double menuWidth = 150;
+            double menuWidth = 105;
             double menuHeight = 100;
             double maxX = ActualWidth - menuWidth - 4;
             double maxY = ActualHeight - menuHeight - 4;

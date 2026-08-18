@@ -1,0 +1,5 @@
+﻿RCLICK on row text at=1057,303
+CLICKED context-menu حذف at=970,372
+after: alive=True responding=True memMB=211
+WIN[0] title='تعادل - نرم‌افزار حسابداری' type=ControlType.Window
+CONFIRM_TEXT: ControlType.Window:'حذف شخص':id=:en=True:off=False | ControlType.Pane:'آیا از حذف «اریاگستر» مطمئن هستید؟':id=65535:en=True:off=False | ControlType.Text:'حذف':id=BtnText:en=True:off=False | ControlType.Text:'ذخیره نام جدید  F12':id=:en=True:off=False

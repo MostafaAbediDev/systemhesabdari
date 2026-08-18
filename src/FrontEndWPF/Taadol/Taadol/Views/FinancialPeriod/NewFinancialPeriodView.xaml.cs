@@ -123,7 +123,7 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "خطا در لود شعبه‌ها", MessageBoxButton.OK, MessageBoxImage.Error);
+                ToastManager.Error("خطا در لود شعبه‌ها: " + ex.Message);
             }
         }
 
@@ -131,31 +131,31 @@ namespace Taadol.Views
         {
             if (string.IsNullOrWhiteSpace(PeriodTitle))
             {
-                MessageBox.Show("عنوان دوره مالی را وارد کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ToastManager.Warning("عنوان دوره مالی را وارد کنید.");
                 return;
             }
 
             if (SelectedBranchId <= 0)
             {
-                MessageBox.Show("لطفاً شعبه را انتخاب کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ToastManager.Warning("لطفاً شعبه را انتخاب کنید.");
                 return;
             }
 
             if (!StartDate.HasValue)
             {
-                MessageBox.Show("تاریخ شروع دوره را انتخاب کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ToastManager.Warning("تاریخ شروع دوره را انتخاب کنید.");
                 return;
             }
 
             if (!EndDate.HasValue)
             {
-                MessageBox.Show("تاریخ پایان دوره را انتخاب کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ToastManager.Warning("تاریخ پایان دوره را انتخاب کنید.");
                 return;
             }
 
             if (EndDate.Value < StartDate.Value)
             {
-                MessageBox.Show("تاریخ پایان نمی‌تواند قبل از تاریخ شروع باشد.", "خطا", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ToastManager.Warning("تاریخ پایان نمی‌تواند قبل از تاریخ شروع باشد.");
                 return;
             }
 
@@ -212,18 +212,19 @@ namespace Taadol.Views
 
                 transaction.Commit();
 
-                MessageBox.Show("دوره مالی با موفقیت ثبت شد.", "موفق", MessageBoxButton.OK, MessageBoxImage.Information);
+                ToastManager.Success("دوره مالی با موفقیت ثبت شد.");
+
+                // کش سال‌های مالی سایدبار را بی‌اعتبار کن تا دوره جدید فوراً دیده شود
+                Taadol.Controls.YearSelectorControl.InvalidateCache();
+                if ((Window.GetWindow(this) as MainWindow)?.Sidebar?.YearSelector is { } yearSelector)
+                    _ = yearSelector.RefreshAsync();
 
                 ClearForm();
                 NavigateToPeriodList();
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
-                    ex.GetBaseException().Message,
-                    "خطا در ثبت دوره مالی",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                ToastManager.Error(ex.GetBaseException().Message);
             }
         }
 
@@ -259,15 +260,14 @@ namespace Taadol.Views
         private void DatePicker_DateChanged(object sender, RoutedEventArgs e)
         {
             var picker = sender as PersianDatePickerControl;
+            if (picker == null) return;
 
-            if (picker == null || !picker.SelectedDate.HasValue)
-                return;
-
+            // اگر فیلدهای تاریخ پاک شوند مقدار null می‌شود تا ذخیره با تاریخ قبلی رخ ندهد
             if (picker == StartDatePicker)
-                StartDate = picker.SelectedDate.Value;
+                StartDate = picker.SelectedDate;
 
             if (picker == EndDatePicker)
-                EndDate = picker.SelectedDate.Value;
+                EndDate = picker.SelectedDate;
         }
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)

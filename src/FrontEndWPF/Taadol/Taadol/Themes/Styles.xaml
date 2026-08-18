@@ -2,7 +2,8 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-                    xmlns:svg="http://sharpvectors.codeplex.com/svgc/">
+                    xmlns:svg="http://sharpvectors.codeplex.com/svgc/"
+                    xmlns:controls="clr-namespace:Taadol.Controls">
 
     
     
@@ -96,7 +97,17 @@
 
     
     <FontFamily x:Key="IRANSans">
-        pack://application:,,,/Fonts/#IRANSansXFaNum
+        pack://application:,,,/Fonts/IRANSans/#IRANSansXFaNum
+    </FontFamily>
+
+    <!-- ═══ فونت وزیر (Vazir) — کل خانواده اضافه شد: Fonts/Vazir ═══
+         Vazir: ارقام لاتین | Vazir FD: ارقام فارسی پیش‌فرض | WOL: بدون حروف لاتین -->
+    <FontFamily x:Key="Vazir">
+        pack://application:,,,/Fonts/Vazir/#Vazir
+    </FontFamily>
+
+    <FontFamily x:Key="VazirFD">
+        pack://application:,,,/Fonts/Vazir/#Vazir FD
     </FontFamily>
 
     <Style x:Key="FilterTabStyle"
@@ -412,8 +423,30 @@
                                     Background="Transparent"
                                     Margin="0,0,4,0"
                                     VerticalAlignment="Center"
-                                    Opacity="0"
                                     Cursor="Hand">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Opacity"
+                                                Value="0" />
+                                        <Setter Property="Visibility"
+                                                Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <!-- ضربدر فقط وقتی مجاز باشد (ShowClose=True) و تب انتخاب شده باشد دیده می‌شود -->
+                                            <MultiDataTrigger>
+                                                <MultiDataTrigger.Conditions>
+                                                    <Condition Binding="{Binding Path=(controls:FilterTabBehavior.ShowClose), RelativeSource={RelativeSource AncestorType=ToggleButton}}"
+                                                               Value="True" />
+                                                    <Condition Binding="{Binding Path=IsChecked, RelativeSource={RelativeSource AncestorType=ToggleButton}}"
+                                                               Value="True" />
+                                                </MultiDataTrigger.Conditions>
+                                                <Setter Property="Opacity"
+                                                        Value="1" />
+                                                <Setter Property="Visibility"
+                                                        Value="Visible" />
+                                            </MultiDataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
                                 <TextBlock x:Name="CloseText"
                                            Text="&#x2715;"
                                            FontSize="9"
@@ -438,7 +471,7 @@
                                            Text="{TemplateBinding Tag}"
                                            FontSize="11"
                                            Foreground="#0D2159"
-                                           FontFamily="{StaticResource IRANSans}"
+                                           FontFamily="{StaticResource Vazir}"
                                            VerticalAlignment="Center"
                                            Margin="6,0,0,0" />
                             </StackPanel>
@@ -460,9 +493,6 @@
                             <Setter TargetName="CountText"
                                     Property="Foreground"
                                     Value="#2667FF" />
-                            <Setter TargetName="CloseBorder"
-                                    Property="Opacity"
-                                    Value="1" />
                         </Trigger>
 
                         <Trigger Property="IsMouseOver"

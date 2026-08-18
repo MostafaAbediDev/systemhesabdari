@@ -1,0 +1,3 @@
+﻿RCLICK idx=57 name='اریاگستر' id='' at=1057,303 off=False
+after: alive=True responding=True memMB=210
+WIN[0] title='تعادل - نرم‌افزار حسابداری'

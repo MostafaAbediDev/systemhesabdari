@@ -1,0 +1,7 @@
+﻿CLICKED BtnNewText at=1482,954
+MODAL_OPEN_AFTER_CLICK=True
+INVOKED 'لیست اشخاص' (clean modal)
+DIALOG_PRESENT=False
+MODAL_CLOSED=False
+PERSON_LIST_VISIBLE=True
+alive=True responding=True

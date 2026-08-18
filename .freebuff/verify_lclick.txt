@@ -1,0 +1,5 @@
+﻿LCLICK 'اریاگستر' at=1057,303
+  id='PanelHeaderText' name='اشخاص انتخاب شده'
+  id='SelectedCountText' name='(۰)'
+  id='SelectedSummaryText' name='جمع اشخاص انتخاب شده (۰)'
+alive=True responding=True

@@ -1,0 +1,5 @@
+﻿RCLICK 'QA FinalTest' at=1057,303
+CLICKED_MENU 'ویرایش' at=964,330
+after: alive=True responding=True memMB=251
+WINCOUNT=1
+  WIN[0] title='تعادل - نرم‌افزار حسابداری'

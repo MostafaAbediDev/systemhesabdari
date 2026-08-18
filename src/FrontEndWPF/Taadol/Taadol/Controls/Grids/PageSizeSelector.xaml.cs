@@ -23,6 +23,10 @@ namespace Taadol.Controls
 
         private readonly List<int> _options = new() { 10, 15, 20, 25, 50, 75 };
 
+        // برای unsubscribe در Unloaded — وگرنه هر PageSizeSelector ساخته‌شده
+        // یک هندلر زنده روی ویندوز باقی می‌گذارد (نشتی حافظه)
+        private Window _subscribedWindow;
+
         public PageSizeSelector()
         {
             InitializeComponent();
@@ -31,8 +35,20 @@ namespace Taadol.Controls
             Loaded += (s, e) =>
             {
                 var window = Window.GetWindow(this);
-                if (window != null)
+                if (window != null && _subscribedWindow == null)
+                {
+                    _subscribedWindow = window;
                     window.PreviewMouseDown += Window_PreviewMouseDown;
+                }
+            };
+
+            Unloaded += (s, e) =>
+            {
+                if (_subscribedWindow != null)
+                {
+                    _subscribedWindow.PreviewMouseDown -= Window_PreviewMouseDown;
+                    _subscribedWindow = null;
+                }
             };
         }
         private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
@@ -53,7 +69,14 @@ namespace Taadol.Controls
             while (child != null)
             {
                 if (child == parent) return true;
-                child = VisualTreeHelper.GetParent(child);
+
+                // کلیک روی متن داخل گزینه‌ها، OriginalSource را یک Run (ContentElement)
+                // می‌کند که Visual نیست؛ VisualTreeHelper.GetParent روی آن
+                // InvalidOperationException می‌اندازد (باگ Runtime تأییدشده).
+                // برای عناصر غیر-Visual از LogicalTree پدر را بالا می‌رویم.
+                child = child is Visual || child is System.Windows.Media.Media3D.Visual3D
+                    ? VisualTreeHelper.GetParent(child)
+                    : LogicalTreeHelper.GetParent(child);
             }
             return false;
         }
