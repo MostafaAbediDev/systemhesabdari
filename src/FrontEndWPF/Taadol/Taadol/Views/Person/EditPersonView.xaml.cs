@@ -23,6 +23,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using Taadol.Controls;
+using Taadol.Helpers;
 
 namespace Taadol.Views
 {
@@ -216,7 +217,7 @@ namespace Taadol.Views
                     LoadBankBranchesAsync()
                 );
                 System.Diagnostics.Debug.WriteLine("[DEBUG] EditPersonView: all load tasks completed, calling LoadPersonData");
-                LoadPersonData();
+                await LoadPersonData();
                 System.Diagnostics.Debug.WriteLine("[DEBUG] EditPersonView: LoadPersonData completed");
             }
             catch (Exception ex)
@@ -392,7 +393,7 @@ namespace Taadol.Views
             }
         }
 
-        private async void LoadPersonData()
+        private async Task LoadPersonData()
         {
             try
             {
@@ -1210,7 +1211,7 @@ namespace Taadol.Views
                 NationalCodeInput.ValidationState = Controls.ValidationState.None;
                 NationalCodeInput.ValidationMessage = "";
             }
-            else if (IsValidNationalCode(text))
+            else if (ValidationHelper.IsValidNationalCode(text))
             {
                 NationalCodeInput.ValidationState = Controls.ValidationState.Valid;
                 NationalCodeInput.ValidationMessage = "";
@@ -1397,10 +1398,10 @@ namespace Taadol.Views
                 if (string.IsNullOrWhiteSpace(LastName)) { ToastManager.Warning("نام خانوادگی را وارد کنید."); return false; }
                 if (string.IsNullOrWhiteSpace(NationalCode)) { ToastManager.Warning("کد ملی را وارد کنید."); return false; }
                 if (NationalCode.Count(char.IsDigit) != 10) { ToastManager.Warning("کد ملی باید دقیقاً ۱۰ رقم باشد."); return false; }
-                if (!IsValidNationalCode(NationalCode)) { ToastManager.Warning("کد ملی وارد شده صحیح نیست."); return false; }
+                if (!ValidationHelper.IsValidNationalCode(NationalCode)) { ToastManager.Warning("کد ملی وارد شده صحیح نیست."); return false; }
             }
 
-            if (!string.IsNullOrWhiteSpace(Email) && !IsValidEmail(Email))
+            if (!string.IsNullOrWhiteSpace(Email) && !ValidationHelper.IsValidEmail(Email))
             {
                 ToastManager.Warning("فرمت ایمیل صحیح نیست. مثال صحیح: name@example.com");
                 return false;
@@ -1410,7 +1411,7 @@ namespace Taadol.Views
             foreach (var row in BankAccounts)
             {
                 var shaba = (row.Shaba ?? "").Trim().Replace(" ", "").ToUpper();
-                if (shaba.Length > 2 && shaba != "IR" && !IsValidShaba(shaba))
+                if (shaba.Length > 2 && shaba != "IR" && !ValidationHelper.IsValidShaba(shaba))
                 {
                     ToastManager.Warning(
                         $"فرمت شبا برای حساب «{row.BankName}» صحیح نیست. باید با IR شروع و در مجموع ۲۶ کاراکتر باشد.");
@@ -1420,60 +1421,6 @@ namespace Taadol.Views
 
             return true;
         }
-
-        // ======================================================
-        //  Validation Helpers
-        // ======================================================
-        private static bool IsValidNationalCode(string code)
-        {
-            if (string.IsNullOrWhiteSpace(code)) return false;
-            code = code.Trim().Replace(" ", "").Replace("-", "");
-
-            // فیلد کد ملی رقم فارسی تولید می‌کند؛ برای محاسبه‌ی checksum باید انگلیسی شوند
-            var digits = new System.Text.StringBuilder();
-            foreach (char c in code)
-            {
-                if (c >= '۰' && c <= '۹') digits.Append((char)('0' + (c - '۰')));
-                else digits.Append(c);
-            }
-            code = digits.ToString();
-
-            if (code.Length != 10 || !code.All(char.IsDigit)) return false;
-
-            // کدهایی مثل 0000000000 یا 1111111111 معتبر نیستند
-            if (code.Distinct().Count() == 1) return false;
-
-            int[] weights = { 10, 9, 8, 7, 6, 5, 4, 3, 2 };
-            int sum = 0;
-            for (int i = 0; i < 9; i++)
-                sum += (code[i] - '0') * weights[i];
-
-            int remainder = sum % 11;
-            int checkDigit = remainder < 2 ? remainder : 11 - remainder;
-            return checkDigit == (code[9] - '0');
-        }
-
-        private static bool IsValidEmail(string email)
-        {
-            if (string.IsNullOrWhiteSpace(email)) return false;
-            try
-            {
-                var addr = new System.Net.Mail.MailAddress(email.Trim());
-                return addr.Address == email.Trim();
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        private static bool IsValidShaba(string shaba)
-        {
-            if (string.IsNullOrWhiteSpace(shaba)) return false;
-            shaba = shaba.Trim().Replace(" ", "").ToUpper();
-            return shaba.StartsWith("IR") && shaba.Length == 26 && shaba.Substring(2).All(char.IsDigit);
-        }
-
 
         private void SavePerson_Click(object sender, RoutedEventArgs e) => SavePerson();
 
