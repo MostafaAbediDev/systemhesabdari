@@ -1,0 +1,62 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Taadol.Helpers
+{
+    public static class ValidationHelper
+    {
+        public static bool IsValidNationalCode(string code)
+        {
+            if (string.IsNullOrWhiteSpace(code)) return false;
+            code = code.Trim().Replace(" ", "").Replace("-", "");
+
+            var digits = new System.Text.StringBuilder();
+            foreach (char c in code)
+            {
+                if (c >= '۰' && c <= '۹') digits.Append((char)('0' + (c - '۰')));
+                else digits.Append(c);
+            }
+            code = digits.ToString();
+
+            if (code.Length != 10 || !code.All(char.IsDigit)) return false;
+            if (code.Distinct().Count() == 1) return false;
+
+            int[] weights = { 10, 9, 8, 7, 6, 5, 4, 3, 2 };
+            int sum = 0;
+            for (int i = 0; i < 9; i++)
+                sum += (code[i] - '0') * weights[i];
+
+            int remainder = sum % 11;
+            int checkDigit = remainder < 2 ? remainder : 11 - remainder;
+            return checkDigit == (code[9] - '0');
+        }
+
+        public static bool IsValidShaba(string shaba)
+        {
+            if (string.IsNullOrWhiteSpace(shaba)) return false;
+            shaba = shaba.Trim().Replace(" ", "").ToUpper();
+            return shaba.StartsWith("IR") && shaba.Length == 26 && shaba.Substring(2).All(char.IsDigit);
+        }
+
+        public static bool IsValidEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email)) return false;
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email.Trim());
+                return addr.Address == email.Trim();
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public static bool IsValidPhone(string phone)
+        {
+            if (string.IsNullOrWhiteSpace(phone)) return false;
+            return phone.All(char.IsDigit) && phone.Length >= 8 && phone.Length <= 11;
+        }
+    }
+}

@@ -14,6 +14,7 @@ using GeneralInfoManagement.Domain.General.CityAgg;
 using GeneralInfoManagement.Domain.General.ProvinceAgg;
 using Microsoft.Extensions.DependencyInjection;
 using Taadol.Controls;
+using Taadol.Helpers;
 
 namespace Taadol.Views
 {
@@ -360,29 +361,7 @@ namespace Taadol.Views
             _userMadeChanges = true;
         }
 
-        private bool IsValidEmail(string email)
-        {
-            if (string.IsNullOrWhiteSpace(email))
-                return false;
-
-            try
-            {
-                var addr = new System.Net.Mail.MailAddress(email);
-                return addr.Address == email;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        private bool IsValidPhone(string phone)
-        {
-            if (string.IsNullOrWhiteSpace(phone))
-                return false;
-
-            return phone.All(char.IsDigit) && phone.Length >= 8 && phone.Length <= 11;
-        }
+        // Validation methods moved to Taadol.Helpers.ValidationHelper
 
         private void SaveBranch()
         {
@@ -413,19 +392,19 @@ namespace Taadol.Views
                 return;
             }
 
-            if (!string.IsNullOrEmpty(Email) && !IsValidEmail(Email))
+            if (!string.IsNullOrEmpty(Email) && !ValidationHelper.IsValidEmail(Email))
             {
                 ToastManager.Warning("ایمیل وارد شده معتبر نیست.");
                 return;
             }
 
-            if (!IsValidPhone(MobilePhone))
+            if (!ValidationHelper.IsValidPhone(MobilePhone))
             {
                 ToastManager.Warning("شماره موبایل وارد شده معتبر نیست.");
                 return;
             }
 
-            if (!IsValidPhone(TelePhone))
+            if (!ValidationHelper.IsValidPhone(TelePhone))
             {
                 ToastManager.Warning("شماره تلفن وارد شده معتبر نیست.");
                 return;

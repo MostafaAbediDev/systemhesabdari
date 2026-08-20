@@ -8,6 +8,7 @@ using GeneralInfoManagement.Application.Contract.Province;
 using GeneralInfoManagement.Domain.General.CityAgg;
 using GeneralInfoManagement.Domain.General.ProvinceAgg;
 using Microsoft.Extensions.DependencyInjection;
+using Taadol.Helpers;
 using PersonManagement.Application.Contract.ContactTypes;
 using PersonManagement.Application.Contract.PersonAddress;
 using PersonManagement.Application.Contract.PersonBank;
@@ -203,8 +204,8 @@ namespace Taadol.Views
             if (CategorySearch2 != null)
                 CategorySearch2.PersonTypeId = personTypeId;
 
-            if (CategorySearc3 != null)
-                CategorySearc3.PersonTypeId = personTypeId;
+            if (CategorySearch3 != null)
+                CategorySearch3.PersonTypeId = personTypeId;
 
             try
             {
@@ -223,8 +224,8 @@ namespace Taadol.Views
                 CategorySearch2?.LoadFromTreeDto(tree);
                 CategorySearch2?.ClearSelection();
 
-                CategorySearc3?.LoadFromTreeDto(tree);
-                CategorySearc3?.ClearSelection();
+                CategorySearch3?.LoadFromTreeDto(tree);
+                CategorySearch3?.ClearSelection();
             }
             catch (Exception ex)
             {
@@ -739,7 +740,17 @@ namespace Taadol.Views
         // ======================================================
         //  Save
         // ======================================================
-        private async void SavePerson_Click(object sender, RoutedEventArgs e) => await SavePersonAsync();
+        private async void SavePerson_Click(object sender, RoutedEventArgs e)
+{
+    try
+    {
+        await SavePersonAsync();
+    }
+    catch (Exception ex)
+    {
+        ToastManager.Error("خطا در ثبت شخص: " + ex.Message);
+    }
+}
 
         /// <summary>بعد از ذخیره‌ی موفق یک شخص صدا زده می‌شود تا گرید پشت مودال رفرش شود.</summary>
         public event Action PersonSaved;
@@ -1177,7 +1188,7 @@ namespace Taadol.Views
                     NationalCodeInput.ValidationMessage = "کد ملی باید دقیقاً ۱۰ رقم باشد.";
                     hasError = true;
                 }
-                else if (!IsValidNationalCode(NationalCode))
+                else if (!ValidationHelper.IsValidNationalCode(NationalCode))
                 {
                     NationalCodeInput.ValidationState = Controls.ValidationState.Invalid;
                     NationalCodeInput.ValidationMessage = "کد ملی وارد شده صحیح نیست.";
@@ -1207,13 +1218,13 @@ namespace Taadol.Views
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(Email) && !IsValidEmail(Email))
+            if (!string.IsNullOrWhiteSpace(Email) && !ValidationHelper.IsValidEmail(Email))
             {
                 ToastManager.Warning("فرمت ایمیل صحیح نیست. مثال صحیح: name@example.com");
                 return false;
             }
 
-            if (!string.IsNullOrWhiteSpace(MainShaba) && !IsValidShaba(MainShaba))
+            if (!string.IsNullOrWhiteSpace(MainShaba) && !ValidationHelper.IsValidShaba(MainShaba))
             {
                 ToastManager.Warning("فرمت شبا صحیح نیست. باید با IR شروع و در مجموع ۲۶ کاراکتر باشد.");
                 return false;
@@ -1222,58 +1233,7 @@ namespace Taadol.Views
             return true;
         }
 
-        // ======================================================
-        //  Validation Helpers (فرمت)
-        // ======================================================
-        private static bool IsValidNationalCode(string code)
-        {
-            if (string.IsNullOrWhiteSpace(code))
-                return false;
-
-            code = code.Trim()
-                       .Replace(" ", "")
-                       .Replace("-", "");
-
-            // تبدیل ارقام فارسی به انگلیسی
-            var digits = new System.Text.StringBuilder();
-
-            foreach (char c in code)
-            {
-                if (c >= '۰' && c <= '۹')
-                    digits.Append((char)('0' + (c - '۰')));
-                else
-                    digits.Append(c);
-            }
-
-            code = digits.ToString();
-
-            // کد باید دقیقاً ۱۰ رقم باشد
-            if (code.Length != 10 || !code.All(char.IsDigit))
-                return false;
-
-            return true;
-        }
-
-        private static bool IsValidEmail(string email)
-        {
-            if (string.IsNullOrWhiteSpace(email)) return false;
-            try
-            {
-                var addr = new System.Net.Mail.MailAddress(email.Trim());
-                return addr.Address == email.Trim();
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        private static bool IsValidShaba(string shaba)
-        {
-            if (string.IsNullOrWhiteSpace(shaba)) return false;
-            shaba = shaba.Trim().Replace(" ", "").ToUpper();
-            return shaba.StartsWith("IR") && shaba.Length == 26 && shaba.Substring(2).All(char.IsDigit);
-        }
+        // Validation methods moved to Taadol.Helpers.ValidationHelper
 
         // ======================================================
         //  GetCreatedPersonId (بدون تغییر بک‌اند)
@@ -1995,7 +1955,7 @@ namespace Taadol.Views
                         textBox.ValidationState = Controls.ValidationState.None;
                         textBox.ValidationMessage = "";
                     }
-                    else if (IsValidNationalCode(text))
+                    else if (ValidationHelper.IsValidNationalCode(text))
                     {
                         textBox.ValidationState = Controls.ValidationState.Valid;
                         textBox.ValidationMessage = "";
@@ -2036,7 +1996,7 @@ namespace Taadol.Views
                 }
                 else if (textBox == EmailInput)
                 {
-                    if (!string.IsNullOrWhiteSpace(text) && IsValidEmail(text))
+                    if (!string.IsNullOrWhiteSpace(text) && ValidationHelper.IsValidEmail(text))
                     {
                         textBox.ValidationState = Controls.ValidationState.Valid;
                         textBox.ValidationMessage = "";

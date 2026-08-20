@@ -18,6 +18,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Taadol.Controls;
+using Taadol.Helpers;
 
 namespace Taadol.Views
 {
@@ -529,21 +530,7 @@ namespace Taadol.Views
             Loaded += NewBranchView_Loaded;
         }
 
-        private bool IsValidEmail(string email)
-        {
-            if (string.IsNullOrWhiteSpace(email))
-                return false;
-
-            try
-            {
-                var addr = new System.Net.Mail.MailAddress(email);
-                return addr.Address == email;
-            }
-            catch
-            {
-                return false;
-            }
-        }
+        // Validation methods moved to Taadol.Helpers.ValidationHelper
         private void ShowCompanyComboLoading(bool show)
         {
             CompanyComboLoading.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
@@ -560,30 +547,23 @@ namespace Taadol.Views
                 OnPropertyChanged(nameof(NationalId));
             }
         }
-        private bool IsValidPhone(string phone)
-        {
-            if (string.IsNullOrWhiteSpace(phone))
-                return false;
-
-            // فقط اعداد فارسی یا لاتین
-            return phone.All(c => char.IsDigit(c)) && phone.Length >= 8 && phone.Length <= 11;
-        }
+        // Phone validation moved to Taadol.Helpers.ValidationHelper
         private void SaveBranch()
         {
-            if (!string.IsNullOrEmpty(Email) && !IsValidEmail(Email))
+            if (!string.IsNullOrEmpty(Email) && !ValidationHelper.IsValidEmail(Email))
             {
                 ToastManager.Warning("ایمیل وارد شده معتبر نیست.");
                 return;
             }
             double parsedLat = double.TryParse(LatitudeText, out var lat) ? lat : double.NaN;
             double parsedLng = double.TryParse(LongitudeText, out var lng) ? lng : double.NaN;
-            if (!IsValidPhone(MobilePhone))
+            if (!ValidationHelper.IsValidPhone(MobilePhone))
             {
                 ToastManager.Warning("شماره موبایل وارد شده معتبر نیست.");
                 return;
             }
 
-            if (!IsValidPhone(TelePhone))
+            if (!ValidationHelper.IsValidPhone(TelePhone))
             {
                 ToastManager.Warning("شماره تلفن وارد شده معتبر نیست.");
                 return;
