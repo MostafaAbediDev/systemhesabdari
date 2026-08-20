@@ -931,7 +931,7 @@
                                                                     MainIconSource="/Assets/Icons/custom_icon.svg" />
                                 </StackPanel>
                                 <StackPanel Grid.Column="2">
-                                    <controls:CategorySearchControl x:Name="CategorySearc3"
+                                    <controls:CategorySearchControl x:Name="CategorySearch3"
                                                                     Width="300"
                                                                     HeaderText="عنوان شغل"
                                                                     IsRequired="True"
