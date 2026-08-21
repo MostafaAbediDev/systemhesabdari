@@ -174,30 +174,6 @@ namespace Taadol.Views
                 _ = LoadCategoriesSafeAsync(value);
             }
         }
-        public class BulkObservableCollection<T> : ObservableCollection<T>
-        {
-            public void AddRange(IEnumerable<T> items)
-            {
-                CheckReentrancy();
-                foreach (var item in items)
-                    Items.Add(item); // مستقیم به لیست داخلی، بدون Notify per-item
-
-                OnPropertyChanged(new PropertyChangedEventArgs(nameof(Count)));
-                OnPropertyChanged(new PropertyChangedEventArgs("Item[]"));
-                OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-            }
-
-            public void ReplaceAll(IEnumerable<T> items)
-            {
-                Items.Clear();
-                foreach (var item in items)
-                    Items.Add(item);
-
-                OnPropertyChanged(new PropertyChangedEventArgs(nameof(Count)));
-                OnPropertyChanged(new PropertyChangedEventArgs("Item[]"));
-                OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-            }
-        }
         private async Task LoadCategoriesAsync(long personTypeId)
         {
             if (personTypeId <= 0) return;

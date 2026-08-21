@@ -1430,27 +1430,5 @@ namespace Taadol.Views
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsDirty)));
         }
 
-        public class BulkObservableCollection<T> : ObservableCollection<T>
-        {
-            public void AddRange(IEnumerable<T> items)
-            {
-                CheckReentrancy();
-                foreach (var item in items)
-                    Items.Add(item);
-                OnPropertyChanged(new PropertyChangedEventArgs(nameof(Count)));
-                OnPropertyChanged(new PropertyChangedEventArgs("Item[]"));
-                OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-            }
-            public void ReplaceAll(IEnumerable<T> items)
-            {
-                Items.Clear();
-                foreach (var item in items)
-                    Items.Add(item);
-                OnPropertyChanged(new PropertyChangedEventArgs(nameof(Count)));
-                OnPropertyChanged(new PropertyChangedEventArgs("Item[]"));
-                OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-            }
-        }
-
     }
 }

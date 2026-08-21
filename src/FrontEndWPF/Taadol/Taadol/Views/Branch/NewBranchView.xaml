@@ -451,14 +451,28 @@
                                     <StackPanel Grid.Column="0">
                                         <TextBlock Text="شهرستان"
                                                    Style="{StaticResource FormLabel}" />
-                                        <ComboBox x:Name="CityComboBox"
-                                                  Width="170"
-                                                  ItemsSource="{Binding Cities}"
-                                                  DisplayMemberPath="Title"
-                                                  SelectedValuePath="Id"
-                                                  SelectedValue="{Binding SelectedCityId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                  Style="{StaticResource SearchableComboBox}"
-                                                  ItemContainerStyle="{StaticResource SearchableComboBoxItem}" />
+                                        <Grid>
+                                            <ComboBox x:Name="CityComboBox"
+                                                      Width="170"
+                                                      ItemsSource="{Binding Cities}"
+                                                      DisplayMemberPath="Title"
+                                                      SelectedValuePath="Id"
+                                                      SelectedValue="{Binding SelectedCityId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                      Style="{StaticResource SearchableComboBox}"
+                                                      ItemContainerStyle="{StaticResource SearchableComboBoxItem}" />
+                                            <Border x:Name="CityBlockOverlay"
+                                                    Background="Transparent"
+                                                    Cursor="No"
+                                                    Visibility="Collapsed"
+                                                    MouseLeftButtonDown="CityBlockOverlay_MouseLeftButtonDown" />
+                                        </Grid>
+                                        <TextBlock x:Name="CityErrorText"
+                                                   Text="ابتدا استان را انتخاب کنید"
+                                                   FontFamily="{StaticResource IRANSans}"
+                                                   FontSize="12"
+                                                   Foreground="#DC2626"
+                                                   Margin="4,4,0,0"
+                                                   Visibility="Collapsed" />
                                     </StackPanel>
 
                                     <StackPanel Grid.Column="2">

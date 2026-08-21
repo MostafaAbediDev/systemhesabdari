@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -26,6 +27,7 @@ namespace Taadol.Views
     /// </summary>
     public partial class EditBranchView : UserControl, INotifyPropertyChanged, IUnsavedChangesAware
     {
+        private CancellationTokenSource _loadCts = new();
         private readonly IBranchApplication _branchApplication;
         private readonly long _branchId;
 
@@ -172,8 +174,11 @@ namespace Taadol.Views
                 _selectedProvinceId = value;
                 OnPropertyChanged(nameof(SelectedProvinceId));
                 if (_isLoading) return;
+                SelectedCityId = 0;
                 if (_selectedProvinceId > 0)
                     _ = LoadCitiesSafeAsync(_selectedProvinceId);
+                else
+                    Cities.Clear();
             }
         }
 
@@ -194,6 +199,15 @@ namespace Taadol.Views
             DataContext = this;
 
             Loaded += OnLoaded;
+            this.Unloaded += OnViewUnloaded;
+        }
+
+        private void OnViewUnloaded(object sender, RoutedEventArgs e)
+        {
+            _loadCts?.Cancel();
+            _loadCts?.Dispose();
+            _loadCts = null;
+            this.Unloaded -= OnViewUnloaded;
         }
 
         public class ProvinceComboItem
@@ -306,33 +320,47 @@ namespace Taadol.Views
 
             try
             {
+                var token = _loadCts?.Token ?? CancellationToken.None;
                 var cities = await Task.Run(() =>
                 {
+                    token.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
                     var repo = scope.ServiceProvider.GetRequiredService<ICityRepository>();
                     return repo.GetCitiesByProvince(provinceId)
                         .Select(c => new CityComboItem { Id = c.Id, Title = c.Title })
                         .ToList();
-                });
+                }, token);
 
-                Cities = new ObservableCollection<CityComboItem>(cities);
-                OnPropertyChanged(nameof(Cities));
+                if (SelectedProvinceId != provinceId)
+                    return;
+
+                Cities.Clear();
+                foreach (var c in cities)
+                    Cities.Add(c);
 
                 long target = _preferredCityId > 0
                     ? _preferredCityId
-                    : (Cities.Count > 0 ? Cities[0].Id : 0);
+                    : (Cities.All(c => c.Id != SelectedCityId) ? 0 : SelectedCityId);
                 _preferredCityId = 0;
 
                 if (target > 0)
                     SelectedCityId = target;
+                else if (Cities.All(c => c.Id != SelectedCityId))
+                    SelectedCityId = 0;
+            }
+            catch (OperationCanceledException)
+            {
+                System.Diagnostics.Debug.WriteLine("[EditBranchView] LoadCitiesAsync was cancelled");
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در لود شهرستان‌ها: " + ex.Message);
+                if (_loadCts?.IsCancellationRequested != true)
+                    ToastManager.Error("خطا در لود شهرستان‌ها: " + ex.Message);
             }
             finally
             {
-                CityComboBox.IsEnabled = true;
+                if (_loadCts?.IsCancellationRequested != true)
+                    CityComboBox.IsEnabled = true;
             }
         }
 
