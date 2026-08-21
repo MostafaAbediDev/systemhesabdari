@@ -463,26 +463,14 @@ namespace Taadol.Views
         private async Task LoadBranchesAsync()
         {
             ShowBranchComboLoading(true);
-
             try
             {
-                var items = await Task.Run(() =>
-                {
-                    using var scope = App.ServiceProvider.CreateScope();
-                    var app = scope.ServiceProvider.GetRequiredService<IBranchApplication>();
-                    return app.GetBranches()
-                               .Select(b => new BranchComboItem { Id = b.Id, Title = b.Title })
-                               .ToList(); // ← تبدیل هم داخل Task.Run انجام بشه، نه روی UI Thread
-                });
-
-                Branches.ReplaceAll(items); // ← یک Notify به‌جای N تا
+                var items = await PersonFormHelper.LoadBranchesAsync(
+                    replaceAll: list => Branches.ReplaceAll(list),
+                    onError: ex => ToastManager.Error("خطا در لود شعبه‌ها: " + ex.Message));
 
                 if (Branches.Count > 0 && SelectedBranchId == 0)
                     SelectedBranchId = Branches[0].Id;
-            }
-            catch (Exception ex)
-            {
-                ToastManager.Error("خطا در لود شعبه‌ها: " + ex.Message);
             }
             finally
             {
@@ -501,117 +489,51 @@ namespace Taadol.Views
 
         private async Task LoadPersonTypesAsync()
         {
-            try
+            var items = await PersonFormHelper.LoadPersonTypesAsync(
+                PersonTypes,
+                ex => ToastManager.Error("خطا در لود انواع شخص: " + ex.Message));
+
+            if (PersonTypes.Count > 0 && SelectedPersonTypeId == 0)
             {
-                var items = await Task.Run(() =>
-                {
-                    using var scope = App.ServiceProvider.CreateScope();
-                    var app = scope.ServiceProvider.GetRequiredService<IPersonTypeApplication>();
-                    return app.GetPersonTypes();
-                });
-
-                PersonTypes.Clear();
-                foreach (var t in items)
-                    PersonTypes.Add(t);
-
-                if (PersonTypes.Count > 0 && SelectedPersonTypeId == 0)
-                {
-                    SelectedPersonTypeId = PersonTypes[0].Id;
-                    UpdatePersonTypeToggleSelection();
-                }
-
-                // رفع باگ ترتیب ساخت: تاگل «مشتری» در XAML از اول IsChecked="True" دارد،
-                // پس رویداد Checked در حین InitializeComponent قبل از ساخته‌شدن
-                // CategorySearch فایر می‌شود و PersonTypeId روی کنترل اعمال نمی‌شود.
-                // اینجا صریحاً اعمال مجدد می‌کنیم تا «افزودن دسته» بدون جابه‌جایی بین
-                // انواع شخص کار کند.
-                if (SelectedPersonTypeId > 0)
-                    await LoadCategoriesAsync(SelectedPersonTypeId);
+                SelectedPersonTypeId = PersonTypes[0].Id;
+                UpdatePersonTypeToggleSelection();
             }
-            catch (Exception ex)
-            {
-                ToastManager.Error("خطا در لود انواع شخص: " + ex.Message);
-            }
+
+            // رفع باگ ترتیب ساخت: تاگل «مشتری» در XAML از اول IsChecked="True" دارد،
+            // پس رویداد Checked در حین InitializeComponent قبل از ساخته‌شدن
+            // CategorySearch فایر می‌شود و PersonTypeId روی کنترل اعمال نمی‌شود.
+            // اینجا صریحاً اعمال مجدد می‌کنیم تا «افزودن دسته» بدون جابه‌جایی بین
+            // انواع شخص کار کند.
+            if (SelectedPersonTypeId > 0)
+                await LoadCategoriesAsync(SelectedPersonTypeId);
         }
 
         private async Task LoadContactTypesAsync()
         {
-            try
-            {
-                _contactTypes = await Task.Run(() =>
-                {
-                    using var scope = App.ServiceProvider.CreateScope();
-                    var app = scope.ServiceProvider.GetRequiredService<IContactTypeApplication>();
-                    return app.GetActive();
-                });
-
-                _contactTypeByName.Clear();
-                foreach (var ct in _contactTypes)
-                    _contactTypeByName[ct.Title] = ct.Id;
-            }
-            catch (Exception ex)
-            {
-                ToastManager.Error("خطا در لود انواع تماس: " + ex.Message);
-            }
+            await PersonFormHelper.LoadContactTypesAsync(
+                _contactTypes,
+                _contactTypeByName,
+                ex => ToastManager.Error("خطا در لود انواع تماس: " + ex.Message));
         }
 
         private async Task LoadProvincesAsync()
         {
-            try
-            {
-                var items = await Task.Run(() =>
-                {
-                    using var scope = App.ServiceProvider.CreateScope();
-                    var repo = scope.ServiceProvider.GetRequiredService<IProvinceRepository>();
-                    return repo.GetProvincesForSelectList();
-                });
-
-                Provinces.Clear();
-                foreach (var p in items)
-                    Provinces.Add(p);
-            }
-            catch (Exception ex)
-            {
-                ToastManager.Error("خطا در لود استان‌ها: " + ex.Message);
-            }
+            await PersonFormHelper.LoadProvincesAsync(
+                Provinces,
+                ex => ToastManager.Error("خطا در لود استان‌ها: " + ex.Message));
         }
 
         private async Task LoadCitiesAsync(long provinceId)
         {
-            if (provinceId <= 0) return;
-
-            try
-            {
-                var token = _loadCts?.Token ?? CancellationToken.None;
-                var items = await Task.Run(() =>
-                {
-                    token.ThrowIfCancellationRequested();
-                    using var scope = App.ServiceProvider.CreateScope();
-                    var repo = scope.ServiceProvider.GetRequiredService<ICityRepository>();
-                    return repo.GetCitiesByProvince(provinceId);
-                }, token);
-
-                token.ThrowIfCancellationRequested();
-                // ✅ Staleness check: اگر کاربر استان را عوض کرده، نتایج قدیمی را نادیده بگیر
-                if (SelectedProvinceId != provinceId)
-                    return;
-
-                Cities.Clear();
-                foreach (var c in items)
-                    Cities.Add(c);
-
-                // اگر شهر انتخاب‌شده دیگر متعلق به این استان نیست، ریستش کن
-                if (Cities.All(c => c.Id != SelectedCityId))
-                    SelectedCityId = 0;
-            }
-            catch (OperationCanceledException)
-            {
-                System.Diagnostics.Debug.WriteLine("[NewPersonView] LoadCitiesAsync was cancelled");
-            }
-            catch (Exception ex)
-            {
-                ToastManager.Error("خطا در لود شهرها: " + ex.Message);
-            }
+            await PersonFormHelper.LoadCitiesAsync(
+                cities: Cities,
+                provinceId: provinceId,
+                token: _loadCts?.Token ?? CancellationToken.None,
+                getCurrentProvinceId: () => SelectedProvinceId,
+                getCurrentCityId: () => SelectedCityId,
+                setSelectedCityId: id => SelectedCityId = id,
+                formName: "NewPersonView",
+                onError: ex => ToastManager.Error("خطا در لود شهرها: " + ex.Message));
         }
 
         /// <summary>Safe wrapper for LoadCategoriesAsync with error handling at call site.</summary>
@@ -642,29 +564,11 @@ namespace Taadol.Views
 
         private async Task LoadBankBranchesAsync()
         {
-            if (_bankBranchApplication == null)
-            {
-                System.Diagnostics.Debug.WriteLine("⚠️ IBankBranchApplication null — لیست شعب بانک لود نخواهد شد.");
-                return;
-            }
-
-            try
-            {
-                var items = await Task.Run(() =>
-                {
-                    using var scope = App.ServiceProvider.CreateScope();
-                    var app = scope.ServiceProvider.GetRequiredService<IBankBranchApplication>();
-                    return app.GetBankBranches();
-                });
-
-                BankBranches.Clear();
-                foreach (var b in items)
-                    BankBranches.Add(b);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("BankBranches load failed: " + ex.Message);
-            }
+            await PersonFormHelper.LoadBankBranchesAsync(
+                bankBranches: BankBranches,
+                hasBankBranchApp: _bankBranchApplication != null,
+                onError: ex => System.Diagnostics.Debug.WriteLine("BankBranches load failed: " + ex.Message),
+                onSkipped: msg => System.Diagnostics.Debug.WriteLine("⚠️ " + msg));
         }
 
         // ======================================================

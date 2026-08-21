@@ -263,135 +263,56 @@ namespace Taadol.Views
 
         private async Task LoadBranchesAsync()
         {
-            try
-            {
-                var items = await Task.Run(() =>
-                {
-                    using var scope = App.ServiceProvider.CreateScope();
-                    var app = scope.ServiceProvider.GetRequiredService<IBranchApplication>();
-                    return app.GetBranches().Select(b => new BranchComboItem { Id = b.Id, Title = b.Title }).ToList();
-                });
-                Branches.ReplaceAll(items);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Branches load failed: " + ex.Message);
-            }
+            var items = await PersonFormHelper.LoadBranchesAsync(
+                replaceAll: list => Branches.ReplaceAll(list),
+                onError: ex => System.Diagnostics.Debug.WriteLine("[EditPersonView] LoadBranchesAsync FAILED: " + ex.Message));
         }
 
         private async Task LoadPersonTypesAsync()
         {
-            try
-            {
-                var items = await Task.Run(() =>
-                {
-                    using var scope = App.ServiceProvider.CreateScope();
-                    var app = scope.ServiceProvider.GetRequiredService<IPersonTypeApplication>();
-                    return app.GetPersonTypes();
-                });
-                if (items.Count > 0 && SelectedPersonTypeId == 0)
-                    SelectedPersonTypeId = items[0].Id;
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("PersonTypes load failed: " + ex.Message);
-            }
+            // EditPersonView doesn't populate a PersonTypes collection — pass null
+            var items = await PersonFormHelper.LoadPersonTypesAsync(
+                null,
+                ex => System.Diagnostics.Debug.WriteLine("[EditPersonView] LoadPersonTypesAsync FAILED: " + ex.Message));
+            if (items.Count > 0 && SelectedPersonTypeId == 0)
+                SelectedPersonTypeId = items[0].Id;
         }
 
         private async Task LoadContactTypesAsync()
         {
-            try
-            {
-                _contactTypes = await Task.Run(() =>
-                {
-                    using var scope = App.ServiceProvider.CreateScope();
-                    var app = scope.ServiceProvider.GetRequiredService<IContactTypeApplication>();
-                    return app.GetActive();
-                });
-                _contactTypeByName.Clear();
-                foreach (var ct in _contactTypes)
-                    _contactTypeByName[ct.Title] = ct.Id;
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("ContactTypes load failed: " + ex.Message);
-            }
+            await PersonFormHelper.LoadContactTypesAsync(
+                _contactTypes,
+                _contactTypeByName,
+                ex => System.Diagnostics.Debug.WriteLine("[EditPersonView] LoadContactTypesAsync FAILED: " + ex.Message));
         }
 
         private async Task LoadProvincesAsync()
         {
-            try
-            {
-                var items = await Task.Run(() =>
-                {
-                    using var scope = App.ServiceProvider.CreateScope();
-                    var repo = scope.ServiceProvider.GetRequiredService<IProvinceRepository>();
-                    return repo.GetProvincesForSelectList();
-                });
-                Provinces.Clear();
-                foreach (var p in items)
-                    Provinces.Add(p);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Provinces load failed: " + ex.Message);
-            }
+            await PersonFormHelper.LoadProvincesAsync(
+                Provinces,
+                ex => System.Diagnostics.Debug.WriteLine("Provinces load failed: " + ex.Message));
         }
 
         private async Task LoadCitiesAsync(long provinceId)
         {
-            if (provinceId <= 0) return;
-            try
-            {
-                var token = _loadCts?.Token ?? CancellationToken.None;
-                var items = await Task.Run(() =>
-                {
-                    token.ThrowIfCancellationRequested();
-                    using var scope = App.ServiceProvider.CreateScope();
-                    var repo = scope.ServiceProvider.GetRequiredService<ICityRepository>();
-                    return repo.GetCitiesByProvince(provinceId);
-                }, token);
-
-                token.ThrowIfCancellationRequested();
-                // ✅ Staleness check: اگر کاربر استان را عوض کرده، نتایج قدیمی را نادیده بگیر
-                if (SelectedProvinceId != provinceId)
-                    return;
-
-                Cities.Clear();
-                foreach (var c in items)
-                    Cities.Add(c);
-                if (Cities.All(c => c.Id != SelectedCityId))
-                    SelectedCityId = 0;
-            }
-            catch (OperationCanceledException)
-            {
-                System.Diagnostics.Debug.WriteLine("[EditPersonView] LoadCitiesAsync was cancelled");
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Cities load failed: " + ex.Message);
-            }
+            await PersonFormHelper.LoadCitiesAsync(
+                cities: Cities,
+                provinceId: provinceId,
+                token: _loadCts?.Token ?? CancellationToken.None,
+                getCurrentProvinceId: () => SelectedProvinceId,
+                getCurrentCityId: () => SelectedCityId,
+                setSelectedCityId: id => SelectedCityId = id,
+                formName: "EditPersonView",
+                onError: ex => System.Diagnostics.Debug.WriteLine("Cities load failed: " + ex.Message));
         }
 
         private async Task LoadBankBranchesAsync()
         {
-            if (_bankBranchApplication == null) return;
-            try
-            {
-                var items = await Task.Run(() =>
-                {
-                    using var scope = App.ServiceProvider.CreateScope();
-                    var app = scope.ServiceProvider.GetRequiredService<IBankBranchApplication>();
-                    return app.GetBankBranches();
-                });
-                BankBranches.Clear();
-                foreach (var b in items)
-                    BankBranches.Add(b);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("BankBranches load failed: " + ex.Message);
-            }
+            await PersonFormHelper.LoadBankBranchesAsync(
+                bankBranches: BankBranches,
+                hasBankBranchApp: _bankBranchApplication != null,
+                onError: ex => System.Diagnostics.Debug.WriteLine("[EditPersonView] LoadBankBranchesAsync FAILED: " + ex.Message),
+                onSkipped: msg => System.Diagnostics.Debug.WriteLine("[EditPersonView] LoadBankBranchesAsync SKIPPED (null)"));
         }
 
         private async Task LoadCategoriesAsync(long personTypeId)
@@ -515,6 +436,7 @@ namespace Taadol.Views
                 // 6) Final sync: cities + snapshot
                 try { await LoadCitiesAsync(SelectedProvinceId); } catch { }
                 await Task.Delay(80);
+                System.Diagnostics.Debug.WriteLine($"[EditPersonView] After LoadPersonData: Provinces={Provinces.Count}, Cities={Cities.Count}, SelectedProvinceId={SelectedProvinceId}, SelectedCityId={SelectedCityId}, SelectedBranchId={SelectedBranchId}, FirstName={FirstName}");
                 CaptureInitialSnapshot();
             }
             catch (Exception ex)
