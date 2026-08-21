@@ -221,8 +221,15 @@ namespace Taadol.Views
             if (_isLoadedOnce) return;
             _isLoadedOnce = true;
 
-            await LoadInitialDataAsync();
-            await LoadProvincesAsync(); // <-- صدا زده شود
+            try
+            {
+                await LoadInitialDataAsync();
+                await LoadProvincesAsync();
+            }
+            catch (Exception ex)
+            {
+                ToastManager.Error("خطا در بارگذاری اطلاعات شعبه: " + ex.Message);
+            }
         }
 
         private async Task LoadInitialDataAsync()

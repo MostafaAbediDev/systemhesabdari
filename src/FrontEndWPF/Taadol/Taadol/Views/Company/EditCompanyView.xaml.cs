@@ -227,7 +227,7 @@ namespace Taadol.Views
 
                 // اگر پشت مودال لیست شرکت‌ها بود همان لیست درجا رفرش می‌شود (بدون از دست رفتن State)
                 if (mainWindow?.MainContent.Content is CompanyListView listView)
-                    _ = listView.RefreshGridAsync();
+                    _ = RefreshListViewSafeAsync(listView);
                 else
                     mainWindow?.NavigateTo("company_list");
             }
@@ -284,6 +284,19 @@ namespace Taadol.Views
                 return;
 
             (Window.GetWindow(this) as MainWindow)?.CloseModal();
+        }
+
+        /// <summary>Safe wrapper for RefreshGridAsync with error handling at call site.</summary>
+        private async Task RefreshListViewSafeAsync(CompanyListView listView)
+        {
+            try
+            {
+                await listView.RefreshGridAsync();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[EditCompanyView] Error in RefreshListViewSafeAsync: {ex}");
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -21,6 +22,8 @@ namespace Taadol.Views
         public ObservableCollection<FinancialPeriodItem> AllPeriods { get; set; }
         public ObservableCollection<FinancialPeriodItem> FilteredPeriods { get; set; }
         public ObservableCollection<PageItem> Pages { get; set; } = new ObservableCollection<PageItem>();
+
+        private CancellationTokenSource _loadCts = new();
 
         private readonly IFinancialPeriodApplication _financialPeriodApplication;
         private int _pageSize = 15;
@@ -74,6 +77,7 @@ namespace Taadol.Views
             FillEmptyRows();
 
             Loaded += FinancialPeriodListView_Loaded;
+            this.Unloaded += (s, e) => { _loadCts?.Cancel(); _loadCts?.Dispose(); _loadCts = null; };
         }
 
         private void HeaderClose_Click(object sender, MouseButtonEventArgs e)
@@ -88,8 +92,22 @@ namespace Taadol.Views
 
         private async void BtnRefresh_Click(object sender, RoutedEventArgs e)
         {
+            _loadCts?.Cancel();
+            _loadCts?.Dispose();
+            _loadCts = new CancellationTokenSource();
             _isLoadedOnce = false;
-            await LoadDataAsync();
+            try
+            {
+                await LoadDataAsync();
+            }
+            catch (OperationCanceledException)
+            {
+                System.Diagnostics.Debug.WriteLine("[FinancialPeriodListView] Refresh was cancelled");
+            }
+            catch (Exception ex)
+            {
+                ToastManager.Error("خطا در بروزرسانی: " + ex.Message);
+            }
         }
 
         // فرم لیست باید همیشه کل فضای محتوا رو پر کنه حتی اگه ردیف جدول کم باشه
@@ -144,7 +162,14 @@ namespace Taadol.Views
 
             _isLoadedOnce = true;
 
-            await LoadDataAsync();
+            try
+            {
+                await LoadDataAsync();
+            }
+            catch (Exception ex)
+            {
+                ToastManager.Error("خطا در بارگذاری دوره‌های مالی: " + ex.Message);
+            }
         }
 
         private async Task LoadDataAsync()

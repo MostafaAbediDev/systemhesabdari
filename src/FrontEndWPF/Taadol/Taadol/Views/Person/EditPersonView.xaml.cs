@@ -18,6 +18,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -29,6 +30,9 @@ namespace Taadol.Views
 {
     public partial class EditPersonView : UserControl, INotifyPropertyChanged, IUnsavedChangesAware
     {
+        private CancellationTokenSource _loadCts = new();
+        private CancellationTokenSource _saveCts = new();
+
         private readonly IPersonApplication _personApplication;
         private readonly IBranchApplication _branchApplication;
         private readonly IPersonTypeApplication _personTypeApplication;
@@ -120,14 +124,14 @@ namespace Taadol.Views
         public long SelectedPersonTypeId
         {
             get => _selectedPersonTypeId;
-            set { _selectedPersonTypeId = value; OnPropertyChanged(); MarkUserChange(); _ = LoadCategoriesAsync(value); }
+            set { _selectedPersonTypeId = value; OnPropertyChanged(); MarkUserChange(); _ = LoadCategoriesSafeAsync(value); }
         }
         public string Phone { get => _phone; set { _phone = value; OnPropertyChanged(); MarkUserChange(); } }
         public string Mobile { get => _mobile; set { _mobile = value; OnPropertyChanged(); MarkUserChange(); } }
         public string Email { get => _email; set { _email = value; OnPropertyChanged(); MarkUserChange(); } }
         public string PostalCode { get => _postalCode; set { _postalCode = value; OnPropertyChanged(); MarkUserChange(); } }
         public string Address { get => _address; set { _address = value; OnPropertyChanged(); MarkUserChange(); } }
-        public long SelectedProvinceId { get => _selectedProvinceId; set { _selectedProvinceId = value; OnPropertyChanged(); MarkUserChange(); _ = LoadCitiesAsync(value); } }
+        public long SelectedProvinceId { get => _selectedProvinceId; set { _selectedProvinceId = value; OnPropertyChanged(); MarkUserChange(); _ = LoadCitiesSafeAsync(value); } }
         public long SelectedCityId { get => _selectedCityId; set { _selectedCityId = value; OnPropertyChanged(); MarkUserChange(); } }
         public string MainBankName { get => _mainBankName; set { _mainBankName = value; OnPropertyChanged(); MarkUserChange(); } }
         public string MainCardNumber { get => _mainCardNumber; set { _mainCardNumber = value; OnPropertyChanged(); MarkUserChange(); } }
@@ -162,6 +166,7 @@ namespace Taadol.Views
             DataContext = this;
 
             Loaded += OnLoaded;
+            this.Unloaded += OnViewUnloaded;
             BankAccounts.CollectionChanged += (s, e) =>
             {
                 if (e.NewItems != null)
@@ -193,8 +198,20 @@ namespace Taadol.Views
             System.Diagnostics.Debug.WriteLine($"[DEBUG] EditPersonView constructor called for personId={personId}");
         }
 
+        private void OnViewUnloaded(object sender, RoutedEventArgs e)
+        {
+            _loadCts?.Cancel();
+            _saveCts?.Cancel();
+            _loadCts?.Dispose();
+            _saveCts?.Dispose();
+            _loadCts = null;
+            _saveCts = null;
+            this.Unloaded -= OnViewUnloaded;
+        }
+
         private async void OnLoaded(object sender, RoutedEventArgs e)
         {
+            if (_loadCts?.IsCancellationRequested == true) return;
             try
             {
                 System.Diagnostics.Debug.WriteLine("[DEBUG] EditPersonView.OnLoaded fired");
@@ -220,9 +237,22 @@ namespace Taadol.Views
                 await LoadPersonData();
                 System.Diagnostics.Debug.WriteLine("[DEBUG] EditPersonView: LoadPersonData completed");
             }
+            catch (OperationCanceledException)
+            {
+                System.Diagnostics.Debug.WriteLine("[EditPersonView] OnLoaded was cancelled");
+            }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"[DEBUG] ERROR in EditPersonView.OnLoaded: {ex}");
+                if (_loadCts?.IsCancellationRequested != true)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[DEBUG] ERROR in EditPersonView.OnLoaded: {ex}");
+                    ToastManager.Error("خطا در بارگذاری اطلاعات شخص: " + ex.Message);
+                }
+            }
+            finally
+            {
+                if (_loadCts?.IsCancellationRequested != true)
+                    _isLoading = false;
             }
         }
 
@@ -313,17 +343,29 @@ namespace Taadol.Views
             if (provinceId <= 0) return;
             try
             {
+                var token = _loadCts?.Token ?? CancellationToken.None;
                 var items = await Task.Run(() =>
                 {
+                    token.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
                     var repo = scope.ServiceProvider.GetRequiredService<ICityRepository>();
                     return repo.GetCitiesByProvince(provinceId);
-                });
+                }, token);
+
+                token.ThrowIfCancellationRequested();
+                // ✅ Staleness check: اگر کاربر استان را عوض کرده، نتایج قدیمی را نادیده بگیر
+                if (SelectedProvinceId != provinceId)
+                    return;
+
                 Cities.Clear();
                 foreach (var c in items)
                     Cities.Add(c);
                 if (Cities.All(c => c.Id != SelectedCityId))
                     SelectedCityId = 0;
+            }
+            catch (OperationCanceledException)
+            {
+                System.Diagnostics.Debug.WriteLine("[EditPersonView] LoadCitiesAsync was cancelled");
             }
             catch (Exception ex)
             {
@@ -367,13 +409,16 @@ namespace Taadol.Views
             {
                 System.Diagnostics.Debug.WriteLine($"📊 LoadCategoriesAsync: loading for personTypeId={personTypeId}");
 
+                var token = _loadCts?.Token ?? CancellationToken.None;
                 var tree = await Task.Run(() =>
                 {
+                    token.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
                     var app = scope.ServiceProvider.GetRequiredService<IPersonCategoryApplication>();
                     return app.GetTree(personTypeId);
-                });
+                }, token);
 
+                token.ThrowIfCancellationRequested();
                 System.Diagnostics.Debug.WriteLine($"✅ LoadCategoriesAsync: got {tree?.Count ?? 0} root categories");
 
                 if (CategorySearch != null)
@@ -386,10 +431,53 @@ namespace Taadol.Views
                     System.Diagnostics.Debug.WriteLine("❌ LoadCategoriesAsync: CategorySearch is null!");
                 }
             }
+            catch (OperationCanceledException)
+            {
+                System.Diagnostics.Debug.WriteLine("[EditPersonView] LoadCategoriesAsync was cancelled");
+            }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("❌ Categories load failed: " + ex.Message);
                 System.Diagnostics.Debug.WriteLine("❌ Stack: " + ex.StackTrace);
+            }
+        }
+
+        /// <summary>Safe wrapper for LoadCategoriesAsync with error handling at call site.</summary>
+        private async Task LoadCategoriesSafeAsync(long personTypeId)
+        {
+            try
+            {
+                await LoadCategoriesAsync(personTypeId);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[EditPersonView] Error in LoadCategoriesSafeAsync: {ex}");
+            }
+        }
+
+        /// <summary>Safe wrapper for LoadCitiesAsync with error handling at call site.</summary>
+        private async Task LoadCitiesSafeAsync(long provinceId)
+        {
+            try
+            {
+                await LoadCitiesAsync(provinceId);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[EditPersonView] Error in LoadCitiesSafeAsync: {ex}");
+            }
+        }
+
+        /// <summary>Safe wrapper for RefreshGridAsync with error handling at call site.</summary>
+        private async Task RefreshListViewSafeAsync(PersonListView listView)
+        {
+            try
+            {
+                await listView.RefreshGridAsync();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[EditPersonView] Error in RefreshListViewSafeAsync: {ex}");
             }
         }
 
@@ -399,198 +487,162 @@ namespace Taadol.Views
             {
                 var personId = _personId;
 
-                // ★ همه‌ی کوئری‌های مستقل همزمان (موازی) اجرا می‌شوند تا فرم زودتر لود شود
-                var detailsTask = Task.Run(() =>
-                {
-                    using var scope = App.ServiceProvider.CreateScope();
-                    var app = scope.ServiceProvider.GetRequiredService<IPersonApplication>();
-                    return app.GetDetails(personId);
-                });
-                var contactsTask = Task.Run(() =>
-                {
-                    using var scope = App.ServiceProvider.CreateScope();
-                    var app = scope.ServiceProvider.GetRequiredService<IPersonContactApplication>();
-                    return app.GetByPersonId(personId) ?? new List<PersonContactViewModel>();
-                });
-                var addressesTask = Task.Run(() =>
-                {
-                    using var scope = App.ServiceProvider.CreateScope();
-                    var app = scope.ServiceProvider.GetRequiredService<IPersonAddressApplication>();
-                    return app.GetByPersonId(personId) ?? new List<PersonAddressViewModel>();
-                });
-                var banksTask = Task.Run(() =>
-                {
-                    using var scope = App.ServiceProvider.CreateScope();
-                    var app = scope.ServiceProvider.GetRequiredService<IPersonBankApplication>();
-                    return app.GetByPersonId(personId) ?? new List<PersonBankViewModel>();
-                });
-                var picturesTask = Task.Run(() =>
-                {
-                    using var scope = App.ServiceProvider.CreateScope();
-                    var app = scope.ServiceProvider.GetRequiredService<IPictureApplication>();
-                    return app.GetByOwner(personId, PictureOwnerTypeDTO.Person);
-                });
+                // 1) Parallel DB loads
+                var detailsTask = LoadDetailsFromDbAsync(personId);
+                var contactsTask = LoadContactsFromDbAsync(personId);
+                var addressesTask = LoadAddressesFromDbAsync(personId);
+                var banksTask = LoadBanksFromDbAsync(personId);
+                var picturesTask = LoadPicturesFromDbAsync(personId);
 
                 var details = await detailsTask;
+                if (details == null) { ToastManager.Error("شخص پیدا نشد."); return; }
 
-                if (details == null)
-                {
-                    ToastManager.Error("شخص پیدا نشد.");
-                    return;
-                }
+                // 2) Populate main fields
+                PopulatePersonDetails(details);
 
-                IsLegal = details.IsLegal;
-                FirstName = details.FirstName ?? "";
-                LastName = details.LastName ?? "";
-                ContactFirstName = details.ContactFirstName ?? "";
-                ContactLastName = details.ContactLastName ?? "";
-                NationalCode = details.NationalCode ?? "";
-                CompanyName = details.IsLegal ? details.FirstName : "";
-                EconomicCode = details.EconomicCode ?? "";
-                RegistrationNumber = details.RegistrationNumber ?? "";
-                var loadedCode = details.ManualCode ?? details.CurrentCode;
-                ManualCode = loadedCode ?? "";
+                // 3) Populate contacts, address, banks + IsActive
+                PopulateContactsFromList(await contactsTask);
+                PopulateAddressFromList(await addressesTask);
+                PopulateBankAccountsFromList(await banksTask);
+                await PopulateIsActiveAsync(details);
 
-                // ★ اگر شخص کدی ندارد (مثلاً اشخاصی که در ثبت قبلی کدشان به‌درستی وصل نشده)،
-                // حالت تاگل به «خودکار» برود تا ویرایش با تولید خودکار کد ذخیره شود
-                // و خطای «کد خالی» در ذخیره رخ ندهد. (فقط فرانت‌اند)
-                if (string.IsNullOrWhiteSpace(loadedCode) && CodeModeToggle != null)
-                {
-                    _isCodeAutomatic = true;
-                    CodeModeToggle.IsFirstSelected = true;
-                    if (ManualCodeTextBox != null)
-                        ManualCodeTextBox.IsEnabled = false;
-                }
-                SelectedBranchId = details.BranchId;
+                // 4) Load categories
+                await LoadCategoriesAndSelectAsync();
 
-                _selectedPersonCategoryId = details.PersonCategoryId;
+                // 5) Load picture
+                await LoadAndSetPictureAsync(await picturesTask);
 
-                _selectedPersonTypeId = details.PersonTypeId;
-                OnPropertyChanged(nameof(SelectedPersonTypeId));
-
-                var personSearch = await Task.Run(() =>
-                {
-                    using var scope = App.ServiceProvider.CreateScope();
-                    var app = scope.ServiceProvider.GetRequiredService<IPersonApplication>();
-                    return app.Search(new PersonSearchModel { NationalCode = details.NationalCode });
-                });
-                var personVm = personSearch?.FirstOrDefault(x => x.Id == _personId);
-                IsActive = personVm?.IsActive ?? true;
-
-                UpdatePersonTypeToggleSelection();
-
-                var contacts = await contactsTask;
-                foreach (var c in contacts)
-                {
-                    if (c.ContactTypeTitle != null && c.ContactTypeTitle.Contains("موبایل") && !string.IsNullOrWhiteSpace(c.Value))
-                        Mobile = c.Value;
-                    else if (c.ContactTypeTitle != null && c.ContactTypeTitle.Contains("تلفن") && !string.IsNullOrWhiteSpace(c.Value))
-                        Phone = c.Value;
-                    else if (c.ContactTypeTitle != null && c.ContactTypeTitle.Contains("ایمیل") && !string.IsNullOrWhiteSpace(c.Value))
-                        Email = c.Value;
-                }
-
-                var addresses = await addressesTask;
-                var addr = addresses.FirstOrDefault();
-                if (addr != null)
-                {
-                    Address = addr.Address ?? "";
-                    PostalCode = addr.PostalCode ?? "";
-                    if (addr.ProvinceId > 0)
-                        SelectedProvinceId = addr.ProvinceId;
-                    if (addr.CityId > 0)
-                        SelectedCityId = addr.CityId;
-                }
-
-                try
-                {
-                    var banks = await banksTask;
-                    System.Diagnostics.Debug.WriteLine($"🏦 LoadPersonData: loaded {banks.Count} bank(s)");
-
-                    BankAccounts.Clear();
-                    foreach (var b in banks)
-                    {
-                        BankAccounts.Add(new BankAccountRow
-                        {
-                            BankBranchId = b.BankBranchId,
-                            BankName = b.BankName ?? "",
-                            BranchName = b.BankBranchName ?? "",
-                            CardNumber = b.CardNumber ?? "",
-                            Shaba = b.Shaba ?? "",
-                            AccountNumber = b.AccountNumber ?? "",
-                            IsDefault = b.IsDefault
-                        });
-                    }
-
-                    System.Diagnostics.Debug.WriteLine($"🏦 LoadPersonData: {BankAccounts.Count} bank(s) added to grid");
-
-                    if (BankAccounts.Count >= 1 && !BankAccounts.Any(r => r.IsDefault))
-                        BankAccounts[0].IsDefault = true;
-
-                    ReindexBankAccounts();
-
-                    MainBankName = "";
-                    MainCardNumber = "";
-                    MainShaba = "IR";
-                    MainAccountNumber = "";
-                    MainBankIsDefault = false;
-                    SelectedBankBranchId = 0;
-                    if (BankNameInput != null) BankNameInput.Text = "";
-                    if (CardNumberInput != null) CardNumberInput.Text = "";
-                    if (ShabaInput != null) ShabaInput.Text = "IR";
-                    if (AccountNumberInput != null) AccountNumberInput.Text = "";
-                    if (DefaultAccountToggle != null) DefaultAccountToggle.IsChecked = false;
-
-                    if (BankBranchCombo != null)
-                        BankBranchCombo.SelectedIndex = -1;
-                }
-                catch (Exception bankEx)
-                {
-                    System.Diagnostics.Debug.WriteLine("Bank load failed: " + bankEx.Message);
-                }
-
-                if (SelectedPersonTypeId > 0)
-                {
-                    System.Diagnostics.Debug.WriteLine($"📊 LoadPersonData: calling LoadCategoriesAsync for personTypeId={SelectedPersonTypeId}");
-                    await LoadCategoriesAsync(SelectedPersonTypeId);
-
-                    if (_selectedPersonCategoryId.HasValue && _selectedPersonCategoryId.Value > 0 && CategorySearch != null)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"📊 LoadPersonData: selecting category {_selectedPersonCategoryId.Value}");
-                        CategorySearch.SelectCategoryById(_selectedPersonCategoryId.Value);
-                    }
-                }
-
-                try
-                {
-                    var pictures = await picturesTask;
-                    var picture = pictures.FirstOrDefault();
-                    if (picture != null && !string.IsNullOrWhiteSpace(picture.Url))
-                    {
-                        var fullPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, picture.Url);
-                        if (System.IO.File.Exists(fullPath))
-                        {
-                            PersonImagePicker.ImagePath = fullPath;
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine("Picture load failed: " + ex.Message);
-                }
-
-                // ★ صبر می‌کنیم بارگذاری‌های موازی (شهرها و بایندینگ ComboBox ها) جا بیفتند؛
-                // وگرنه snapshot زودتر از حالت نهایی فرم گرفته می‌شود و «انصراف» بدون تغییر،
-                // اشتباهاً سؤال «ذخیره تغییرات» می‌پرسد.
+                // 6) Final sync: cities + snapshot
                 try { await LoadCitiesAsync(SelectedProvinceId); } catch { }
                 await Task.Delay(80);
-
                 CaptureInitialSnapshot();
             }
             catch (Exception ex)
             {
                 ToastManager.Error("خطا در لود اطلاعات: " + ex.Message);
             }
+        }
+
+        // --- DB loaders ---
+
+        private Task<EditPerson?> LoadDetailsFromDbAsync(long personId) => Task.Run(() =>
+        {
+            using var scope = App.ServiceProvider.CreateScope();
+            return scope.ServiceProvider.GetRequiredService<IPersonApplication>().GetDetails(personId);
+        });
+
+        private Task<List<PersonContactViewModel>> LoadContactsFromDbAsync(long personId) => Task.Run(() =>
+        {
+            using var scope = App.ServiceProvider.CreateScope();
+            return scope.ServiceProvider.GetRequiredService<IPersonContactApplication>().GetByPersonId(personId) ?? new();
+        });
+
+        private Task<List<PersonAddressViewModel>> LoadAddressesFromDbAsync(long personId) => Task.Run(() =>
+        {
+            using var scope = App.ServiceProvider.CreateScope();
+            return scope.ServiceProvider.GetRequiredService<IPersonAddressApplication>().GetByPersonId(personId) ?? new();
+        });
+
+        private Task<List<PersonBankViewModel>> LoadBanksFromDbAsync(long personId) => Task.Run(() =>
+        {
+            using var scope = App.ServiceProvider.CreateScope();
+            return scope.ServiceProvider.GetRequiredService<IPersonBankApplication>().GetByPersonId(personId) ?? new();
+        });
+
+        private Task<List<PictureViewModel>> LoadPicturesFromDbAsync(long personId) => Task.Run(() =>
+        {
+            using var scope = App.ServiceProvider.CreateScope();
+            return scope.ServiceProvider.GetRequiredService<IPictureApplication>().GetByOwner(personId, PictureOwnerTypeDTO.Person);
+        });
+
+        // --- UI population ---
+
+        private void PopulatePersonDetails(EditPerson d)
+        {
+            IsLegal = d.IsLegal;
+            FirstName = d.FirstName ?? ""; LastName = d.LastName ?? "";
+            ContactFirstName = d.ContactFirstName ?? ""; ContactLastName = d.ContactLastName ?? "";
+            NationalCode = d.NationalCode ?? "";
+            CompanyName = d.IsLegal ? d.FirstName : "";
+            EconomicCode = d.EconomicCode ?? ""; RegistrationNumber = d.RegistrationNumber ?? "";
+            var loadedCode = d.ManualCode ?? d.CurrentCode;
+            ManualCode = loadedCode ?? "";
+            if (string.IsNullOrWhiteSpace(loadedCode) && CodeModeToggle != null)
+            { _isCodeAutomatic = true; CodeModeToggle.IsFirstSelected = true; if (ManualCodeTextBox != null) ManualCodeTextBox.IsEnabled = false; }
+            SelectedBranchId = d.BranchId; _selectedPersonCategoryId = d.PersonCategoryId;
+            _selectedPersonTypeId = d.PersonTypeId; OnPropertyChanged(nameof(SelectedPersonTypeId));
+        }
+
+        private async Task PopulateIsActiveAsync(EditPerson d)
+        {
+            var personSearch = await Task.Run(() =>
+            {
+                using var scope = App.ServiceProvider.CreateScope();
+                return scope.ServiceProvider.GetRequiredService<IPersonApplication>().Search(new PersonSearchModel { NationalCode = d.NationalCode });
+            });
+            IsActive = personSearch?.FirstOrDefault(x => x.Id == _personId)?.IsActive ?? true;
+        }
+
+        private void PopulateContactsFromList(List<PersonContactViewModel> contacts)
+        {
+            foreach (var c in contacts)
+            {
+                if (c.ContactTypeTitle?.Contains("موبایل") == true && !string.IsNullOrWhiteSpace(c.Value)) Mobile = c.Value;
+                else if (c.ContactTypeTitle?.Contains("تلفن") == true && !string.IsNullOrWhiteSpace(c.Value)) Phone = c.Value;
+                else if (c.ContactTypeTitle?.Contains("ایمیل") == true && !string.IsNullOrWhiteSpace(c.Value)) Email = c.Value;
+            }
+            UpdatePersonTypeToggleSelection();
+        }
+
+        private void PopulateAddressFromList(List<PersonAddressViewModel> addresses)
+        {
+            var addr = addresses.FirstOrDefault();
+            if (addr == null) return;
+            Address = addr.Address ?? ""; PostalCode = addr.PostalCode ?? "";
+            if (addr.ProvinceId > 0) SelectedProvinceId = addr.ProvinceId;
+            if (addr.CityId > 0) SelectedCityId = addr.CityId;
+        }
+
+        private void PopulateBankAccountsFromList(List<PersonBankViewModel> banks)
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine($"🏦 LoadPersonData: loaded {banks.Count} bank(s)");
+                BankAccounts.Clear();
+                foreach (var b in banks)
+                    BankAccounts.Add(new BankAccountRow { BankBranchId = b.BankBranchId, BankName = b.BankName ?? "", BranchName = b.BankBranchName ?? "", CardNumber = b.CardNumber ?? "", Shaba = b.Shaba ?? "", AccountNumber = b.AccountNumber ?? "", IsDefault = b.IsDefault });
+                if (BankAccounts.Count >= 1 && !BankAccounts.Any(r => r.IsDefault)) BankAccounts[0].IsDefault = true;
+                ReindexBankAccounts();
+                // Reset main bank form fields
+                MainBankName = ""; MainCardNumber = ""; MainShaba = "IR"; MainAccountNumber = ""; MainBankIsDefault = false; SelectedBankBranchId = 0;
+                if (BankNameInput != null) BankNameInput.Text = "";
+                if (CardNumberInput != null) CardNumberInput.Text = "";
+                if (ShabaInput != null) ShabaInput.Text = "IR";
+                if (AccountNumberInput != null) AccountNumberInput.Text = "";
+                if (DefaultAccountToggle != null) DefaultAccountToggle.IsChecked = false;
+                if (BankBranchCombo != null) BankBranchCombo.SelectedIndex = -1;
+            }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine("Bank load failed: " + ex.Message); }
+        }
+
+        private async Task LoadCategoriesAndSelectAsync()
+        {
+            if (SelectedPersonTypeId <= 0) return;
+            await LoadCategoriesAsync(SelectedPersonTypeId);
+            if (_selectedPersonCategoryId.HasValue && _selectedPersonCategoryId.Value > 0 && CategorySearch != null)
+                CategorySearch.SelectCategoryById(_selectedPersonCategoryId.Value);
+        }
+
+        private async Task LoadAndSetPictureAsync(List<PictureViewModel> pictures)
+        {
+            try
+            {
+                var picture = pictures.FirstOrDefault();
+                if (picture == null || string.IsNullOrWhiteSpace(picture.Url)) return;
+                var fullPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, picture.Url);
+                if (System.IO.File.Exists(fullPath)) PersonImagePicker.ImagePath = fullPath;
+            }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine("Picture load failed: " + ex.Message); }
         }
 
         private void CaptureInitialSnapshot()
@@ -758,145 +810,24 @@ namespace Taadol.Views
 
         private bool _isSaving;
 
+        // Note: async void here is safe because:
+        // 1. try/catch wraps the entire body
+        // 2. _isSaving guard prevents reentrancy
+        // 3. SaveButton is disabled during save
         private async void SavePerson()
         {
             if (_isSaving) return;
+            if (_saveCts?.IsCancellationRequested == true) return;
             _isSaving = true;
-            if (SaveButton != null)
-            {
-                SaveButton.IsEnabled = false;
-                SaveButton.Text = "در حال ذخیره...";
-            }
+            if (SaveButton != null) { SaveButton.IsEnabled = false; SaveButton.Text = "در حال ذخیره..."; }
 
             try
             {
-                // اعتبارسنجی قبل از ذخیره — اگر نامعتبر باشد، فرم در همان وضعیت می‌ماند
-                if (!ValidatePerson())
-                    return;
+                if (!ValidatePerson()) return;
+                _saveCts.Token.ThrowIfCancellationRequested();
 
-                var personId = _personId;
-                var isLegal = IsLegal;
-                var companyName = CompanyName;
-                var firstName = FirstName;
-                var lastName = LastName;
-                var contactFirstName = ContactFirstName;
-                var contactLastName = ContactLastName;
-                var nationalCode = NationalCode;
-                var economicCode = EconomicCode;
-                var registrationNumber = RegistrationNumber;
-                var selectedPersonTypeId = SelectedPersonTypeId;
-                var selectedBranchId = SelectedBranchId;
-                var manualCode = ManualCode;
-                var selectedPersonCategoryId = _selectedPersonCategoryId;
-                var isActive = IsActive;
-
-                var contactPhone = Phone?.Trim();
-                var contactMobile = Mobile?.Trim();
-                var contactEmail = Email?.Trim();
-                var contactTypeNames = new Dictionary<string, long>(_contactTypeByName);
-
-                var addressText = Address;
-                var postalCode = PostalCode;
-                var selectedProvinceId = SelectedProvinceId;
-                var selectedCityId = SelectedCityId;
-
-                var bankAccounts = BankAccounts.Select(r => new BankAccountRow
-                {
-                    BankBranchId = r.BankBranchId,
-                    BankName = r.BankName,
-                    CardNumber = r.CardNumber,
-                    Shaba = r.Shaba,
-                    AccountNumber = r.AccountNumber,
-                    IsDefault = r.IsDefault
-                }).ToList();
-
-                var saveResult = await Task.Run(() =>
-                {
-                    using var scope = App.ServiceProvider.CreateScope();
-                    var sp = scope.ServiceProvider;
-                    var personApp = sp.GetRequiredService<IPersonApplication>();
-                    var contactApp = sp.GetRequiredService<IPersonContactApplication>();
-                    var addressApp = sp.GetRequiredService<IPersonAddressApplication>();
-                    var bankApp = sp.GetRequiredService<IPersonBankApplication>();
-
-                    var command = new EditPerson
-                    {
-                        Id = personId,
-                        FirstName = isLegal ? companyName : firstName,
-                        LastName = isLegal ? "" : lastName,
-                        ContactFirstName = isLegal ? (contactFirstName ?? "") : "",
-                        ContactLastName = isLegal ? (contactLastName ?? "") : "",
-                        NationalCode = isLegal ? null : nationalCode,
-                        EconomicCode = isLegal ? economicCode : null,
-                        RegistrationNumber = isLegal ? registrationNumber : null,
-                        IsLegal = isLegal,
-                        PersonTypeId = selectedPersonTypeId,
-                        BranchId = selectedBranchId,
-                        CreditLimit = 0,
-                        IsCodeAutomatic = _isCodeAutomatic,
-                        ManualCode = manualCode,
-                        PersonCategoryId = selectedPersonCategoryId
-                    };
-
-                    var result = personApp.Edit(command);
-                    if (!result.IsSucceeded)
-                        return result;
-
-                    if (isActive)
-                        personApp.Activate(personId);
-                    else
-                        personApp.Deactivate(personId);
-
-                    // SaveContacts
-                    var existingContacts = contactApp.GetByPersonId(personId) ?? new List<PersonContactViewModel>();
-                    foreach (var c in existingContacts)
-                        contactApp.Remove(c.Id);
-
-                    if (!string.IsNullOrWhiteSpace(contactPhone) && contactTypeNames.TryGetValue("تلفن ثابت", out var phoneTypeId))
-                        contactApp.Create(new CreatePersonContact { PersonId = personId, ContactTypeId = phoneTypeId, Value = contactPhone, Description = "", IsDefault = false });
-
-                    if (!string.IsNullOrWhiteSpace(contactMobile) && contactTypeNames.TryGetValue("موبایل", out var mobileTypeId))
-                        contactApp.Create(new CreatePersonContact { PersonId = personId, ContactTypeId = mobileTypeId, Value = contactMobile, Description = "", IsDefault = true });
-
-                    if (!string.IsNullOrWhiteSpace(contactEmail) && contactTypeNames.TryGetValue("ایمیل", out var emailTypeId))
-                        contactApp.Create(new CreatePersonContact { PersonId = personId, ContactTypeId = emailTypeId, Value = contactEmail, Description = "", IsDefault = false });
-
-                    // SaveAddress
-                    var existingAddresses = addressApp.GetByPersonId(personId) ?? new List<PersonAddressViewModel>();
-                    foreach (var a in existingAddresses)
-                        addressApp.Remove(a.Id);
-
-                    if (!string.IsNullOrWhiteSpace(addressText) || selectedProvinceId > 0 || selectedCityId > 0)
-                    {
-                        if (selectedProvinceId > 0 && selectedCityId > 0)
-                        {
-                            addressApp.Create(new CreatePersonAddress
-                            {
-                                PersonId = personId,
-                                Title = "آدرس اصلی",
-                                Address = addressText ?? "",
-                                PostalCode = postalCode ?? "",
-                                ProvinceId = selectedProvinceId,
-                                CityId = selectedCityId,
-                                IsDefault = true
-                            });
-                        }
-                    }
-
-                    // SaveBank — all accounts from grid only
-                    var existingBanks = bankApp.GetByPersonId(personId) ?? new List<PersonBankViewModel>();
-                    foreach (var b in existingBanks)
-                        bankApp.Remove(b.Id);
-
-                    foreach (var row in bankAccounts)
-                    {
-                        if (string.IsNullOrWhiteSpace(row.Shaba) && string.IsNullOrWhiteSpace(row.CardNumber))
-                            continue;
-                        TryCreateBankAccountScoped(bankApp, personId, row.BankBranchId, row.BankName, row.AccountNumber, row.CardNumber, row.Shaba, row.IsDefault);
-                    }
-
-                    return result;
-                });
+                var snapshot = CaptureEditSnapshot();
+                var saveResult = await ExecuteEditSaveAsync(snapshot);
 
                 if (!saveResult.IsSucceeded)
                 {
@@ -905,31 +836,111 @@ namespace Taadol.Views
                 }
 
                 ToastManager.Success("ویرایش شخص با موفقیت انجام شد.");
-
                 BankAccounts.Clear();
-
                 var mainWindow = Window.GetWindow(this) as MainWindow;
                 mainWindow?.CloseModal();
-
-                // به‌جای پرتاب به person_list با از دست رفتن State (فیلتر/صفحه/انتخاب)،
-                // اگر پشت مودال لیست اشخاص بود همان لیست درجا رفرش می‌شود.
                 if (mainWindow?.MainContent.Content is PersonListView listView)
-                    _ = listView.RefreshGridAsync();
-                else
-                    mainWindow?.NavigateTo("person_list");
+                    _ = RefreshListViewSafeAsync(listView);
+                else mainWindow?.NavigateTo("person_list");
+            }
+            catch (OperationCanceledException)
+            {
+                System.Diagnostics.Debug.WriteLine("[EditPersonView] SavePerson was cancelled");
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در ویرایش: " + ex.Message);
+                if (_saveCts?.IsCancellationRequested != true)
+                    ToastManager.Error("خطا در ویرایش: " + ex.Message);
             }
             finally
             {
-                _isSaving = false;
-                if (SaveButton != null)
+                if (_saveCts?.IsCancellationRequested != true)
                 {
-                    SaveButton.IsEnabled = true;
-                    SaveButton.Text = "ویرایش";
+                    _isSaving = false;
+                    if (SaveButton != null) { SaveButton.IsEnabled = true; SaveButton.Text = "ویرایش"; }
                 }
+            }
+        }
+
+        private record EditSaveSnapshot(
+            long PersonId, bool IsLegal, string CompanyName, string FirstName, string LastName,
+            string ContactFirstName, string ContactLastName, string NationalCode, string EconomicCode,
+            string RegistrationNumber, long PersonTypeId, long BranchId, string ManualCode,
+            long? PersonCategoryId, bool IsActive, bool IsCodeAutomatic,
+            string Phone, string Mobile, string Email, Dictionary<string, long> ContactTypeNames,
+            string Address, string PostalCode, long ProvinceId, long CityId,
+            List<BankAccountRow> BankAccounts);
+
+        private EditSaveSnapshot CaptureEditSnapshot()
+        {
+            return new EditSaveSnapshot(
+                _personId, IsLegal, CompanyName, FirstName, LastName,
+                ContactFirstName, ContactLastName, NationalCode, EconomicCode,
+                RegistrationNumber, SelectedPersonTypeId, SelectedBranchId, ManualCode,
+                _selectedPersonCategoryId, IsActive, _isCodeAutomatic,
+                Phone?.Trim() ?? "", Mobile?.Trim() ?? "", Email?.Trim() ?? "",
+                new Dictionary<string, long>(_contactTypeByName),
+                Address, PostalCode, SelectedProvinceId, SelectedCityId,
+                BankAccounts.Select(r => new BankAccountRow { BankBranchId = r.BankBranchId, BankName = r.BankName, CardNumber = r.CardNumber, Shaba = r.Shaba, AccountNumber = r.AccountNumber, IsDefault = r.IsDefault }).ToList());
+        }
+
+        private Task<OperationResult> ExecuteEditSaveAsync(EditSaveSnapshot s)
+        {
+            return Task.Run(() =>
+            {
+                using var scope = App.ServiceProvider.CreateScope();
+                var sp = scope.ServiceProvider;
+                var personApp = sp.GetRequiredService<IPersonApplication>();
+                var contactApp = sp.GetRequiredService<IPersonContactApplication>();
+                var addressApp = sp.GetRequiredService<IPersonAddressApplication>();
+                var bankApp = sp.GetRequiredService<IPersonBankApplication>();
+
+                var command = new EditPerson
+                {
+                    Id = s.PersonId, FirstName = s.IsLegal ? s.CompanyName : s.FirstName,
+                    LastName = s.IsLegal ? "" : s.LastName,
+                    ContactFirstName = s.IsLegal ? (s.ContactFirstName ?? "") : "",
+                    ContactLastName = s.IsLegal ? (s.ContactLastName ?? "") : "",
+                    NationalCode = s.IsLegal ? null : s.NationalCode,
+                    EconomicCode = s.IsLegal ? s.EconomicCode : null,
+                    RegistrationNumber = s.IsLegal ? s.RegistrationNumber : null,
+                    IsLegal = s.IsLegal, PersonTypeId = s.PersonTypeId, BranchId = s.BranchId,
+                    CreditLimit = 0, IsCodeAutomatic = s.IsCodeAutomatic,
+                    ManualCode = s.ManualCode, PersonCategoryId = s.PersonCategoryId
+                };
+                var result = personApp.Edit(command);
+                if (!result.IsSucceeded) return result;
+                if (s.IsActive) personApp.Activate(s.PersonId); else personApp.Deactivate(s.PersonId);
+                EditSaveContacts(contactApp, s.PersonId, s.ContactTypeNames, s.Phone, s.Mobile, s.Email);
+                EditSaveAddress(addressApp, s.PersonId, s);
+                EditSaveBanks(bankApp, s.PersonId, s.BankAccounts);
+                return result;
+            });
+        }
+
+        private static void EditSaveContacts(IPersonContactApplication app, long personId, Dictionary<string, long> typeNames, string phone, string mobile, string email)
+        {
+            foreach (var c in app.GetByPersonId(personId) ?? new List<PersonContactViewModel>()) app.Remove(c.Id);
+            if (!string.IsNullOrWhiteSpace(phone) && typeNames.TryGetValue("تلفن ثابت", out var pt)) app.Create(new CreatePersonContact { PersonId = personId, ContactTypeId = pt, Value = phone, Description = "", IsDefault = false });
+            if (!string.IsNullOrWhiteSpace(mobile) && typeNames.TryGetValue("موبایل", out var mt)) app.Create(new CreatePersonContact { PersonId = personId, ContactTypeId = mt, Value = mobile, Description = "", IsDefault = true });
+            if (!string.IsNullOrWhiteSpace(email) && typeNames.TryGetValue("ایمیل", out var et)) app.Create(new CreatePersonContact { PersonId = personId, ContactTypeId = et, Value = email, Description = "", IsDefault = false });
+        }
+
+        private static void EditSaveAddress(IPersonAddressApplication app, long personId, EditSaveSnapshot s)
+        {
+            foreach (var a in app.GetByPersonId(personId) ?? new List<PersonAddressViewModel>()) app.Remove(a.Id);
+            if (string.IsNullOrWhiteSpace(s.Address) && s.ProvinceId <= 0 && s.CityId <= 0) return;
+            if (s.ProvinceId <= 0 || s.CityId <= 0) return;
+            app.Create(new CreatePersonAddress { PersonId = personId, Title = "آدرس اصلی", Address = s.Address ?? "", PostalCode = s.PostalCode ?? "", ProvinceId = s.ProvinceId, CityId = s.CityId, IsDefault = true });
+        }
+
+        private static void EditSaveBanks(IPersonBankApplication app, long personId, List<BankAccountRow> rows)
+        {
+            foreach (var b in app.GetByPersonId(personId) ?? new List<PersonBankViewModel>()) app.Remove(b.Id);
+            foreach (var row in rows)
+            {
+                if (string.IsNullOrWhiteSpace(row.Shaba) && string.IsNullOrWhiteSpace(row.CardNumber)) continue;
+                TryCreateBankAccountScoped(app, personId, row.BankBranchId, row.BankName, row.AccountNumber, row.CardNumber, row.Shaba, row.IsDefault);
             }
         }
 
@@ -1205,9 +1216,18 @@ namespace Taadol.Views
         {
             string text = NationalCodeInput.Text?.Trim() ?? "";
 
-            if (string.IsNullOrWhiteSpace(text) || text.Length < 10)
+            if (string.IsNullOrWhiteSpace(text))
             {
-                // هنوز کامل نشده — آیکونی نشان نده
+                // فیلد خالی شده — state رو ریست کن
+                NationalCodeInput.ValidationState = Controls.ValidationState.None;
+                NationalCodeInput.ValidationMessage = "";
+            }
+            else if (text.Length < 10)
+            {
+                // هنوز کامل نشده — اگر قبلاً Invalid بوده، قرمز رو حفظ کن
+                // فقط اگر None یا Valid بوده، Nothing نشون بده
+                if (NationalCodeInput.ValidationState == Controls.ValidationState.Invalid)
+                    return; // border قرمز حفظ شود تا ۱۰ رقم تکمیل شود
                 NationalCodeInput.ValidationState = Controls.ValidationState.None;
                 NationalCodeInput.ValidationMessage = "";
             }
@@ -1351,16 +1371,16 @@ namespace Taadol.Views
             if (SelectedBranchId <= 0) { ToastManager.Warning("لطفاً شعبه را انتخاب کنید."); return false; }
             if (SelectedPersonTypeId <= 0) { ToastManager.Warning("لطفاً نوع شخص را انتخاب کنید."); return false; }
 
-            // شماره موبایل: خالی = بدون آیکون؛ پر = باید دقیقاً ۱۱ رقم باشد
+            // شماره موبایل: خالی = بدون آیکون؛ پر = باید 11 رقم و با 09 شروع شود
             if (string.IsNullOrWhiteSpace(Mobile))
             {
                 MobileInput.ValidationState = Controls.ValidationState.None;
                 MobileInput.ValidationMessage = "";
             }
-            else if (Mobile.Count(char.IsDigit) != 11)
+            else if (!ValidationHelper.IsValidMobile(Mobile))
             {
                 MobileInput.ValidationState = Controls.ValidationState.Invalid;
-                MobileInput.ValidationMessage = "شماره موبایل باید ۱۱ رقم باشد.";
+                MobileInput.ValidationMessage = "شماره موبایل باید ۱۱ رقم و با 09 شروع شود.";
                 return false;
             }
             else
@@ -1369,16 +1389,16 @@ namespace Taadol.Views
                 MobileInput.ValidationMessage = "";
             }
 
-            // شماره تلفن: خالی = بدون آیکون؛ پر = باید دقیقاً ۱۱ رقم باشد
+            // شماره تلفن ثابت: خالی = بدون آیکون؛ پر = 8 تا 11 رقم
             if (string.IsNullOrWhiteSpace(Phone))
             {
                 PhoneInput.ValidationState = Controls.ValidationState.None;
                 PhoneInput.ValidationMessage = "";
             }
-            else if (Phone.Count(char.IsDigit) != 11)
+            else if (!ValidationHelper.IsValidPhone(Phone))
             {
                 PhoneInput.ValidationState = Controls.ValidationState.Invalid;
-                PhoneInput.ValidationMessage = "شماره تلفن باید ۱۱ رقم باشد.";
+                PhoneInput.ValidationMessage = "شماره تلفن باید ۸ تا ۱۱ رقم باشد.";
                 return false;
             }
             else
@@ -1391,6 +1411,8 @@ namespace Taadol.Views
             {
                 if (string.IsNullOrWhiteSpace(CompanyName)) { ToastManager.Warning("نام شرکت را وارد کنید."); return false; }
                 if (string.IsNullOrWhiteSpace(EconomicCode)) { ToastManager.Warning("کد اقتصادی را وارد کنید."); return false; }
+                if (string.IsNullOrWhiteSpace(ContactFirstName)) { ToastManager.Warning("نام فرد رابط را وارد کنید."); return false; }
+                if (string.IsNullOrWhiteSpace(ContactLastName)) { ToastManager.Warning("نام خانوادگی فرد رابط را وارد کنید."); return false; }
             }
             else
             {

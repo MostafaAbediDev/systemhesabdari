@@ -223,15 +223,38 @@ namespace Taadol.Controls
             Text = PART_TextBox.Text;
             UpdatePlaceholderVisibility();
             TextChanged?.Invoke(this, new RoutedEventArgs());
+
+            // After all handlers run, enforce border = ValidationState.
+            // External handlers or focus cascades may have overridden the border;
+            // this guarantees the visual matches the validation state at all times.
+            System.Diagnostics.Debug.WriteLine($"[GUARD] TextBox_TextChanged fired | ValidationState={ValidationState} | Text=\"{Text}\"");
+            if (ValidationState == ValidationState.Invalid)
+            {
+                border.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#DC2626"));
+                border.BorderThickness = new Thickness(1.5);
+                System.Diagnostics.Debug.WriteLine($"[GUARD] -> Enforced RED border (Invalid)");
+            }
+            else if (ValidationState == ValidationState.Valid)
+            {
+                border.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E8E8E8"));
+                border.BorderThickness = new Thickness(1);
+                System.Diagnostics.Debug.WriteLine($"[GUARD] -> Enforced GRAY border (Valid)");
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"[GUARD] -> Skipped (None) — focus effects apply");
+            }
         }
 
         private void PART_TextBox_GotFocus(object sender, RoutedEventArgs e)
         {
+            // وقتی Invalid هست، border قرمز حفظ می‌شود (حتی روی فوکوس)
             if (ValidationState == ValidationState.None)
             {
                 border.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2667FF"));
                 border.BorderThickness = new Thickness(1.5);
             }
+            // Valid: border خاکی باقی می‌ماند (آیکون سبز نشان داده می‌شود)
 
             var tb = sender as TextBox;
             if (tb != null && string.IsNullOrEmpty(tb.Text))
@@ -242,6 +265,7 @@ namespace Taadol.Controls
 
         private void PART_TextBox_LostFocus(object sender, RoutedEventArgs e)
         {
+            // فقط وقتی None هست border رو ریست کن — Invalid و Valid دست‌نخورده باقی می‌مانند
             if (ValidationState == ValidationState.None)
             {
                 border.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E8E8E8"));
@@ -312,6 +336,8 @@ namespace Taadol.Controls
             switch (ValidationState)
             {
                 case ValidationState.Valid:
+                    border.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E8E8E8"));
+                    border.BorderThickness = new Thickness(1);
                     ValidationIconBorder.Visibility = Visibility.Visible;
                     ValidationIconBorder.Background = Brushes.Transparent;
                     WarningIcon.Visibility = Visibility.Collapsed;

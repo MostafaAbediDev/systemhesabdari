@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -19,6 +20,8 @@ namespace Taadol.Views
 {
     public partial class BranchListView : UserControl
     {
+        private CancellationTokenSource _loadCts = new();
+
         public ObservableCollection<BranchItem> AllBranches { get; set; }
         public ObservableCollection<BranchItem> FilteredBranches { get; set; }
         public ObservableCollection<PageItem> Pages { get; set; } = new ObservableCollection<PageItem>();
@@ -88,6 +91,7 @@ namespace Taadol.Views
             FillEmptyRows();
 
             Loaded += BranchListView_Loaded;
+            this.Unloaded += (s, e) => { _loadCts?.Cancel(); _loadCts?.Dispose(); _loadCts = null; };
         }
 
         // ─── هدر ستون‌های داخلی (چک‌باکس و شماره ردیف) را خاکستری می‌کند ───
@@ -120,8 +124,22 @@ namespace Taadol.Views
 
         private async void BtnRefresh_Click(object sender, RoutedEventArgs e)
         {
+            _loadCts?.Cancel();
+            _loadCts?.Dispose();
+            _loadCts = new CancellationTokenSource();
             _isLoadedOnce = false;
-            await LoadDataAsync();
+            try
+            {
+                await LoadDataAsync();
+            }
+            catch (OperationCanceledException)
+            {
+                System.Diagnostics.Debug.WriteLine("[BranchListView] Refresh was cancelled");
+            }
+            catch (Exception ex)
+            {
+                ToastManager.Error("خطا در بروزرسانی: " + ex.Message);
+            }
         }
 
         /// <summary>
@@ -129,10 +147,17 @@ namespace Taadol.Views
         /// </summary>
         public async Task RefreshGridAsync()
         {
+            _loadCts?.Cancel();
+            _loadCts?.Dispose();
+            _loadCts = new CancellationTokenSource();
             _isLoadedOnce = false;
             try
             {
                 await LoadDataAsync();
+            }
+            catch (OperationCanceledException)
+            {
+                System.Diagnostics.Debug.WriteLine("[BranchListView] RefreshGridAsync was cancelled");
             }
             catch (Exception ex)
             {
@@ -147,7 +172,14 @@ namespace Taadol.Views
 
             _isLoadedOnce = true;
 
-            await LoadDataAsync();
+            try
+            {
+                await LoadDataAsync();
+            }
+            catch (Exception ex)
+            {
+                ToastManager.Error("خطا در بارگذاری شعبه‌ها: " + ex.Message);
+            }
         }
 
         private async Task LoadDataAsync()
@@ -596,16 +628,25 @@ namespace Taadol.Views
 
             try
             {
-                foreach (var item in selectedItems.ToList())
+                BranchesGrid.IsLoading = true;
+
+                await Task.Run(() =>
                 {
-                    if (long.TryParse(item.UniqueId, out var branchId))
-                        _branchApplication.Remove(branchId);
-                }
+                    foreach (var item in selectedItems.ToList())
+                    {
+                        if (long.TryParse(item.UniqueId, out var branchId))
+                            _branchApplication.Remove(branchId);
+                    }
+                });
             }
             catch (Exception ex)
             {
                 ToastManager.Error("خطا در حذف: " + ex.Message);
                 return;
+            }
+            finally
+            {
+                BranchesGrid.IsLoading = false;
             }
 
             _currentPage = 1;

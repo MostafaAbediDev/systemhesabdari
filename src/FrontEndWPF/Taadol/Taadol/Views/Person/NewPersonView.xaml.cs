@@ -23,6 +23,7 @@ using System.Globalization;
 using System.IO;
 
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -46,6 +47,10 @@ namespace Taadol.Views
     /// </summary>
     public partial class NewPersonView : UserControl, INotifyPropertyChanged, IUnsavedChangesAware
     {
+        // ===== CancellationToken =====
+        private CancellationTokenSource _loadCts = new();
+        private CancellationTokenSource _saveCts = new();
+
         // ===== Services (از DI رزولو می‌شوند) =====
         private readonly IPersonApplication _personApplication;
         private readonly IBranchApplication _branchApplication;
@@ -166,7 +171,7 @@ namespace Taadol.Views
                 _selectedPersonTypeId = value;
                 OnPropertyChanged();
                 MarkUserChange();
-                _ = LoadCategoriesAsync(value);
+                _ = LoadCategoriesSafeAsync(value);
             }
         }
         public class BulkObservableCollection<T> : ObservableCollection<T>
@@ -209,13 +214,16 @@ namespace Taadol.Views
 
             try
             {
+                var token = _loadCts?.Token ?? CancellationToken.None;
                 var tree = await Task.Run(() =>
                 {
+                    token.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
                     var app = scope.ServiceProvider.GetRequiredService<IPersonCategoryApplication>();
                     return app.GetTree(personTypeId);
-                });
+                }, token);
 
+                token.ThrowIfCancellationRequested();
                 CategorySearch?.LoadFromTreeDto(tree);
                 CategorySearch?.ClearSelection();
 
@@ -226,6 +234,10 @@ namespace Taadol.Views
 
                 CategorySearch3?.LoadFromTreeDto(tree);
                 CategorySearch3?.ClearSelection();
+            }
+            catch (OperationCanceledException)
+            {
+                System.Diagnostics.Debug.WriteLine("[NewPersonView] LoadCategoriesAsync was cancelled");
             }
             catch (Exception ex)
             {
@@ -250,7 +262,7 @@ namespace Taadol.Views
                 _selectedProvinceId = value;
                 OnPropertyChanged();
                 MarkUserChange();
-                _ = LoadCitiesAsync(value);
+                _ = LoadCitiesSafeAsync(value);
                 UpdateCityState();
             }
         }
@@ -382,6 +394,7 @@ namespace Taadol.Views
             }
 
             Loaded += OnLoaded;
+            this.Unloaded += OnViewUnloaded;
             CategorySearch.CategorySelected += OnCategorySelected;
 
             // تغییر حساب‌های بانکی (افزودن/حذف) هم «تغییر کاربر» محسوب می‌شود
@@ -401,23 +414,50 @@ namespace Taadol.Views
             MarkUserChange();
         }
 
+        /// <summary>لغو عملیات‌های در حال اجرا هنگام بسته شدن فرم</summary>
+        private void OnViewUnloaded(object sender, RoutedEventArgs e)
+        {
+            _loadCts?.Cancel();
+            _saveCts?.Cancel();
+            _loadCts?.Dispose();
+            _saveCts?.Dispose();
+            _loadCts = null;
+            _saveCts = null;
+            this.Unloaded -= OnViewUnloaded;
+        }
+
         // ======================================================
         //  Async Loaders
         // ======================================================
         private async void OnLoaded(object sender, RoutedEventArgs e)
         {
             if (Branches.Count > 0) return;
+            if (_loadCts?.IsCancellationRequested == true) return;
 
-            await Task.WhenAll(
-                LoadBranchesAsync(),
-                LoadPersonTypesAsync(),
-                LoadContactTypesAsync(),
-                LoadProvincesAsync(),
-                LoadBankBranchesAsync()
-            );
-
-            // بعد از جا افتادن کامل لودها، تغییرات بعدی فقط از طرف کاربر است
-            _isLoading = false;
+            try
+            {
+                await Task.WhenAll(
+                    LoadBranchesAsync(),
+                    LoadPersonTypesAsync(),
+                    LoadContactTypesAsync(),
+                    LoadProvincesAsync(),
+                    LoadBankBranchesAsync()
+                );
+            }
+            catch (OperationCanceledException)
+            {
+                System.Diagnostics.Debug.WriteLine("[NewPersonView] OnLoaded was cancelled");
+            }
+            catch (Exception ex)
+            {
+                if (_loadCts?.IsCancellationRequested != true)
+                    ToastManager.Error("خطا در بارگذاری اطلاعات: " + ex.Message);
+            }
+            finally
+            {
+                if (_loadCts?.IsCancellationRequested != true)
+                    _isLoading = false;
+            }
         }
 
         private async Task LoadBranchesAsync()
@@ -542,12 +582,19 @@ namespace Taadol.Views
 
             try
             {
+                var token = _loadCts?.Token ?? CancellationToken.None;
                 var items = await Task.Run(() =>
                 {
+                    token.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
                     var repo = scope.ServiceProvider.GetRequiredService<ICityRepository>();
                     return repo.GetCitiesByProvince(provinceId);
-                });
+                }, token);
+
+                token.ThrowIfCancellationRequested();
+                // ✅ Staleness check: اگر کاربر استان را عوض کرده، نتایج قدیمی را نادیده بگیر
+                if (SelectedProvinceId != provinceId)
+                    return;
 
                 Cities.Clear();
                 foreach (var c in items)
@@ -557,9 +604,39 @@ namespace Taadol.Views
                 if (Cities.All(c => c.Id != SelectedCityId))
                     SelectedCityId = 0;
             }
+            catch (OperationCanceledException)
+            {
+                System.Diagnostics.Debug.WriteLine("[NewPersonView] LoadCitiesAsync was cancelled");
+            }
             catch (Exception ex)
             {
                 ToastManager.Error("خطا در لود شهرها: " + ex.Message);
+            }
+        }
+
+        /// <summary>Safe wrapper for LoadCategoriesAsync with error handling at call site.</summary>
+        private async Task LoadCategoriesSafeAsync(long personTypeId)
+        {
+            try
+            {
+                await LoadCategoriesAsync(personTypeId);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[NewPersonView] Error in LoadCategoriesSafeAsync: {ex}");
+            }
+        }
+
+        /// <summary>Safe wrapper for LoadCitiesAsync with error handling at call site.</summary>
+        private async Task LoadCitiesSafeAsync(long provinceId)
+        {
+            try
+            {
+                await LoadCitiesAsync(provinceId);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[NewPersonView] Error in LoadCitiesSafeAsync: {ex}");
             }
         }
 
@@ -740,17 +817,21 @@ namespace Taadol.Views
         // ======================================================
         //  Save
         // ======================================================
+        // Note: async void here is safe because:
+        // 1. try/catch wraps the entire body
+        // 2. _isSaving guard prevents reentrancy
+        // 3. SavePersonAsync handles all error paths
         private async void SavePerson_Click(object sender, RoutedEventArgs e)
-{
-    try
-    {
-        await SavePersonAsync();
-    }
-    catch (Exception ex)
-    {
-        ToastManager.Error("خطا در ثبت شخص: " + ex.Message);
-    }
-}
+        {
+            try
+            {
+                await SavePersonAsync();
+            }
+            catch (Exception ex)
+            {
+                ToastManager.Error("خطا در ثبت شخص: " + ex.Message);
+            }
+        }
 
         /// <summary>بعد از ذخیره‌ی موفق یک شخص صدا زده می‌شود تا گرید پشت مودال رفرش شود.</summary>
         public event Action PersonSaved;
@@ -773,170 +854,24 @@ namespace Taadol.Views
         private async Task SavePersonAsync()
         {
             if (_isSaving) return;
+            if (_saveCts?.IsCancellationRequested == true) return;
             _isSaving = true;
 
             try
             {
                 if (SaveButton != null) SaveButton.IsEnabled = false;
 
-                // 1) اعتبارسنجی — اول بررسی کن، بعد تأیید بگیر؛
-                //    وگرنه با فرم خالی/نامعتبر پیام دروغین «بررسی شد» نشان داده می‌شود.
+                // 1) اعتبارسنجی
                 if (!ValidatePerson()) return;
+                _saveCts.Token.ThrowIfCancellationRequested();
 
                 // 2) تأیید کاربر
                 var dialog = new CustomConfirmDialog();
                 if (dialog.ShowDialog() != true) return;
 
-            // 3) ذخیره تمام اطلاعات در یک Task.Run با Scope جداگانه
-            var isLegal = IsLegal;
-            var companyName = CompanyName;
-            var firstName = FirstName;
-            var lastName = LastName;
-            var contactFirstName = ContactFirstName;
-            var contactLastName = ContactLastName;
-            var nationalCode = NationalCode;
-            var economicCode = EconomicCode;
-            var registrationNumber = RegistrationNumber;
-            var selectedPersonTypeId = SelectedPersonTypeId;
-            var selectedBranchId = SelectedBranchId;
-            var manualCode = ManualCode;
-            var selectedPersonCategoryId = _selectedPersonCategoryId;
-            var isActive = IsActive;
-            var creditLimit = CreditLimit;
-            var contactPhone = Phone?.Trim();
-            var contactMobile = Mobile?.Trim();
-            var contactEmail = Email?.Trim();
-            var contactTypeNames = new Dictionary<string, long>(_contactTypeByName);
-            var addressText = Address;
-            var postalCode = PostalCode;
-            var selectedProvinceId = SelectedProvinceId;
-            var selectedCityId = SelectedCityId;
-            var mainShaba = MainShaba;
-            var mainCardNumber = MainCardNumber;
-            var mainBankBranchId = SelectedBankBranchId;
-            var mainBankName = MainBankName;
-            var mainAccountNumber = MainAccountNumber;
-            var mainBankIsDefault = MainBankIsDefault;
-            var bankAccountsSnapshot = BankAccounts.Select(r => new { r.BankBranchId, r.BankName, r.CardNumber, r.Shaba, r.AccountNumber, r.IsDefault }).ToList();
-
-            try
-            {
-                var saveResult = await Task.Run(() =>
-                {
-                    using var scope = App.ServiceProvider.CreateScope();
-                    var sp = scope.ServiceProvider;
-                    var personApp = sp.GetRequiredService<IPersonApplication>();
-                    var contactApp = sp.GetRequiredService<IPersonContactApplication>();
-                    var addressApp = sp.GetRequiredService<IPersonAddressApplication>();
-                    var bankApp = sp.GetRequiredService<IPersonBankApplication>();
-
-                    var command = new CreatePerson
-                    {
-                        FirstName = isLegal ? companyName : firstName,
-                        LastName = isLegal ? "" : lastName,
-                        ContactFirstName = isLegal ? (contactFirstName ?? "") : "",
-                        ContactLastName = isLegal ? (contactLastName ?? "") : "",
-                        NationalCode = isLegal ? null : nationalCode,
-                        EconomicCode = isLegal ? economicCode : null,
-                        RegistrationNumber = isLegal ? registrationNumber : null,
-                        IsLegal = isLegal,
-                        PersonTypeId = selectedPersonTypeId,
-                        BranchId = selectedBranchId,
-                        CreditLimit = creditLimit,
-                        IsCodeAutomatic = false,
-                        ManualCode = manualCode,
-                        PersonCategoryId = selectedPersonCategoryId
-                    };
-
-                    var personResult = personApp.Create(command);
-                    long personIdForChildren = 0;
-
-                    if (personResult.IsSucceeded)
-                    {
-                        var code = command.IsLegal ? command.EconomicCode : command.NationalCode;
-                        var search = new PersonSearchModel { NationalCode = code };
-                        var list = personApp.Search(search);
-                        personIdForChildren = list?.OrderByDescending(x => x.Id).FirstOrDefault()?.Id ?? 0;
-
-                        if (personIdForChildren > 0)
-                        {
-                            if (isActive)
-                                personApp.Activate(personIdForChildren);
-                            else
-                                personApp.Deactivate(personIdForChildren);
-                        }
-                    }
-
-                    if (!personResult.IsSucceeded)
-                        return (Success: false, Message: personResult.Message ?? "ثبت شخص ناموفق بود.", PersonId: 0L);
-
-                    if (personIdForChildren <= 0)
-                        return (Success: false, Message: "شخص ثبت شد ولی پیدا کردن شناسه‌ی او ناموفق بود. لطفاً مجدداً تلاش کنید.", PersonId: 0L);
-
-                    // SaveContacts
-                    if (!string.IsNullOrWhiteSpace(contactPhone) && contactTypeNames.TryGetValue("تلفن ثابت", out var phoneTypeId))
-                        contactApp.Create(new CreatePersonContact { PersonId = personIdForChildren, ContactTypeId = phoneTypeId, Value = contactPhone, Description = "", IsDefault = false });
-
-                    if (!string.IsNullOrWhiteSpace(contactMobile) && contactTypeNames.TryGetValue("موبایل", out var mobileTypeId))
-                        contactApp.Create(new CreatePersonContact { PersonId = personIdForChildren, ContactTypeId = mobileTypeId, Value = contactMobile, Description = "", IsDefault = true });
-
-                    if (!string.IsNullOrWhiteSpace(contactEmail) && contactTypeNames.TryGetValue("ایمیل", out var emailTypeId))
-                        contactApp.Create(new CreatePersonContact { PersonId = personIdForChildren, ContactTypeId = emailTypeId, Value = contactEmail, Description = "", IsDefault = false });
-
-                    // SaveAddress
-                    if (!string.IsNullOrWhiteSpace(addressText) || selectedProvinceId > 0 || selectedCityId > 0)
-                    {
-                        if (selectedProvinceId > 0 && selectedCityId > 0)
-                        {
-                            addressApp.Create(new CreatePersonAddress
-                            {
-                                PersonId = personIdForChildren,
-                                Title = "آدرس اصلی",
-                                Address = addressText ?? "",
-                                PostalCode = postalCode ?? "",
-                                ProvinceId = selectedProvinceId,
-                                CityId = selectedCityId,
-                                IsDefault = true
-                            });
-                        }
-                    }
-
-                    // SaveBanks — main account
-                    if (!string.IsNullOrWhiteSpace(mainShaba) || !string.IsNullOrWhiteSpace(mainCardNumber))
-                    {
-                        if (mainBankBranchId > 0)
-                        {
-                            bankApp.Create(new CreatePersonBank
-                            {
-                                PersonId = personIdForChildren,
-                                BankBranchId = mainBankBranchId,
-                                AccountNumber = mainAccountNumber ?? "",
-                                CardNumber = mainCardNumber ?? "",
-                                Shaba = mainShaba ?? "",
-                                IsDefault = mainBankIsDefault
-                            });
-                        }
-                    }
-
-                    // SaveBanks — grid accounts
-                    foreach (var row in bankAccountsSnapshot)
-                    {
-                        if (string.IsNullOrWhiteSpace(row.Shaba) && string.IsNullOrWhiteSpace(row.CardNumber))
-                            continue;
-                        if (row.BankBranchId <= 0) continue;
-                        bankApp.Create(new CreatePersonBank
-                        {
-                            PersonId = personIdForChildren,
-                            BankBranchId = row.BankBranchId,
-                            AccountNumber = row.AccountNumber ?? "",
-                            CardNumber = row.CardNumber ?? "",
-                            Shaba = row.Shaba ?? "",
-                            IsDefault = row.IsDefault
-                        });
-                    }
-
-                    return (Success: true, Message: "", PersonId: personIdForChildren);
-                });
+                // 3) ذخیره در دیتابیس
+                var snapshot = CaptureSaveSnapshot();
+                var saveResult = await ExecutePersonSaveAsync(snapshot);
 
                 if (!saveResult.Success)
                 {
@@ -944,49 +879,191 @@ namespace Taadol.Views
                     return;
                 }
 
-                SavePersonPicture(saveResult.PersonId);
-
-                ToastManager.Success("ثبت شخص با موفقیت انجام شد.");
-
-                var mainWindow = Window.GetWindow(this) as MainWindow;
-
-                // تشخیص محل میزبانی فرم:
-                // 1) مودال (دکمه «+ شخص جدید» در لیست) → مودال بسته شود و گرید پشت آن رفرش شود
-                // 2) ناحیه اصلی (منوی «شخص جدید» در سایدبار) → به لیست اشخاص برگردد
-                //    تا فرم پُر در حالت قابل‌ثبت باقی نماند و ثبت تکراری رخ ندهد.
-                bool isModal = mainWindow?.ModalContent.Content == this;
-
-                if (isModal)
-                {
-                    PersonSaved?.Invoke();
-                    mainWindow?.CloseModal();
-                }
-                else
-                {
-                    mainWindow?.NavigateTo("person_list");
-                }
+                // 4) ذخیره عکس + رفرش UI
+                OnSaveSucceeded(saveResult.PersonId);
+            }
+            catch (OperationCanceledException)
+            {
+                System.Diagnostics.Debug.WriteLine("[NewPersonView] SavePersonAsync was cancelled");
             }
             catch (Exception ex)
             {
-                var fullMessage = BuildFullExceptionMessage(ex);
-                ToastManager.Error("خطا در ثبت شخص: " + ex.Message);
-
-                try
-                {
-                    System.IO.File.AppendAllText(
-                        System.IO.Path.Combine(System.IO.Path.GetTempPath(), "taadol-person-save-error.log"),
-                        $"[{DateTime.Now:yyyy/MM/dd HH:mm:ss}]{Environment.NewLine}{fullMessage}{Environment.NewLine}{new string('-', 80)}{Environment.NewLine}");
-                }
-                catch
-                {
-                }
-            }
+                LogSaveException(ex);
             }
             finally
             {
-                _isSaving = false;
-                if (SaveButton != null) SaveButton.IsEnabled = true;
+                if (_saveCts?.IsCancellationRequested != true)
+                {
+                    _isSaving = false;
+                    if (SaveButton != null) SaveButton.IsEnabled = true;
+                }
             }
+        }
+
+        /// <summary> snapping all form field values for cross-thread save</summary>
+        private record SaveSnapshot(
+            bool IsLegal, string CompanyName, string FirstName, string LastName,
+            string ContactFirstName, string ContactLastName, string NationalCode,
+            string EconomicCode, string RegistrationNumber, long PersonTypeId,
+            long BranchId, string ManualCode, long? PersonCategoryId, bool IsActive,
+            decimal CreditLimit, string Phone, string Mobile, string Email,
+            Dictionary<string, long> ContactTypeNames, string Address, string PostalCode,
+            long ProvinceId, long CityId, string MainShaba, string MainCardNumber,
+            long MainBankBranchId, string MainAccountNumber, bool MainBankIsDefault,
+            List<dynamic> BankAccountsSnapshot);
+
+        private SaveSnapshot CaptureSaveSnapshot()
+        {
+            return new SaveSnapshot(
+                IsLegal, CompanyName, FirstName, LastName,
+                ContactFirstName, ContactLastName, NationalCode,
+                EconomicCode, RegistrationNumber, SelectedPersonTypeId,
+                SelectedBranchId, ManualCode, _selectedPersonCategoryId, IsActive,
+                CreditLimit, Phone?.Trim() ?? "", Mobile?.Trim() ?? "", Email?.Trim() ?? "",
+                new Dictionary<string, long>(_contactTypeByName), Address, PostalCode,
+                SelectedProvinceId, SelectedCityId, MainShaba, MainCardNumber,
+                SelectedBankBranchId, MainAccountNumber, MainBankIsDefault,
+                BankAccounts.Select(r => new { r.BankBranchId, r.BankName, r.CardNumber, r.Shaba, r.AccountNumber, r.IsDefault })
+                    .Select(r => (dynamic)r).ToList());
+        }
+
+        /// <summary> persists person + contacts + address + banks in a single scoped Task.Run</summary>
+        private Task<(bool Success, string Message, long PersonId)> ExecutePersonSaveAsync(SaveSnapshot s)
+        {
+            return Task.Run(() =>
+            {
+                using var scope = App.ServiceProvider.CreateScope();
+                var sp = scope.ServiceProvider;
+                var personApp = sp.GetRequiredService<IPersonApplication>();
+                var contactApp = sp.GetRequiredService<IPersonContactApplication>();
+                var addressApp = sp.GetRequiredService<IPersonAddressApplication>();
+                var bankApp = sp.GetRequiredService<IPersonBankApplication>();
+
+                // --- Create person ---
+                var command = new CreatePerson
+                {
+                    FirstName = s.IsLegal ? s.CompanyName : s.FirstName,
+                    LastName = s.IsLegal ? "" : s.LastName,
+                    ContactFirstName = s.IsLegal ? (s.ContactFirstName ?? "") : "",
+                    ContactLastName = s.IsLegal ? (s.ContactLastName ?? "") : "",
+                    NationalCode = s.IsLegal ? null : s.NationalCode,
+                    EconomicCode = s.IsLegal ? s.EconomicCode : null,
+                    RegistrationNumber = s.IsLegal ? s.RegistrationNumber : null,
+                    IsLegal = s.IsLegal,
+                    PersonTypeId = s.PersonTypeId,
+                    BranchId = s.BranchId,
+                    CreditLimit = s.CreditLimit,
+                    IsCodeAutomatic = false,
+                    ManualCode = s.ManualCode,
+                    PersonCategoryId = s.PersonCategoryId
+                };
+
+                var personResult = personApp.Create(command);
+                if (!personResult.IsSucceeded)
+                    return (false, personResult.Message ?? "ثبت شخص ناموفق بود.", 0L);
+
+                long personId = ResolveCreatedPersonId(personApp, command);
+                if (personId <= 0)
+                    return (false, "شخص ثبت شد ولی پیدا کردن شناسه‌ی او ناموفق بود.", 0L);
+
+                // Activate / Deactivate
+                if (s.IsActive) personApp.Activate(personId); else personApp.Deactivate(personId);
+
+                // --- Save contacts ---
+                SaveContactsScoped(contactApp, personId, s.ContactTypeNames, s.Phone, s.Mobile, s.Email);
+
+                // --- Save address ---
+                SaveAddressScoped(addressApp, personId, s);
+
+                // --- Save bank accounts ---
+                SaveBankAccountsScoped(bankApp, personId, s);
+
+                return (true, "", personId);
+            });
+        }
+
+        /// <summary> resolves person ID after Create (OperationResult lacks Id property)</summary>
+        private static long ResolveCreatedPersonId(IPersonApplication personApp, CreatePerson command)
+        {
+            var code = command.IsLegal ? command.EconomicCode : command.NationalCode;
+            var list = personApp.Search(new PersonSearchModel { NationalCode = code });
+            return list?.OrderByDescending(x => x.Id).FirstOrDefault()?.Id ?? 0;
+        }
+
+        /// <summary> saves phone / mobile / email contacts</summary>
+        private static void SaveContactsScoped(IPersonContactApplication contactApp, long personId,
+            Dictionary<string, long> typeNames, string phone, string mobile, string email)
+        {
+            if (!string.IsNullOrWhiteSpace(phone) && typeNames.TryGetValue("تلفن ثابت", out var phoneTypeId))
+                contactApp.Create(new CreatePersonContact { PersonId = personId, ContactTypeId = phoneTypeId, Value = phone, Description = "", IsDefault = false });
+            if (!string.IsNullOrWhiteSpace(mobile) && typeNames.TryGetValue("موبایل", out var mobileTypeId))
+                contactApp.Create(new CreatePersonContact { PersonId = personId, ContactTypeId = mobileTypeId, Value = mobile, Description = "", IsDefault = true });
+            if (!string.IsNullOrWhiteSpace(email) && typeNames.TryGetValue("ایمیل", out var emailTypeId))
+                contactApp.Create(new CreatePersonContact { PersonId = personId, ContactTypeId = emailTypeId, Value = email, Description = "", IsDefault = false });
+        }
+
+        /// <summary> saves main address</summary>
+        private static void SaveAddressScoped(IPersonAddressApplication addressApp, long personId, SaveSnapshot s)
+        {
+            if (string.IsNullOrWhiteSpace(s.Address) && s.ProvinceId <= 0 && s.CityId <= 0) return;
+            if (s.ProvinceId <= 0 || s.CityId <= 0) return;
+            addressApp.Create(new CreatePersonAddress
+            {
+                PersonId = personId,
+                Title = "آدرس اصلی",
+                Address = s.Address ?? "",
+                PostalCode = s.PostalCode ?? "",
+                ProvinceId = s.ProvinceId,
+                CityId = s.CityId,
+                IsDefault = true
+            });
+        }
+
+        /// <summary> saves main + grid bank accounts</summary>
+        private static void SaveBankAccountsScoped(IPersonBankApplication bankApp, long personId, SaveSnapshot s)
+        {
+            // Main account
+            if ((!string.IsNullOrWhiteSpace(s.MainShaba) || !string.IsNullOrWhiteSpace(s.MainCardNumber)) && s.MainBankBranchId > 0)
+            {
+                bankApp.Create(new CreatePersonBank
+                {
+                    PersonId = personId, BankBranchId = s.MainBankBranchId,
+                    AccountNumber = s.MainAccountNumber ?? "", CardNumber = s.MainCardNumber ?? "",
+                    Shaba = s.MainShaba ?? "", IsDefault = s.MainBankIsDefault
+                });
+            }
+            // Grid accounts
+            foreach (var row in s.BankAccountsSnapshot)
+            {
+                if (row.Shaba == null && row.CardNumber == null) continue;
+                if (row.BankBranchId <= 0) continue;
+                bankApp.Create(new CreatePersonBank
+                {
+                    PersonId = personId, BankBranchId = row.BankBranchId,
+                    AccountNumber = row.AccountNumber ?? "", CardNumber = row.CardNumber ?? "",
+                    Shaba = row.Shaba ?? "", IsDefault = row.IsDefault
+                });
+            }
+        }
+
+        /// <summary> post-save: picture + toast + navigate</summary>
+        private void OnSaveSucceeded(long personId)
+        {
+            SavePersonPicture(personId);
+            ToastManager.Success("ثبت شخص با موفقیت انجام شد.");
+            var mainWindow = Window.GetWindow(this) as MainWindow;
+            bool isModal = mainWindow?.ModalContent.Content == this;
+            if (isModal) { PersonSaved?.Invoke(); mainWindow?.CloseModal(); }
+            else mainWindow?.NavigateTo("person_list");
+        }
+
+        /// <summary> logs exception to debug + file</summary>
+        private void LogSaveException(Exception ex)
+        {
+            var fullMessage = BuildFullExceptionMessage(ex);
+            if (_saveCts?.IsCancellationRequested != true)
+                ToastManager.Error("خطا در ثبت شخص: " + ex.Message);
+            try { System.IO.File.AppendAllText(System.IO.Path.Combine(System.IO.Path.GetTempPath(), "taadol-person-save-error.log"), $"[{DateTime.Now:yyyy/MM/dd HH:mm:ss}]{Environment.NewLine}{fullMessage}{Environment.NewLine}{new string('-', 80)}{Environment.NewLine}"); } catch { }
         }
         /// <summary>
         /// ★ ذخیره عکس شخص.
@@ -1076,160 +1153,101 @@ namespace Taadol.Views
 
         private bool ValidatePerson()
         {
-            if (SelectedBranchId <= 0)
-            {
-                ToastManager.Warning("لطفاً شعبه را انتخاب کنید.");
-                return false;
-            }
+            if (!ValidateRequiredSelections()) return false;
+            if (!ValidateMobileField()) return false;
+            if (!ValidatePhoneField()) return false;
+            if (IsLegal) { if (!ValidateLegalFields()) return false; }
+            else { if (!ValidateNaturalPersonFields()) return false; }
+            if (!ValidateUniqueCode()) return false;
+            if (!ValidateContactFormats()) return false;
+            return true;
+        }
 
-            if (SelectedPersonTypeId <= 0)
-            {
-                ToastManager.Warning("لطفاً نوع شخص را انتخاب کنید.");
-                return false;
-            }
+        /// <summary> validates BranchId and PersonTypeId are selected</summary>
+        private bool ValidateRequiredSelections()
+        {
+            if (SelectedBranchId <= 0) { ToastManager.Warning("لطفاً شعبه را انتخاب کنید."); return false; }
+            if (SelectedPersonTypeId <= 0) { ToastManager.Warning("لطفاً نوع شخص را انتخاب کنید."); return false; }
+            return true;
+        }
 
-            // شماره موبایل: خالی = بدون آیکون؛ پر = باید دقیقاً ۱۱ رقم باشد
-            if (string.IsNullOrWhiteSpace(Mobile))
-            {
-                MobileInput.ValidationState = Controls.ValidationState.None;
-                MobileInput.ValidationMessage = "";
-            }
-            else if (Mobile.Count(char.IsDigit) != 11)
-            {
-                MobileInput.ValidationState = Controls.ValidationState.Invalid;
-                MobileInput.ValidationMessage = "شماره موبایل باید ۱۱ رقم باشد.";
-                return false;
-            }
+        /// <summary> validates mobile format and updates UI indicator</summary>
+        private bool ValidateMobileField()
+        {
+            if (string.IsNullOrWhiteSpace(Mobile)) { MobileInput.ValidationState = Controls.ValidationState.None; MobileInput.ValidationMessage = ""; return true; }
+            if (!ValidationHelper.IsValidMobile(Mobile)) { MobileInput.ValidationState = Controls.ValidationState.Invalid; MobileInput.ValidationMessage = "شماره موبایل باید ۱۱ رقم و با 09 شروع شود."; return false; }
+            MobileInput.ValidationState = Controls.ValidationState.Valid; MobileInput.ValidationMessage = ""; return true;
+        }
+
+        /// <summary> validates phone format and updates UI indicator</summary>
+        private bool ValidatePhoneField()
+        {
+            if (string.IsNullOrWhiteSpace(Phone)) { PhoneInput.ValidationState = Controls.ValidationState.None; PhoneInput.ValidationMessage = ""; return true; }
+            if (!ValidationHelper.IsValidPhone(Phone)) { PhoneInput.ValidationState = Controls.ValidationState.Invalid; PhoneInput.ValidationMessage = "شماره تلفن باید ۸ تا ۱۱ رقم باشد."; return false; }
+            PhoneInput.ValidationState = Controls.ValidationState.Valid; PhoneInput.ValidationMessage = ""; return true;
+        }
+
+        /// <summary> validates legal person required fields: CompanyName, EconomicCode, ContactFirstName/LastName</summary>
+        private bool ValidateLegalFields()
+        {
+            if (string.IsNullOrWhiteSpace(CompanyName)) { ToastManager.Warning("نام شرکت را وارد کنید."); return false; }
+            if (string.IsNullOrWhiteSpace(EconomicCode)) { ToastManager.Warning("کد اقتصادی را وارد کنید."); return false; }
+            if (string.IsNullOrWhiteSpace(ContactFirstName)) { ToastManager.Warning("نام فرد رابط را وارد کنید."); return false; }
+            if (string.IsNullOrWhiteSpace(ContactLastName)) { ToastManager.Warning("نام خانوادگی فرد رابط را وارد کنید."); return false; }
+            return true;
+        }
+
+        /// <summary> validates natural person required fields: FirstName, LastName, NationalCode</summary>
+        private bool ValidateNaturalPersonFields()
+        {
+            bool hasError = false;
+            SetFieldValidation(FirstNameInput, string.IsNullOrWhiteSpace(FirstName), "نام را وارد کنید.", ref hasError);
+            SetFieldValidation(LastNameInput, string.IsNullOrWhiteSpace(LastName), "نام خانوادگی را وارد کنید.", ref hasError);
+            // NationalCode: empty → error; wrong length → error; invalid checksum → error; else valid
+            if (string.IsNullOrWhiteSpace(NationalCode))
+                SetNationalCodeValidation(Controls.ValidationState.Invalid, "کد ملی را وارد کنید.", ref hasError);
+            else if (NationalCode.Count(char.IsDigit) != 10)
+                SetNationalCodeValidation(Controls.ValidationState.Invalid, "کد ملی باید دقیقاً ۱۰ رقم باشد.", ref hasError);
+            else if (!ValidationHelper.IsValidNationalCode(NationalCode))
+                SetNationalCodeValidation(Controls.ValidationState.Invalid, "کد ملی وارد شده صحیح نیست.", ref hasError);
             else
-            {
-                MobileInput.ValidationState = Controls.ValidationState.Valid;
-                MobileInput.ValidationMessage = "";
-            }
+                SetNationalCodeValidation(Controls.ValidationState.Valid, "", ref hasError);
+            return !hasError;
+        }
 
-            // شماره تلفن: خالی = بدون آیکون؛ پر = باید دقیقاً ۱۱ رقم باشد
-            if (string.IsNullOrWhiteSpace(Phone))
-            {
-                PhoneInput.ValidationState = Controls.ValidationState.None;
-                PhoneInput.ValidationMessage = "";
-            }
-            else if (Phone.Count(char.IsDigit) != 11)
-            {
-                PhoneInput.ValidationState = Controls.ValidationState.Invalid;
-                PhoneInput.ValidationMessage = "شماره تلفن باید ۱۱ رقم باشد.";
-                return false;
-            }
-            else
-            {
-                PhoneInput.ValidationState = Controls.ValidationState.Valid;
-                PhoneInput.ValidationMessage = "";
-            }
+        private void SetFieldValidation(Controls.ModernPersianTextBox control, bool isInvalid, string msg, ref bool hasError)
+        {
+            if (isInvalid) { control.ValidationState = Controls.ValidationState.Invalid; control.ValidationMessage = msg; hasError = true; }
+            else { control.ValidationState = Controls.ValidationState.Valid; control.ValidationMessage = ""; }
+        }
 
-            if (IsLegal)
-            {
-                if (string.IsNullOrWhiteSpace(CompanyName))
-                {
-                    ToastManager.Warning("نام شرکت را وارد کنید.");
-                    return false;
-                }
-                if (string.IsNullOrWhiteSpace(EconomicCode))
-                {
-                    ToastManager.Warning("کد اقتصادی را وارد کنید.");
-                    return false;
-                }
+        private void SetNationalCodeValidation(Controls.ValidationState state, string msg, ref bool hasError)
+        {
+            NationalCodeInput.ValidationState = state; NationalCodeInput.ValidationMessage = msg;
+            if (state == Controls.ValidationState.Invalid) hasError = true;
+        }
 
-                if (string.IsNullOrWhiteSpace(ContactFirstName))
-                {
-                    ToastManager.Warning("نام فرد رابط را وارد کنید.");
-                    return false;
-                }
-                if (string.IsNullOrWhiteSpace(ContactLastName))
-                {
-                    ToastManager.Warning("نام خانوادگی فرد رابط را وارد کنید.");
-                    return false;
-                }
-            }
-            else
-            {
-                bool hasError = false;
-
-                if (string.IsNullOrWhiteSpace(FirstName))
-                {
-                    FirstNameInput.ValidationState = Controls.ValidationState.Invalid;
-                    FirstNameInput.ValidationMessage = "نام را وارد کنید.";
-                    hasError = true;
-                }
-                else
-                {
-                    FirstNameInput.ValidationState = Controls.ValidationState.Valid;
-                    FirstNameInput.ValidationMessage = "";
-                }
-
-                if (string.IsNullOrWhiteSpace(LastName))
-                {
-                    LastNameInput.ValidationState = Controls.ValidationState.Invalid;
-                    LastNameInput.ValidationMessage = "نام خانوادگی را وارد کنید.";
-                    hasError = true;
-                }
-                else
-                {
-                    LastNameInput.ValidationState = Controls.ValidationState.Valid;
-                    LastNameInput.ValidationMessage = "";
-                }
-
-                if (string.IsNullOrWhiteSpace(NationalCode))
-                {
-                    NationalCodeInput.ValidationState = Controls.ValidationState.Invalid;
-                    NationalCodeInput.ValidationMessage = "کد ملی را وارد کنید.";
-                    hasError = true;
-                }
-                else if (NationalCode.Count(char.IsDigit) != 10)
-                {
-                    NationalCodeInput.ValidationState = Controls.ValidationState.Invalid;
-                    NationalCodeInput.ValidationMessage = "کد ملی باید دقیقاً ۱۰ رقم باشد.";
-                    hasError = true;
-                }
-                else if (!ValidationHelper.IsValidNationalCode(NationalCode))
-                {
-                    NationalCodeInput.ValidationState = Controls.ValidationState.Invalid;
-                    NationalCodeInput.ValidationMessage = "کد ملی وارد شده صحیح نیست.";
-                    hasError = true;
-                }
-                else
-                {
-                    NationalCodeInput.ValidationState = Controls.ValidationState.Valid;
-                    NationalCodeInput.ValidationMessage = "";
-                }
-
-                if (hasError) return false;
-            }
+        /// <summary> validates unique code (auto-generated or manual)</summary>
+        private bool ValidateUniqueCode()
+        {
             if (!IsCodeAutomatic && string.IsNullOrWhiteSpace(ManualCode))
-            {
-                ToastManager.Warning("شناسه یکتای دستی را وارد کنید یا حالت اتوماتیک را فعال کنید.");
-                return false;
-            }
-
+            { ToastManager.Warning("شناسه یکتای دستی را وارد کنید یا حالت اتوماتیک را فعال کنید."); return false; }
             if (IsCodeAutomatic && string.IsNullOrWhiteSpace(ManualCode))
             {
                 ManualCode = GenerateNextUniqueCode();
                 if (string.IsNullOrWhiteSpace(ManualCode))
-                {
-                    ToastManager.Error("تولید شناسه یکتای اتوماتیک ناموفق بود. لطفاً حالت دستی را انتخاب کرده و کد را وارد کنید.");
-                    return false;
-                }
+                { ToastManager.Error("تولید شناسه یکتای اتوماتیک ناموفق بود. لطفاً حالت دستی را انتخاب کرده و کد را وارد کنید."); return false; }
             }
+            return true;
+        }
 
+        /// <summary> validates email and shaba formats</summary>
+        private bool ValidateContactFormats()
+        {
             if (!string.IsNullOrWhiteSpace(Email) && !ValidationHelper.IsValidEmail(Email))
-            {
-                ToastManager.Warning("فرمت ایمیل صحیح نیست. مثال صحیح: name@example.com");
-                return false;
-            }
-
+            { ToastManager.Warning("فرمت ایمیل صحیح نیست. مثال صحیح: name@example.com"); return false; }
             if (!string.IsNullOrWhiteSpace(MainShaba) && !ValidationHelper.IsValidShaba(MainShaba))
-            {
-                ToastManager.Warning("فرمت شبا صحیح نیست. باید با IR شروع و در مجموع ۲۶ کاراکتر باشد.");
-                return false;
-            }
-
+            { ToastManager.Warning("فرمت شبا صحیح نیست. باید با IR شروع و در مجموع ۲۶ کاراکتر باشد."); return false; }
             return true;
         }
 
@@ -1488,26 +1506,37 @@ namespace Taadol.Views
                 mainWindow.CloseCurrentForm();
         }
 
-        private void Cancel_Click(object sender, RoutedEventArgs e)
+        private async void Cancel_Click(object sender, RoutedEventArgs e)
         {
-            if (HasUnsavedChanges)
+            try
             {
-                var result = MessageBox.Show(
-                    "تغییراتی که ایجاد کرده‌اید ذخیره نشده است.\nآیا می‌خواهید آن‌ها را ذخیره کنید؟",
-                    "ذخیره تغییرات",
-                    MessageBoxButton.YesNoCancel,
-                    MessageBoxImage.Question);
-
-                if (result == MessageBoxResult.Yes)
+                if (HasUnsavedChanges)
                 {
-                    _ = SavePersonAsync();
-                    return;
-                }
-                if (result == MessageBoxResult.Cancel)
-                    return;
-            }
+                    var result = MessageBox.Show(
+                        "تغییراتی که ایجاد کرده‌اید ذخیره نشده است.\nآیا می‌خواهید آن‌ها را ذخیره کنید؟",
+                        "ذخیره تغییرات",
+                        MessageBoxButton.YesNoCancel,
+                        MessageBoxImage.Question);
 
-            CloseFormOrModal();
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        // ✅ غیرفعال کردن دکمه‌ها برای جلوگیری از کلیک مجدد
+                        if (SaveButton != null) SaveButton.IsEnabled = false;
+
+                        await SavePersonAsync();
+                        // SavePersonAsync بعد از موفقیت خودش فرم را می‌بندد
+                        return;
+                    }
+                    if (result == MessageBoxResult.Cancel)
+                        return;
+                }
+
+                CloseFormOrModal();
+            }
+            catch (Exception ex)
+            {
+                ToastManager.Error("خطا در عملیات: " + ex.Message);
+            }
         }
 
         // ======================================================

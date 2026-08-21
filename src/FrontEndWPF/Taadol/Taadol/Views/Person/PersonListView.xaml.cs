@@ -90,6 +90,12 @@ namespace Taadol.Views
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
 
             Loaded += PersonListView_Loaded;
+            this.Unloaded += (s, e) =>
+            {
+                // Cleanup: prevent stale callbacks if view is re-used
+                ViewModel.PropertyChanged -= ViewModel_PropertyChanged;
+                this.Unloaded -= (s2, e2) => { };
+            };
         }
 
         private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -470,7 +476,15 @@ namespace Taadol.Views
                     .ToList();
 
                 foreach (var panel in toRemove)
+                {
+                    // ✅ Event handler cleanup: قبل از حذف پنل، handler ها را جدا کن
+                    // تا اگر reference به پنل باقی ماند، handler اجرا نشود
+                    panel.CloseRequested -= DetailPanel_CloseRequested;
+                    panel.EditRequested -= DetailPanel_EditRequested;
+                    panel.DeleteRequested -= DetailPanel_DeleteRequested;
+
                     DetailPanelsStack.Children.Remove(panel);
+                }
 
                 // ساخت تدریجی پنل‌ها: بین هر پنل به Dispatcher فرصت render می‌دهیم
                 // تا ساخت هم‌زمان پنل‌های زیاد (مثلاً «انتخاب همه») برنامه را فریز نکند.

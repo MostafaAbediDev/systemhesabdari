@@ -92,7 +92,14 @@ namespace Taadol.Views
 
         private async void NewFinancialPeriodView_Loaded(object sender, RoutedEventArgs e)
         {
-            await LoadBranchesAsync();
+            try
+            {
+                await LoadBranchesAsync();
+            }
+            catch (Exception ex)
+            {
+                ToastManager.Error("خطا در بارگذاری شعبه‌ها: " + ex.Message);
+            }
         }
 
         private async Task LoadBranchesAsync()
@@ -217,7 +224,7 @@ namespace Taadol.Views
                 // کش سال‌های مالی سایدبار را بی‌اعتبار کن تا دوره جدید فوراً دیده شود
                 Taadol.Controls.YearSelectorControl.InvalidateCache();
                 if ((Window.GetWindow(this) as MainWindow)?.Sidebar?.YearSelector is { } yearSelector)
-                    _ = yearSelector.RefreshAsync();
+                    _ = RefreshYearSelectorSafeAsync(yearSelector);
 
                 ClearForm();
                 NavigateToPeriodList();
@@ -276,6 +283,19 @@ namespace Taadol.Views
 
         private void IsCurrentPeriod_Changed(object sender, RoutedEventArgs e)
         {
+        }
+
+        /// <summary>Safe wrapper for yearSelector.RefreshAsync with error handling at call site.</summary>
+        private async Task RefreshYearSelectorSafeAsync(Taadol.Controls.YearSelectorControl yearSelector)
+        {
+            try
+            {
+                await yearSelector.RefreshAsync();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[NewFinancialPeriodView] Error in RefreshYearSelectorSafeAsync: {ex}");
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

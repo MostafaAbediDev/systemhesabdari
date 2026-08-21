@@ -173,7 +173,7 @@ namespace Taadol.Views
                 OnPropertyChanged(nameof(SelectedProvinceId));
                 if (_isLoading) return;
                 if (_selectedProvinceId > 0)
-                    _ = LoadCitiesAsync(_selectedProvinceId);
+                    _ = LoadCitiesSafeAsync(_selectedProvinceId);
             }
         }
 
@@ -336,6 +336,32 @@ namespace Taadol.Views
             }
         }
 
+        /// <summary>Safe wrapper for LoadCitiesAsync with error handling at call site.</summary>
+        private async Task LoadCitiesSafeAsync(long provinceId)
+        {
+            try
+            {
+                await LoadCitiesAsync(provinceId);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[EditBranchView] Error in LoadCitiesSafeAsync: {ex}");
+            }
+        }
+
+        /// <summary>Safe wrapper for RefreshGridAsync with error handling at call site.</summary>
+        private async Task RefreshListViewSafeAsync(BranchListView listView)
+        {
+            try
+            {
+                await listView.RefreshGridAsync();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[EditBranchView] Error in RefreshListViewSafeAsync: {ex}");
+            }
+        }
+
         private void ProvinceComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (ProvinceComboBox.SelectedValue is long id)
@@ -463,7 +489,7 @@ namespace Taadol.Views
 
                 // اگر پشت مودال لیست شعبه‌ها بود همان لیست درجا رفرش می‌شود (بدون از دست رفتن State)
                 if (mainWindow?.MainContent.Content is BranchListView listView)
-                    _ = listView.RefreshGridAsync();
+                    _ = RefreshListViewSafeAsync(listView);
                 else
                     mainWindow?.NavigateTo("branch_list");
             }

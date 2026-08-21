@@ -312,14 +312,14 @@ namespace Taadol.Views
                 // کش سال‌های مالی سایدبار را بی‌اعتبار کن تا تغییرات فوراً دیده شود
                 Taadol.Controls.YearSelectorControl.InvalidateCache();
                 if ((Window.GetWindow(this) as MainWindow)?.Sidebar?.YearSelector is { } yearSelector)
-                    _ = yearSelector.RefreshAsync();
+                    _ = RefreshYearSelectorSafeAsync(yearSelector);
 
                 var mainWindow = Window.GetWindow(this) as MainWindow;
                 mainWindow?.CloseModal();
 
                 // اگر پشت مودال لیست دوره‌های مالی بود همان لیست درجا رفرش می‌شود (بدون از دست رفتن State)
                 if (mainWindow?.MainContent.Content is FinancialPeriodListView listView)
-                    _ = listView.RefreshGridAsync();
+                    _ = RefreshListViewSafeAsync(listView);
                 else
                     mainWindow?.NavigateTo("financial_period");
             }
@@ -376,6 +376,32 @@ namespace Taadol.Views
                 return;
 
             (Window.GetWindow(this) as MainWindow)?.CloseModal();
+        }
+
+        /// <summary>Safe wrapper for yearSelector.RefreshAsync with error handling at call site.</summary>
+        private async Task RefreshYearSelectorSafeAsync(Taadol.Controls.YearSelectorControl yearSelector)
+        {
+            try
+            {
+                await yearSelector.RefreshAsync();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[EditFinancialPeriodView] Error in RefreshYearSelectorSafeAsync: {ex}");
+            }
+        }
+
+        /// <summary>Safe wrapper for RefreshGridAsync with error handling at call site.</summary>
+        private async Task RefreshListViewSafeAsync(FinancialPeriodListView listView)
+        {
+            try
+            {
+                await listView.RefreshGridAsync();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[EditFinancialPeriodView] Error in RefreshListViewSafeAsync: {ex}");
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

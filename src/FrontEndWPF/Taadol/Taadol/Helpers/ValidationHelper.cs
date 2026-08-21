@@ -53,10 +53,28 @@ namespace Taadol.Helpers
             }
         }
 
+        /// <summary>
+        /// اعتبارسنجی شماره موبایل (دقیقاً 11 رقم، شروع با 09)
+        /// </summary>
+        public static bool IsValidMobile(string mobile)
+        {
+            if (string.IsNullOrWhiteSpace(mobile)) return false;
+            var digits = mobile.Trim().Replace(" ", "").Replace("-", "");
+            return digits.Length == 11
+                   && digits.StartsWith("09")
+                   && digits.All(char.IsDigit);
+        }
+
+        /// <summary>
+        /// اعتبارسنجی شماره تلفن ثابت (8 تا 11 رقم)
+        /// </summary>
         public static bool IsValidPhone(string phone)
         {
             if (string.IsNullOrWhiteSpace(phone)) return false;
-            return phone.All(char.IsDigit) && phone.Length >= 8 && phone.Length <= 11;
+            var digits = phone.Trim().Replace(" ", "").Replace("-", "");
+            return digits.Length >= 8
+                   && digits.Length <= 11
+                   && digits.All(char.IsDigit);
         }
     }
 }

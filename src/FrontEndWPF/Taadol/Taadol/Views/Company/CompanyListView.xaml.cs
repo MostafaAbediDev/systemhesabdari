@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -21,6 +22,8 @@ namespace Taadol.Views
         public ObservableCollection<CompanyItem> AllCompanies { get; set; }
         public ObservableCollection<CompanyItem> FilteredCompanies { get; set; }
         public ObservableCollection<PageItem> Pages { get; set; } = new ObservableCollection<PageItem>();
+
+        private CancellationTokenSource _loadCts = new();
 
         private readonly ICompanyApplication _companyApplication;
         private int _pageSize = 15;
@@ -84,6 +87,7 @@ namespace Taadol.Views
             FillEmptyRows();
 
             Loaded += CompanyListView_Loaded;
+            this.Unloaded += (s, e) => { _loadCts?.Cancel(); _loadCts?.Dispose(); _loadCts = null; };
         }
 
         private void HeaderClose_Click(object sender, MouseButtonEventArgs e)
@@ -98,8 +102,22 @@ namespace Taadol.Views
 
         private async void BtnRefresh_Click(object sender, RoutedEventArgs e)
         {
+            _loadCts?.Cancel();
+            _loadCts?.Dispose();
+            _loadCts = new CancellationTokenSource();
             _isLoadedOnce = false;
-            await LoadDataAsync();
+            try
+            {
+                await LoadDataAsync();
+            }
+            catch (OperationCanceledException)
+            {
+                System.Diagnostics.Debug.WriteLine("[CompanyListView] Refresh was cancelled");
+            }
+            catch (Exception ex)
+            {
+                ToastManager.Error("خطا در بروزرسانی: " + ex.Message);
+            }
         }
 
         // فرم لیست باید همیشه کل فضای محتوا رو پر کنه حتی اگه ردیف جدول کم باشه
@@ -154,7 +172,14 @@ namespace Taadol.Views
 
             _isLoadedOnce = true;
 
-            await LoadDataAsync();
+            try
+            {
+                await LoadDataAsync();
+            }
+            catch (Exception ex)
+            {
+                ToastManager.Error("خطا در بارگذاری شرکت‌ها: " + ex.Message);
+            }
         }
 
         private async System.Threading.Tasks.Task LoadDataAsync()
@@ -519,7 +544,7 @@ namespace Taadol.Views
             popup.ShowAt(anchor);
         }
 
-        private void BtnDelete_Click(object sender, RoutedEventArgs e)
+        private async void BtnDelete_Click(object sender, RoutedEventArgs e)
         {
             var selectedItems = AllCompanies
                 .Where(c => c.IsSelected && !c.IsEmpty)
@@ -542,19 +567,28 @@ namespace Taadol.Views
 
             try
             {
-                foreach (var item in selectedItems)
+                CompaniesGrid.IsLoading = true;
+
+                await Task.Run(() =>
                 {
-                    _companyApplication.Remove(item.Id);
-                }
+                    foreach (var item in selectedItems.ToList())
+                    {
+                        _companyApplication.Remove(item.Id);
+                    }
+                });
             }
             catch (Exception ex)
             {
                 ToastManager.Error("خطا در حذف: " + ex.Message);
                 return;
             }
+            finally
+            {
+                CompaniesGrid.IsLoading = false;
+            }
 
             _currentPage = 1;
-            LoadDataAsync();
+            await LoadDataAsync();
 
             ToastManager.Success("عملیات حذف انجام شد.");
         }
