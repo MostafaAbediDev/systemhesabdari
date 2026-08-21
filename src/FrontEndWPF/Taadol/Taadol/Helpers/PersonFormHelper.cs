@@ -5,6 +5,7 @@ using GeneralInfoManagement.Domain.General.ProvinceAgg;
 using Microsoft.Extensions.DependencyInjection;
 using BankManagement.Application.Contracts.BankBranch;
 using PersonManagement.Application.Contract.ContactTypes;
+using PersonManagement.Application.Contract.PersonCategory;
 using PersonManagement.Application.Contract.PersonTypes;
 using System;
 using System.Collections.Generic;
@@ -243,6 +244,45 @@ namespace Taadol.Helpers
             catch (Exception ex)
             {
                 onError(ex);
+            }
+        }
+
+        /// <summary>
+        /// Loads the category tree for a given person type via IPersonCategoryApplication.
+        /// Returns the tree DTO so the caller can populate its own CategorySearch controls.
+        /// No UI dependencies — each view sets PersonTypeId and calls LoadFromTreeDto itself.
+        /// </summary>
+        public static async Task<List<PersonCategoryTreeViewModel>> LoadCategoryTreeAsync(
+            long personTypeId,
+            CancellationToken? token,
+            Action<Exception> onError,
+            Action onCancelled = null)
+        {
+            if (personTypeId <= 0) return null;
+
+            try
+            {
+                var ct = token ?? CancellationToken.None;
+                var tree = await Task.Run(() =>
+                {
+                    ct.ThrowIfCancellationRequested();
+                    using var scope = App.ServiceProvider.CreateScope();
+                    var app = scope.ServiceProvider.GetRequiredService<IPersonCategoryApplication>();
+                    return app.GetTree(personTypeId);
+                }, ct);
+
+                ct.ThrowIfCancellationRequested();
+                return tree;
+            }
+            catch (OperationCanceledException)
+            {
+                onCancelled?.Invoke();
+                return null;
+            }
+            catch (Exception ex)
+            {
+                onError(ex);
+                return null;
             }
         }
     }

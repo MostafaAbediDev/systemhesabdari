@@ -326,40 +326,32 @@ namespace Taadol.Views
             if (CategorySearch != null)
                 CategorySearch.PersonTypeId = personTypeId;
 
-            try
+            System.Diagnostics.Debug.WriteLine($"📊 LoadCategoriesAsync: loading for personTypeId={personTypeId}");
+
+            var token = _loadCts?.Token ?? CancellationToken.None;
+            var tree = await PersonFormHelper.LoadCategoryTreeAsync(
+                personTypeId,
+                token,
+                onError: ex =>
+                {
+                    System.Diagnostics.Debug.WriteLine($"❌ Categories load failed: {ex.Message}");
+                    System.Diagnostics.Debug.WriteLine($"❌ Stack: {ex.StackTrace}");
+                },
+                onCancelled: () => System.Diagnostics.Debug.WriteLine("[EditPersonView] LoadCategoriesAsync was cancelled")
+            );
+
+            if (tree == null) return;
+
+            System.Diagnostics.Debug.WriteLine($"✅ LoadCategoriesAsync: got {tree?.Count ?? 0} root categories");
+
+            if (CategorySearch != null)
             {
-                System.Diagnostics.Debug.WriteLine($"📊 LoadCategoriesAsync: loading for personTypeId={personTypeId}");
-
-                var token = _loadCts?.Token ?? CancellationToken.None;
-                var tree = await Task.Run(() =>
-                {
-                    token.ThrowIfCancellationRequested();
-                    using var scope = App.ServiceProvider.CreateScope();
-                    var app = scope.ServiceProvider.GetRequiredService<IPersonCategoryApplication>();
-                    return app.GetTree(personTypeId);
-                }, token);
-
-                token.ThrowIfCancellationRequested();
-                System.Diagnostics.Debug.WriteLine($"✅ LoadCategoriesAsync: got {tree?.Count ?? 0} root categories");
-
-                if (CategorySearch != null)
-                {
-                    CategorySearch.LoadFromTreeDto(tree);
-                    System.Diagnostics.Debug.WriteLine("✅ LoadCategoriesAsync: LoadFromTreeDto called");
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("❌ LoadCategoriesAsync: CategorySearch is null!");
-                }
+                CategorySearch.LoadFromTreeDto(tree);
+                System.Diagnostics.Debug.WriteLine("✅ LoadCategoriesAsync: LoadFromTreeDto called");
             }
-            catch (OperationCanceledException)
+            else
             {
-                System.Diagnostics.Debug.WriteLine("[EditPersonView] LoadCategoriesAsync was cancelled");
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("❌ Categories load failed: " + ex.Message);
-                System.Diagnostics.Debug.WriteLine("❌ Stack: " + ex.StackTrace);
+                System.Diagnostics.Debug.WriteLine("❌ LoadCategoriesAsync: CategorySearch is null!");
             }
         }
 

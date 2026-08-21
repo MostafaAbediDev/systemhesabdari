@@ -212,37 +212,26 @@ namespace Taadol.Views
             if (CategorySearch3 != null)
                 CategorySearch3.PersonTypeId = personTypeId;
 
-            try
-            {
-                var token = _loadCts?.Token ?? CancellationToken.None;
-                var tree = await Task.Run(() =>
-                {
-                    token.ThrowIfCancellationRequested();
-                    using var scope = App.ServiceProvider.CreateScope();
-                    var app = scope.ServiceProvider.GetRequiredService<IPersonCategoryApplication>();
-                    return app.GetTree(personTypeId);
-                }, token);
+            var token = _loadCts?.Token ?? CancellationToken.None;
+            var tree = await PersonFormHelper.LoadCategoryTreeAsync(
+                personTypeId,
+                token,
+                onError: ex => System.Diagnostics.Debug.WriteLine($"Categories load failed: {ex.Message}"),
+                onCancelled: () => System.Diagnostics.Debug.WriteLine("[NewPersonView] LoadCategoriesAsync was cancelled")
+            );
 
-                token.ThrowIfCancellationRequested();
-                CategorySearch?.LoadFromTreeDto(tree);
-                CategorySearch?.ClearSelection();
+            if (tree == null) return;
 
-                // دپارتمان و عنوان شغل هم فعلاً همان درخت را نشان می‌دهند؛
-                // اگر روزی درخت جدا (PersonTypeId متفاوت) لازم شد، GetTree جدا صدا زده شود.
-                CategorySearch2?.LoadFromTreeDto(tree);
-                CategorySearch2?.ClearSelection();
+            CategorySearch?.LoadFromTreeDto(tree);
+            CategorySearch?.ClearSelection();
 
-                CategorySearch3?.LoadFromTreeDto(tree);
-                CategorySearch3?.ClearSelection();
-            }
-            catch (OperationCanceledException)
-            {
-                System.Diagnostics.Debug.WriteLine("[NewPersonView] LoadCategoriesAsync was cancelled");
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Categories load failed: " + ex.Message);
-            }
+            // دپارتمان و عنوان شغل هم فعلاً همان درخت را نشان می‌دهند؛
+            // اگر روزی درخت جدا (PersonTypeId متفاوت) لازم شد، GetTree جدا صدا زده شود.
+            CategorySearch2?.LoadFromTreeDto(tree);
+            CategorySearch2?.ClearSelection();
+
+            CategorySearch3?.LoadFromTreeDto(tree);
+            CategorySearch3?.ClearSelection();
         }
         public decimal CreditLimit { get => _creditLimit; set { _creditLimit = value; OnPropertyChanged(); MarkUserChange(); } }
 
