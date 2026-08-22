@@ -15,6 +15,7 @@
         public long? PersonCategoryId { get; set; }
         public decimal CreditLimit { get; set; }
         public bool IsCodeAutomatic { get; set; } = true; 
-        public string? ManualCode { get; set; } 
+        public string? ManualCode { get; set; }
+        public bool IsActive { get; set; }
     }
 }

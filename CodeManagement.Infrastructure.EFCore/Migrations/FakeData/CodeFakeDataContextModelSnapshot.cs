@@ -42,6 +42,9 @@ namespace CodeManagement.Infrastructure.EFCore.Migrations.FakeData
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsAutomatic")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
