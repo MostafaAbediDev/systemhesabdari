@@ -29,7 +29,7 @@ namespace CodeManagement.Application
             if (_codeRepository.Exists(x => x.Value == finalValue))
                 return operation.Failed("این کد قبلاً در سیستم ثبت شده است.");
 
-            var code = new Codes(finalValue, command.OwnerId, (CodeOwnerType)command.OwnerType);
+            var code = new Codes(finalValue, command.OwnerId, (CodeOwnerType)command.OwnerType, command.IsAutomatic);
 
             _codeRepository.Create(code);
             _codeRepository.SaveChanges();
@@ -48,7 +48,7 @@ namespace CodeManagement.Application
             if (_codeRepository.Exists(x => x.Value == command.Value && x.Id != command.Id))
                 return operation.Failed("کد جدید تکراری است.");
 
-            code.Edit(command.Value, command.OwnerId, (CodeOwnerType)command.OwnerType);
+            code.Edit(command.Value, command.OwnerId, (CodeOwnerType)command.OwnerType, command.IsAutomatic);
 
             _codeRepository.SaveChanges();
 
@@ -57,15 +57,20 @@ namespace CodeManagement.Application
 
         public CodeViewModel GetByOwner(long ownerId, CodeOwnerTypeDTO ownerType)
         {
-            var code = _codeRepository.GetByOwner(ownerId, (CodeOwnerType)ownerType);
+            var code = _codeRepository.GetByOwner(
+                ownerId,
+                (CodeOwnerType)ownerType);
 
-            if (code == null) return null;
+            if (code == null)
+                return null;
 
             return new CodeViewModel
             {
                 Id = code.Id,
                 Value = code.Value,
-                CreationDate = code.CreationDate.ToString("yyyy/MM/dd")
+                CreationDate = code.CreationDate.ToString("yyyy/MM/dd"),
+                OwnerId = code.OwnerId,
+                IsAutomatic = code.IsAutomatic
             };
         }
 
@@ -105,7 +110,7 @@ namespace CodeManagement.Application
                 if (_codeRepository.Exists(x => x.Value == finalValue))
                     return operation.Failed("کد تولید شده یا وارد شده تکراری است.");
 
-                var newCode = new Codes(finalValue, command.OwnerId, (CodeOwnerType)command.OwnerType);
+                var newCode = new Codes(finalValue, command.OwnerId, (CodeOwnerType)command.OwnerType, command.IsAutomatic);
                 _codeRepository.Create(newCode);
             }
             else
@@ -113,7 +118,7 @@ namespace CodeManagement.Application
                 if (_codeRepository.Exists(x => x.Value == finalValue && x.Id != existingCode.Id))
                     return operation.Failed("کد جدید با رکورد دیگری تکراری است.");
 
-                existingCode.Edit(finalValue, command.OwnerId, (CodeOwnerType)command.OwnerType);
+                existingCode.Edit(finalValue, command.OwnerId, (CodeOwnerType)command.OwnerType, command.IsAutomatic);
             }
 
             _codeRepository.SaveChanges();

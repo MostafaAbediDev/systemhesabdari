@@ -131,11 +131,15 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
                 .ToList();
         }
 
-        public void ResetAllMainBranches()
+        public void ResetAllMainBranches(long companyId)
         {
             _context.Branches
-                .Where(x => x.IsMain)
-                .ExecuteUpdate(x => x.SetProperty(b => b.IsMain, false));
+                .Where(x =>
+                    x.CompanyId == companyId &&
+                    x.IsMain &&
+                    !x.IsDeleted)
+                .ExecuteUpdate(x =>
+                    x.SetProperty(b => b.IsMain, false));
         }
 
         public bool ExistsMainBranch(long companyId, long? excludeId = null)

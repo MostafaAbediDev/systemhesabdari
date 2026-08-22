@@ -155,6 +155,8 @@ namespace PersonManagement.Application
             var code = _codeApplication.GetByOwner(id, CodeOwnerTypeDTO.Person);
             details.CurrentCode = code?.Value;
             details.ManualCode = code?.Value;
+            details.IsCodeAutomatic = code?.IsAutomatic ?? true;
+
 
             return details;
         }

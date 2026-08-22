@@ -21,6 +21,9 @@ namespace GeneralInfoManagement.Application
         {
             var operation = new OperationResult();
 
+            if (string.IsNullOrWhiteSpace(command.Title))
+                return operation.Failed("نام شرکت نمی‌تواند خالی باشد.");
+
             if (_companyRepository.Exists(x => x.Title == command.Title))
                 return operation.Failed("نام شرکت تکراری است.");
 
@@ -60,6 +63,11 @@ namespace GeneralInfoManagement.Application
         public OperationResult Edit(EditCompanies command)
         {
             var operation = new OperationResult();
+
+
+            if (string.IsNullOrWhiteSpace(command.Title))
+                return operation.Failed("نام شرکت نمی‌تواند خالی باشد.");
+
 
             var company = _companyRepository.Get(command.Id);
             if (company == null) return new OperationResult().Failed("شرکت یافت نشد.");

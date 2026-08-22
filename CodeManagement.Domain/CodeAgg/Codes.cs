@@ -8,11 +8,12 @@ namespace CodeManagement.Domain.CodeAgg
 
         public long OwnerId { get; private set; }
 
+        public bool IsAutomatic { get; private set; }
         public CodeOwnerType OwnerType { get; private set; }
 
         protected Codes() { }
 
-        public Codes(string value, long ownerId, CodeOwnerType ownerType)
+        public Codes(string value, long ownerId, CodeOwnerType ownerType, bool isAutomatic)
         {
             if (string.IsNullOrWhiteSpace(value))
                 throw new ArgumentException("Code value is required");
@@ -20,21 +21,21 @@ namespace CodeManagement.Domain.CodeAgg
             Value = value;
             OwnerId = ownerId;
             OwnerType = ownerType;
+            IsAutomatic = isAutomatic;
+
         }
 
-        public void ChangeValue(string value)
+        public void Edit(string value, long ownerId, CodeOwnerType ownerType, bool isAutomatic)
         {
+
             if (string.IsNullOrWhiteSpace(value))
                 throw new ArgumentException("Code value is required");
 
             Value = value;
-        }
-
-        public void Edit(string value, long ownerId, CodeOwnerType ownerType)
-        {
-            Value = value;
             OwnerId = ownerId;
             OwnerType = ownerType;
+            IsAutomatic = isAutomatic;
+
         }
     }
 
