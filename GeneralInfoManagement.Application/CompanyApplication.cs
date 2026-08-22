@@ -24,7 +24,7 @@ namespace GeneralInfoManagement.Application
             if (_companyRepository.Exists(x => x.Title == command.Title))
                 return operation.Failed("نام شرکت تکراری است.");
 
-            var company = new Companies(command.Title, command.Logo, command.LegalName, command.EstablishedDate);
+            var company = new Companies(command.Title, command.Logo, command.LegalName, command.EstablishedDate, command.IsActive);
 
             _companyRepository.Create(company);
             _companyRepository.SaveChanges();
@@ -67,7 +67,7 @@ namespace GeneralInfoManagement.Application
             if (_companyRepository.Exists(x => x.Title == command.Title && x.Id != command.Id))
                 return new OperationResult().Failed("نام شرکت تکراری است.");
 
-            company.Edit(command.Title, command.Logo, command.LegalName, command.EstablishedDate);
+            company.Edit(command.Title, command.Logo, command.LegalName, command.EstablishedDate, command.IsActive);
 
             _companyRepository.SaveChanges();
             return operation.Succedded();

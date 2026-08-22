@@ -17,21 +17,23 @@ namespace GeneralInfoManagement.Domain.BaseInfo.CompaniesAgg
 
         }
         public Companies(string title, string? logo, string legalName, 
-            DateTime establishedDate)
+            DateTime establishedDate, bool isActive)
         {
             Title = title;
             Logo = logo;
             LegalName = legalName;
             EstablishedDate = establishedDate;
+            IsActive = isActive;
         }
 
         public void Edit(string title, string? logo, string legalName,
-            DateTime establishedDate)
+            DateTime establishedDate, bool isActive)
         {
             Title = title;
             Logo = logo;
             LegalName = legalName;
             EstablishedDate = establishedDate;
+            IsActive = isActive;
         }
 
         public void Remove()
