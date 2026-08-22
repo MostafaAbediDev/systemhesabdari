@@ -75,7 +75,10 @@ namespace PersonManagement.Application
             person.Edit(command.FirstName, command.LastName, command.ContactFirstName, command.ContactLastName , command.NationalCode, command.EconomicCode,
                         command.RegistrationNumber, command.PersonTypeId, command.BranchId, command.IsLegal, command.PersonCategoryId);
 
-            person.UpdateFinancialInfo(command.CreditLimit);
+            if (command.CreditLimit.HasValue)
+            {
+                person.UpdateFinancialInfo(command.CreditLimit.Value);
+            }
 
             //Set The Code
             var codeResult = _codeApplication.SetCode(new CreateCode
