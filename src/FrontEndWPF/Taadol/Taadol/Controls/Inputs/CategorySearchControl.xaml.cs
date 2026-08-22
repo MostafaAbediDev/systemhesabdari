@@ -452,7 +452,8 @@ namespace Taadol.Controls
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در افزودن: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[CategorySearchControl] Category operation error: {ex}");
+                ToastManager.Error("خطا در عملیات دسته‌بندی");
             }
         }
         public async Task RefreshTreeAsync(long? expandToId = null)
@@ -718,7 +719,8 @@ namespace Taadol.Controls
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در افزودن: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[CategorySearchControl] Category operation error: {ex}");
+                ToastManager.Error("خطا در عملیات دسته‌بندی");
             }
         }
         private async void DeleteButton_Click(object sender, MouseButtonEventArgs e)
@@ -774,7 +776,8 @@ namespace Taadol.Controls
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در افزودن: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[CategorySearchControl] Category operation error: {ex}");
+                ToastManager.Error("خطا در عملیات دسته‌بندی");
             }
         }
 
@@ -832,7 +835,8 @@ namespace Taadol.Controls
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در افزودن: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[CategorySearchControl] Category operation error: {ex}");
+                ToastManager.Error("خطا در عملیات دسته‌بندی");
             }
         }
         private bool ExpandToId(ItemsControl parent, long targetId)

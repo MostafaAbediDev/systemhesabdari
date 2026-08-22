@@ -83,7 +83,7 @@ namespace Taadol.Views
             _periodId = periodId;
             _financialPeriodApplication = App.ServiceProvider.GetRequiredService<IFinancialPeriodApplication>();
 
-            SaveCommand = new RelayCommand(SavePeriod);
+            SaveCommand = new RelayCommand(async () => await SavePeriodAsync());
             DataContext = this;
 
             Loaded += OnLoaded;
@@ -182,7 +182,10 @@ namespace Taadol.Views
             {
                 _isLoading = false;
                 if (_loadCts?.IsCancellationRequested != true)
-                    ToastManager.Error("خطا در لود اطلاعات: " + ex.Message);
+                {
+                    System.Diagnostics.Debug.WriteLine($"[EditFinancialPeriodView] Load info error: {ex}");
+                    ToastManager.Error("خطا در لود اطلاعات");
+                }
             }
         }
 
@@ -210,7 +213,7 @@ namespace Taadol.Views
             EndDate = picker.SelectedDate;
         }
 
-        private void SavePeriod()
+        private async Task SavePeriodAsync()
         {
             if (_isSaving) return;
 
@@ -245,88 +248,92 @@ namespace Taadol.Views
                 return;
             }
 
+            _isSaving = true;
+            if (SaveButton != null)
+            {
+                SaveButton.IsEnabled = false;
+                SaveButton.Text = "در حال ذخیره...";
+            }
+
             try
             {
-                // چک‌های سمت دیتابیس (همپوشانی و عنوان تکراری) — خودِ دوره مستثنی است.
-                // این چک‌ها قبل از تغییر دکمه انجام می‌شوند تا «در حال ذخیره» با خطا همزمان دیده نشود.
-                using (var checkConnection = new SqlConnection(App.ConnectionString))
+                // چک‌های سمت دیتابیس (همپوشانی و عنوان تکراری) و خودِ ذخیره روی ترد پس‌زمینه
+                // اجرا می‌شوند تا UI فریز نشود. خروجی null یعنی موفق؛ غیر null پیام هشدار است.
+                var dbMessage = await Task.Run(() =>
                 {
-                    checkConnection.Open();
-
-                    using (var overlapCommand = new SqlCommand(@"
-                        SELECT COUNT(1) FROM FinancialPeriods
-                        WHERE Id != @Id AND IsDeleted = 0
-                          AND @StartDate <= EndDate AND @EndDate >= StartDate;
-                    ", checkConnection))
+                    using (var checkConnection = new SqlConnection(App.ConnectionString))
                     {
-                        overlapCommand.Parameters.AddWithValue("@Id", _periodId);
-                        overlapCommand.Parameters.AddWithValue("@StartDate", StartDate.Value);
-                        overlapCommand.Parameters.AddWithValue("@EndDate", EndDate.Value);
-                        var overlapCount = Convert.ToInt32(overlapCommand.ExecuteScalar());
-                        if (overlapCount > 0)
+                        checkConnection.Open();
+
+                        using (var overlapCommand = new SqlCommand(@"
+                            SELECT COUNT(1) FROM FinancialPeriods
+                            WHERE Id != @Id AND IsDeleted = 0
+                              AND @StartDate <= EndDate AND @EndDate >= StartDate;
+                        ", checkConnection))
                         {
-                            ToastManager.Warning("بازه زمانی دوره مالی با یک دوره مالی دیگر همپوشانی دارد.");
-                            return;
+                            overlapCommand.Parameters.AddWithValue("@Id", _periodId);
+                            overlapCommand.Parameters.AddWithValue("@StartDate", StartDate.Value);
+                            overlapCommand.Parameters.AddWithValue("@EndDate", EndDate.Value);
+                            var overlapCount = Convert.ToInt32(overlapCommand.ExecuteScalar());
+                            if (overlapCount > 0)
+                                return "بازه زمانی دوره مالی با یک دوره مالی دیگر همپوشانی دارد.";
+                        }
+
+                        using (var titleCommand = new SqlCommand(@"
+                            SELECT COUNT(1) FROM FinancialPeriods
+                            WHERE Id != @Id AND IsDeleted = 0 AND Title = @Title;
+                        ", checkConnection))
+                        {
+                            titleCommand.Parameters.AddWithValue("@Id", _periodId);
+                            titleCommand.Parameters.AddWithValue("@Title", PeriodTitle.Trim());
+                            var titleCount = Convert.ToInt32(titleCommand.ExecuteScalar());
+                            if (titleCount > 0)
+                                return "نام دوره مالی تکراری است.";
                         }
                     }
 
-                    using (var titleCommand = new SqlCommand(@"
-                        SELECT COUNT(1) FROM FinancialPeriods
-                        WHERE Id != @Id AND IsDeleted = 0 AND Title = @Title;
-                    ", checkConnection))
+                    using var connection = new SqlConnection(App.ConnectionString);
+                    connection.Open();
+                    using var transaction = connection.BeginTransaction();
+
+                    // اگر دوره جاری است، بقیه دوره‌های همان شعبه غیرفعال شوند
+                    if (IsCurrentPeriod)
                     {
-                        titleCommand.Parameters.AddWithValue("@Id", _periodId);
-                        titleCommand.Parameters.AddWithValue("@Title", PeriodTitle.Trim());
-                        var titleCount = Convert.ToInt32(titleCommand.ExecuteScalar());
-                        if (titleCount > 0)
-                        {
-                            ToastManager.Warning("نام دوره مالی تکراری است.");
-                            return;
-                        }
+                        using var deactivateCommand = new SqlCommand(@"
+                            UPDATE FinancialPeriods
+                            SET IsActive = 0
+                            WHERE BranchId = @BranchId AND IsDeleted = 0;
+                        ", connection, transaction);
+                        deactivateCommand.Parameters.AddWithValue("@BranchId", SelectedBranchId);
+                        deactivateCommand.ExecuteNonQuery();
                     }
-                }
 
-                _isSaving = true;
-                if (SaveButton != null)
-                {
-                    SaveButton.IsEnabled = false;
-                    SaveButton.Text = "در حال ذخیره...";
-                }
-
-                using var connection = new SqlConnection(App.ConnectionString);
-                connection.Open();
-                using var transaction = connection.BeginTransaction();
-
-                // اگر دوره جاری است، بقیه دوره‌های همان شعبه غیرفعال شوند
-                if (IsCurrentPeriod)
-                {
-                    using var deactivateCommand = new SqlCommand(@"
+                    using var updateCommand = new SqlCommand(@"
                         UPDATE FinancialPeriods
-                        SET IsActive = 0
-                        WHERE BranchId = @BranchId AND IsDeleted = 0;
+                        SET Title = @Title,
+                            StartDate = @StartDate,
+                            EndDate = @EndDate,
+                            BranchId = @BranchId,
+                            IsActive = @IsActive
+                        WHERE Id = @Id AND IsDeleted = 0;
                     ", connection, transaction);
-                    deactivateCommand.Parameters.AddWithValue("@BranchId", SelectedBranchId);
-                    deactivateCommand.ExecuteNonQuery();
+                    updateCommand.Parameters.AddWithValue("@Id", _periodId);
+                    updateCommand.Parameters.AddWithValue("@Title", PeriodTitle.Trim());
+                    updateCommand.Parameters.AddWithValue("@StartDate", StartDate.Value);
+                    updateCommand.Parameters.AddWithValue("@EndDate", EndDate.Value);
+                    updateCommand.Parameters.AddWithValue("@BranchId", SelectedBranchId);
+                    updateCommand.Parameters.AddWithValue("@IsActive", IsCurrentPeriod);
+                    updateCommand.ExecuteNonQuery();
+
+                    transaction.Commit();
+                    return (string)null;
+                });
+
+                if (dbMessage != null)
+                {
+                    ToastManager.Warning(dbMessage);
+                    return;
                 }
-
-                using var updateCommand = new SqlCommand(@"
-                    UPDATE FinancialPeriods
-                    SET Title = @Title,
-                        StartDate = @StartDate,
-                        EndDate = @EndDate,
-                        BranchId = @BranchId,
-                        IsActive = @IsActive
-                    WHERE Id = @Id AND IsDeleted = 0;
-                ", connection, transaction);
-                updateCommand.Parameters.AddWithValue("@Id", _periodId);
-                updateCommand.Parameters.AddWithValue("@Title", PeriodTitle.Trim());
-                updateCommand.Parameters.AddWithValue("@StartDate", StartDate.Value);
-                updateCommand.Parameters.AddWithValue("@EndDate", EndDate.Value);
-                updateCommand.Parameters.AddWithValue("@BranchId", SelectedBranchId);
-                updateCommand.Parameters.AddWithValue("@IsActive", IsCurrentPeriod);
-                updateCommand.ExecuteNonQuery();
-
-                transaction.Commit();
 
                 ToastManager.Success("ویرایش دوره مالی با موفقیت انجام شد.");
 
@@ -346,7 +353,8 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در ویرایش: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[EditFinancialPeriodView] Edit error: {ex}");
+                ToastManager.Error("خطا در ویرایش");
             }
             finally
             {
@@ -376,7 +384,7 @@ namespace Taadol.Views
 
             if (result == MessageBoxResult.Yes)
             {
-                SavePeriod();
+                _ = SavePeriodAsync();
                 return false; // ذخیره خودش فرم را می‌بندد
             }
 

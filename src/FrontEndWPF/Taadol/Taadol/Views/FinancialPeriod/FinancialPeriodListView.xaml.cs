@@ -106,7 +106,8 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در بروزرسانی: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[FinancialPeriodListView] Refresh error: {ex}");
+                ToastManager.Error("خطا در بروزرسانی");
             }
         }
 
@@ -151,7 +152,8 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در بروزرسانی: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[FinancialPeriodListView] Refresh error: {ex}");
+                ToastManager.Error("خطا در بروزرسانی");
             }
         }
 
@@ -168,7 +170,8 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در بارگذاری دوره‌های مالی: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[FinancialPeriodListView] Load periods error: {ex}");
+                ToastManager.Error("خطا در بارگذاری دوره‌های مالی");
             }
         }
 
@@ -208,7 +211,8 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در لود دوره‌های مالی: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[FinancialPeriodListView] Load periods error: {ex}");
+                ToastManager.Error("خطا در لود دوره‌های مالی");
 
                 AllPeriods = new ObservableCollection<FinancialPeriodItem>();
 

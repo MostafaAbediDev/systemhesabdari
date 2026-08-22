@@ -17,6 +17,8 @@ namespace Taadol.Views
     public partial class NewFinancialPeriodView : UserControl, INotifyPropertyChanged
     {
         private bool _isSaving;
+        private bool _userMadeChanges;
+        private bool _isLoading = true;
         private CancellationTokenSource _loadCts = new();
         private readonly IBranchApplication _branchApplication;
 
@@ -37,6 +39,7 @@ namespace Taadol.Views
             {
                 _periodTitle = value;
                 OnPropertyChanged(nameof(PeriodTitle));
+                MarkUserChange();
             }
         }
 
@@ -47,6 +50,7 @@ namespace Taadol.Views
             {
                 _selectedBranchId = value;
                 OnPropertyChanged(nameof(SelectedBranchId));
+                MarkUserChange();
             }
         }
 
@@ -57,6 +61,7 @@ namespace Taadol.Views
             {
                 _startDate = value;
                 OnPropertyChanged(nameof(StartDate));
+                MarkUserChange();
             }
         }
 
@@ -67,6 +72,7 @@ namespace Taadol.Views
             {
                 _endDate = value;
                 OnPropertyChanged(nameof(EndDate));
+                MarkUserChange();
             }
         }
 
@@ -77,6 +83,7 @@ namespace Taadol.Views
             {
                 _isCurrentPeriod = value;
                 OnPropertyChanged(nameof(IsCurrentPeriod));
+                MarkUserChange();
             }
         }
 
@@ -86,7 +93,7 @@ namespace Taadol.Views
 
             _branchApplication = App.ServiceProvider.GetRequiredService<IBranchApplication>();
 
-            SaveCommand = new FinancialPeriodSaveCommand(SaveFinancialPeriod);
+            SaveCommand = new FinancialPeriodSaveCommand(async () => await SaveFinancialPeriodAsync());
 
             DataContext = this;
 
@@ -110,8 +117,11 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در بارگذاری شعبه‌ها: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[NewFinancialPeriodView] Load branches error: {ex}");
+                ToastManager.Error("خطا در بارگذاری شعبه‌ها");
             }
+
+            _isLoading = false;
         }
 
         private async Task LoadBranchesAsync()
@@ -150,11 +160,14 @@ namespace Taadol.Views
             catch (Exception ex)
             {
                 if (_loadCts?.IsCancellationRequested != true)
-                    ToastManager.Error("خطا در لود شعبه‌ها: " + ex.Message);
+                {
+                    System.Diagnostics.Debug.WriteLine($"[NewFinancialPeriodView] Load branches error: {ex}");
+                    ToastManager.Error("خطا در لود شعبه‌ها");
+                }
             }
         }
 
-        private void SaveFinancialPeriod()
+        private async Task SaveFinancialPeriodAsync()
         {
             if (_isSaving) return;
 
@@ -197,56 +210,60 @@ namespace Taadol.Views
 
             try
             {
-                using var connection = new SqlConnection(App.ConnectionString);
-                connection.Open();
-
-                using var transaction = connection.BeginTransaction();
-
-                if (IsCurrentPeriod)
+                // عملیات دیتابیس روی ترد پس‌زمینه اجرا می‌شود تا UI فریز نشود
+                await Task.Run(() =>
                 {
-                    using var deactivateCommand = new SqlCommand(@"
-                        UPDATE FinancialPeriods
-                        SET IsActive = 0
-                        WHERE BranchId = @BranchId
-                          AND IsDeleted = 0;
+                    using var connection = new SqlConnection(App.ConnectionString);
+                    connection.Open();
+
+                    using var transaction = connection.BeginTransaction();
+
+                    if (IsCurrentPeriod)
+                    {
+                        using var deactivateCommand = new SqlCommand(@"
+                            UPDATE FinancialPeriods
+                            SET IsActive = 0
+                            WHERE BranchId = @BranchId
+                              AND IsDeleted = 0;
+                        ", connection, transaction);
+
+                        deactivateCommand.Parameters.AddWithValue("@BranchId", SelectedBranchId);
+                        deactivateCommand.ExecuteNonQuery();
+                    }
+
+                    using var insertCommand = new SqlCommand(@"
+                        INSERT INTO FinancialPeriods
+                        (
+                            Title,
+                            StartDate,
+                            EndDate,
+                            BranchId,
+                            IsDeleted,
+                            IsActive,
+                            CreationDate
+                        )
+                        VALUES
+                        (
+                            @Title,
+                            @StartDate,
+                            @EndDate,
+                            @BranchId,
+                            0,
+                            @IsActive,
+                            SYSDATETIME()
+                        );
                     ", connection, transaction);
 
-                    deactivateCommand.Parameters.AddWithValue("@BranchId", SelectedBranchId);
-                    deactivateCommand.ExecuteNonQuery();
-                }
+                    insertCommand.Parameters.AddWithValue("@Title", PeriodTitle.Trim());
+                    insertCommand.Parameters.AddWithValue("@StartDate", StartDate.Value);
+                    insertCommand.Parameters.AddWithValue("@EndDate", EndDate.Value);
+                    insertCommand.Parameters.AddWithValue("@BranchId", SelectedBranchId);
+                    insertCommand.Parameters.AddWithValue("@IsActive", IsCurrentPeriod);
 
-                using var insertCommand = new SqlCommand(@"
-                    INSERT INTO FinancialPeriods
-                    (
-                        Title,
-                        StartDate,
-                        EndDate,
-                        BranchId,
-                        IsDeleted,
-                        IsActive,
-                        CreationDate
-                    )
-                    VALUES
-                    (
-                        @Title,
-                        @StartDate,
-                        @EndDate,
-                        @BranchId,
-                        0,
-                        @IsActive,
-                        SYSDATETIME()
-                    );
-                ", connection, transaction);
+                    insertCommand.ExecuteNonQuery();
 
-                insertCommand.Parameters.AddWithValue("@Title", PeriodTitle.Trim());
-                insertCommand.Parameters.AddWithValue("@StartDate", StartDate.Value);
-                insertCommand.Parameters.AddWithValue("@EndDate", EndDate.Value);
-                insertCommand.Parameters.AddWithValue("@BranchId", SelectedBranchId);
-                insertCommand.Parameters.AddWithValue("@IsActive", IsCurrentPeriod);
-
-                insertCommand.ExecuteNonQuery();
-
-                transaction.Commit();
+                    transaction.Commit();
+                });
 
                 ToastManager.Success("دوره مالی با موفقیت ثبت شد.");
 
@@ -261,7 +278,8 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                ToastManager.Error(ex.GetBaseException().Message);
+                System.Diagnostics.Debug.WriteLine($"[NewFinancialPeriodView] Save period error: {ex}");
+                ToastManager.Error("خطا در ثبت دوره مالی");
             }
             finally
             {
@@ -288,8 +306,27 @@ namespace Taadol.Views
             mainWindow?.NavigateTo("financial_period");
         }
 
+        private void MarkUserChange()
+        {
+            if (_isLoading) return;
+            _userMadeChanges = true;
+        }
+
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
+            if (_userMadeChanges)
+            {
+                var result = MessageBox.Show(
+                    "تغییراتی که ایجاد کرده‌اید ذخیره نشده است.\nآیا مایل به خروج هستید؟",
+                    "خروج",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question,
+                    MessageBoxResult.No);
+
+                if (result != MessageBoxResult.Yes)
+                    return;
+            }
+
             NavigateToPeriodList();
         }
 

@@ -76,5 +76,15 @@ namespace Taadol.Helpers
                    && digits.Length <= 11
                    && digits.All(char.IsDigit);
         }
+
+        /// <summary>
+        /// اعتبارسنجی کد پستی (دقیقاً ۱۰ رقم عددی)
+        /// </summary>
+        public static bool IsValidPostalCode(string postalCode)
+        {
+            if (string.IsNullOrWhiteSpace(postalCode)) return false;
+            var digits = postalCode.Trim().Replace(" ", "").Replace("-", "");
+            return digits.Length == 10 && digits.All(char.IsDigit);
+        }
     }
 }

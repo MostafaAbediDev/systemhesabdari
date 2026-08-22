@@ -90,7 +90,7 @@ namespace Taadol.Views
 
             _companyApplication = App.ServiceProvider.GetRequiredService<ICompanyApplication>();
 
-            SaveCommand = new CompanySaveCommand(SaveCompany);
+            SaveCommand = new CompanySaveCommand(async () => await SaveCompanyAsync());
             DataContext = this;
         }
         public class CompanySaveCommand : ICommand
@@ -111,7 +111,7 @@ namespace Taadol.Views
 
             public event EventHandler CanExecuteChanged;
         }
-        private void SaveCompany()
+        private async Task SaveCompanyAsync()
         {
             if (_isSaving) return;
 
@@ -156,7 +156,7 @@ namespace Taadol.Views
                     Logo = string.IsNullOrWhiteSpace(ProductImage) ? "" : ProductImage
                 };
 
-                var operation = _companyApplication.Create(command);
+                var operation = await Task.Run(() => _companyApplication.Create(command));
 
                 var message = GetOperationMessage(operation);
 
@@ -178,7 +178,8 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                ToastManager.Error(ex.GetBaseException().Message);
+                System.Diagnostics.Debug.WriteLine($"[NewCompanyView] Save company error: {ex}");
+                ToastManager.Error("خطا در ثبت شرکت");
             }
             finally
             {
@@ -204,7 +205,7 @@ namespace Taadol.Views
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    SaveCompany();
+                    _ = SaveCompanyAsync();
                     return;
                 }
                 if (result == MessageBoxResult.Cancel)

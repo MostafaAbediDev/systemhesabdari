@@ -116,7 +116,8 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در بروزرسانی: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[CompanyListView] Refresh error: {ex}");
+                ToastManager.Error("خطا در بروزرسانی");
             }
         }
 
@@ -161,7 +162,8 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در بروزرسانی: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[CompanyListView] Refresh error: {ex}");
+                ToastManager.Error("خطا در بروزرسانی");
             }
         }
 
@@ -178,7 +180,8 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در بارگذاری شرکت‌ها: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[CompanyListView] Load companies error: {ex}");
+                ToastManager.Error("خطا در بارگذاری شرکت‌ها");
             }
         }
 
@@ -216,7 +219,8 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در لود شرکت‌ها: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[CompanyListView] Load companies error: {ex}");
+                ToastManager.Error("خطا در لود شرکت‌ها");
 
                 AllCompanies = new ObservableCollection<CompanyItem>();
 
@@ -581,7 +585,8 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در حذف: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[CompanyListView] Delete error: {ex}");
+                ToastManager.Error("خطا در حذف");
                 return;
             }
             finally

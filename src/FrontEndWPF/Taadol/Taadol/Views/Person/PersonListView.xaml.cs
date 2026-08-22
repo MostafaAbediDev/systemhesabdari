@@ -197,7 +197,8 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در بارگذاری اشخاص: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[PersonListView] Load persons error: {ex}");
+                ToastManager.Error("خطا در بارگذاری اشخاص");
             }
         }
 
@@ -285,7 +286,8 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در حذف: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[PersonListView] Delete error: {ex}");
+                ToastManager.Error("خطا در حذف");
             }
         }
 
@@ -326,7 +328,8 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در بروزرسانی: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[PersonListView] Refresh error: {ex}");
+                ToastManager.Error("خطا در بروزرسانی");
             }
         }
 
@@ -339,7 +342,8 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در بروزرسانی: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[PersonListView] Refresh error: {ex}");
+                ToastManager.Error("خطا در بروزرسانی");
             }
         }
 
@@ -568,7 +572,8 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در نمایش جزئیات: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[PersonListView] Show details error: {ex}");
+                ToastManager.Error("خطا در نمایش جزئیات");
             }
         }
 
@@ -625,7 +630,8 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در حذف: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[PersonListView] Delete error: {ex}");
+                ToastManager.Error("خطا در حذف");
             }
         }
 

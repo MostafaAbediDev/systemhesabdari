@@ -195,7 +195,7 @@ namespace Taadol.Views
             _branchId = branchId;
             _branchApplication = App.ServiceProvider.GetRequiredService<IBranchApplication>();
 
-            SaveCommand = new RelayCommand(SaveBranch);
+            SaveCommand = new RelayCommand(async () => await SaveBranchAsync());
             DataContext = this;
 
             Loaded += OnLoaded;
@@ -311,7 +311,8 @@ namespace Taadol.Views
             catch (Exception ex)
             {
                 _isLoading = false;
-                ToastManager.Error("خطا در لود اطلاعات: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[EditBranchView] Load info error: {ex}");
+                ToastManager.Error("خطا در لود اطلاعات");
             }
         }
 
@@ -356,7 +357,10 @@ namespace Taadol.Views
             catch (Exception ex)
             {
                 if (_loadCts?.IsCancellationRequested != true)
-                    ToastManager.Error("خطا در لود شهرستان‌ها: " + ex.Message);
+                {
+                    System.Diagnostics.Debug.WriteLine($"[EditBranchView] Load cities error: {ex}");
+                    ToastManager.Error("خطا در لود شهرستان‌ها");
+                }
             }
             finally
             {
@@ -418,7 +422,7 @@ namespace Taadol.Views
 
         // Validation methods moved to Taadol.Helpers.ValidationHelper
 
-        private void SaveBranch()
+        private async Task SaveBranchAsync()
         {
             if (_isSaving) return;
 
@@ -497,7 +501,7 @@ namespace Taadol.Views
                     IsMain = IsMain
                 };
 
-                var operation = _branchApplication.Edit(command);
+                var operation = await Task.Run(() => _branchApplication.Edit(command));
                 if (!operation.IsSucceeded)
                 {
                     ToastManager.Warning(
@@ -507,9 +511,9 @@ namespace Taadol.Views
 
                 // هماهنگ‌سازی وضعیت فعال/غیرفعال با لیست
                 if (IsActive)
-                    _branchApplication.Activate(_branchId);
+                    await Task.Run(() => _branchApplication.Activate(_branchId));
                 else
-                    _branchApplication.Deactivate(_branchId);
+                    await Task.Run(() => _branchApplication.Deactivate(_branchId));
 
                 ToastManager.Success("ویرایش شعبه با موفقیت انجام شد.");
 
@@ -524,7 +528,8 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در ویرایش: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[EditBranchView] Edit error: {ex}");
+                ToastManager.Error("خطا در ویرایش");
             }
             finally
             {
@@ -554,7 +559,7 @@ namespace Taadol.Views
 
             if (result == MessageBoxResult.Yes)
             {
-                SaveBranch();
+                _ = SaveBranchAsync();
                 return false; // ذخیره خودش فرم را می‌بندد
             }
 

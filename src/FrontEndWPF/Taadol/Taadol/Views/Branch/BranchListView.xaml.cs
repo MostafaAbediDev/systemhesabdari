@@ -138,7 +138,8 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در بروزرسانی: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[BranchListView] Refresh error: {ex}");
+                ToastManager.Error("خطا در بروزرسانی");
             }
         }
 
@@ -161,7 +162,8 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در بروزرسانی: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[BranchListView] Refresh error: {ex}");
+                ToastManager.Error("خطا در بروزرسانی");
             }
         }
 
@@ -178,7 +180,8 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در بارگذاری شعبه‌ها: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[BranchListView] Load branches error: {ex}");
+                ToastManager.Error("خطا در بارگذاری شعبه‌ها");
             }
         }
 
@@ -225,7 +228,8 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در لود شعبه‌ها: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[BranchListView] Load branches error: {ex}");
+                ToastManager.Error("خطا در لود شعبه‌ها");
 
                 AllBranches = new ObservableCollection<BranchItem>();
 
@@ -641,7 +645,8 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در حذف: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[BranchListView] Delete error: {ex}");
+                ToastManager.Error("خطا در حذف");
                 return;
             }
             finally

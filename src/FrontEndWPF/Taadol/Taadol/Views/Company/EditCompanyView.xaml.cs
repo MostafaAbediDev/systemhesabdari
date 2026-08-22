@@ -71,7 +71,7 @@ namespace Taadol.Views
             _companyId = companyId;
             _companyApplication = App.ServiceProvider.GetRequiredService<ICompanyApplication>();
 
-            SaveCommand = new RelayCommand(SaveCompany);
+            SaveCommand = new RelayCommand(async () => await SaveCompanyAsync());
             DataContext = this;
 
             Loaded += OnLoaded;
@@ -140,7 +140,8 @@ namespace Taadol.Views
             catch (Exception ex)
             {
                 _isLoading = false;
-                ToastManager.Error("خطا در لود اطلاعات: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[EditCompanyView] Load info error: {ex}");
+                ToastManager.Error("خطا در لود اطلاعات");
             }
         }
 
@@ -169,7 +170,7 @@ namespace Taadol.Views
             MarkUserChange();
         }
 
-        private void SaveCompany()
+        private async Task SaveCompanyAsync()
         {
             if (_isSaving) return;
 
@@ -217,7 +218,7 @@ namespace Taadol.Views
                     Logo = CompanyImagePicker?.ImagePath ?? ""
                 };
 
-                var operation = _companyApplication.Edit(command);
+                var operation = await Task.Run(() => _companyApplication.Edit(command));
                 if (!operation.IsSucceeded)
                 {
                     ToastManager.Warning(
@@ -227,9 +228,9 @@ namespace Taadol.Views
 
                 // هماهنگ‌سازی وضعیت فعال/غیرفعال با لیست
                 if (IsActive)
-                    _companyApplication.Activate(_companyId);
+                    await Task.Run(() => _companyApplication.Activate(_companyId));
                 else
-                    _companyApplication.Deactivate(_companyId);
+                    await Task.Run(() => _companyApplication.Deactivate(_companyId));
 
                 ToastManager.Success("ویرایش شرکت با موفقیت انجام شد.");
 
@@ -244,7 +245,8 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در ویرایش: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[EditCompanyView] Edit error: {ex}");
+                ToastManager.Error("خطا در ویرایش");
             }
             finally
             {
@@ -274,7 +276,7 @@ namespace Taadol.Views
 
             if (result == MessageBoxResult.Yes)
             {
-                SaveCompany();
+                _ = SaveCompanyAsync();
                 return false; // ذخیره خودش فرم را می‌بندد
             }
 

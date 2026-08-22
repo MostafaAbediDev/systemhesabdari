@@ -246,7 +246,7 @@ namespace Taadol.Views
                 if (_loadCts?.IsCancellationRequested != true)
                 {
                     System.Diagnostics.Debug.WriteLine($"[DEBUG] ERROR in EditPersonView.OnLoaded: {ex}");
-                    ToastManager.Error("خطا در بارگذاری اطلاعات شخص: " + ex.Message);
+                    ToastManager.Error("خطا در بارگذاری اطلاعات شخص");
                 }
             }
             finally
@@ -433,7 +433,8 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در لود اطلاعات: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[EditPersonView] Load info error: {ex}");
+                ToastManager.Error("خطا در لود اطلاعات");
             }
         }
 
@@ -764,7 +765,10 @@ namespace Taadol.Views
             catch (Exception ex)
             {
                 if (_saveCts?.IsCancellationRequested != true)
-                    ToastManager.Error("خطا در ویرایش: " + ex.Message);
+                {
+                    System.Diagnostics.Debug.WriteLine($"[EditPersonView] Edit error: {ex}");
+                    ToastManager.Error("خطا در ویرایش");
+                }
             }
             finally
             {
@@ -1340,6 +1344,12 @@ namespace Taadol.Views
             if (!string.IsNullOrWhiteSpace(Email) && !ValidationHelper.IsValidEmail(Email))
             {
                 ToastManager.Warning("فرمت ایمیل صحیح نیست. مثال صحیح: name@example.com");
+                return false;
+            }
+
+            if (!string.IsNullOrWhiteSpace(PostalCode) && !ValidationHelper.IsValidPostalCode(PostalCode))
+            {
+                ToastManager.Warning("کد پستی باید دقیقاً ۱۰ رقم باشد.");
                 return false;
             }
 

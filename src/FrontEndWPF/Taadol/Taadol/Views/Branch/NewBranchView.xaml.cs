@@ -29,6 +29,8 @@ namespace Taadol.Views
         private readonly IBranchApplication _branchApplication;
         private readonly ICompanyApplication _companyApplication;
         private bool _isSaving;
+        private bool _userMadeChanges;
+        private bool _isLoading = true;
         private bool _isCodeAutomatic = true;
         private bool _isLoadedOnce = false;
         public ObservableCollection<CityComboItem> Cities { get; set; } = new();
@@ -44,6 +46,7 @@ namespace Taadol.Views
             {
                 _selectedProvinceId = value;
                 OnPropertyChanged(nameof(SelectedProvinceId));
+                MarkUserChange();
                 SelectedCityId = 0;
                 UpdateCityState();
                 if (_selectedProvinceId > 0)
@@ -125,6 +128,7 @@ namespace Taadol.Views
             {
                 _selectedCityId = value;
                 OnPropertyChanged(nameof(SelectedCityId));
+                MarkUserChange();
             }
         }
 
@@ -185,7 +189,10 @@ namespace Taadol.Views
             catch (Exception ex)
             {
                 if (_loadCts?.IsCancellationRequested != true)
-                    ToastManager.Error("خطا در لود استان‌ها: " + ex.Message);
+                {
+                    System.Diagnostics.Debug.WriteLine($"[NewBranchView] Load provinces error: {ex}");
+                    ToastManager.Error("خطا در لود استان‌ها");
+                }
             }
             finally
             {
@@ -270,6 +277,7 @@ namespace Taadol.Views
             {
                 _isActive = value;
                 OnPropertyChanged(nameof(IsActive));
+                MarkUserChange();
             }
         }
         private async void NewBranchView_Loaded(object sender, RoutedEventArgs e)
@@ -284,8 +292,11 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در بارگذاری اطلاعات شعبه: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[NewBranchView] Load branch info error: {ex}");
+                ToastManager.Error("خطا در بارگذاری اطلاعات شعبه");
             }
+
+            _isLoading = false;
         }
 
         private async Task LoadInitialDataAsync()
@@ -323,7 +334,8 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در لود اطلاعات: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[NewBranchView] Load info error: {ex}");
+                ToastManager.Error("خطا در لود اطلاعات");
             }
             finally
             {
@@ -424,6 +436,7 @@ namespace Taadol.Views
             {
                 _uniqueCode = value;
                 OnPropertyChanged(nameof(UniqueCode));
+                MarkUserChange();
             }
         }
 
@@ -434,6 +447,7 @@ namespace Taadol.Views
             {
                 _isUniqueCodeManual = value;
                 OnPropertyChanged(nameof(IsUniqueCodeManual));
+                MarkUserChange();
             }
         }
         public ICommand SaveCommand { get; private set; }
@@ -445,6 +459,7 @@ namespace Taadol.Views
             {
                 _postCode = value;
                 OnPropertyChanged(nameof(PostCode));
+                MarkUserChange();
             }
         }
 
@@ -455,6 +470,7 @@ namespace Taadol.Views
             {
                 _address = value;
                 OnPropertyChanged(nameof(Address));
+                MarkUserChange();
             }
         }
 
@@ -465,6 +481,7 @@ namespace Taadol.Views
             {
                 _latitudeText = value;
                 OnPropertyChanged(nameof(LatitudeText));
+                MarkUserChange();
             }
         }
         private double ToDoubleOrZero(string value)
@@ -486,6 +503,7 @@ namespace Taadol.Views
             {
                 _longitudeText = value;
                 OnPropertyChanged(nameof(LongitudeText));
+                MarkUserChange();
             }
         }
         public long SelectedCompanyId
@@ -495,6 +513,7 @@ namespace Taadol.Views
             {
                 _selectedCompanyId = value;
                 OnPropertyChanged(nameof(SelectedCompanyId));
+                MarkUserChange();
             }
         }
 
@@ -505,6 +524,7 @@ namespace Taadol.Views
             {
                 _branchName = value;
                 OnPropertyChanged(nameof(BranchName));
+                MarkUserChange();
             }
         }
 
@@ -515,6 +535,7 @@ namespace Taadol.Views
             {
                 _economicCode = value;
                 OnPropertyChanged(nameof(EconomicCode));
+                MarkUserChange();
             }
         }
 
@@ -525,6 +546,7 @@ namespace Taadol.Views
             {
                 _registerNumber = value;
                 OnPropertyChanged(nameof(RegisterNumber));
+                MarkUserChange();
             }
         }
 
@@ -537,6 +559,7 @@ namespace Taadol.Views
             {
                 _telePhone = value;
                 OnPropertyChanged(nameof(TelePhone));
+                MarkUserChange();
             }
         }
 
@@ -547,6 +570,7 @@ namespace Taadol.Views
             {
                 _mobilePhone = value;
                 OnPropertyChanged(nameof(MobilePhone));
+                MarkUserChange();
             }
         }
 
@@ -557,6 +581,7 @@ namespace Taadol.Views
             {
                 _email = value;
                 OnPropertyChanged(nameof(Email));
+                MarkUserChange();
             }
         }
         public class RelayCommand : ICommand
@@ -589,7 +614,7 @@ namespace Taadol.Views
             _cityRepository = App.ServiceProvider.GetRequiredService<ICityRepository>();
 
             DataContext = this;
-            SaveCommand = new RelayCommand(SaveBranch);
+            SaveCommand = new RelayCommand(async () => await SaveBranchAsync());
 
             UpdateCityState();
 
@@ -620,10 +645,11 @@ namespace Taadol.Views
             {
                 _nationalId = value;
                 OnPropertyChanged(nameof(NationalId));
+                MarkUserChange();
             }
         }
         // Phone validation moved to Taadol.Helpers.ValidationHelper
-        private void SaveBranch()
+        private async Task SaveBranchAsync()
         {
             if (_isSaving) return;
 
@@ -676,7 +702,7 @@ namespace Taadol.Views
             {
                 if (_isCodeAutomatic)
                 {
-                    UniqueCode = GenerateNextUniqueCodeFromDatabase();
+                    UniqueCode = await Task.Run(() => GenerateNextUniqueCodeFromDatabase());
                 }
 
                 var command = new CreateBranches
@@ -706,7 +732,7 @@ namespace Taadol.Views
                     IsMain = IsMainBranch
                 };
 
-                var operation = _branchApplication.Create(command);
+                var operation = await Task.Run(() => _branchApplication.Create(command));
 
                 var message = GetOperationMessage(operation);
 
@@ -720,13 +746,13 @@ namespace Taadol.Views
 
                 if (IsActive)
                 {
-                    var savedBranch = _branchApplication
+                    var savedBranch = await Task.Run(() => _branchApplication
                         .GetBranches()
                         .Where(x =>
                             x.NationalId == NationalId.Trim() &&
                             x.CompanyId == SelectedCompanyId)
                         .OrderByDescending(x => x.Id)
-                        .FirstOrDefault();
+                        .FirstOrDefault());
 
                     if (savedBranch == null)
                     {
@@ -736,7 +762,7 @@ namespace Taadol.Views
                         return;
                     }
 
-                    var activateResult = _branchApplication.Activate(savedBranch.Id);
+                    var activateResult = await Task.Run(() => _branchApplication.Activate(savedBranch.Id));
 
                     if (!IsOperationSucceeded(activateResult))
                     {
@@ -799,8 +825,27 @@ namespace Taadol.Views
             mainWindow?.NavigateTo("branch_list");
         }
 
+        private void MarkUserChange()
+        {
+            if (_isLoading) return;
+            _userMadeChanges = true;
+        }
+
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
+            if (_userMadeChanges)
+            {
+                var result = MessageBox.Show(
+                    "تغییراتی که ایجاد کرده‌اید ذخیره نشده است.\nآیا مایل به خروج هستید؟",
+                    "خروج",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question,
+                    MessageBoxResult.No);
+
+                if (result != MessageBoxResult.Yes)
+                    return;
+            }
+
             NavigateToBranchList();
         }
 
@@ -842,6 +887,7 @@ namespace Taadol.Views
             {
                 _isMainBranch = value;
                 OnPropertyChanged(nameof(IsMainBranch));
+                MarkUserChange();
             }
         }
         private string GetOperationMessage(object operation)

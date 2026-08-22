@@ -195,7 +195,8 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در بارگذاری بایگانی: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[BranchArchiveListView] Load archive error: {ex}");
+                ToastManager.Error("خطا در بارگذاری بایگانی");
             }
         }
 
@@ -220,7 +221,8 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در حذف: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[BranchArchiveListView] Delete error: {ex}");
+                ToastManager.Error("خطا در حذف");
             }
         }
 
@@ -232,7 +234,8 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در بروزرسانی: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[BranchArchiveListView] Refresh error: {ex}");
+                ToastManager.Error("خطا در بروزرسانی");
             }
         }
 
