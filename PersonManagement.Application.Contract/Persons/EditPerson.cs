@@ -4,6 +4,8 @@
     {
         public long Id { get; set; }
         public string? CurrentCode { get; set; }
+        public decimal? CreditLimit { get; set; }
+
 
 
     }

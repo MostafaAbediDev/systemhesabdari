@@ -100,13 +100,15 @@ namespace PersonManagement.Domain.Person.PersonAgg
 
         public void UpdateFinancialInfo(decimal creditLimit)
         {
-
             if (creditLimit < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(creditLimit), "سقف اعتبار نمی‌تواند منفی باشد.");
-            }
+                throw new ArgumentOutOfRangeException(
+                    nameof(creditLimit),
+                    "سقف اعتبار نمی‌تواند منفی باشد.");
+
+            var usedCredit = CreditLimit - AvailableCredit;
 
             CreditLimit = creditLimit;
+            AvailableCredit = creditLimit - usedCredit;
         }
 
         public void SetBranch(long branchId)
