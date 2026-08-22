@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -22,6 +23,7 @@ namespace Taadol.Views
     /// </summary>
     public partial class EditFinancialPeriodView : UserControl, INotifyPropertyChanged, IUnsavedChangesAware
     {
+        private CancellationTokenSource _loadCts = new();
         private readonly IFinancialPeriodApplication _financialPeriodApplication;
         private readonly long _periodId;
 
@@ -85,34 +87,48 @@ namespace Taadol.Views
             DataContext = this;
 
             Loaded += OnLoaded;
+            this.Unloaded += OnViewUnloaded;
+        }
+
+        private void OnViewUnloaded(object sender, RoutedEventArgs e)
+        {
+            _loadCts?.Cancel();
+            _loadCts?.Dispose();
+            _loadCts = null;
+            this.Unloaded -= OnViewUnloaded;
         }
 
         private async void OnLoaded(object sender, RoutedEventArgs e)
         {
             try
             {
+                var token = _loadCts?.Token ?? CancellationToken.None;
+
                 // جزئیات دوره و وضعیت فعال به‌صورت موازی لود می‌شوند
                 var detailsTask = Task.Run(() =>
                 {
+                    token.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
                     var app = scope.ServiceProvider.GetRequiredService<IFinancialPeriodApplication>();
                     return app.GetDetails(_periodId);
-                });
+                }, token);
 
                 var periodsTask = Task.Run(() =>
                 {
+                    token.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
                     var app = scope.ServiceProvider.GetRequiredService<IFinancialPeriodApplication>();
                     return app.GetFinancialPeriods();
-                });
+                }, token);
 
                 var branchesTask = Task.Run(() =>
                 {
+                    token.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
                     var app = scope.ServiceProvider.GetRequiredService<IBranchApplication>();
                     return app.GetBranches().Where(b => b.IsActive)
                         .Select(b => new BranchComboItem { Id = b.Id, Title = b.Title }).ToList();
-                });
+                }, token);
 
                 var details = await detailsTask;
                 if (details == null)
@@ -158,10 +174,15 @@ namespace Taadol.Views
                 // لود کامل شد — از این به بعد هر تغییری = تغییر کاربر
                 _isLoading = false;
             }
+            catch (OperationCanceledException)
+            {
+                System.Diagnostics.Debug.WriteLine("[EditFinancialPeriodView] OnLoaded was cancelled");
+            }
             catch (Exception ex)
             {
                 _isLoading = false;
-                ToastManager.Error("خطا در لود اطلاعات: " + ex.Message);
+                if (_loadCts?.IsCancellationRequested != true)
+                    ToastManager.Error("خطا در لود اطلاعات: " + ex.Message);
             }
         }
 

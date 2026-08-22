@@ -923,7 +923,7 @@ namespace Taadol.Views
             var mainWindow = Window.GetWindow(this) as MainWindow;
             bool isModal = mainWindow?.ModalContent.Content == this;
             if (isModal) { PersonSaved?.Invoke(); mainWindow?.CloseModal(); }
-            else mainWindow?.NavigateTo("person_list");
+            else ClearForm();
         }
 
         /// <summary> logs exception to debug + file</summary>

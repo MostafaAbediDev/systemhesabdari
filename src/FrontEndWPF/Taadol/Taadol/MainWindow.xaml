@@ -36,7 +36,7 @@
                 Background="#FFF8ED"
                 BorderThickness="0,0,0,1"
                 Panel.ZIndex="5">
-            <Grid Margin="16,15,40,0">
+            <Grid Margin="16,15,25,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />

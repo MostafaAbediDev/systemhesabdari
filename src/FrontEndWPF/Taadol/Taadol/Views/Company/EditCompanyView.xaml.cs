@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -33,6 +34,7 @@ namespace Taadol.Views
         private bool _isLoading = true;
         private bool _userMadeChanges;
         private bool _isSaving;
+        private CancellationTokenSource _loadCts = new();
 
         public ICommand SaveCommand { get; }
 
@@ -73,6 +75,15 @@ namespace Taadol.Views
             DataContext = this;
 
             Loaded += OnLoaded;
+            this.Unloaded += OnViewUnloaded;
+        }
+
+        private void OnViewUnloaded(object sender, RoutedEventArgs e)
+        {
+            _loadCts?.Cancel();
+            _loadCts?.Dispose();
+            _loadCts = null;
+            this.Unloaded -= OnViewUnloaded;
         }
 
         private async void OnLoaded(object sender, RoutedEventArgs e)

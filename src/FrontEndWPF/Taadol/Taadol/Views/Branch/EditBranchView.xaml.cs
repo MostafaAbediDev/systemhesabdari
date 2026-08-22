@@ -266,12 +266,13 @@ namespace Taadol.Views
                 var companies = await companiesTask;
                 var provinces = await provincesTask;
 
-                Companies = new ObservableCollection<CompanyViewModel>(companies);
-                OnPropertyChanged(nameof(Companies));
+                Companies.Clear();
+                foreach (var c in companies)
+                    Companies.Add(c);
 
-                Provinces = new ObservableCollection<ProvinceComboItem>(
-                    provinces.Select(p => new ProvinceComboItem { Id = p.Id, Title = p.Title }));
-                OnPropertyChanged(nameof(Provinces));
+                Provinces.Clear();
+                foreach (var p in provinces)
+                    Provinces.Add(new ProvinceComboItem { Id = p.Id, Title = p.Title });
 
                 // کد فعلی شعبه — در حالت ویرایش «دستی» است تا کد موجود حفظ شود (بدون تولید کد جدید)
                 var currentCode = details.ManualCode ?? details.CurrentCode ?? "";

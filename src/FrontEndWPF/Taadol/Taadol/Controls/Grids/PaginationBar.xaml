@@ -12,7 +12,8 @@
              FontFamily="{StaticResource IRANSans}"
              Background="White">
 
-    <Border Padding="0,5"
+    <Border Padding="0,0,0,8"
+            Margin="10"
             Background="White"
             BorderBrush="#E9F0FF"
             BorderThickness="0,0,0,0">

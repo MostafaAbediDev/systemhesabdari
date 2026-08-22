@@ -28,6 +28,7 @@ namespace Taadol.Views
         private CancellationTokenSource _loadCts = new();
         private readonly IBranchApplication _branchApplication;
         private readonly ICompanyApplication _companyApplication;
+        private bool _isSaving;
         private bool _isCodeAutomatic = true;
         private bool _isLoadedOnce = false;
         public ObservableCollection<CityComboItem> Cities { get; set; } = new();
@@ -88,9 +89,14 @@ namespace Taadol.Views
             {
                 System.Diagnostics.Debug.WriteLine("[NewBranchView] LoadCitiesFromSubSystemAsync was cancelled");
             }
-
-            CityComboBox.IsEnabled = true;
-            CityLoadingOverlay.Visibility = Visibility.Collapsed;
+            finally
+            {
+                if (_loadCts?.IsCancellationRequested != true)
+                {
+                    CityComboBox.IsEnabled = true;
+                    CityLoadingOverlay.Visibility = Visibility.Collapsed;
+                }
+            }
         }
         public class ProvinceComboItem
         {
@@ -150,7 +156,7 @@ namespace Taadol.Views
             try
             {
                 var token = _loadCts?.Token ?? CancellationToken.None;
-                await Task.Run(() =>
+                await Task.Run(async () =>
                 {
                     token.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
@@ -164,10 +170,11 @@ namespace Taadol.Views
                         Title = p.Title
                     }).ToList();
 
-                    Application.Current.Dispatcher.Invoke(() =>
+                    await Application.Current.Dispatcher.InvokeAsync(() =>
                     {
-                        Provinces = new ObservableCollection<ProvinceComboItem>(mappedProvinces);
-                        OnPropertyChanged(nameof(Provinces));
+                        Provinces.Clear();
+                        foreach (var p in mappedProvinces)
+                            Provinces.Add(p);
                     });
                 }, token);
             }
@@ -221,8 +228,11 @@ namespace Taadol.Views
             {
                 System.Diagnostics.Debug.WriteLine("[NewBranchView] LoadCitiesAsync was cancelled");
             }
-
-            CityComboBox.IsEnabled = true;
+            finally
+            {
+                if (_loadCts?.IsCancellationRequested != true)
+                    CityComboBox.IsEnabled = true;
+            }
         }
         private void UniqueCodeMode_SelectionChanged(object sender, bool isAutomatic)
         {
@@ -239,7 +249,7 @@ namespace Taadol.Views
                 UniqueCode = "";
             }
         }
-        public ObservableCollection<CompanyViewModel> Companies { get; set; }
+        public ObservableCollection<CompanyViewModel> Companies { get; set; } = new();
         private string _postCode;
         private string _address;
         private string _latitudeText;
@@ -302,8 +312,9 @@ namespace Taadol.Views
                 var companies = await companiesTask;
                 var nextCode = await codeTask;
 
-                Companies = new ObservableCollection<CompanyViewModel>(companies);
-                OnPropertyChanged(nameof(Companies));
+                Companies.Clear();
+                foreach (var c in companies)
+                    Companies.Add(c);
 
                 if (Companies.Count > 0)
                     SelectedCompanyId = Companies[0].Id;
@@ -614,6 +625,8 @@ namespace Taadol.Views
         // Phone validation moved to Taadol.Helpers.ValidationHelper
         private void SaveBranch()
         {
+            if (_isSaving) return;
+
             if (!string.IsNullOrEmpty(Email) && !ValidationHelper.IsValidEmail(Email))
             {
                 ToastManager.Warning("ایمیل وارد شده معتبر نیست.");
@@ -645,42 +658,54 @@ namespace Taadol.Views
                 ToastManager.Warning("نام شعبه را وارد کنید.");
                 return;
             }
-            if (_isCodeAutomatic)
+
+            if (SelectedProvinceId <= 0 || SelectedCityId <= 0)
             {
-                UniqueCode = GenerateNextUniqueCodeFromDatabase();
+                ToastManager.Warning("لطفاً استان و شهر را به درستی انتخاب کنید.");
+                return;
             }
-   
-            
-            var command = new CreateBranches
+
+            _isSaving = true;
+            if (SaveButton != null)
             {
-                Title = BranchName.Trim(),
-                Code = UniqueCode ?? "",
-                ManualCode = _isCodeAutomatic ? "" : UniqueCode ?? "",
-                IsCodeAutomatic = _isCodeAutomatic,
+                SaveButton.IsEnabled = false;
+                SaveButton.ButtonText = "در حال ذخیره...";
+            }
 
-                NationalId = NationalId?.Trim() ?? "",
-                EconomicCode = EconomicCode?.Trim() ?? "",
-                RegisterNumber = RegisterNumber?.Trim() ?? "",
-
-                Email = Email?.Trim() ?? "",
-                MobilePhone = MobilePhone?.Trim() ?? "",
-                TelePhone = TelePhone?.Trim() ?? "",
-
-                Address = Address?.Trim() ?? "",
-                PostCode = PostCode?.Trim() ?? "",
-
-                Latitude = double.TryParse(LatitudeText, out var latitudeValue) ? latitudeValue : 0,
-                Longitude = double.TryParse(LongitudeText, out var longitudeValue) ? longitudeValue : 0,
-                CompanyId = SelectedCompanyId,
-
-                CityId = SelectedCityId,
-                ProvinceId = SelectedProvinceId,
-                IsMain = IsMainBranch
-
-
-            };
             try
             {
+                if (_isCodeAutomatic)
+                {
+                    UniqueCode = GenerateNextUniqueCodeFromDatabase();
+                }
+
+                var command = new CreateBranches
+                {
+                    Title = BranchName.Trim(),
+                    Code = UniqueCode ?? "",
+                    ManualCode = _isCodeAutomatic ? "" : UniqueCode ?? "",
+                    IsCodeAutomatic = _isCodeAutomatic,
+
+                    NationalId = NationalId?.Trim() ?? "",
+                    EconomicCode = EconomicCode?.Trim() ?? "",
+                    RegisterNumber = RegisterNumber?.Trim() ?? "",
+
+                    Email = Email?.Trim() ?? "",
+                    MobilePhone = MobilePhone?.Trim() ?? "",
+                    TelePhone = TelePhone?.Trim() ?? "",
+
+                    Address = Address?.Trim() ?? "",
+                    PostCode = PostCode?.Trim() ?? "",
+
+                    Latitude = double.TryParse(LatitudeText, out var latitudeValue) ? latitudeValue : 0,
+                    Longitude = double.TryParse(LongitudeText, out var longitudeValue) ? longitudeValue : 0,
+                    CompanyId = SelectedCompanyId,
+
+                    CityId = SelectedCityId,
+                    ProvinceId = SelectedProvinceId,
+                    IsMain = IsMainBranch
+                };
+
                 var operation = _branchApplication.Create(command);
 
                 var message = GetOperationMessage(operation);
@@ -724,13 +749,30 @@ namespace Taadol.Views
                 ToastManager.Success("شعبه با موفقیت ثبت شد.");
 
                 ClearForm();
-                NavigateToBranchList();
+                // Focus first focusable element (BranchName field)
+                MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
             }
             catch (Exception ex)
             {
                 var realError = ex.GetBaseException().Message;
 
-                ToastManager.Error(realError);
+                if (realError.Contains("FK_Branches_Cities_CityId") || realError.Contains("Cities") && realError.Contains("FK"))
+                {
+                    ToastManager.Error("شهر انتخاب‌شده در سیستم معتبر نیست. لطفاً مجدداً شهر را انتخاب کنید.");
+                }
+                else
+                {
+                    ToastManager.Error(realError);
+                }
+            }
+            finally
+            {
+                _isSaving = false;
+                if (SaveButton != null)
+                {
+                    SaveButton.IsEnabled = true;
+                    SaveButton.ButtonText = "ثبت شعبه";
+                }
             }
         }
 
@@ -747,6 +789,8 @@ namespace Taadol.Views
             Address = "";
             LatitudeText = "";
             LongitudeText = "";
+            SelectedProvinceId = 0;
+            SelectedCityId = 0;
         }
 
         private void NavigateToBranchList()
@@ -853,18 +897,6 @@ namespace Taadol.Views
         {
         }
 
-        private void TabTax_Checked(object sender, RoutedEventArgs e)
-        {
-            if (TabPricing == null || TabInventory == null) return;
-
-            TabPricing.IsChecked = false;
-            TabInventory.IsChecked = false;
-
-            PricingContent.Visibility = Visibility.Collapsed;
-            InventoryContent.Visibility = Visibility.Collapsed;
-            TaxContent.Visibility = Visibility.Visible;
-        }
-
         private void TabInventory_Checked(object sender, RoutedEventArgs e)
         {
             if (TabPricing == null ) return;
@@ -874,7 +906,6 @@ namespace Taadol.Views
 
             PricingContent.Visibility = Visibility.Collapsed;
             InventoryContent.Visibility = Visibility.Visible;
-            TaxContent.Visibility = Visibility.Collapsed;
 
             InventoryContent.Height = PricingContent.ActualHeight > 0 ? PricingContent.ActualHeight : double.NaN;
         }
@@ -887,7 +918,6 @@ namespace Taadol.Views
 
             PricingContent.Visibility = Visibility.Visible;
             InventoryContent.Visibility = Visibility.Collapsed;
-            TaxContent.Visibility = Visibility.Collapsed;
 
             PricingContent.Height = InventoryContent.ActualHeight > 0 ? InventoryContent.ActualHeight : double.NaN;
         }

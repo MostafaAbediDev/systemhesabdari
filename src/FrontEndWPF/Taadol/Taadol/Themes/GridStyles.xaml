@@ -181,7 +181,7 @@
                         Value="Collapsed" />
             </DataTrigger>
 
-            <DataTrigger Binding="{Binding RowBackground}"
+            <DataTrigger Binding="{Binding RowBackground, FallbackValue=''}"
                          Value="#FCEBEC">
                 <Setter Property="Background"
                         Value="#FCEBEC" />

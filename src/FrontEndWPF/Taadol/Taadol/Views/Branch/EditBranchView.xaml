@@ -377,7 +377,7 @@
                             BorderThickness="1"
                             CornerRadius="4"
                             Padding="16,14,16,14"
-                            Margin="4,0,4,12">
+                            Margin="4,0,4,5">
                         <StackPanel>
                             <TextBlock Text="تماس"
                                        FontSize="14"

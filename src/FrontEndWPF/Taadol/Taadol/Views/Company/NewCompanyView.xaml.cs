@@ -14,6 +14,7 @@ namespace Taadol.Views
     {
         private readonly ICompanyApplication _companyApplication;
 
+        private bool _isSaving;
         private string _uniqueId;
         private string _companyName;
         private string _officialName;
@@ -112,6 +113,8 @@ namespace Taadol.Views
         }
         private void SaveCompany()
         {
+            if (_isSaving) return;
+
             if (string.IsNullOrWhiteSpace(CompanyName))
             {
                 ToastManager.Warning("نام شرکت / کسب‌وکار را وارد کنید.");
@@ -135,31 +138,57 @@ namespace Taadol.Views
                 ToastManager.Warning("تاریخ تاسیس را انتخاب کنید.");
                 return;
             }
-            var command = new CreateCompanies
+
+            _isSaving = true;
+            if (SaveButton != null)
             {
-                Title = CompanyName.Trim(),
-                LegalName = OfficialName.Trim(),
-                EstablishedDate = FoundingDate.Value,
-                Logo = string.IsNullOrWhiteSpace(ProductImage) ? "" : ProductImage
-            };
-
-            var operation = _companyApplication.Create(command);
-
-            var message = GetOperationMessage(operation);
-
-            if (!IsOperationSucceeded(operation))
-            {
-                ToastManager.Warning(
-                    string.IsNullOrWhiteSpace(message) ? "ثبت شرکت انجام نشد." : message);
-
-                return;
+                SaveButton.IsEnabled = false;
+                SaveButton.ButtonText = "در حال ذخیره...";
             }
 
-            ToastManager.Success(
-                string.IsNullOrWhiteSpace(message) ? "شرکت با موفقیت ثبت شد." : message);
+            try
+            {
+                var command = new CreateCompanies
+                {
+                    Title = CompanyName.Trim(),
+                    LegalName = OfficialName.Trim(),
+                    EstablishedDate = FoundingDate.Value,
+                    Logo = string.IsNullOrWhiteSpace(ProductImage) ? "" : ProductImage
+                };
 
-            // بعد از ثبت، فرم باز می‌ماند و فقط فیلدها پاک می‌شوند (بدون رفتن به لیست شرکت‌ها)
-            ClearForm();
+                var operation = _companyApplication.Create(command);
+
+                var message = GetOperationMessage(operation);
+
+                if (!IsOperationSucceeded(operation))
+                {
+                    ToastManager.Warning(
+                        string.IsNullOrWhiteSpace(message) ? "ثبت شرکت انجام نشد." : message);
+
+                    return;
+                }
+
+                ToastManager.Success(
+                    string.IsNullOrWhiteSpace(message) ? "شرکت با موفقیت ثبت شد." : message);
+
+                // بعد از ثبت، فرم باز می‌ماند و فقط فیلدها پاک می‌شوند (بدون رفتن به لیست شرکت‌ها)
+                ClearForm();
+                // Focus first focusable element (CompanyName field)
+                MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
+            }
+            catch (Exception ex)
+            {
+                ToastManager.Error(ex.GetBaseException().Message);
+            }
+            finally
+            {
+                _isSaving = false;
+                if (SaveButton != null)
+                {
+                    SaveButton.IsEnabled = true;
+                    SaveButton.ButtonText = "ثبت شرکت";
+                }
+            }
         }
 
         private void Cancel_Click(object sender, MouseButtonEventArgs e)

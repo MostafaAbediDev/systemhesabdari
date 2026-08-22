@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,6 +16,8 @@ namespace Taadol.Views
 {
     public partial class NewFinancialPeriodView : UserControl, INotifyPropertyChanged
     {
+        private bool _isSaving;
+        private CancellationTokenSource _loadCts = new();
         private readonly IBranchApplication _branchApplication;
 
         private string _periodTitle;
@@ -88,6 +91,15 @@ namespace Taadol.Views
             DataContext = this;
 
             Loaded += NewFinancialPeriodView_Loaded;
+            this.Unloaded += OnViewUnloaded;
+        }
+
+        private void OnViewUnloaded(object sender, RoutedEventArgs e)
+        {
+            _loadCts?.Cancel();
+            _loadCts?.Dispose();
+            _loadCts = null;
+            this.Unloaded -= OnViewUnloaded;
         }
 
         private async void NewFinancialPeriodView_Loaded(object sender, RoutedEventArgs e)
@@ -106,8 +118,10 @@ namespace Taadol.Views
         {
             try
             {
+                var token = _loadCts?.Token ?? CancellationToken.None;
                 var branches = await Task.Run(() =>
                 {
+                    token.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
 
                     var branchApplication = scope.ServiceProvider.GetRequiredService<IBranchApplication>();
@@ -120,22 +134,30 @@ namespace Taadol.Views
                             Title = x.Title
                         })
                         .ToList();
-                });
+                }, token);
 
-                Branches = new ObservableCollection<BranchComboItem>(branches);
-                OnPropertyChanged(nameof(Branches));
+                Branches.Clear();
+                foreach (var b in branches)
+                    Branches.Add(b);
 
                 if (Branches.Count > 0)
                     SelectedBranchId = Branches[0].Id;
             }
+            catch (OperationCanceledException)
+            {
+                System.Diagnostics.Debug.WriteLine("[NewFinancialPeriodView] LoadBranchesAsync was cancelled");
+            }
             catch (Exception ex)
             {
-                ToastManager.Error("خطا در لود شعبه‌ها: " + ex.Message);
+                if (_loadCts?.IsCancellationRequested != true)
+                    ToastManager.Error("خطا در لود شعبه‌ها: " + ex.Message);
             }
         }
 
         private void SaveFinancialPeriod()
         {
+            if (_isSaving) return;
+
             if (string.IsNullOrWhiteSpace(PeriodTitle))
             {
                 ToastManager.Warning("عنوان دوره مالی را وارد کنید.");
@@ -164,6 +186,13 @@ namespace Taadol.Views
             {
                 ToastManager.Warning("تاریخ پایان نمی‌تواند قبل از تاریخ شروع باشد.");
                 return;
+            }
+
+            _isSaving = true;
+            if (SaveButton != null)
+            {
+                SaveButton.IsEnabled = false;
+                SaveButton.ButtonText = "در حال ذخیره...";
             }
 
             try
@@ -227,11 +256,21 @@ namespace Taadol.Views
                     _ = RefreshYearSelectorSafeAsync(yearSelector);
 
                 ClearForm();
-                NavigateToPeriodList();
+                // Focus first focusable element (PeriodTitle field)
+                MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
             }
             catch (Exception ex)
             {
                 ToastManager.Error(ex.GetBaseException().Message);
+            }
+            finally
+            {
+                _isSaving = false;
+                if (SaveButton != null)
+                {
+                    SaveButton.IsEnabled = true;
+                    SaveButton.ButtonText = "ثبت دوره";
+                }
             }
         }
 
