@@ -6,5 +6,7 @@
         public string Value { get; set; }
         public string CreationDate { get; set; }
         public long OwnerId { get; set; }
+        public bool? IsAutomatic { get; set; }
+
     }
 }

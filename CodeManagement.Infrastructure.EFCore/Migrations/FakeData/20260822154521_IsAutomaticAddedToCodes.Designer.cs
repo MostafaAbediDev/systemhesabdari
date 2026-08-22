@@ -4,16 +4,19 @@ using CodeManagement.Infrastructure.EFCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace CodeManagement.Infrastructure.EFCore.Migrations
+namespace CodeManagement.Infrastructure.EFCore.Migrations.FakeData
 {
-    [DbContext(typeof(CodeSystemContext))]
-    partial class CodeSystemContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(CodeFakeDataContext))]
+    [Migration("20260822154521_IsAutomaticAddedToCodes")]
+    partial class IsAutomaticAddedToCodes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

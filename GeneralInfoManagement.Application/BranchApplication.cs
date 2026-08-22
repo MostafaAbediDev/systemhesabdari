@@ -21,25 +21,21 @@ namespace GeneralInfoManagement.Application
             var operation = new OperationResult();
 
             var nationalId = command.NationalId;
+
             if (string.IsNullOrWhiteSpace(nationalId))
                 return operation.Failed("شناسه ملی الزامی است.");
 
             if (_branchRepository.Exists(x => x.NationalId == nationalId))
                 return operation.Failed("شعبه‌ای با این شناسه ملی قبلاً ثبت شده است.");
-            if (command.IsMain)
-                _branchRepository.ResetAllMainBranches();
+
+
+            var location = new Location(command.Latitude, command.Longitude);
 
             if (command.IsMain)
             {
-                var existMainBranch = _branchRepository.Exists(x =>
-                    x.CompanyId == command.CompanyId &&
-                    x.IsMain);
-
-                if (existMainBranch)
-                    return operation.Failed("یک شعبه اصلی قبلاً ثبت شده است.");
+                _branchRepository.ResetAllMainBranches(command.CompanyId);
             }
 
-            var location = new Location(command.Latitude, command.Longitude);
             var branch = new Branches(
                 command.Title,
                 nationalId,
@@ -76,11 +72,14 @@ namespace GeneralInfoManagement.Application
         public OperationResult Edit(EditBranch command)
         {
             var operation = new OperationResult();
+
             var branch = _branchRepository.Get(command.Id);
+
             if (branch == null)
                 return operation.Failed(ApplicationMessages.RecordNotFound);
 
             var nationalId = command.NationalId;
+
             if (string.IsNullOrWhiteSpace(nationalId))
                 return operation.Failed("شناسه ملی الزامی است.");
 
@@ -89,17 +88,7 @@ namespace GeneralInfoManagement.Application
 
             if (command.IsMain)
             {
-                if (_branchRepository.ExistsMainBranch(command.CompanyId, command.Id))
-                {
-                    return operation.Failed("یک شعبه اصلی قبلاً ثبت شده است.");
-                }
-
-                var currentMain = _branchRepository.GetCurrentMainBranch(command.CompanyId);
-
-                if (currentMain != null)
-                {
-                    currentMain.UnsetMain();
-                }
+                _branchRepository.ResetAllMainBranches(command.CompanyId);
 
                 branch.SetAsMain();
             }
@@ -107,7 +96,6 @@ namespace GeneralInfoManagement.Application
             {
                 branch.UnsetMain();
             }
-
 
             var location = new Location(command.Latitude, command.Longitude);
 
@@ -171,11 +159,11 @@ namespace GeneralInfoManagement.Application
         {
             var operation = new OperationResult();
 
-            _branchRepository.ResetAllMainBranches(); 
-
             var current = _branchRepository.Get(id);
 
             if (current == null) return new OperationResult().Failed("یافت نشد");
+
+            _branchRepository.ResetAllMainBranches(current.CompanyId);
 
             current.SetAsMain();
 
@@ -251,6 +239,8 @@ namespace GeneralInfoManagement.Application
             var code = _codeApplication.GetByOwner(id, CodeOwnerTypeDTO.Branch);
             details.CurrentCode = code?.Value;
             details.ManualCode = code?.Value;
+            details.IsCodeAutomatic = code?.IsAutomatic ?? true;
+
 
             return details;
         }

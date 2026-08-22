@@ -1,4 +1,6 @@
-﻿using _0_Framework.Application;
+﻿using System.Security.Cryptography.X509Certificates;
+using System.Xml.Schema;
+using _0_Framework.Application;
 using _0_FrameWork.Domain;
 using GeneralInfoManagement.Application.Contract.FinancialPeriod;
 using GeneralInfoManagement.Domain.BaseInfo.FinancialPeriodsAgg;
@@ -18,6 +20,9 @@ namespace GeneralInfoManagement.Application
         public OperationResult Create(CreateFinancialPeriod command)
         {
             var operation = new OperationResult();
+
+            if (string.IsNullOrWhiteSpace(command.Title))
+                return operation.Failed("عنوان دوره مالی نمی‌تواند خالی باشد.");
 
             if (_financialPeriodRepository.Exists(x => x.Title == command.Title))
                 return operation.Failed("نام دوره مالی تکراری است.");
@@ -50,6 +55,9 @@ namespace GeneralInfoManagement.Application
             var operation = new OperationResult();
             var period = _financialPeriodRepository.Get(command.Id);
 
+            if (string.IsNullOrWhiteSpace(command.Title))
+                return operation.Failed("عنوان دوره مالی نمی‌تواند خالی باشد.");
+
             if (period == null)
                 return operation.Failed(ApplicationMessages.RecordNotFound);
 
@@ -60,6 +68,7 @@ namespace GeneralInfoManagement.Application
                 return operation.Failed("تاریخ پایان باید بعد از تاریخ شروع باشد.");
 
             var hasOverlap = _financialPeriodRepository.Exists(x =>
+                x.Id != command.Id &&
                 command.StartDate <= x.EndDate &&
                 command.EndDate >= x.StartDate);
 

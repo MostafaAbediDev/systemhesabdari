@@ -33,6 +33,7 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
                     BranchId = x.BranchId,
                     CreditLimit = x.CreditLimit,
                     PersonCategoryId = x.PersonCategoryId,
+                    IsActive = x.IsActive,
                 })
                 .FirstOrDefault(x => x.Id == id);
         }
