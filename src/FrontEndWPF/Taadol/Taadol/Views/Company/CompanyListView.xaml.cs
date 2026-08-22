@@ -186,6 +186,8 @@ namespace Taadol.Views
         {
             CompaniesGrid.IsLoading = true;
 
+            await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background);
+
             try
             {
                 var items = await System.Threading.Tasks.Task.Run(() =>

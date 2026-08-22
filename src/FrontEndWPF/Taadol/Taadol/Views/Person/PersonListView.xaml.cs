@@ -90,12 +90,13 @@ namespace Taadol.Views
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
 
             Loaded += PersonListView_Loaded;
-            this.Unloaded += (s, e) =>
-            {
-                // Cleanup: prevent stale callbacks if view is re-used
-                ViewModel.PropertyChanged -= ViewModel_PropertyChanged;
-                this.Unloaded -= (s2, e2) => { };
-            };
+            this.Unloaded += PersonListView_Unloaded;
+        }
+
+        private void PersonListView_Unloaded(object sender, RoutedEventArgs e)
+        {
+            ViewModel.PropertyChanged -= ViewModel_PropertyChanged;
+            this.Unloaded -= PersonListView_Unloaded;
         }
 
         private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)

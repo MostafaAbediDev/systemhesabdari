@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,6 +16,7 @@ namespace Taadol.Views
     {
         public BranchArchiveListViewModel ViewModel { get; }
         private readonly DispatcherTimer _searchDebounceTimer;
+        private CancellationTokenSource _loadCts = new();
         private bool _isLoadedOnce;
 
         public BranchArchiveListView()
@@ -73,9 +75,21 @@ namespace Taadol.Views
 
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
             Loaded += BranchArchiveListView_Loaded;
+            this.Unloaded += OnViewUnloaded;
 
             if (FilePicker != null)
                 FilePicker.FileSelected += async (s, e) => await AddPickedFileAsync();
+        }
+
+        private void OnViewUnloaded(object sender, RoutedEventArgs e)
+        {
+            _loadCts?.Cancel();
+            _loadCts?.Dispose();
+            _loadCts = null;
+
+            _searchDebounceTimer?.Stop();
+
+            this.Unloaded -= OnViewUnloaded;
         }
 
         // ─── ظاهر گرید شبیه جدول حساب‌های بانکی ───
