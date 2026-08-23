@@ -17,6 +17,7 @@ using PersonManagement.Application.Contract.PersonTypes;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Windows;
@@ -118,6 +119,8 @@ namespace Taadol.Views
         public string EconomicCode { get => _economicCode; set { _economicCode = value; OnPropertyChanged(); MarkUserChange(); } }
         public string RegistrationNumber { get => _registrationNumber; set { _registrationNumber = value; OnPropertyChanged(); MarkUserChange(); } }
         public string ManualCode { get => _manualCode; set { _manualCode = value; OnPropertyChanged(); MarkUserChange(); } }
+        private string _creditLimitText = "";
+        public string CreditLimitText { get => _creditLimitText; set { _creditLimitText = value; OnPropertyChanged(); MarkUserChange(); } }
         public bool IsLegal { get => _isLegal; set { _isLegal = value; OnPropertyChanged(); MarkUserChange(); UpdateLegalTypePanels(); } }
         public bool IsActive { get => _isActive; set { _isActive = value; OnPropertyChanged(); MarkUserChange(); } }
         public long SelectedBranchId { get => _selectedBranchId; set { _selectedBranchId = value; OnPropertyChanged(); MarkUserChange(); } }
@@ -482,8 +485,14 @@ namespace Taadol.Views
             EconomicCode = d.EconomicCode ?? ""; RegistrationNumber = d.RegistrationNumber ?? "";
             var loadedCode = d.ManualCode ?? d.CurrentCode;
             ManualCode = loadedCode ?? "";
-            if (string.IsNullOrWhiteSpace(loadedCode) && CodeModeToggle != null)
-            { _isCodeAutomatic = true; CodeModeToggle.IsFirstSelected = true; if (ManualCodeTextBox != null) ManualCodeTextBox.IsEnabled = false; }
+            // وضعیت کد (خودکار/دستی) مستقیماً از DTO دریافتی از GetDetails خوانده می‌شود — بدون حدس زدن
+            _isCodeAutomatic = d.IsCodeAutomatic;
+            if (CodeModeToggle != null)
+            {
+                CodeModeToggle.IsFirstSelected = _isCodeAutomatic;
+                if (ManualCodeTextBox != null) ManualCodeTextBox.IsEnabled = !_isCodeAutomatic;
+            }
+            CreditLimitText = d.CreditLimit.HasValue ? d.CreditLimit.Value.ToString("0.##", CultureInfo.InvariantCulture) : "";
             SelectedBranchId = d.BranchId; _selectedPersonCategoryId = d.PersonCategoryId;
             _selectedPersonTypeId = d.PersonTypeId; OnPropertyChanged(nameof(SelectedPersonTypeId));
         }
@@ -785,6 +794,7 @@ namespace Taadol.Views
             string ContactFirstName, string ContactLastName, string NationalCode, string EconomicCode,
             string RegistrationNumber, long PersonTypeId, long BranchId, string ManualCode,
             long? PersonCategoryId, bool IsActive, bool IsCodeAutomatic,
+            decimal CreditLimit,
             string Phone, string Mobile, string Email, Dictionary<string, long> ContactTypeNames,
             string Address, string PostalCode, long ProvinceId, long CityId,
             List<BankAccountRow> BankAccounts);
@@ -796,10 +806,26 @@ namespace Taadol.Views
                 ContactFirstName, ContactLastName, NationalCode, EconomicCode,
                 RegistrationNumber, SelectedPersonTypeId, SelectedBranchId, ManualCode,
                 _selectedPersonCategoryId, IsActive, _isCodeAutomatic,
+                ParseCreditLimit(CreditLimitText),
                 Phone?.Trim() ?? "", Mobile?.Trim() ?? "", Email?.Trim() ?? "",
                 new Dictionary<string, long>(_contactTypeByName),
                 Address, PostalCode, SelectedProvinceId, SelectedCityId,
                 BankAccounts.Select(r => new BankAccountRow { BankBranchId = r.BankBranchId, BankName = r.BankName, CardNumber = r.CardNumber, Shaba = r.Shaba, AccountNumber = r.AccountNumber, IsDefault = r.IsDefault }).ToList());
+        }
+
+        /// <summary>
+        /// تبدیل متن واردشده سقف اعتبار به decimal؛ ارقام فارسی به انگلیسی نرمال می‌شوند.
+        /// </summary>
+        private static decimal ParseCreditLimit(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return 0m;
+            var sb = new System.Text.StringBuilder();
+            foreach (var c in text.Trim())
+            {
+                if (c >= '۰' && c <= '۹') sb.Append((char)('0' + (c - '۰')));
+                else sb.Append(c);
+            }
+            return decimal.TryParse(sb.ToString(), NumberStyles.Number, CultureInfo.InvariantCulture, out var v) ? v : 0m;
         }
 
         private Task<OperationResult> ExecuteEditSaveAsync(EditSaveSnapshot s)
@@ -823,7 +849,7 @@ namespace Taadol.Views
                     EconomicCode = s.IsLegal ? s.EconomicCode : null,
                     RegistrationNumber = s.IsLegal ? s.RegistrationNumber : null,
                     IsLegal = s.IsLegal, PersonTypeId = s.PersonTypeId, BranchId = s.BranchId,
-                    CreditLimit = 0, IsCodeAutomatic = s.IsCodeAutomatic,
+                    CreditLimit = s.CreditLimit, IsCodeAutomatic = s.IsCodeAutomatic,
                     ManualCode = s.ManualCode, PersonCategoryId = s.PersonCategoryId
                 };
                 var result = personApp.Edit(command);

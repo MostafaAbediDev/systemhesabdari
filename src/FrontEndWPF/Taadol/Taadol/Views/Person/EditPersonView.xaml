@@ -250,6 +250,22 @@
                             </Grid>
                         </Grid>
 
+                        <Grid Margin="0,5,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="240" />
+                                <ColumnDefinition Width="400" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="سقف اعتبار"
+                                           Style="{StaticResource FormLabel}" />
+                                <controls:ModernPersianTextBox InputType="Number"
+                                                               FlowDirection="LeftToRight"
+                                                               Width="240"
+                                                               Text="{Binding CreditLimitText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                               Placeholder="0" />
+                            </StackPanel>
+                        </Grid>
+
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition MaxHeight="625" />

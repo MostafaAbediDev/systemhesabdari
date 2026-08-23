@@ -274,11 +274,12 @@ namespace Taadol.Views
                 foreach (var p in provinces)
                     Provinces.Add(new ProvinceComboItem { Id = p.Id, Title = p.Title });
 
-                // کد فعلی شعبه — در حالت ویرایش «دستی» است تا کد موجود حفظ شود (بدون تولید کد جدید)
+                // کد فعلی شعبه — وضعیت خودکار/دستی مستقیماً از DTO دریافتی از GetDetails خوانده می‌شود (بدون حدس زدن)
                 var currentCode = details.ManualCode ?? details.CurrentCode ?? "";
                 UniqueCode = currentCode;
-                _isCodeAutomatic = false;
-                IsUniqueCodeManual = true;
+                _isCodeAutomatic = details.IsCodeAutomatic;
+                IsUniqueCodeManual = !_isCodeAutomatic;
+                if (CodeModeToggle != null) CodeModeToggle.IsFirstSelected = _isCodeAutomatic;
 
                 BranchName = details.Title ?? "";
                 NationalId = details.NationalId ?? "";
