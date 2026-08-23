@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Taadol.Controls;
+using Taadol.Helpers;
 using Taadol.Services;
 using Taadol.Views;
 
@@ -25,21 +26,21 @@ namespace Taadol
             _factory = new ViewFactory(App.ServiceProvider);
             _companyApplication = App.ServiceProvider.GetRequiredService<ICompanyApplication>();
 
-            _factory.Register("person_list", () => new PersonListView());
-            _factory.Register("person_new", () => new NewPersonView());
+            _factory.Register(NavKeys.PersonList, () => new PersonListView());
+            _factory.Register(NavKeys.PersonNew, () => new NewPersonView());
 
-            _factory.Register("product_list", () => new ProductListView());
-            _factory.Register("product_new", () => new NewProductView());
+            _factory.Register(NavKeys.ProductList, () => new ProductListView());
+            _factory.Register(NavKeys.ProductNew, () => new NewProductView());
 
-            _factory.Register("company_info", () => new NewCompanyView());
-            _factory.Register("company_list", () => new CompanyListView());
+            _factory.Register(NavKeys.CompanyInfo, () => new NewCompanyView());
+            _factory.Register(NavKeys.CompanyList, () => new CompanyListView());
 
-            _factory.Register("branch_new", () => new NewBranchView());
-            _factory.Register("branch_list", () => new BranchListView());
-            _factory.Register("branch_archive", () => new BranchArchiveListView());
+            _factory.Register(NavKeys.BranchNew, () => new NewBranchView());
+            _factory.Register(NavKeys.BranchList, () => new BranchListView());
+            _factory.Register(NavKeys.BranchArchive, () => new BranchArchiveListView());
 
-            _factory.Register("financial_period", () => new FinancialPeriodListView());
-            _factory.Register("financial_period_new", () => new NewFinancialPeriodView());
+            _factory.Register(NavKeys.FinancialPeriod, () => new FinancialPeriodListView());
+            _factory.Register(NavKeys.FinancialPeriodNew, () => new NewFinancialPeriodView());
 
             _nav = new NavigationService(MainContent, _factory);
 

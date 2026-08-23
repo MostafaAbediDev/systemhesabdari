@@ -525,7 +525,7 @@ namespace Taadol.Views
                 if (mainWindow?.MainContent.Content is BranchListView listView)
                     _ = RefreshListViewSafeAsync(listView);
                 else
-                    mainWindow?.NavigateTo("branch_list");
+                    mainWindow?.NavigateTo(NavKeys.BranchList);
             }
             catch (Exception ex)
             {

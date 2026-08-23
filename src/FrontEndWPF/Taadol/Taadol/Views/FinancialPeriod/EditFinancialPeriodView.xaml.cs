@@ -10,9 +10,9 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using GeneralInfoManagement.Application.Contract.Branches;
 using GeneralInfoManagement.Application.Contract.FinancialPeriod;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
 using Taadol.Controls;
+using Taadol.Helpers;
 
 namespace Taadol.Views
 {
@@ -257,75 +257,43 @@ namespace Taadol.Views
 
             try
             {
-                // چک‌های سمت دیتابیس (همپوشانی و عنوان تکراری) و خودِ ذخیره روی ترد پس‌زمینه
-                // اجرا می‌شوند تا UI فریز نشود. خروجی null یعنی موفق؛ غیر null پیام هشدار است.
+                // ذخیره از طریق سرویس Application روی ترد پس‌زمینه اجرا می‌شود تا UI فریز نشود.
+                // سرویس بک‌اند خودش چک همپوشانی و عنوان تکراری را انجام می‌دهد.
+                // خروجی null یعنی موفق؛ غیر null پیام هشدار است.
                 var dbMessage = await Task.Run(() =>
                 {
-                    using (var checkConnection = new SqlConnection(App.ConnectionString))
+                    using var scope = App.ServiceProvider.CreateScope();
+                    var app = scope.ServiceProvider.GetRequiredService<IFinancialPeriodApplication>();
+
+                    var result = app.Edit(new EditFinancialPeriod
                     {
-                        checkConnection.Open();
+                        Id = _periodId,
+                        Title = PeriodTitle.Trim(),
+                        StartDate = StartDate.Value,
+                        EndDate = EndDate.Value,
+                        BranchId = SelectedBranchId
+                    });
 
-                        using (var overlapCommand = new SqlCommand(@"
-                            SELECT COUNT(1) FROM FinancialPeriods
-                            WHERE Id != @Id AND IsDeleted = 0
-                              AND @StartDate <= EndDate AND @EndDate >= StartDate;
-                        ", checkConnection))
-                        {
-                            overlapCommand.Parameters.AddWithValue("@Id", _periodId);
-                            overlapCommand.Parameters.AddWithValue("@StartDate", StartDate.Value);
-                            overlapCommand.Parameters.AddWithValue("@EndDate", EndDate.Value);
-                            var overlapCount = Convert.ToInt32(overlapCommand.ExecuteScalar());
-                            if (overlapCount > 0)
-                                return "بازه زمانی دوره مالی با یک دوره مالی دیگر همپوشانی دارد.";
-                        }
+                    if (!result.IsSucceeded)
+                        return result.Message;
 
-                        using (var titleCommand = new SqlCommand(@"
-                            SELECT COUNT(1) FROM FinancialPeriods
-                            WHERE Id != @Id AND IsDeleted = 0 AND Title = @Title;
-                        ", checkConnection))
-                        {
-                            titleCommand.Parameters.AddWithValue("@Id", _periodId);
-                            titleCommand.Parameters.AddWithValue("@Title", PeriodTitle.Trim());
-                            var titleCount = Convert.ToInt32(titleCommand.ExecuteScalar());
-                            if (titleCount > 0)
-                                return "نام دوره مالی تکراری است.";
-                        }
-                    }
-
-                    using var connection = new SqlConnection(App.ConnectionString);
-                    connection.Open();
-                    using var transaction = connection.BeginTransaction();
-
-                    // اگر دوره جاری است، بقیه دوره‌های همان شعبه غیرفعال شوند
+                    // Edit فیلد IsActive را تغییر نمی‌دهد؛ وضعیت «دوره جاری» را دستی اعمال می‌کنیم
                     if (IsCurrentPeriod)
                     {
-                        using var deactivateCommand = new SqlCommand(@"
-                            UPDATE FinancialPeriods
-                            SET IsActive = 0
-                            WHERE BranchId = @BranchId AND IsDeleted = 0;
-                        ", connection, transaction);
-                        deactivateCommand.Parameters.AddWithValue("@BranchId", SelectedBranchId);
-                        deactivateCommand.ExecuteNonQuery();
+                        // بقیه دوره‌های فعال همان شعبه غیرفعال شوند (به‌جز خودِ این دوره)
+                        var others = app.GetFinancialPeriods()
+                            .Where(p => p.Id != _periodId && p.BranchId == SelectedBranchId && p.IsActive && !p.IsDeleted)
+                            .ToList();
+                        foreach (var p in others)
+                            app.Deactivate(p.Id);
+
+                        app.Activate(_periodId);
+                    }
+                    else
+                    {
+                        app.Deactivate(_periodId);
                     }
 
-                    using var updateCommand = new SqlCommand(@"
-                        UPDATE FinancialPeriods
-                        SET Title = @Title,
-                            StartDate = @StartDate,
-                            EndDate = @EndDate,
-                            BranchId = @BranchId,
-                            IsActive = @IsActive
-                        WHERE Id = @Id AND IsDeleted = 0;
-                    ", connection, transaction);
-                    updateCommand.Parameters.AddWithValue("@Id", _periodId);
-                    updateCommand.Parameters.AddWithValue("@Title", PeriodTitle.Trim());
-                    updateCommand.Parameters.AddWithValue("@StartDate", StartDate.Value);
-                    updateCommand.Parameters.AddWithValue("@EndDate", EndDate.Value);
-                    updateCommand.Parameters.AddWithValue("@BranchId", SelectedBranchId);
-                    updateCommand.Parameters.AddWithValue("@IsActive", IsCurrentPeriod);
-                    updateCommand.ExecuteNonQuery();
-
-                    transaction.Commit();
                     return (string)null;
                 });
 
@@ -349,7 +317,7 @@ namespace Taadol.Views
                 if (mainWindow?.MainContent.Content is FinancialPeriodListView listView)
                     _ = RefreshListViewSafeAsync(listView);
                 else
-                    mainWindow?.NavigateTo("financial_period");
+                    mainWindow?.NavigateTo(NavKeys.FinancialPeriod);
             }
             catch (Exception ex)
             {

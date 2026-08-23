@@ -9,7 +9,7 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/Taadol;component/Themes/SubmenuStyles1.xaml" />
+                <ResourceDictionary Source="/Taadol;component/Themes/SubmenuStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
         </ResourceDictionary>

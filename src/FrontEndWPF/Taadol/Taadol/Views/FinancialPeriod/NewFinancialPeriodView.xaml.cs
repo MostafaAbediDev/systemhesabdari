@@ -8,9 +8,10 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using GeneralInfoManagement.Application.Contract.Branches;
-using Microsoft.Data.SqlClient;
+using GeneralInfoManagement.Application.Contract.FinancialPeriod;
 using Microsoft.Extensions.DependencyInjection;
 using Taadol.Controls;
+using Taadol.Helpers;
 
 namespace Taadol.Views
 {
@@ -21,6 +22,7 @@ namespace Taadol.Views
         private bool _isLoading = true;
         private CancellationTokenSource _loadCts = new();
         private readonly IBranchApplication _branchApplication;
+        private readonly IFinancialPeriodApplication _financialPeriodApplication;
 
         private string _periodTitle;
         private long _selectedBranchId;
@@ -92,6 +94,7 @@ namespace Taadol.Views
             InitializeComponent();
 
             _branchApplication = App.ServiceProvider.GetRequiredService<IBranchApplication>();
+            _financialPeriodApplication = App.ServiceProvider.GetRequiredService<IFinancialPeriodApplication>();
 
             SaveCommand = new FinancialPeriodSaveCommand(async () => await SaveFinancialPeriodAsync());
 
@@ -210,60 +213,48 @@ namespace Taadol.Views
 
             try
             {
-                // عملیات دیتابیس روی ترد پس‌زمینه اجرا می‌شود تا UI فریز نشود
-                await Task.Run(() =>
+                // عملیات دیتابیس از طریق سرویس Application روی ترد پس‌زمینه اجرا می‌شود تا UI فریز نشود
+                var dbMessage = await Task.Run(() =>
                 {
-                    using var connection = new SqlConnection(App.ConnectionString);
-                    connection.Open();
+                    using var scope = App.ServiceProvider.CreateScope();
+                    var app = scope.ServiceProvider.GetRequiredService<IFinancialPeriodApplication>();
 
-                    using var transaction = connection.BeginTransaction();
+                    // اول ثبت، بعد وضعیت «دوره جاری» — تا اگر Create خطا داد، دوره‌های قبلی دست‌نخورده بمانند
+                    var result = app.Create(new CreateFinancialPeriod
+                    {
+                        Title = PeriodTitle.Trim(),
+                        StartDate = StartDate.Value,
+                        EndDate = EndDate.Value,
+                        BranchId = SelectedBranchId
+                    });
+
+                    if (!result.IsSucceeded)
+                        return result.Message;
 
                     if (IsCurrentPeriod)
                     {
-                        using var deactivateCommand = new SqlCommand(@"
-                            UPDATE FinancialPeriods
-                            SET IsActive = 0
-                            WHERE BranchId = @BranchId
-                              AND IsDeleted = 0;
-                        ", connection, transaction);
+                        // دوره‌های فعال قبلی همان شعبه غیرفعال شوند
+                        var existing = app.GetFinancialPeriods()
+                            .Where(p => p.BranchId == SelectedBranchId && p.IsActive && !p.IsDeleted)
+                            .ToList();
+                        foreach (var p in existing)
+                            app.Deactivate(p.Id);
 
-                        deactivateCommand.Parameters.AddWithValue("@BranchId", SelectedBranchId);
-                        deactivateCommand.ExecuteNonQuery();
+                        // Create فیلد IsActive را ست نمی‌کند؛ دوره جدید را فعال کن
+                        var created = app.GetFinancialPeriods()
+                            .FirstOrDefault(p => p.Title == PeriodTitle.Trim() && p.BranchId == SelectedBranchId && !p.IsDeleted);
+                        if (created != null)
+                            app.Activate(created.Id);
                     }
 
-                    using var insertCommand = new SqlCommand(@"
-                        INSERT INTO FinancialPeriods
-                        (
-                            Title,
-                            StartDate,
-                            EndDate,
-                            BranchId,
-                            IsDeleted,
-                            IsActive,
-                            CreationDate
-                        )
-                        VALUES
-                        (
-                            @Title,
-                            @StartDate,
-                            @EndDate,
-                            @BranchId,
-                            0,
-                            @IsActive,
-                            SYSDATETIME()
-                        );
-                    ", connection, transaction);
-
-                    insertCommand.Parameters.AddWithValue("@Title", PeriodTitle.Trim());
-                    insertCommand.Parameters.AddWithValue("@StartDate", StartDate.Value);
-                    insertCommand.Parameters.AddWithValue("@EndDate", EndDate.Value);
-                    insertCommand.Parameters.AddWithValue("@BranchId", SelectedBranchId);
-                    insertCommand.Parameters.AddWithValue("@IsActive", IsCurrentPeriod);
-
-                    insertCommand.ExecuteNonQuery();
-
-                    transaction.Commit();
+                    return (string)null;
                 });
+
+                if (dbMessage != null)
+                {
+                    ToastManager.Warning(dbMessage);
+                    return;
+                }
 
                 ToastManager.Success("دوره مالی با موفقیت ثبت شد.");
 
@@ -303,7 +294,7 @@ namespace Taadol.Views
         private void NavigateToPeriodList()
         {
             var mainWindow = Window.GetWindow(this) as MainWindow;
-            mainWindow?.NavigateTo("financial_period");
+            mainWindow?.NavigateTo(NavKeys.FinancialPeriod);
         }
 
         private void MarkUserChange()

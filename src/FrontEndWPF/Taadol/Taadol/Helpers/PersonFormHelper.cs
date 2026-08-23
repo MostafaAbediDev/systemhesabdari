@@ -40,7 +40,7 @@ namespace Taadol.Helpers
                     using var scope = App.ServiceProvider.CreateScope();
                     var repo = scope.ServiceProvider.GetRequiredService<IProvinceRepository>();
                     return repo.GetProvincesForSelectList();
-                });
+                }).ConfigureAwait(false);
 
                 await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
                 {
@@ -90,7 +90,7 @@ namespace Taadol.Helpers
                     using var scope = App.ServiceProvider.CreateScope();
                     var repo = scope.ServiceProvider.GetRequiredService<ICityRepository>();
                     return repo.GetCitiesByProvince(provinceId);
-                }, ct);
+                }, ct).ConfigureAwait(false);
 
                 ct.ThrowIfCancellationRequested();
                 // ✅ Staleness check: اگر کاربر استان را عوض کرده، نتایج قدیمی را نادیده بگیر
@@ -136,7 +136,7 @@ namespace Taadol.Helpers
                     using var scope = App.ServiceProvider.CreateScope();
                     var app = scope.ServiceProvider.GetRequiredService<IContactTypeApplication>();
                     return app.GetActive();
-                });
+                }).ConfigureAwait(false);
                 contactTypes.Clear();
                 contactTypes.AddRange(items);
                 contactTypeByName.Clear();
@@ -164,7 +164,7 @@ namespace Taadol.Helpers
                     using var scope = App.ServiceProvider.CreateScope();
                     var app = scope.ServiceProvider.GetRequiredService<IPersonTypeApplication>();
                     return app.GetPersonTypes();
-                });
+                }).ConfigureAwait(false);
                 if (personTypes != null)
                 {
                     await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
@@ -201,7 +201,7 @@ namespace Taadol.Helpers
                     return app.GetBranches()
                                .Select(b => new BranchComboItem { Id = b.Id, Title = b.Title })
                                .ToList();
-                });
+                }).ConfigureAwait(false);
                 await System.Windows.Application.Current.Dispatcher.InvokeAsync(() => replaceAll(items));
                 return items;
             }
@@ -233,7 +233,7 @@ namespace Taadol.Helpers
                     using var scope = App.ServiceProvider.CreateScope();
                     var app = scope.ServiceProvider.GetRequiredService<BankManagement.Application.Contracts.BankBranch.IBankBranchApplication>();
                     return app.GetBankBranches();
-                });
+                }).ConfigureAwait(false);
                 await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
                 {
                     bankBranches.Clear();
@@ -269,7 +269,7 @@ namespace Taadol.Helpers
                     using var scope = App.ServiceProvider.CreateScope();
                     var app = scope.ServiceProvider.GetRequiredService<IPersonCategoryApplication>();
                     return app.GetTree(personTypeId);
-                }, ct);
+                }, ct).ConfigureAwait(false);
 
                 ct.ThrowIfCancellationRequested();
                 return tree;

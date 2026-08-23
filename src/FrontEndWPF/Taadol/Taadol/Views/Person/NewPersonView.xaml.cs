@@ -5,8 +5,6 @@ using GeneralInfoManagement.Application.Contract.Branches;
 using GeneralInfoManagement.Application.Contract.City;
 using GeneralInfoManagement.Application.Contract.Picture;
 using GeneralInfoManagement.Application.Contract.Province;
-using GeneralInfoManagement.Domain.General.CityAgg;
-using GeneralInfoManagement.Domain.General.ProvinceAgg;
 using Microsoft.Extensions.DependencyInjection;
 using Taadol.Helpers;
 using PersonManagement.Application.Contract.ContactTypes;
@@ -59,8 +57,6 @@ namespace Taadol.Views
         private readonly IPersonContactApplication _personContactApplication;
         private readonly IPersonAddressApplication _personAddressApplication;
         private readonly IPersonBankApplication _personBankApplication;
-        private readonly IProvinceRepository _provinceRepository;
-        private readonly ICityRepository _cityRepository;
         // این سرویس اختیاری است (ممکن است در App.xaml.cs ثبت نشده باشد)
         private readonly IBankBranchApplication? _bankBranchApplication;
         private readonly ICodeGeneratorService _codeGeneratorService;
@@ -329,8 +325,6 @@ namespace Taadol.Views
             _personContactApplication = App.ServiceProvider.GetRequiredService<IPersonContactApplication>();
             _personAddressApplication = App.ServiceProvider.GetRequiredService<IPersonAddressApplication>();
             _personBankApplication = App.ServiceProvider.GetRequiredService<IPersonBankApplication>();
-            _provinceRepository = App.ServiceProvider.GetRequiredService<IProvinceRepository>();
-            _cityRepository = App.ServiceProvider.GetRequiredService<ICityRepository>();
             _pictureApplication = App.ServiceProvider.GetRequiredService<IPictureApplication>();
             // سرویس اختیاری — اگه BankManagementBoostrapper در App.xaml.cs ثبت نشده باشه،
             // null برمی‌گردانه و فرم باز می‌شه (بدون لیست شعب بانک)

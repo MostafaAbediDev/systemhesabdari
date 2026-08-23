@@ -4,8 +4,6 @@ using GeneralInfoManagement.Application.Contract.Branches;
 using GeneralInfoManagement.Application.Contract.City;
 using GeneralInfoManagement.Application.Contract.Picture;
 using GeneralInfoManagement.Application.Contract.Province;
-using GeneralInfoManagement.Domain.General.CityAgg;
-using GeneralInfoManagement.Domain.General.ProvinceAgg;
 using Microsoft.Extensions.DependencyInjection;
 using PersonManagement.Application.Contract.ContactTypes;
 using PersonManagement.Application.Contract.PersonAddress;
@@ -40,9 +38,6 @@ namespace Taadol.Views
         private readonly IContactTypeApplication _contactTypeApplication;
         private readonly IPersonContactApplication _personContactApplication;
         private readonly IPersonAddressApplication _personAddressApplication;
-        private readonly IPersonBankApplication _personBankApplication;
-        private readonly IProvinceRepository _provinceRepository;
-        private readonly ICityRepository _cityRepository;
         private readonly IBankBranchApplication? _bankBranchApplication;
         private readonly IPersonCategoryApplication _personCategoryApplication;
         private readonly IPictureApplication _pictureApplication;
@@ -159,9 +154,6 @@ namespace Taadol.Views
             _contactTypeApplication = App.ServiceProvider.GetRequiredService<IContactTypeApplication>();
             _personContactApplication = App.ServiceProvider.GetRequiredService<IPersonContactApplication>();
             _personAddressApplication = App.ServiceProvider.GetRequiredService<IPersonAddressApplication>();
-            _personBankApplication = App.ServiceProvider.GetRequiredService<IPersonBankApplication>();
-            _provinceRepository = App.ServiceProvider.GetRequiredService<IProvinceRepository>();
-            _cityRepository = App.ServiceProvider.GetRequiredService<ICityRepository>();
             _bankBranchApplication = App.ServiceProvider.GetService<IBankBranchApplication>();
             _personCategoryApplication = App.ServiceProvider.GetRequiredService<IPersonCategoryApplication>();
             _pictureApplication = App.ServiceProvider.GetRequiredService<IPictureApplication>();
@@ -765,7 +757,7 @@ namespace Taadol.Views
                 mainWindow?.CloseModal();
                 if (mainWindow?.MainContent.Content is PersonListView listView)
                     _ = RefreshListViewSafeAsync(listView);
-                else mainWindow?.NavigateTo("person_list");
+                else mainWindow?.NavigateTo(NavKeys.PersonList);
             }
             catch (OperationCanceledException)
             {
@@ -1280,34 +1272,6 @@ namespace Taadol.Views
             }
 
             _isUpdatingDefault = false;
-        }
-
-        // ★ متد کمکی برای ساخت حساب بانکی (legacy - replaced by TryCreateBankAccountScoped in SavePerson)
-        private void TryCreateBankAccount(long personId, long bankBranchId, string bankName, string accountNumber, string cardNumber, string shaba, bool isDefault)
-        {
-            if (bankBranchId <= 0) return;
-
-            try
-            {
-                var result = _personBankApplication.Create(new CreatePersonBank
-                {
-                    PersonId = personId,
-                    BankBranchId = bankBranchId,
-                    AccountNumber = accountNumber ?? "",
-                    CardNumber = cardNumber ?? "",
-                    Shaba = shaba ?? "",
-                    IsDefault = isDefault
-                });
-
-                if (!result.IsSucceeded)
-                {
-                    System.Diagnostics.Debug.WriteLine($"⚠️ Bank account creation failed: {result.Message}");
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"⚠️ TryCreateBankAccount exception: {ex.Message}");
-            }
         }
 
         private bool ValidatePerson()

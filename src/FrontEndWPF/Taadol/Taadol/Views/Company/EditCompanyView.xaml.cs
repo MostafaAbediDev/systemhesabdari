@@ -10,6 +10,7 @@ using System.Windows.Input;
 using GeneralInfoManagement.Application.Contract.Company;
 using Microsoft.Extensions.DependencyInjection;
 using Taadol.Controls;
+using Taadol.Helpers;
 
 namespace Taadol.Views
 {
@@ -241,7 +242,7 @@ namespace Taadol.Views
                 if (mainWindow?.MainContent.Content is CompanyListView listView)
                     _ = RefreshListViewSafeAsync(listView);
                 else
-                    mainWindow?.NavigateTo("company_list");
+                    mainWindow?.NavigateTo(NavKeys.CompanyList);
             }
             catch (Exception ex)
             {

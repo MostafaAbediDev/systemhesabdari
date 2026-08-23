@@ -4,7 +4,6 @@ using GeneralInfoManagement.Application.Contract.Company;
 using GeneralInfoManagement.Application.Contract.Province;
 using GeneralInfoManagement.Domain.General.CityAgg;
 using GeneralInfoManagement.Domain.General.ProvinceAgg;
-using GeneralInfoManagement.Infrastructure.EFCore.Repository;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -342,8 +341,6 @@ namespace Taadol.Views
                 ShowCompanyComboLoading(false);
             }
         }
-        private readonly IProvinceRepository _provinceRepository;
-        private readonly ICityRepository _cityRepository;
         private string GenerateNextUniqueCodeFromDatabase()
         {
             using var scope = App.ServiceProvider.CreateScope();
@@ -610,8 +607,6 @@ namespace Taadol.Views
             InitializeComponent();
 
             _branchApplication = App.ServiceProvider.GetRequiredService<IBranchApplication>();
-            _provinceRepository = App.ServiceProvider.GetRequiredService<IProvinceRepository>();
-            _cityRepository = App.ServiceProvider.GetRequiredService<ICityRepository>();
 
             DataContext = this;
             SaveCommand = new RelayCommand(async () => await SaveBranchAsync());
@@ -822,7 +817,7 @@ namespace Taadol.Views
         private void NavigateToBranchList()
         {
             var mainWindow = Window.GetWindow(this) as MainWindow;
-            mainWindow?.NavigateTo("branch_list");
+            mainWindow?.NavigateTo(NavKeys.BranchList);
         }
 
         private void MarkUserChange()
