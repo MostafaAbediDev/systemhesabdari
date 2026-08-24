@@ -86,17 +86,6 @@ namespace GeneralInfoManagement.Application
             if (_branchRepository.Exists(x => x.NationalId == nationalId && x.Id != command.Id))
                 return operation.Failed("شناسه ملی تکراری است.");
 
-            if (command.IsMain)
-            {
-                _branchRepository.ResetAllMainBranches(command.CompanyId);
-
-                branch.SetAsMain();
-            }
-            else
-            {
-                branch.UnsetMain();
-            }
-
             var location = new Location(command.Latitude, command.Longitude);
 
             branch.Edit(
@@ -124,6 +113,17 @@ namespace GeneralInfoManagement.Application
 
             if (!codeResult.IsSucceeded)
                 return operation.Failed(codeResult.Message);
+
+            if (command.IsMain)
+            {
+                _branchRepository.ResetAllMainBranches(command.CompanyId);
+
+                branch.SetAsMain();
+            }
+            else
+            {
+                branch.UnsetMain();
+            }
 
             _branchRepository.SaveChanges();
             return operation.Succedded();

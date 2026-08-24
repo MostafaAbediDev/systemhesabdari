@@ -51,7 +51,7 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
         {
             return _context.PersonContacts
                             .AsNoTracking()
-                            .Where(x => x.Id == id)
+                            .Where(x => x.Id == id && !x.IsDeleted)
                             .Select(x => new EditPersonContact
                             {
                                 Id = x.Id,
@@ -66,7 +66,7 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
 
         public List<PersonContactViewModel> Search(PersonContactSearchModel searchModel)
         {
-            var query = _context.PersonContacts
+            var query = _context.PersonContacts.Where(x => !x.IsDeleted)
                             .AsNoTracking()
                             .Include(x => x.Persons)
                             .Include(x => x.ContactTypes)

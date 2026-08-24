@@ -17,6 +17,7 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
         public List<FinancialPeriodViewModel> GetFinancialPeriods()
         {
             return _context.FinancialPeriods
+                .Where(x => !x.IsDeleted)
                 .Include(x => x.Branch)
                 .Select(x => new FinancialPeriodViewModel
                 {
@@ -33,7 +34,7 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
 
         public EditFinancialPeriod GetDetails(long id)
         {
-            return _context.FinancialPeriods
+            return _context.FinancialPeriods.Where(x => !x.IsDeleted)
                             .Select(x => new EditFinancialPeriod
                             {
                                 Id = x.Id,
@@ -47,7 +48,7 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
 
         public List<FinancialPeriodViewModel> Search(FinancialPeriodSearchModel searchModel)
         {
-            var query = _context.FinancialPeriods
+            var query = _context.FinancialPeriods.Where(x => !x.IsDeleted)
                .Include(x => x.Branch)
                .Select(x => new FinancialPeriodViewModel
                {

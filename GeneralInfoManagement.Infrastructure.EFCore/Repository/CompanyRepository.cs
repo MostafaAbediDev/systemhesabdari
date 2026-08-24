@@ -16,6 +16,7 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
         public List<CompanyViewModel> GetCompanies()
         {
             return _context.Companies
+                .Where(x => !x.IsDeleted)
                 .Select(x => new CompanyViewModel
                 {
                     Id = x.Id,
@@ -31,6 +32,7 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
         public EditCompanies GetDetails(long id)
         {
             return _context.Companies
+                .Where(x => !x.IsDeleted)
                 .Select(x => new EditCompanies
                 {
                     Id = x.Id,
@@ -44,7 +46,7 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
 
         public List<CompanyViewModel> Search(CompanySearchModel searchModel)
         {
-            var query = _context.Companies
+            var query = _context.Companies.Where(x => !x.IsDeleted)
                             .Select(x => new CompanyViewModel
                             {
                                 Id = x.Id,
