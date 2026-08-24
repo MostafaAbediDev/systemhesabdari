@@ -202,11 +202,15 @@
 
             
             <Border Grid.Row="3"
+                    x:Name="ProductsGridArea"
                     Background="Transparent"
                     ClipToBounds="False"
                     Padding="15,0">
 
-                <Grid x:Name="DataGridContainer">
+                <!-- VerticalAlignment=Top: گرید فقط به‌اندازه‌ی محتوا (هدر + ردیف‌ها) بلند می‌شود؛
+                     MaxHeight در کد-behind = فضای موجود، تا با ردیف‌های زیاد اسکرول داخلی فعال شود -->
+                <Grid x:Name="DataGridContainer"
+                      VerticalAlignment="Top">
                     <Grid.Resources>
                         <Style x:Key="BaseTextColumnStyle"
                                TargetType="TextBlock">

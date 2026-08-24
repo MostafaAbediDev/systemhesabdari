@@ -8,7 +8,9 @@
              mc:Ignorable="d"
              FlowDirection="RightToLeft"
              FontFamily="{StaticResource IRANSans}"
-             Background="#FFFFFF">
+             Background="#FFFFFF"
+             SnapsToDevicePixels="True"
+             UseLayoutRounding="True">
 
     <UserControl.Resources>
         <Style x:Key="EllipseLeft" TargetType="Ellipse">
@@ -71,30 +73,49 @@
         </ControlTemplate>
     </UserControl.Resources>
 
-    <!-- ارتفاع گرید ثابت می‌ماند حتی وقتی ردیف کم است؛ با تغییر تعداد ردیف
-         فرم نه کوچک می‌شود نه بزرگ (مثل لیست اشخاص). -->
-    <Grid MinHeight="480">
+    <!-- چیدمان: [ناحیه‌ی گرید با اسکرول بیرونی] + [Footer = نوار جمع‌بندی] + [PaginationBar در پایین].
+         اسکرول‌بار خارج از قاب گرید است؛ قاب همیشه دقیقاً به‌اندازه‌ی محتوا (هدر + ردیف‌ها) جمع می‌شود
+         و هیچ فاصله‌ای بین آخرین ردیف و بردر پایین قاب نیست. چرخ ماوس روی گرید به اسکرول بیرونی منتقل می‌شود. -->
+    <Grid>
         <Grid.RowDefinitions>
+            <!-- سطر گرید * است تا اسکرول‌ویور بیرونی ارتفاع محدود (viewport) داشته باشد؛
+                 خود قاب گرید همیشه به‌اندازه‌ی محتوا (هدر + ردیف‌ها) جمع می‌شود -->
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- ═══ DataGrid + Loading ═══ -->
-        <Grid Grid.Row="0"
-              ClipToBounds="True">
+        <!-- ═══ اسکرول بیرونی + DataGrid + Loading ═══ -->
+        <!-- اسکرول‌بار خارج از قاب گرید است و فقط وقتی ردیف‌ها از فضای موجود بلندتر شوند ظاهر می‌شود؛
+             قاب گرید دست‌نخورده و دقیقاً به‌اندازه‌ی محتوا می‌ماند (هیچ فاصله‌ای بین آخرین ردیف و بردر پایین نیست) -->
+        <ScrollViewer x:Name="OuterScrollViewer"
+                      Grid.Row="0"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled"
+                      CanContentScroll="False"
+                      VerticalContentAlignment="Top">
+            <ScrollViewer.Resources>
+                <Style TargetType="ScrollBar"
+                       BasedOn="{StaticResource MinimalScrollBar}" />
+            </ScrollViewer.Resources>
+            <!-- GridArea: VerticalAlignment=Top تا دقیقاً به‌اندازه‌ی محتوا جمع شود؛
+                 MinHeight فقط در حالت خالی/لودینگ ۲۰۰ می‌شود تا پیام/لودر جا داشته باشد -->
+            <Grid x:Name="GridArea"
+                  VerticalAlignment="Top"
+                  ClipToBounds="True">
+            <!-- MinHeight در کد-behind مدیریت می‌شود: فقط در حالت خالی/لودینگ ۲۰۰ می‌شود
+                 تا پیام/لودر جا داشته باشد؛ با داده‌ی واقعی صفر است تا گرید دقیقاً به‌اندازه‌ی محتوا جمع شود -->
             <Border x:Name="DataGridBorder"
-                    Background="#FFFFFF"
-                    BorderBrush="#E5E7EB"
-                    BorderThickness="1,1,1,1"
-                    CornerRadius="4"
-                    Padding="0"
-                    Margin="0"
-                    ClipToBounds="True"
-                    SnapsToDevicePixels="True"
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Stretch">
+                        Background="#FFFFFF"
+                        BorderBrush="#E5E7EB"
+                        BorderThickness="1,1,1,1"
+                        CornerRadius="4"
+                        Padding="0"
+                        Margin="0"
+                        ClipToBounds="True"
+                        SnapsToDevicePixels="True"
+                        HorizontalAlignment="Stretch">
                 <DataGrid x:Name="DataGridView"
-                          VerticalAlignment="Stretch"
                           HorizontalAlignment="Stretch"
                           CanUserSortColumns="False"
                           SnapsToDevicePixels="True"
@@ -107,6 +128,8 @@
                           Background="White"
                           BorderBrush="Transparent"
                           BorderThickness="0"
+                          Padding="0"
+                          VerticalContentAlignment="Top"
                           CanUserAddRows="False"
                           CanUserDeleteRows="False"
                           CanUserResizeRows="False"
@@ -114,30 +137,15 @@
                           AlternationCount="2"
                           IsReadOnly="True"
                           VirtualizingPanel.VirtualizationMode="Standard"
-                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                          ScrollViewer.VerticalScrollBarVisibility="Auto"
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                          ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                          ScrollViewer.CanContentScroll="False"
                           ColumnHeaderStyle="{StaticResource UnifiedGridColumnHeaderStyle}"
                           CellStyle="{StaticResource UnifiedGridCellStyle}"
                           RowStyle="{StaticResource UnifiedGridRowStyle}"
                           SelectionChanged="DataGridView_SelectionChanged"
                           MouseDoubleClick="DataGridView_MouseDoubleClick"
                           LoadingRow="DataGridView_LoadingRow">
-
-                    <DataGrid.Resources>
-                        <Style TargetType="ScrollBar"
-                               BasedOn="{StaticResource MinimalScrollBar}">
-                            <Style.Triggers>
-                                <Trigger Property="Orientation"
-                                         Value="Horizontal">
-                                    <!-- اسکرولبار افقی باید دیده شود تا کاربر بفهمد
-                                         در پنجره کوچک می‌تواند به ستون‌های آخر برسد -->
-                                    <Setter Property="Height"
-                                            Value="10" />
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-
-                    </DataGrid.Resources>
 
                     <DataGrid.Columns>
                         <!-- 1️⃣ چک‌باکس -->
@@ -165,6 +173,19 @@
                                             Value="#E5E7EB" />
                                 </Style>
                             </DataGridTemplateColumn.HeaderStyle>
+                            <DataGridTemplateColumn.CellStyle>
+                                <Style TargetType="DataGridCell"
+                                       BasedOn="{StaticResource UnifiedGridCellStyle}">
+                                    <!-- سلول چک‌باکس هیچ خطی نمی‌کشد؛ لبه‌ی راست گرید فقط بردر قاب را دارد
+                                         و جداکننده‌ی بین چک‌باکس و # از سلول ستون # می‌آید -->
+                                    <Setter Property="BorderThickness"
+                                            Value="0" />
+                                    <Setter Property="Padding"
+                                            Value="0" />
+                                    <Setter Property="HorizontalContentAlignment"
+                                            Value="Center" />
+                                </Style>
+                            </DataGridTemplateColumn.CellStyle>
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <!-- ردیف‌های خالی (پرکننده صفحه) چک‌باکس ندارند -->
@@ -202,8 +223,9 @@
                             <DataGridTextColumn.HeaderStyle>
                                 <Style TargetType="DataGridColumnHeader"
                                        BasedOn="{StaticResource UnifiedGridColumnHeaderStyle}">
+                                    <!-- خط راست = جداکننده با چک‌باکس؛ خط چپ حذف شد تا با خط راست هدر «کد یکتا» دوتایی نشود -->
                                     <Setter Property="BorderThickness"
-                                            Value="1,0,1,1" />
+                                            Value="0,0,1,1" />
                                     <Setter Property="BorderBrush"
                                             Value="#E5E7EB" />
                                 </Style>
@@ -439,10 +461,20 @@
                 </StackPanel>
             </Border>
         </Grid>
+        </ScrollViewer>
 
-        <!-- ═══ صفحه‌بندی ═══ -->
+        <!-- ═══ شکاف نوار جمع‌بندی: هر فرم نوار خودش (ListSummaryBar یا نوار سفارشی) را اینجا می‌گذارد؛
+             همیشه زیر گرید و خارج از ناحیه‌ی اسکرول است ═══ -->
+        <ContentControl x:Name="FooterSlot"
+                        Grid.Row="1"
+                        Margin="0,4,0,0"
+                        Focusable="False" />
+
+        <!-- ═══ صفحه‌بندی (زیر نوار جمع‌بندی، خارج از ناحیه‌ی اسکرول) ═══
+             مارجین پایین: با لیست بلند که گرید تا سقف پر می‌شود، نوار هرگز زیر فوتر/لبه بریده نشود -->
         <controls:PaginationBar x:Name="PaginationBar"
-                                Grid.Row="1" />
+                                Grid.Row="2"
+                                Margin="0,0,0,8" />
 
         <!-- ═══ منوی راست‌کلیک ردیف (ویرایش / حذف) — کنترل مستقل ═══ -->
         <controls:RowContextMenuControl x:Name="RowContextMenu" />

@@ -33,6 +33,12 @@ namespace Taadol.Views
         {
             InitializeComponent();
 
+            // نوار خلاصه به شکاف زیر گرید منتقل می‌شود تا همیشه زیر گرید بچسبد
+            // (اول از والد فعلی جدا می‌شود تا خطای «Must disconnect child» رخ ندهد)
+            if (SummaryBorder.Parent is Panel parent)
+                parent.Children.Remove(SummaryBorder);
+            PersonsGrid.Footer = SummaryBorder;
+
             using var scope = App.ServiceProvider.CreateScope();
             ViewModel = new PersonListViewModel(App.ServiceProvider);
 

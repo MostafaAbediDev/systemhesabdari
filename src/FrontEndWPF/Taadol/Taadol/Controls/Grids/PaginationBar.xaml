@@ -12,8 +12,8 @@
              FontFamily="{StaticResource IRANSans}"
              Background="White">
 
-    <Border Padding="0,0,0,8"
-            Margin="10"
+    <Border Padding="0,0,0,0"
+            Margin="0"
             Background="White"
             BorderBrush="#E9F0FF"
             BorderThickness="0,0,0,0">
@@ -123,6 +123,12 @@
                                                 <Setter TargetName="bd"
                                                         Property="Background"
                                                         Value="Transparent" />
+                                                <!-- نقطه‌چین همیشه ثابت/بی‌حرکت است: بدون مکان‌نمای دست، بدون هاور
+                                                     و بدون کلیک — فقط یک «...» خنثی بین شماره‌ها، در هر دو طرف -->
+                                                <Setter Property="Cursor"
+                                                        Value="Arrow" />
+                                                <Setter Property="IsHitTestVisible"
+                                                        Value="False" />
                                             </DataTrigger>
                                             <Trigger Property="IsMouseOver"
                                                      Value="True">

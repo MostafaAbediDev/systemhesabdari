@@ -25,6 +25,11 @@ namespace Taadol.Views
         {
             InitializeComponent();
 
+            // گرید فقط به‌اندازه‌ی محتوا جمع می‌شود؛ با ردیف‌های زیاد تا سقف فضای موجود
+            // (منهای مارجین کوچک) رشد می‌کند و اسکرول داخلی با هدر ثابت فعال می‌شود.
+            ProductsGridArea.SizeChanged += (s, e) => UpdateGridMaxHeight();
+            Loaded += (s, e) => UpdateGridMaxHeight();
+
             LoadTestData();
 
             // جستجو با Debounce داخلی SearchBoxControl (پیش‌فرض ۳۰۰ms)
@@ -35,6 +40,12 @@ namespace Taadol.Views
             };
 
             this.Dispatcher.BeginInvoke(new Action(() => ApplyFilter()));
+        }
+
+        private void UpdateGridMaxHeight()
+        {
+            if (ProductsGridArea == null || ProductsGridArea.ActualHeight <= 0) return;
+            DataGridContainer.MaxHeight = Math.Max(0, ProductsGridArea.ActualHeight - 4);
         }
 
         private void HeaderClose_Click(object sender, MouseButtonEventArgs e)

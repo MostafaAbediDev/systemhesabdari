@@ -25,10 +25,20 @@ namespace Taadol.Controls
         // وگرنه قبل از شروع لود، فلش خالی وسط گرید دیده می‌شود.
         private bool _itemsSourceEverSet = false;
 
+        // شعاع گرد گوشه‌ی داخلی قاب (CornerRadius بیرونی ۴ منهای ضخامت بردر ۱)
+        private const double GridCornerRadius = 3;
+
         public UnifiedListView()
         {
             InitializeComponent();
             Loaded += UnifiedListView_Loaded;
+
+            // چرخ ماوس روی گرید به اسکرول بیرونی منتقل می‌شود (DataGrid رویداد را می‌بلعد)
+            DataGridView.PreviewMouseWheel += DataGrid_PreviewMouseWheel;
+
+            // گوشه‌های محتوای گرید را گرد نگه می‌دارد تا هدر/ردیف‌ها از CornerRadius قاب بیرون نزنند
+            // (فقط خود DataGrid کلیپ می‌شود تا خط بردر قاب بیرونی بریده نشود)
+            DataGridView.SizeChanged += DataGridView_SizeChanged;
 
             DataGridView.PreviewMouseLeftButtonDown += DataGridRow_PreviewMouseLeftButtonDown;
             DataGridView.MouseLeftButtonDown += DataGridRow_MouseLeftButtonDown;
@@ -92,6 +102,28 @@ namespace Taadol.Controls
         {
             get => (IEnumerable)GetValue(ItemsSourceProperty);
             set => SetValue(ItemsSourceProperty, value);
+        }
+
+        /// <summary>
+        /// محتوای شکاف پایین گرید (نوار جمع‌بندی). هر فرم نوار خودش را اینجا قرار می‌دهد؛
+        /// همیشه زیر گرید و خارج از ناحیه‌ی اسکرول است.
+        /// </summary>
+        public static readonly DependencyProperty FooterProperty =
+            DependencyProperty.Register(nameof(Footer), typeof(object), typeof(UnifiedListView),
+                new PropertyMetadata(null, (d, _) =>
+                {
+                    var control = (UnifiedListView)d;
+                    if (control.FooterSlot == null) return;
+                    control.FooterSlot.Content = control.Footer;
+                    control.FooterSlot.Visibility = control.Footer == null
+                        ? Visibility.Collapsed
+                        : Visibility.Visible;
+                }));
+
+        public object Footer
+        {
+            get => GetValue(FooterProperty);
+            set => SetValue(FooterProperty, value);
         }
 
         public static readonly DependencyProperty PagesSourceProperty =
@@ -207,6 +239,9 @@ namespace Taadol.Controls
             // لودینگ اولویت دارد؛ و پیام فقط بعد از اولین بارگذاری نمایش داده می‌شود
             var show = ShowEmptyState && _itemsSourceEverSet && !hasRealItems && !IsLoading;
             EmptyStateOverlay.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
+
+            // در حالت خالی، گرید حداقل ارتفاع می‌گیرد تا پیام وسط جدول جا داشته باشد
+            UpdateGridMinHeight();
         }
 
         public static readonly DependencyProperty ShowRowNumberProperty =
@@ -278,12 +313,38 @@ namespace Taadol.Controls
         {
             ApplyColumnVisibility();
 
+            UpdateGridMinHeight();
+
             Dispatcher.BeginInvoke(new Action(() =>
             {
                 WireScrollChanged();
                 UpdateRowBorders();
                 UpdateHeaderSelectAllState();
             }), DispatcherPriority.Background);
+        }
+
+        /// <summary>
+        /// وقتی لیست خالی است یا در حال بارگذاری، گرید حداقل ارتفاع می‌گیرد تا پیام خالی/لودر
+        /// جایی برای نمایش داشته باشد؛ با داده‌ی واقعی صفر می‌شود تا گرید دقیقاً به‌اندازه‌ی محتوا جمع شود.
+        /// </summary>
+        private void UpdateGridMinHeight()
+        {
+            if (GridArea == null) return;
+
+            var hasRealItems = false;
+            if (ItemsSource != null)
+            {
+                foreach (var item in ItemsSource)
+                {
+                    if (item is IListRowItem row && !row.IsEmpty)
+                    {
+                        hasRealItems = true;
+                        break;
+                    }
+                }
+            }
+
+            GridArea.MinHeight = (!hasRealItems || IsLoading) ? 200 : 0;
         }
 
         private void ApplyColumnVisibility()
@@ -314,6 +375,9 @@ namespace Taadol.Controls
                 LoadingOverlay.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
             if (DataGridView != null)
                 DataGridView.IsHitTestVisible = !show;
+
+            // در حالت لودینگ، گرید حداقل ارتفاع می‌گیرد تا کارت لودر جا داشته باشد
+            UpdateGridMinHeight();
         }
 
         // ══════════════════════════════════════════════════════
@@ -465,6 +529,9 @@ namespace Taadol.Controls
 
         private void DataGridView_LoadingRow(object sender, DataGridRowEventArgs e)
         {
+            // هر ردیف تازه‌واقع‌شده — واقعی یا پرکننده — بلافاصله خط جداکننده‌اش را می‌گیرد
+            // (پوشش مجازی‌سازی و ردیف‌هایی که بعد از افزودن فیلرها ساخته می‌شوند)
+            UpdateRowBorders();
         }
 
         private static T FindChild<T>(DependencyObject parent) where T : DependencyObject
@@ -547,40 +614,34 @@ namespace Taadol.Controls
             var items = DataGridView.Items;
             var blue = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2667FF"));
             var transparent = Brushes.Transparent;
-            var gray = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#D1D5DB"));
-
-            int lastRealIndex = -1;
-            for (int i = items.Count - 1; i >= 0; i--)
-            {
-                if (items[i] is IListRowItem p && !p.IsEmpty)
-                {
-                    lastRealIndex = i;
-                    break;
-                }
-            }
+            var gray = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E5E7EB"));
 
             for (int i = 0; i < items.Count; i++)
             {
                 var row = DataGridView.ItemContainerGenerator.ContainerFromIndex(i) as DataGridRow;
                 if (row == null) continue;
 
-                if (items[i] is not IListRowItem item || item.IsEmpty)
+                if (items[i] is not IListRowItem item)
                 {
                     row.BorderBrush = transparent;
                     row.BorderThickness = new Thickness(0);
                     continue;
                 }
 
-                bool prevSelected = (i > 0) && items[i - 1] is IListRowItem prev && !prev.IsEmpty && prev.IsSelected;
-                bool isLast = (i == lastRealIndex);
+                // فقط آخرین ردیفِ کل لیست (واقعی یا پرکننده) خط پایین ندارد؛ بردر پایین قاب
+                // همان خطِ انتهای جدول است. بقیه‌ی ردیف‌ها — از جمله ردیف‌های پرکننده —
+                // جداکننده‌ی خاکستری می‌گیرند تا جدول تا انتهای کادر پر و یکدست دیده شود.
+                bool isLastOverall = (i == items.Count - 1);
 
                 if (item.IsSelected)
                 {
+                    // ردیف انتخاب‌شده: خط پایین آبی ملایم (مطابق فیگما)
                     row.BorderBrush = blue;
-                    row.BorderThickness = new Thickness(0, prevSelected ? 0 : 1, 0, 1);
+                    row.BorderThickness = new Thickness(0, 0, 0, 1);
                 }
-                else if (isLast)
+                else if (!isLastOverall)
                 {
+                    // جداکننده‌ی افقی یکدست بین ردیف‌ها: ۱ پیکسل خاکستری
                     row.BorderBrush = gray;
                     row.BorderThickness = new Thickness(0, 0, 0, 1);
                 }
@@ -599,20 +660,56 @@ namespace Taadol.Controls
         private void WireScrollChanged()
         {
             if (DataGridView == null || _scrollWired) return;
+
+            // اسکرول توسط خود DataGrid (اسکرول‌ویور داخلی) انجام می‌شود تا هدر ستون‌ها ثابت بماند؛
+            // Padding/Margin اسکرول‌ویور داخلی صفر می‌شود. اسکرول‌بار عمودی با Visibility=Auto
+            // فقط وقتی ردیف‌ها از ظرفیت کادر بلندتر شوند ظاهر می‌شود (استایل مینیمال ۸px) تا
+            // کاربر بداند لیست اسکرول دارد؛ با ردیف کم هیچ اسکرول‌باری دیده نمی‌شود.
             if (FindDescendantByName(DataGridView, "DG_ScrollViewer") is ScrollViewer sv)
             {
+                sv.Padding = new Thickness(0);
+                sv.Margin = new Thickness(0);
+                sv.VerticalContentAlignment = VerticalAlignment.Top;
+
                 _scrollWired = true;
                 sv.ScrollChanged += (s, _) =>
                     Dispatcher.BeginInvoke(new Action(UpdateRowBorders), DispatcherPriority.Background);
             }
         }
 
-        /// <summary>اسکرول عمودی گرید را به بالای لیست برمی‌گرداند (بعد از تغییر صفحه/فیلتر).</summary>
+        /// <summary>
+        /// محتوای DataGrid (هدر و ردیف‌ها) را با گوشه‌های گرد می‌بُرد تا گوشه‌های تیز سفید
+        /// از داخل CornerRadius قاب بیرونی دیده نشوند؛ خود قاب (بردر بیرونی) کلیپ نمی‌شود.
+        /// </summary>
+        private void DataGridView_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (DataGridView == null || DataGridView.ActualWidth <= 0 || DataGridView.ActualHeight <= 0) return;
+            DataGridView.Clip = new RectangleGeometry(
+                new Rect(0, 0, DataGridView.ActualWidth, DataGridView.ActualHeight),
+                GridCornerRadius, GridCornerRadius);
+        }
+
+        /// <summary>اسکرول بیرونی را به بالای لیست برمی‌گرداند (بعد از تغییر صفحه/فیلتر).</summary>
         private void ScrollGridToTop()
         {
-            if (DataGridView == null) return;
-            if (FindDescendantByName(DataGridView, "DG_ScrollViewer") is ScrollViewer sv)
-                sv.ScrollToVerticalOffset(0);
+            OuterScrollViewer?.ScrollToTop();
+        }
+
+        /// <summary>
+        /// DataGrid رویداد چرخ ماوس را می‌بلعد؛ دلتا را به اسکرول بیرونی منتقل می‌کند تا
+        /// با ماوس روی هر جای گرید، چرخ اسکرول بیرونی را بچرخاند. فقط وقتی اسکرول واقعاً
+        /// ممکن است (محتوا بلندتر از viewport) رویداد مصرف می‌شود.
+        /// </summary>
+        private void DataGrid_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (OuterScrollViewer == null || e.Delta == 0) return;
+            if (OuterScrollViewer.ScrollableHeight <= 0) return;
+
+            double newOffset = OuterScrollViewer.VerticalOffset - e.Delta;
+            newOffset = Math.Max(0, Math.Min(newOffset, OuterScrollViewer.ScrollableHeight));
+
+            OuterScrollViewer.ScrollToVerticalOffset(newOffset);
+            e.Handled = true;
         }
     }
 }

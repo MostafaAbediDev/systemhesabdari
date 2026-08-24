@@ -220,28 +220,33 @@
                             </DataGridTemplateColumn.HeaderStyle>
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Border Padding="8,3" CornerRadius="5" HorizontalAlignment="Center">
+                                    <!-- بج سبز لایت مطابق فیگما (هماهنگ با PersonListView) -->
+                                    <Border Padding="8,4" CornerRadius="6" HorizontalAlignment="Center">
                                         <Border.Style>
                                             <Style TargetType="Border">
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding BranchType}" Value="اصلی">
-                                                        <Setter Property="Background" Value="#DCFCE7" />
+                                                        <Setter Property="Background" Value="#E0FBEC" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding BranchType}" Value="فرعی">
                                                         <Setter Property="Background" Value="#E5E7EC" />
+                                                    </DataTrigger>
+                                                    <!-- در ردیف‌های پرکننده، بج دیده نشود -->
+                                                    <DataTrigger Binding="{Binding IsEmpty}" Value="True">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
                                         </Border.Style>
                                         <TextBlock Text="{Binding BranchType}"
-                                                   FontSize="11"
+                                                   FontSize="11.5"
                                                    FontWeight="Medium"
                                                    FontFamily="{StaticResource IRANSans}">
                                             <TextBlock.Style>
                                                 <Style TargetType="TextBlock">
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding BranchType}" Value="اصلی">
-                                                            <Setter Property="Foreground" Value="#166534" />
+                                                            <Setter Property="Foreground" Value="#02A844" />
                                                         </DataTrigger>
                                                         <DataTrigger Binding="{Binding BranchType}" Value="فرعی">
                                                             <Setter Property="Foreground" Value="#66718E" />
@@ -503,28 +508,33 @@
                             </DataGridTemplateColumn.HeaderTemplate>
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Border Padding="8,3" CornerRadius="5" HorizontalAlignment="Center">
+                                    <!-- بج سبز لایت مطابق فیگما (هماهنگ با PersonListView) -->
+                                    <Border Padding="8,4" CornerRadius="6" HorizontalAlignment="Center">
                                         <Border.Style>
                                             <Style TargetType="Border">
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding Status}" Value="فعال">
-                                                        <Setter Property="Background" Value="#DCFCE7" />
+                                                        <Setter Property="Background" Value="#E0FBEC" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Status}" Value="غیرفعال">
                                                         <Setter Property="Background" Value="#E5E7EC" />
+                                                    </DataTrigger>
+                                                    <!-- در ردیف‌های پرکننده، بج دیده نشود -->
+                                                    <DataTrigger Binding="{Binding IsEmpty}" Value="True">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
                                         </Border.Style>
                                         <TextBlock Text="{Binding Status}"
-                                                   FontSize="11"
+                                                   FontSize="11.5"
                                                    FontWeight="Medium"
                                                    FontFamily="{StaticResource IRANSans}">
                                             <TextBlock.Style>
                                                 <Style TargetType="TextBlock">
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding Status}" Value="فعال">
-                                                            <Setter Property="Foreground" Value="#166534" />
+                                                            <Setter Property="Foreground" Value="#02A844" />
                                                         </DataTrigger>
                                                         <DataTrigger Binding="{Binding Status}" Value="غیرفعال">
                                                             <Setter Property="Foreground" Value="#66718E" />

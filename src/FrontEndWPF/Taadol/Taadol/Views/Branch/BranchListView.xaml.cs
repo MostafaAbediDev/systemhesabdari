@@ -43,6 +43,12 @@ namespace Taadol.Views
         {
             InitializeComponent();
 
+            // نوار جمع‌بندی به شکاف زیر گرید منتقل می‌شود تا همیشه زیر گرید بچسبد
+            // (اول از والد فعلی جدا می‌شود تا خطای «Must disconnect child» رخ ندهد)
+            if (BranchSummaryBar.Parent is Panel parent)
+                parent.Children.Remove(BranchSummaryBar);
+            BranchesGrid.Footer = BranchSummaryBar;
+
             ApplyGrayHeaders();
 
             _branchApplication = App.ServiceProvider.GetRequiredService<IBranchApplication>();
@@ -391,7 +397,8 @@ namespace Taadol.Views
         {
             var pages = new ObservableCollection<PageItem>();
 
-            if (_totalPages <= 7)
+            // آستانه ۵ صفحه: با ۵ صفحه یا کمتر همه‌ی شماره‌ها بدون نقطه‌چین
+            if (_totalPages <= 5)
             {
                 for (int i = 1; i <= _totalPages; i++)
                 {
@@ -416,6 +423,14 @@ namespace Taadol.Views
                 IsCurrent = _currentPage == 1
             });
 
+            // نقطه‌چین اول — همیشه ثابت در هر دو طرف (مطابق لیست اشخاص)
+            pages.Add(new PageItem
+            {
+                PageNumber = 0,
+                PageNumberDisplay = "...",
+                IsCurrent = false
+            });
+
             int middleStart = _currentPage - 1;
             int middleEnd = _currentPage + 1;
 
@@ -428,16 +443,6 @@ namespace Taadol.Views
             {
                 middleStart = _totalPages - 3;
                 middleEnd = _totalPages - 1;
-            }
-
-            if (middleStart > 2)
-            {
-                pages.Add(new PageItem
-                {
-                    PageNumber = 0,
-                    PageNumberDisplay = "...",
-                    IsCurrent = false
-                });
             }
 
             for (int i = middleStart; i <= middleEnd; i++)
@@ -453,15 +458,13 @@ namespace Taadol.Views
                 }
             }
 
-            if (middleEnd < _totalPages - 1)
+            // نقطه‌چین دوم — همیشه ثابت
+            pages.Add(new PageItem
             {
-                pages.Add(new PageItem
-                {
-                    PageNumber = 0,
-                    PageNumberDisplay = "...",
-                    IsCurrent = false
-                });
-            }
+                PageNumber = 0,
+                PageNumberDisplay = "...",
+                IsCurrent = false
+            });
 
             pages.Add(new PageItem
             {

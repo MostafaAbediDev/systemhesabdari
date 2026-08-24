@@ -77,14 +77,19 @@
                 Value="8,0" />
         <Setter Property="BorderBrush"
                 Value="#E5E7EB" />
+        <!-- خط پایین ۱ پیکسلی (قبلاً ۲ پیکسل بود و کلفت دیده می‌شد) + خط راست ۱ پیکسلی جداکننده -->
         <Setter Property="BorderThickness"
-                Value="0,0,1,2" />
+                Value="0,0,1,1" />
         <Setter Property="HorizontalContentAlignment"
                 Value="Center" />
         <Setter Property="VerticalContentAlignment"
                 Value="Center" />
         <Setter Property="Height"
                 Value="44" />
+        <Setter Property="SnapsToDevicePixels"
+                Value="True" />
+        <Setter Property="UseLayoutRounding"
+                Value="True" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="DataGridColumnHeader">
@@ -108,7 +113,11 @@
                 Value="#374151" />
         <Setter Property="FontSize"
                 Value="13" />
-        <!-- جداکننده عمودی ستون‌ها: فقط روی ردیف‌های پر (ردیف‌های خالی خط ندارند) -->
+        <Setter Property="SnapsToDevicePixels"
+                Value="True" />
+        <Setter Property="UseLayoutRounding"
+                Value="True" />
+        <!-- جداکننده عمودی ستون‌ها: فقط راست (۱ پیکسل)؛ لبه‌ی بیرونی گرید را خود قاب رسم می‌کند -->
         <Setter Property="BorderBrush"
                 Value="#E5E7EB" />
         <Setter Property="BorderThickness"
@@ -137,12 +146,8 @@
                         Value="#1F2937" />
             </Trigger>
 
-            <!-- ردیف‌های خالی (پرکننده صفحه) خط عمودی ندارند -->
-            <DataTrigger Binding="{Binding IsEmpty}"
-                         Value="True">
-                <Setter Property="BorderThickness"
-                        Value="0" />
-            </DataTrigger>
+            <!-- ردیف‌های پرکننده (IsEmpty) هم خطوط عمودی ستون‌ها را دارند تا مثل ادامه‌ی
+                 جدول دیده شوند و فضای خالی بین آخرین ردیف و بردر پایین کادر نماند -->
         </Style.Triggers>
     </Style>
 
@@ -173,12 +178,25 @@
                         Value="#EFF6FF" />
             </Trigger>
 
+            <!-- ردیف انتخاب‌شده (چک‌باکس): پس‌زمینه لایت آبی مطابق فیگما؛
+                 خط آبی پایین را UpdateRowBorders در کد-behind می‌کشد -->
+            <DataTrigger Binding="{Binding IsSelected}"
+                         Value="True">
+                <Setter Property="Background"
+                        Value="#EAF2FF" />
+            </DataTrigger>
+
+            <!-- ردیف‌های پرکننده (IsEmpty): قابل مشاهده‌اند تا جدول تا انتهای کادر پر دیده شود
+                 و فاصله‌ی خالی بین آخرین ردیف و بردر پایین کادر نماند؛ غیرقابل‌کلیک/هاور
+                 هستند تا با ردیف‌های واقعی اشتباه گرفته نشوند -->
             <DataTrigger Binding="{Binding IsEmpty}"
                          Value="True">
                 <Setter Property="Height"
-                        Value="0" />
-                <Setter Property="Visibility"
-                        Value="Collapsed" />
+                        Value="36" />
+                <Setter Property="Cursor"
+                        Value="Arrow" />
+                <Setter Property="IsHitTestVisible"
+                        Value="False" />
             </DataTrigger>
 
             <DataTrigger Binding="{Binding RowBackground, FallbackValue=''}"

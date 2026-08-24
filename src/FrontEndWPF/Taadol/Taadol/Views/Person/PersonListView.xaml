@@ -217,10 +217,17 @@
                                       Width="340"
                                       MinWidth="64"
                                       MaxWidth="340" />
-                    <ColumnDefinition Width="4" />
+                    <!-- خط جداکننده‌ی ۱ پیکسلی بین پنل و گرید با مارجین ۵ از هر طرف (مطابق فیگما) -->
+                    <ColumnDefinition Width="11" />
                     <ColumnDefinition Width="*"
                                       MinWidth="500" />
                 </Grid.ColumnDefinitions>
+
+                <!-- خط عمودی ۱ پیکسلی بین پنل و گرید (مارجین افقی ۵) -->
+                <Border Grid.Column="1"
+                        Background="#E5E7EB"
+                        Margin="5,0"
+                        SnapsToDevicePixels="True" />
 
                 <!-- ═══ پنل سمت راست — اطلاعات اشخاص انتخاب شده ═══ -->
                 <Grid Grid.Column="0"
@@ -528,8 +535,9 @@
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding Status}"
                                                                          Value="فعال">
+                                                                <!-- سبز لایت مطابق فیگما (قبلاً شفاف/کم‌رنگ بود) -->
                                                                 <Setter Property="Background"
-                                                                        Value="#1A00D86F" />
+                                                                        Value="#E0FBEC" />
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
@@ -549,7 +557,7 @@
                                                                 <DataTrigger Binding="{Binding Status}"
                                                                              Value="فعال">
                                                                     <Setter Property="Foreground"
-                                                                            Value="#22C55E" />
+                                                                            Value="#02A844" />
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
@@ -724,7 +732,7 @@
 
                                 <!-- 🔟 وضعیت حساب با فیلتر -->
                                 <DataGridTemplateColumn Width="*"
-                                                        MinWidth="145">
+                                                        MinWidth="175">
                                     <DataGridTemplateColumn.HeaderStyle>
                                         <Style TargetType="DataGridColumnHeader"
                                                BasedOn="{StaticResource UnifiedGridColumnHeaderStyle}"><Setter Property="BorderThickness" Value="0,0,1,1" /><Setter Property="BorderBrush" Value="#E5E7EB" />
@@ -774,40 +782,66 @@
                                     </DataGridTemplateColumn.HeaderTemplate>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
+                                            <!-- مبلغ و برچسب همیشه در یک ردیف افقی کنار هم و با فاصله‌ی ۶ پیکسل؛
+                                                 TextWrapping=NoWrap روی هر دو، بنابراین هرگز به خط دوم نمی‌روند -->
                                             <StackPanel Orientation="Horizontal"
                                                         HorizontalAlignment="Center"
                                                         VerticalAlignment="Center"
                                                         Visibility="{Binding AccountStatusVisibility}">
 
-                                                <TextBlock FontSize="13"
-                                                           FontFamily="{StaticResource IRANSans}"
-                                                           HorizontalAlignment="Center">
+                                                <TextBlock Text="{Binding BalanceDisplay, Mode=OneWay}"
+                                                           FontSize="13"
+                                                           FontWeight="Bold"
+                                                           FontFamily="{StaticResource Vazir}"
+                                                           VerticalAlignment="Center"
+                                                           
+                                                           Margin="0,0,8,0"
+                                                           TextWrapping="NoWrap">
                                                     <TextBlock.Style>
                                                         <Style TargetType="TextBlock">
+                                                            <Setter Property="Foreground"
+                                                                    Value="#64748B" />
                                                             <Style.Triggers>
                                                                 <DataTrigger Binding="{Binding AccountStatus}" Value="بدهکار">
                                                                     <Setter Property="Foreground" Value="#22C55E" />
                                                                 </DataTrigger>
                                                                 <DataTrigger Binding="{Binding AccountStatus}" Value="بستانکار">
-                                                                     <Setter Property="Foreground" Value="#DC2626" />
-                                                                </DataTrigger>
-                                                                <DataTrigger Binding="{Binding AccountStatus}" Value="بی حساب">
-                                                                    <Setter Property="Foreground" Value="#64748B" />
+                                                                    <Setter Property="Foreground" Value="#DC2626" />
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
                                                     </TextBlock.Style>
-                                                    <Run Text="{Binding BalanceDisplay, Mode=OneWay}" FontWeight="Bold" FontFamily="{StaticResource Vazir}" />
-                                                    <Run Text="{Binding AccountStatus, Mode=OneWay}" FontWeight="Regular" />
+                                                </TextBlock>
+
+                                                <TextBlock Text="{Binding AccountStatus, Mode=OneWay}"
+                                                           FontSize="12"
+                                                           FontWeight="Medium"
+                                                           FontFamily="{StaticResource IRANSans}"
+                                                           VerticalAlignment="Center"
+                                                           Margin="0,0,6,0"
+                                                           TextWrapping="NoWrap">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Foreground"
+                                                                    Value="#64748B" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding AccountStatus}" Value="بدهکار">
+                                                                    <Setter Property="Foreground" Value="#22C55E" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding AccountStatus}" Value="بستانکار">
+                                                                    <Setter Property="Foreground" Value="#DC2626" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
                                                 </TextBlock>
                                             </StackPanel>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                            </controls:UnifiedListView.Columns>
+                                </DataGridTemplateColumn>                             </controls:UnifiedListView.Columns>
                         </controls:UnifiedListView>
 
-                <!-- ═══ نوار خلاصه زیر گرید ═══ -->
+                <!-- ═══ نوار خلاصه زیر گرید (در سازنده به Footer گرید منتقل می‌شود) ═══ -->
                 <Border Grid.Row="2"
                         Background="#ffffff"
                         BorderBrush="#E5E7EB"
@@ -815,7 +849,7 @@
                         BorderThickness="1"
                         Height="42"
                         CornerRadius="4"
-                        Margin="0,2,10,8"
+                        Margin="0,2,0,8"
                         Padding="16,8">
                     <Grid>
                         <Grid.ColumnDefinitions>
