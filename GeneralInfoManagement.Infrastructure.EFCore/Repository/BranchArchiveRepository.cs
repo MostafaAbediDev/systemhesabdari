@@ -16,7 +16,7 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
 
         public List<BranchArchiveViewModel> GetBranchArchives()
         {
-            return _context.BranchArchives
+            return _context.BranchArchives.Where(x => !x.IsDeleted)
                 .Include(x => x.Branch)
                 .Select(x => new BranchArchiveViewModel
                 {
@@ -34,7 +34,7 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
 
         public EditBranchArchive GetDetails(long id)
         {
-            return _context.BranchArchives
+            return _context.BranchArchives.Where(x => !x.IsDeleted)
                 .Select(x => new EditBranchArchive
                 {
                     Id = x.Id,
@@ -48,7 +48,8 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
 
         public List<BranchArchiveViewModel> Search(BranchArchiveSearchModel searchModel)
         {
-            var query = _context.BranchArchives
+            var query = _context.BranchArchives.Where(x => !x.IsDeleted)
+                .Include(x => x.Branch)
                 .Select(x => new BranchArchiveViewModel
                 {
                     Id = x.Id,
