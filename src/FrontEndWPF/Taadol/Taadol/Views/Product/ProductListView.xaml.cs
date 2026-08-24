@@ -25,10 +25,8 @@ namespace Taadol.Views
         {
             InitializeComponent();
 
-            // گرید فقط به‌اندازه‌ی محتوا جمع می‌شود؛ با ردیف‌های زیاد تا سقف فضای موجود
-            // (منهای مارجین کوچک) رشد می‌کند و اسکرول داخلی با هدر ثابت فعال می‌شود.
-            ProductsGridArea.SizeChanged += (s, e) => UpdateGridMaxHeight();
-            Loaded += (s, e) => UpdateGridMaxHeight();
+            // چرخ ماوس روی گرید به اسکرول بیرونی منتقل می‌شود (DataGrid رویداد را می‌بلعد)
+            ProductsDataGrid.PreviewMouseWheel += ProductsDataGrid_PreviewMouseWheel;
 
             LoadTestData();
 
@@ -42,10 +40,20 @@ namespace Taadol.Views
             this.Dispatcher.BeginInvoke(new Action(() => ApplyFilter()));
         }
 
-        private void UpdateGridMaxHeight()
+        /// <summary>
+        /// چرخ ماوس روی گرید را به اسکرول بیرونی منتقل می‌کند؛ فقط وقتی اسکرول واقعاً
+        /// ممکن است (محتوا بلندتر از viewport) رویداد مصرف می‌شود.
+        /// </summary>
+        private void ProductsDataGrid_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            if (ProductsGridArea == null || ProductsGridArea.ActualHeight <= 0) return;
-            DataGridContainer.MaxHeight = Math.Max(0, ProductsGridArea.ActualHeight - 4);
+            if (OuterProductsScrollViewer == null || e.Delta == 0) return;
+            if (OuterProductsScrollViewer.ScrollableHeight <= 0) return;
+
+            double newOffset = OuterProductsScrollViewer.VerticalOffset - e.Delta;
+            newOffset = Math.Max(0, Math.Min(newOffset, OuterProductsScrollViewer.ScrollableHeight));
+
+            OuterProductsScrollViewer.ScrollToVerticalOffset(newOffset);
+            e.Handled = true;
         }
 
         private void HeaderClose_Click(object sender, MouseButtonEventArgs e)

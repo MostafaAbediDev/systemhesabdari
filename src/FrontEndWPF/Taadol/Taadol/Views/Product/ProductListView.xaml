@@ -207,10 +207,19 @@
                     ClipToBounds="False"
                     Padding="15,0">
 
-                <!-- VerticalAlignment=Top: گرید فقط به‌اندازه‌ی محتوا (هدر + ردیف‌ها) بلند می‌شود؛
-                     MaxHeight در کد-behind = فضای موجود، تا با ردیف‌های زیاد اسکرول داخلی فعال شود -->
-                <Grid x:Name="DataGridContainer"
-                      VerticalAlignment="Top">
+                <!-- اسکرول بیرونی: اسکرول‌بار خارج از قاب گرید است؛ قاب دقیقاً به‌اندازه‌ی محتوا جمع می‌شود
+                     و هیچ فاصله‌ای بین آخرین ردیف و بردر پایین قاب نیست -->
+                <ScrollViewer x:Name="OuterProductsScrollViewer"
+                              VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled"
+                              CanContentScroll="False"
+                              VerticalContentAlignment="Top">
+                    <ScrollViewer.Resources>
+                        <Style TargetType="ScrollBar"
+                               BasedOn="{StaticResource MinimalScrollBar}" />
+                    </ScrollViewer.Resources>
+                    <Grid x:Name="DataGridContainer"
+                          VerticalAlignment="Top">
                     <Grid.Resources>
                         <Style x:Key="BaseTextColumnStyle"
                                TargetType="TextBlock">
@@ -271,7 +280,8 @@
                               IsReadOnly="True"
                               VirtualizingPanel.VirtualizationMode="Standard"
                               ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                              ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                              ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                              ScrollViewer.CanContentScroll="False"
                               FontFamily="{StaticResource IRANSans}"
                               SelectionChanged="ProductsDataGrid_SelectionChanged">
 
@@ -521,7 +531,8 @@
                                                 ElementStyle="{StaticResource LtrTextColumnStyle}" />
                         </DataGrid.Columns>
                     </DataGrid>
-                </Grid>
+                    </Grid>
+                </ScrollViewer>
             </Border>
 
             
