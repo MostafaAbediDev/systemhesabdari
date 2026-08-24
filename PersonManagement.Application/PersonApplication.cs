@@ -41,6 +41,7 @@ namespace PersonManagement.Application
                 command.PersonCategoryId);
 
             _personRepository.Create(person);
+            _personRepository.SaveChanges();
 
 
             //Set The code 
@@ -55,7 +56,6 @@ namespace PersonManagement.Application
             if (!codeResult.IsSucceeded)
                 return result.Failed(codeResult.Message);
 
-            _personRepository.SaveChanges();
 
             return result.Succedded();
         }

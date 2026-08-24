@@ -15,7 +15,7 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
 
         public EditPicture GetDetails(long id)
         {
-            return _context.Pictures
+            return _context.Pictures.Where(x => !x.IsDeleted)
                 .Select(x => new EditPicture
                 {
                     Id = x.Id,
@@ -28,7 +28,7 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
 
         public List<PictureViewModel> GetByOwner(long ownerId, PictureOwnerType ownerType)
         {
-            return _context.Pictures
+            return _context.Pictures.Where(x => !x.IsDeleted)
                 .Where(x => x.OwnerId == ownerId && x.OwnerType == ownerType)
                 .Select(x => new PictureViewModel
                 {
