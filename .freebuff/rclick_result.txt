@@ -1,3 +1,0 @@
-﻿RCLICK idx=57 name='' id='EmailInput' at=-30929,-31404 off=False
-after: alive=True responding=True memMB=268
-WIN[0] title='تعادل - نرم‌افزار حسابداری'

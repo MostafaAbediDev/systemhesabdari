@@ -1,2 +1,0 @@
-﻿BEFORE: hPercent=-1 hView=100 hMax=-1
-PATTERN_FAIL: Exception calling "Scroll" with "2" argument(s): "Cannot perform operation."

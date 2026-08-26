@@ -1,4 +1,0 @@
-﻿RCLICK at=806,303
-MENUITEM[387] type=ControlType.Text rect=691,319,43,21
-CLICKED_MENU at=712,330
-RESULT FirstNameInput=0 TabInventory=0 BankAccountsTable=0 ERROR=0 alive=True

@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1220" viewBox="0 0 1600 1220">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f8fbff"/>
+      <stop offset="1" stop-color="#eef4fb"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="7" flood-color="#19345f" flood-opacity="0.13"/>
+    </filter>
+    <style>
+      .title { font: 700 30px Segoe UI, Tahoma, Arial; fill: #102a56; }
+      .subtitle { font: 400 16px Segoe UI, Tahoma, Arial; fill: #5d6f89; }
+      .root { font: 700 19px Segoe UI, Tahoma, Arial; fill: #ffffff; }
+      .folder { font: 700 17px Segoe UI, Tahoma, Arial; fill: #102a56; }
+      .item { font: 400 15px Segoe UI, Tahoma, Arial; fill: #354b68; }
+      .note { font: 400 14px Segoe UI, Tahoma, Arial; fill: #65758d; }
+      .small { font: 400 13px Segoe UI, Tahoma, Arial; fill: #60728a; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="1220" fill="url(#bg)"/>
+  <text x="800" y="52" text-anchor="middle" class="title">ساختار پوشه‌بندی FrontEnd — Taadol WPF</text>
+  <text x="800" y="82" text-anchor="middle" class="subtitle">ساختار فعلی پروژه، با تفکیک کد اصلی از خروجی‌های Build</text>
+
+  <!-- root -->
+  <rect x="50" y="125" width="1500" height="58" rx="12" fill="#173d78" filter="url(#shadow)"/>
+  <text x="800" y="162" text-anchor="middle" class="root">src / FrontEndWPF / Taadol / Taadol</text>
+
+  <!-- connectors -->
+  <path d="M800 183 V215 M190 215 H1410 M190 215 V250 M490 215 V250 M790 215 V250 M1090 215 V250 M1410 215 V250" fill="none" stroke="#91a8c7" stroke-width="2"/>
+
+  <!-- Views -->
+  <rect x="50" y="250" width="280" height="330" rx="14" fill="#ffffff" stroke="#80a9e0" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="50" y="250" width="280" height="48" rx="14" fill="#dcecff"/>
+  <text x="190" y="281" text-anchor="middle" class="folder">Views/</text>
+  <text x="75" y="330" class="item">├── Branch/</text>
+  <text x="75" y="360" class="item">├── Company/</text>
+  <text x="75" y="390" class="item">├── FinancialPeriod/</text>
+  <text x="75" y="420" class="item">├── Person/</text>
+  <text x="75" y="450" class="item">└── Product/</text>
+  <text x="75" y="500" class="note">هر قابلیت یک پوشه‌ی جدا دارد</text>
+  <text x="75" y="524" class="note">الگوی مناسب برای WPF</text>
+
+  <!-- Controls -->
+  <rect x="350" y="250" width="280" height="330" rx="14" fill="#ffffff" stroke="#80c7b0" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="350" y="250" width="280" height="48" rx="14" fill="#d9f5ec"/>
+  <text x="490" y="281" text-anchor="middle" class="folder">Controls/</text>
+  <text x="375" y="330" class="item">├── Buttons/</text>
+  <text x="375" y="360" class="item">├── Dialogs/</text>
+  <text x="375" y="390" class="item">├── Feedback/</text>
+  <text x="375" y="420" class="item">├── Grids/</text>
+  <text x="375" y="450" class="item">├── Inputs/</text>
+  <text x="375" y="480" class="item">├── Navigation/</text>
+  <text x="375" y="510" class="item">└── Toggles/</text>
+  <text x="375" y="550" class="note">کنترل‌های قابل استفاده‌ی مجدد</text>
+
+  <!-- MVVM -->
+  <rect x="650" y="250" width="280" height="330" rx="14" fill="#ffffff" stroke="#d7ad70" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="650" y="250" width="280" height="48" rx="14" fill="#fff0d4"/>
+  <text x="790" y="281" text-anchor="middle" class="folder">ViewModels/ + Models/</text>
+  <text x="675" y="330" class="item">BaseViewModel.cs</text>
+  <text x="675" y="360" class="item">PersonListViewModel.cs</text>
+  <text x="675" y="390" class="item">BranchArchiveListViewModel.cs</text>
+  <text x="675" y="430" class="item">Product.cs</text>
+  <text x="675" y="460" class="item">ProductModel.cs</text>
+  <text x="675" y="490" class="item">TransactionItem.cs</text>
+  <text x="675" y="530" class="note">در حال حاضر ترکیبی از</text>
+  <text x="675" y="552" class="note">MVVM و Code-behind است</text>
+
+  <!-- shared -->
+  <rect x="950" y="250" width="280" height="330" rx="14" fill="#ffffff" stroke="#b596d8" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="950" y="250" width="280" height="48" rx="14" fill="#eee2ff"/>
+  <text x="1090" y="281" text-anchor="middle" class="folder">Shared Infrastructure</text>
+  <text x="975" y="330" class="item">Services/</text>
+  <text x="975" y="360" class="item">├── NavigationService</text>
+  <text x="975" y="390" class="item">├── ViewFactory</text>
+  <text x="975" y="420" class="item">└── ToastManager</text>
+  <text x="975" y="460" class="item">Behaviors/</text>
+  <text x="975" y="490" class="item">Helpers/</text>
+  <text x="975" y="520" class="item">Themes/</text>
+  <text x="975" y="550" class="item">Fonts/</text>
+
+  <!-- assets / root -->
+  <rect x="1250" y="250" width="300" height="330" rx="14" fill="#ffffff" stroke="#e08c8c" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="1250" y="250" width="300" height="48" rx="14" fill="#ffe1e1"/>
+  <text x="1400" y="281" text-anchor="middle" class="folder">Root + Resources</text>
+  <text x="1275" y="330" class="item">App.xaml / App.xaml.cs</text>
+  <text x="1275" y="360" class="item">MainWindow.xaml</text>
+  <text x="1275" y="390" class="item">Taadol.csproj</text>
+  <text x="1275" y="420" class="item">appsettings.json</text>
+  <text x="1275" y="450" class="item">Assets/Icons/</text>
+  <text x="1275" y="480" class="item">Fonts/IRANSans + Vazir</text>
+  <text x="1275" y="520" class="item">Themes/Styles.xaml</text>
+  <text x="1275" y="550" class="item">Themes/GridStyles.xaml</text>
+
+  <!-- Build and cleanup section -->
+  <rect x="50" y="635" width="1500" height="245" rx="14" fill="#fffaf0" stroke="#e1b45d" stroke-width="2" filter="url(#shadow)"/>
+  <text x="800" y="675" text-anchor="middle" class="folder">خروجی‌ها و فایل‌های غیرسورس</text>
+  <text x="100" y="720" class="item">artifacts/</text>
+  <text x="300" y="720" class="small">خروجی چند Build آزمایشی؛ برای سورس ضروری نیست</text>
+  <text x="100" y="755" class="item">bin/</text>
+  <text x="300" y="755" class="small">خروجی Build محلی؛ قابل بازتولید</text>
+  <text x="100" y="790" class="item">obj/</text>
+  <text x="300" y="790" class="small">فایل‌های میانی .NET؛ قابل بازتولید</text>
+  <text x="100" y="825" class="item">network-deploy-build/</text>
+  <text x="410" y="825" class="small">بسته‌ی آماده‌ی انتشار برای تستر؛ بهتر است خارج از سورس نگهداری شود</text>
+  <text x="100" y="858" class="note">پیشنهاد: artifacts/ را خارج از پروژه یا در .gitignore نگه دارید.</text>
+
+  <!-- findings -->
+  <rect x="50" y="925" width="730" height="220" rx="14" fill="#f1f8ff" stroke="#8fb9e8" stroke-width="2"/>
+  <text x="415" y="965" text-anchor="middle" class="folder">نقاط قوت</text>
+  <text x="80" y="1005" class="item">✓ Viewها بر اساس قابلیت تفکیک شده‌اند</text>
+  <text x="80" y="1035" class="item">✓ کنترل‌های عمومی در Controls قرار دارند</text>
+  <text x="80" y="1065" class="item">✓ Themes، Assets، Fonts و Services جدا هستند</text>
+  <text x="80" y="1095" class="item">✓ ساختار برای توسعه‌ی فعلی قابل استفاده است</text>
+
+  <rect x="820" y="925" width="730" height="220" rx="14" fill="#fff4f1" stroke="#e4a29a" stroke-width="2"/>
+  <text x="1185" y="965" text-anchor="middle" class="folder">موارد قابل بهبود</text>
+  <text x="850" y="1005" class="item">! ارجاع قدیمی SubmenuStyles1.xaml در csproj</text>
+  <text x="850" y="1035" class="item">! ترکیب Code-behind و MVVM بدون قرارداد مستند</text>
+  <text x="850" y="1065" class="item">! نام‌گذاری آیکون‌ها یکدست نیست</text>
+  <text x="850" y="1095" class="item">! Models کمی ناهمگون و قابل تفکیک بیشتر است</text>
+
+  <text x="800" y="1190" text-anchor="middle" class="subtitle">وضعیت کلی: قابل قبول — نیازمند پاک‌سازی خروجی‌ها و چند اصلاح کوچک، نه بازسازی کامل</text>
+</svg>

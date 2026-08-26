@@ -1,4 +1,0 @@
-﻿INVOKED 'لیست اشخاص' at rect=1680,322,239,36
-DIALOG_PRESENT=False
-MODAL_OPEN=True
-alive=True responding=True

@@ -1,2 +1,0 @@
-﻿  type=ControlType.Text name='اریاگستر' id='PersonNameText' rect=1569,253,43,20
-  type=ControlType.Text name='فعال' id='ActiveStatusText' rect=1537,255,20,15

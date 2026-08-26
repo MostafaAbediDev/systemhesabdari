@@ -1,4 +1,0 @@
-﻿INVOKED 'شرکت جدید' at rect=1680,376,239,36
-DIALOG_PRESENT=False
-MODAL_OPEN=True
-alive=True responding=True

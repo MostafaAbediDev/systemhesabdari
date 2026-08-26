@@ -1,5 +1,0 @@
-﻿TOP type=ControlType.Button name='مشتری' id='tabCustomers' off=False
-  ANC[0] ControlType.Button name='مشتری' id='tabCustomers' en=True off=False
-  ANC[1] ControlType.Custom name='' id='' en=True off=False
-  ANC[2] ControlType.Window name='تعادل - نرم‌افزار حسابداری' id='' en=True off=False
-  ANC[3] ControlType.Pane name='' id='' en=True off=False

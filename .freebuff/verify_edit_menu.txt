@@ -1,5 +1,0 @@
-﻿RCLICK 'ثصقصثق ثصقصثقصثق' at=1057,339
-CLICKED_MENU 'ویرایش' at=964,366
-after: alive=True responding=True memMB=225
-WINCOUNT=1
-  WIN[0] title='تعادل - نرم‌افزار حسابداری'

@@ -1,7 +1,0 @@
-﻿RCLICK 'اریاگستر' at=1057,303
-DELETE_MATCHES=1
-  match id='BtnText' type=ControlType.Text at=48,146
-MENU_ITEM_NOT_FOUND
-after: alive=True responding=True memMB=229
-WINCOUNT=1
-  WIN[0] title='تعادل - نرم‌افزار حسابداری'

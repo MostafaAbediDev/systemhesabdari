@@ -1,7 +1,0 @@
-﻿INVOKED 'لیست اشخاص'
-DIALOG_PRESENT_BEFORE_CONFIRM=True
-INVOKED ConfirmButton (خروج از فرم)
-DIALOG_AFTER=False
-MODAL_CLOSED=True
-PERSON_LIST_VISIBLE=True
-alive=True responding=True

@@ -1,5 +1,0 @@
-﻿ROW rect=36,285,1284,36 click=806,303
-RCLICK done
-FOUND[505] type=ControlType.Text rect=1528,973,43,21
-INVOKED name=''
-RESULT FirstNameInput=0 TabInventory=0 BankAccountsScroller=0 ERROR=0 alive=True

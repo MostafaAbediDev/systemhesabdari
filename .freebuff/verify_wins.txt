@@ -1,2 +1,0 @@
-﻿WINCOUNT=1
-WIN[0] title='تعادل - نرم‌افزار حسابداری' cls='Window' rect=-8,-8,1936x1056 vis=True

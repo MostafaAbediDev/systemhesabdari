@@ -1,3 +1,0 @@
-﻿
-STEP1: NAME CHANGED (dirty)
-DIRTY_DIALOG=[ذخیره تغییرات]

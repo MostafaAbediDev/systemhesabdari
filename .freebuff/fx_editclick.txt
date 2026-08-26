@@ -1,2 +1,0 @@
-﻿CLICKED at=1348,262 alive=True responding=True
-FirstNameInput=0 SaveButton=0 ERROR=0

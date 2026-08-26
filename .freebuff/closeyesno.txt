@@ -1,3 +1,0 @@
-﻿CLICKED No at=978,602
-DIALOG_STILL_OPEN=False
-alive=True responding=True

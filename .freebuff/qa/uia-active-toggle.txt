@@ -1,4 +1,0 @@
-﻿
-Custom | 0 | Name=[] | AId=[BranchActiveToggle]
-  Text | 1 | Name=[شعبه فعال است] | AId=[LabelText]
-BUTTONS=0

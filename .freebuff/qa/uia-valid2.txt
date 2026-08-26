@@ -1,5 +1,0 @@
-﻿
-STEP1: NAME EMPTIED
-MODAL_OPEN=True
-SAVE_BTN_TEXT=[ویرایش]
-ERR_TEXT=[نام شعبه را وارد کنید.]

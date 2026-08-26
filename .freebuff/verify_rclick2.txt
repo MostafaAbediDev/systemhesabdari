@@ -1,4 +1,0 @@
-﻿RCLICK name='PE-۶۲۵۲۸' at=1182,339
-after: alive=True responding=True memMB=215
-WIN[0] title='تعادل - نرم‌افزار حسابداری'
-CTXMENU_HITS=1

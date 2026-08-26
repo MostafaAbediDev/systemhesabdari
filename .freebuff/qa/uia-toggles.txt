@@ -1,8 +1,0 @@
-﻿
-CODE_MODE [BtnFirst] Name=[] State=Off
-CODE_MODE [BtnSecond] Name=[] State=On
-BRANCH_TYPE [BtnFirst] Name=[] State=On
-BRANCH_TYPE [BtnSecond] Name=[] State=Off
-CodeModeToggle RadioButtons: 0
-BranchTypeToggle RadioButtons: 0
-BranchActiveToggle RadioButtons: 0

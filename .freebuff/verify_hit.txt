@@ -1,6 +1,0 @@
-﻿TOP type=ControlType.Custom name='' id='RowContextMenu' off=False
-  ANC[0] ControlType.Custom name='' id='RowContextMenu' en=True off=False
-  ANC[1] ControlType.Custom name='' id='PersonsGrid' en=True off=False
-  ANC[2] ControlType.Custom name='' id='' en=True off=False
-  ANC[3] ControlType.Window name='تعادل - نرم‌افزار حسابداری' id='' en=True off=False
-  ANC[4] ControlType.Pane name='' id='' en=True off=False

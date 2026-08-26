@@ -1,4 +1,0 @@
-﻿TAB id=tabAll patterns=TogglePatternIdentifiers.Pattern,SynchronizedInputPatternIdentifiers.Pattern
-TAB id=tabCustomers patterns=TogglePatternIdentifiers.Pattern,SynchronizedInputPatternIdentifiers.Pattern
-TAB id=tabSuppliers patterns=TogglePatternIdentifiers.Pattern,SynchronizedInputPatternIdentifiers.Pattern
-TAB id=tabPersonnel patterns=TogglePatternIdentifiers.Pattern,SynchronizedInputPatternIdentifiers.Pattern
