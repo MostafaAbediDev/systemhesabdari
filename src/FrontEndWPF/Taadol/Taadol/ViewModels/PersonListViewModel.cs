@@ -292,7 +292,7 @@ namespace Taadol.ViewModels
                     {
                         Id = p.Id,
                         RowNumber = index + 1,
-                        Code = string.IsNullOrWhiteSpace(p.Code) ? p.Id.ToString() : p.Code,
+                        Code = string.IsNullOrWhiteSpace(p.Code) ? "—" : p.Code,
                         Category = string.IsNullOrWhiteSpace(p.PersonType) ? "—" : p.PersonType,
                         Status = p.IsActive ? "فعال" : "غیرفعال",
                         Nickname = "—",

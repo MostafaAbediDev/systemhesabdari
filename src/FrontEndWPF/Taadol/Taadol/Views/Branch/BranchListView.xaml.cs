@@ -193,19 +193,20 @@ namespace Taadol.Views
 
         private async Task LoadDataAsync()
         {
-            BranchesGrid.IsLoading = true;
-
-            await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background);
+            var cancellationToken = _loadCts?.Token ?? CancellationToken.None;
 
             try
             {
+                BranchesGrid.IsLoading = true;
+                App.Log($"[BranchListView] Loading branches. BaseDirectory: {AppContext.BaseDirectory}");
+
                 var items = await Task.Run(() =>
                 {
                     using var scope = App.ServiceProvider.CreateScope();
 
                     var branchApplication = scope.ServiceProvider.GetRequiredService<IBranchApplication>();
 
-                    var branches = branchApplication.GetBranches();
+                    var branches = branchApplication.GetBranches() ?? new List<BranchViewModel>();
 
                     return branches.Select((b, index) => new BranchItem
                     {
@@ -226,15 +227,29 @@ namespace Taadol.Views
                         Status = b.IsActive ? "فعال" : "غیرفعال",
                         IsEmpty = false
                     }).ToList();
-                });
+                }, cancellationToken).WaitAsync(TimeSpan.FromSeconds(30), cancellationToken);
 
                 AllBranches = new ObservableCollection<BranchItem>(items);
 
                 ApplyFilters();
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (TimeoutException ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[BranchListView] Database timeout: {ex}");
+                App.Log($"[BranchListView] Database timeout while loading branches: {ex}");
+                ToastManager.Error("ارتباط با پایگاه‌داده بیش از حد طول کشید");
+
+                AllBranches = new ObservableCollection<BranchItem>();
+                ApplyFilters();
+            }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"[BranchListView] Load branches error: {ex}");
+                App.Log($"[BranchListView] Load branches error: {ex}");
                 ToastManager.Error("خطا در لود شعبه‌ها");
 
                 AllBranches = new ObservableCollection<BranchItem>();

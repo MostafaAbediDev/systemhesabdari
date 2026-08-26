@@ -78,19 +78,14 @@
          و هیچ فاصله‌ای بین آخرین ردیف و بردر پایین قاب نیست. چرخ ماوس روی گرید به اسکرول بیرونی منتقل می‌شود. -->
     <Grid>
         <Grid.RowDefinitions>
-            <!-- سطر گرید * است تا اسکرول‌ویور بیرونی ارتفاع محدود (viewport) داشته باشد؛
-                 خود قاب گرید همیشه به‌اندازه‌ی محتوا (هدر + ردیف‌ها) جمع می‌شود -->
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- ═══ اسکرول بیرونی + DataGrid + Loading ═══ -->
-        <!-- اسکرول‌بار خارج از قاب گرید است و فقط وقتی ردیف‌ها از فضای موجود بلندتر شوند ظاهر می‌شود؛
-             قاب گرید دست‌نخورده و دقیقاً به‌اندازه‌ی محتوا می‌ماند (هیچ فاصله‌ای بین آخرین ردیف و بردر پایین نیست) -->
         <ScrollViewer x:Name="OuterScrollViewer"
                       Grid.Row="0"
-                      VerticalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Disabled"
                       HorizontalScrollBarVisibility="Disabled"
                       CanContentScroll="False"
                       VerticalContentAlignment="Top">
@@ -112,7 +107,7 @@
                         CornerRadius="4"
                         Padding="0"
                         Margin="0"
-                        ClipToBounds="True"
+                        ClipToBounds="False"
                         SnapsToDevicePixels="True"
                         HorizontalAlignment="Stretch">
                 <DataGrid x:Name="DataGridView"
@@ -138,14 +133,20 @@
                           IsReadOnly="True"
                           VirtualizingPanel.VirtualizationMode="Standard"
                           ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                          ScrollViewer.VerticalScrollBarVisibility="Disabled"
-                          ScrollViewer.CanContentScroll="False"
+                          ScrollViewer.VerticalScrollBarVisibility="Auto"
+                          ScrollViewer.CanContentScroll="True"
+                          VirtualizingPanel.ScrollUnit="Pixel"
                           ColumnHeaderStyle="{StaticResource UnifiedGridColumnHeaderStyle}"
                           CellStyle="{StaticResource UnifiedGridCellStyle}"
                           RowStyle="{StaticResource UnifiedGridRowStyle}"
                           SelectionChanged="DataGridView_SelectionChanged"
                           MouseDoubleClick="DataGridView_MouseDoubleClick"
                           LoadingRow="DataGridView_LoadingRow">
+                    <DataGrid.Resources>
+                        <Style TargetType="ScrollBar" BasedOn="{StaticResource MinimalScrollBar}">
+                            <Setter Property="Margin" Value="-14,0,0,0" />
+                        </Style>
+                    </DataGrid.Resources>
 
                     <DataGrid.Columns>
                         <!-- 1️⃣ چک‌باکس -->
@@ -230,8 +231,7 @@
                                             Value="#E5E7EB" />
                                 </Style>
                             </DataGridTextColumn.HeaderStyle>
-                        </DataGridTextColumn>
-                    </DataGrid.Columns>
+                        </DataGridTextColumn>                        </DataGrid.Columns>
                 </DataGrid>
             </Border>
 
@@ -325,7 +325,7 @@
                             </StackPanel>
                         </Grid>
 
-                        <TextBlock Grid.Row="1"
+                        <TextBlock                        Grid.Row="1"
                                    Text="در حال بارگذاری اطلاعات"
                                    FontFamily="{StaticResource IRANSans}"
                                    FontSize="15"
@@ -333,7 +333,7 @@
                                    Foreground="#001242"
                                    HorizontalAlignment="Center" />
 
-                        <TextBlock Grid.Row="2"
+                        <TextBlock                                Grid.Row="2"
                                    Text="لطفاً چند لحظه صبر کنید..."
                                    FontFamily="{StaticResource IRANSans}"
                                    FontSize="12.5"

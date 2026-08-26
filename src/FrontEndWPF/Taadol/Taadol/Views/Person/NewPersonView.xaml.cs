@@ -48,6 +48,7 @@ namespace Taadol.Views
         // ===== CancellationToken =====
         private CancellationTokenSource _loadCts = new();
         private CancellationTokenSource _saveCts = new();
+        private CancellationTokenSource _cityLoadCts = new();
 
         // ===== Services (از DI رزولو می‌شوند) =====
         private readonly IPersonApplication _personApplication;
@@ -223,7 +224,10 @@ namespace Taadol.Views
                 _selectedProvinceId = value;
                 OnPropertyChanged();
                 MarkUserChange();
-                _ = LoadCitiesSafeAsync(value);
+                _cityLoadCts.Cancel();
+                _cityLoadCts.Dispose();
+                _cityLoadCts = new CancellationTokenSource();
+                _ = LoadCitiesSafeAsync(value, _cityLoadCts.Token);
                 UpdateCityState();
             }
         }
@@ -380,8 +384,11 @@ namespace Taadol.Views
             _saveCts?.Cancel();
             _loadCts?.Dispose();
             _saveCts?.Dispose();
-            _loadCts = null;
-            _saveCts = null;
+            _cityLoadCts.Cancel();
+            _cityLoadCts.Dispose();
+            _loadCts = new CancellationTokenSource();
+            _saveCts = new CancellationTokenSource();
+            _cityLoadCts = new CancellationTokenSource();
             this.Unloaded -= OnViewUnloaded;
         }
 
@@ -390,6 +397,8 @@ namespace Taadol.Views
         // ======================================================
         private async void OnLoaded(object sender, RoutedEventArgs e)
         {
+            this.Unloaded -= OnViewUnloaded;
+            this.Unloaded += OnViewUnloaded;
             if (Branches.Count > 0) return;
             if (_loadCts?.IsCancellationRequested == true) return;
 
@@ -485,12 +494,12 @@ namespace Taadol.Views
                 ex => { System.Diagnostics.Debug.WriteLine($"[NewPersonView] Load provinces error: {ex}"); ToastManager.Error("خطا در لود استان‌ها"); });
         }
 
-        private async Task LoadCitiesAsync(long provinceId)
+        private async Task LoadCitiesAsync(long provinceId, CancellationToken cancellationToken)
         {
             await PersonFormHelper.LoadCitiesAsync(
                 cities: Cities,
                 provinceId: provinceId,
-                token: _loadCts?.Token ?? CancellationToken.None,
+                token: cancellationToken,
                 getCurrentProvinceId: () => SelectedProvinceId,
                 getCurrentCityId: () => SelectedCityId,
                 setSelectedCityId: id => SelectedCityId = id,
@@ -511,11 +520,11 @@ namespace Taadol.Views
         }
 
         /// <summary>Safe wrapper for LoadCitiesAsync with error handling at call site.</summary>
-        private async Task LoadCitiesSafeAsync(long provinceId)
+        private async Task LoadCitiesSafeAsync(long provinceId, CancellationToken cancellationToken)
         {
             try
             {
-                await LoadCitiesAsync(provinceId);
+                await LoadCitiesAsync(provinceId, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -771,6 +780,7 @@ namespace Taadol.Views
             bool IsLegal, string CompanyName, string FirstName, string LastName,
             string ContactFirstName, string ContactLastName, string NationalCode,
             string EconomicCode, string RegistrationNumber, long PersonTypeId,
+            bool IsCodeAutomatic,
             long BranchId, string ManualCode, long? PersonCategoryId, bool IsActive,
             decimal CreditLimit, string Phone, string Mobile, string Email,
             Dictionary<string, long> ContactTypeNames, string Address, string PostalCode,
@@ -784,7 +794,7 @@ namespace Taadol.Views
                 IsLegal, CompanyName, FirstName, LastName,
                 ContactFirstName, ContactLastName, NationalCode,
                 EconomicCode, RegistrationNumber, SelectedPersonTypeId,
-                SelectedBranchId, ManualCode, _selectedPersonCategoryId, IsActive,
+                IsCodeAutomatic, SelectedBranchId, ManualCode, _selectedPersonCategoryId, IsActive,
                 CreditLimit, Phone?.Trim() ?? "", Mobile?.Trim() ?? "", Email?.Trim() ?? "",
                 new Dictionary<string, long>(_contactTypeByName), Address, PostalCode,
                 SelectedProvinceId, SelectedCityId, MainShaba, MainCardNumber,
@@ -819,7 +829,7 @@ namespace Taadol.Views
                     PersonTypeId = s.PersonTypeId,
                     BranchId = s.BranchId,
                     CreditLimit = s.CreditLimit,
-                    IsCodeAutomatic = false,
+                    IsCodeAutomatic = s.IsCodeAutomatic,
                     ManualCode = s.ManualCode,
                     PersonCategoryId = s.PersonCategoryId
                 };
@@ -851,8 +861,11 @@ namespace Taadol.Views
         /// <summary> resolves person ID after Create (OperationResult lacks Id property)</summary>
         private static long ResolveCreatedPersonId(IPersonApplication personApp, CreatePerson command)
         {
-            var code = command.IsLegal ? command.EconomicCode : command.NationalCode;
-            var list = personApp.Search(new PersonSearchModel { NationalCode = code });
+            var list = personApp.Search(new PersonSearchModel
+            {
+                NationalCode = command.IsLegal ? null! : command.NationalCode!,
+                EconomicCode = command.IsLegal ? command.EconomicCode! : null!
+            });
             return list?.OrderByDescending(x => x.Id).FirstOrDefault()?.Id ?? 0;
         }
 
@@ -1128,36 +1141,6 @@ namespace Taadol.Views
         }
 
         // Validation methods moved to Taadol.Helpers.ValidationHelper
-
-        // ======================================================
-        //  GetCreatedPersonId (بدون تغییر بک‌اند)
-        // ======================================================
-
-        /// <summary>
-        /// از آنجا که OperationResult.Id برنمی‌گرده، شخص تازه‌ایجادشده رو
-        /// با NationalCode (برای حقیقی) یا EconomicCode (برای حقوقی) جست‌وجو می‌کنیم.
-        /// نکته: این روش شکننده‌ست — اگه دو کاربر هم‌زمان ثبت کنن، ممکنه Id اشتباه بگیریم.
-        /// ولی در عمل برای کاربر تک‌نفری OK هست.
-        /// </summary>
-        private long GetCreatedPersonId(CreatePerson command)
-        {
-            try
-            {
-                var code = command.IsLegal ? command.EconomicCode : command.NationalCode;
-                var search = new PersonSearchModel
-                {
-                    NationalCode = code
-                };
-                var list = _personApplication.Search(search);
-                var result = list?.OrderByDescending(x => x.Id).FirstOrDefault()?.Id ?? 0;
-                return result;
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"🔍 GetCreatedPersonId EXCEPTION: {ex.Message}");
-                return 0;
-            }
-        }
 
         // ======================================================
         //  Save Sub-Entities

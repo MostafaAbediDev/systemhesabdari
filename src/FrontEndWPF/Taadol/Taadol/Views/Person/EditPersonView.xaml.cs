@@ -31,6 +31,7 @@ namespace Taadol.Views
     {
         private CancellationTokenSource _loadCts = new();
         private CancellationTokenSource _saveCts = new();
+        private CancellationTokenSource _cityLoadCts = new();
 
         private readonly IPersonApplication _personApplication;
         private readonly IBranchApplication _branchApplication;
@@ -129,7 +130,20 @@ namespace Taadol.Views
         public string Email { get => _email; set { _email = value; OnPropertyChanged(); MarkUserChange(); } }
         public string PostalCode { get => _postalCode; set { _postalCode = value; OnPropertyChanged(); MarkUserChange(); } }
         public string Address { get => _address; set { _address = value; OnPropertyChanged(); MarkUserChange(); } }
-        public long SelectedProvinceId { get => _selectedProvinceId; set { _selectedProvinceId = value; OnPropertyChanged(); MarkUserChange(); _ = LoadCitiesSafeAsync(value); } }
+        public long SelectedProvinceId
+        {
+            get => _selectedProvinceId;
+            set
+            {
+                _selectedProvinceId = value;
+                OnPropertyChanged();
+                MarkUserChange();
+                _cityLoadCts.Cancel();
+                _cityLoadCts.Dispose();
+                _cityLoadCts = new CancellationTokenSource();
+                _ = LoadCitiesSafeAsync(value, _cityLoadCts.Token);
+            }
+        }
         public long SelectedCityId { get => _selectedCityId; set { _selectedCityId = value; OnPropertyChanged(); MarkUserChange(); } }
         public string MainBankName { get => _mainBankName; set { _mainBankName = value; OnPropertyChanged(); MarkUserChange(); } }
         public string MainCardNumber { get => _mainCardNumber; set { _mainCardNumber = value; OnPropertyChanged(); MarkUserChange(); } }
@@ -167,12 +181,12 @@ namespace Taadol.Views
                 if (e.NewItems != null)
                 {
                     foreach (BankAccountRow item in e.NewItems)
-                        item.PropertyChanged += (_, _) => { OnPropertyChanged(nameof(IsDirty)); MarkUserChange(); };
+                        item.PropertyChanged += BankAccountRow_PropertyChanged;
                 }
                 if (e.OldItems != null)
                 {
                     foreach (BankAccountRow item in e.OldItems)
-                        item.PropertyChanged -= (_, _) => { OnPropertyChanged(nameof(IsDirty)); MarkUserChange(); };
+                        item.PropertyChanged -= BankAccountRow_PropertyChanged;
                 }
                 OnPropertyChanged(nameof(IsDirty));
                 MarkUserChange();
@@ -193,31 +207,55 @@ namespace Taadol.Views
             System.Diagnostics.Debug.WriteLine($"[DEBUG] EditPersonView constructor called for personId={personId}");
         }
 
+        private void BankAccountRow_PropertyChanged(object? sender, PropertyChangedEventArgs? e)
+        {
+            OnPropertyChanged(nameof(IsDirty));
+            MarkUserChange();
+        }
+
         private void OnViewUnloaded(object sender, RoutedEventArgs e)
         {
+            if (CategorySearch != null)
+                CategorySearch.CategorySelected -= OnCategorySelected;
+            if (PersonImagePicker != null)
+            {
+                PersonImagePicker.ImageSelected -= PersonImagePicker_ImageSelected;
+                PersonImagePicker.ImageRemoved -= PersonImagePicker_ImageRemoved;
+            }
+
             _loadCts?.Cancel();
             _saveCts?.Cancel();
             _loadCts?.Dispose();
             _saveCts?.Dispose();
-            _loadCts = null;
-            _saveCts = null;
+            _cityLoadCts.Cancel();
+            _cityLoadCts.Dispose();
+            _loadCts = new CancellationTokenSource();
+            _saveCts = new CancellationTokenSource();
+            _cityLoadCts = new CancellationTokenSource();
             this.Unloaded -= OnViewUnloaded;
         }
 
         private async void OnLoaded(object sender, RoutedEventArgs e)
         {
-            if (_loadCts?.IsCancellationRequested == true) return;
+            if (_loadCts.IsCancellationRequested) return;
+            this.Unloaded -= OnViewUnloaded;
+            this.Unloaded += OnViewUnloaded;
             try
             {
                 System.Diagnostics.Debug.WriteLine("[DEBUG] EditPersonView.OnLoaded fired");
                 if (CategorySearch != null)
+                {
+                    CategorySearch.CategorySelected -= OnCategorySelected;
                     CategorySearch.CategorySelected += OnCategorySelected;
+                }
 
                 // Subscribe to image picker changes for IsDirty
                 if (PersonImagePicker != null)
                 {
-                    PersonImagePicker.ImageSelected += (_, _) => { OnPropertyChanged(nameof(IsDirty)); MarkUserChange(); };
-                    PersonImagePicker.ImageRemoved += (_, _) => { OnPropertyChanged(nameof(IsDirty)); MarkUserChange(); };
+                    PersonImagePicker.ImageSelected -= PersonImagePicker_ImageSelected;
+                    PersonImagePicker.ImageSelected += PersonImagePicker_ImageSelected;
+                    PersonImagePicker.ImageRemoved -= PersonImagePicker_ImageRemoved;
+                    PersonImagePicker.ImageRemoved += PersonImagePicker_ImageRemoved;
                 }
 
                 System.Diagnostics.Debug.WriteLine("[DEBUG] EditPersonView: starting data load tasks");
@@ -256,6 +294,18 @@ namespace Taadol.Views
             _selectedPersonCategoryId = category.Id;
         }
 
+        private void PersonImagePicker_ImageSelected(object? sender, RoutedEventArgs e)
+        {
+            OnPropertyChanged(nameof(IsDirty));
+            MarkUserChange();
+        }
+
+        private void PersonImagePicker_ImageRemoved(object? sender, RoutedEventArgs e)
+        {
+            OnPropertyChanged(nameof(IsDirty));
+            MarkUserChange();
+        }
+
         private async Task LoadBranchesAsync()
         {
             var items = await PersonFormHelper.LoadBranchesAsync(
@@ -288,12 +338,12 @@ namespace Taadol.Views
                 ex => System.Diagnostics.Debug.WriteLine("Provinces load failed: " + ex.Message));
         }
 
-        private async Task LoadCitiesAsync(long provinceId)
+        private async Task LoadCitiesAsync(long provinceId, CancellationToken cancellationToken)
         {
             await PersonFormHelper.LoadCitiesAsync(
                 cities: Cities,
                 provinceId: provinceId,
-                token: _loadCts?.Token ?? CancellationToken.None,
+                token: cancellationToken,
                 getCurrentProvinceId: () => SelectedProvinceId,
                 getCurrentCityId: () => SelectedCityId,
                 setSelectedCityId: id => SelectedCityId = id,
@@ -364,11 +414,11 @@ namespace Taadol.Views
         }
 
         /// <summary>Safe wrapper for LoadCitiesAsync with error handling at call site.</summary>
-        private async Task LoadCitiesSafeAsync(long provinceId)
+        private async Task LoadCitiesSafeAsync(long provinceId, CancellationToken cancellationToken)
         {
             try
             {
-                await LoadCitiesAsync(provinceId);
+                await LoadCitiesAsync(provinceId, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -421,7 +471,7 @@ namespace Taadol.Views
                 await LoadAndSetPictureAsync(await picturesTask);
 
                 // 6) Final sync: cities + snapshot
-                try { await LoadCitiesAsync(SelectedProvinceId); } catch { }
+                try { await LoadCitiesAsync(SelectedProvinceId, _cityLoadCts.Token); } catch { }
                 await Task.Delay(80);
                 System.Diagnostics.Debug.WriteLine($"[EditPersonView] After LoadPersonData: Provinces={Provinces.Count}, Cities={Cities.Count}, SelectedProvinceId={SelectedProvinceId}, SelectedCityId={SelectedCityId}, SelectedBranchId={SelectedBranchId}, FirstName={FirstName}");
                 CaptureInitialSnapshot();

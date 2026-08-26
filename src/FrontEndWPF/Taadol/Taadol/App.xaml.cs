@@ -60,7 +60,8 @@ namespace Taadol
 
                 string connectionString = GetConnectionString();
                 ConnectionString = connectionString;
-                LogStep($"Connection string set: {connectionString}");
+                // از نوشتن رمز عبور در لاگ جلوگیری می‌کنیم.
+                LogStep("Connection string loaded successfully");
 
                 LogStep("Registering ICodeGeneratorService...");
                 services.AddTransient<ICodeGeneratorService, CodeGeneratorService>();
@@ -151,6 +152,9 @@ namespace Taadol
         {
             try
             {
+                var configPath = Path.Combine(AppContext.BaseDirectory, "appsettings.json");
+                LogStep($"Reading configuration from: {configPath}");
+
                 var config = new ConfigurationBuilder()
                     .SetBasePath(AppContext.BaseDirectory)
                     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
@@ -228,6 +232,11 @@ namespace Taadol
 
             e.SetObserved();
         }
+
+        /// <summary>
+        /// ثبت پیام برای عیب‌یابی بخش‌های مختلف برنامه.
+        /// </summary>
+        internal static void Log(string message) => LogStep(message);
 
         /// <summary>
         /// نوشتن یک خط در فایل لاگ با timestamp

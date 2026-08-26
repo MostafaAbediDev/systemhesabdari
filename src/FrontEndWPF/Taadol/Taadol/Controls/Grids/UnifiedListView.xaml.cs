@@ -24,6 +24,7 @@ namespace Taadol.Controls
         // فقط بعد از اولین ست شدن ItemsSource پیام خالی نمایش داده می‌شود؛
         // وگرنه قبل از شروع لود، فلش خالی وسط گرید دیده می‌شود.
         private bool _itemsSourceEverSet = false;
+        private ScrollViewer _innerScrollViewer;
 
         // شعاع گرد گوشه‌ی داخلی قاب (CornerRadius بیرونی ۴ منهای ضخامت بردر ۱)
         private const double GridCornerRadius = 3;
@@ -34,8 +35,6 @@ namespace Taadol.Controls
             Loaded += UnifiedListView_Loaded;
 
             // چرخ ماوس روی گرید به اسکرول بیرونی منتقل می‌شود (DataGrid رویداد را می‌بلعد)
-            DataGridView.PreviewMouseWheel += DataGrid_PreviewMouseWheel;
-
             // گوشه‌های محتوای گرید را گرد نگه می‌دارد تا هدر/ردیف‌ها از CornerRadius قاب بیرون نزنند
             // (فقط خود DataGrid کلیپ می‌شود تا خط بردر قاب بیرونی بریده نشود)
             DataGridView.SizeChanged += DataGridView_SizeChanged;
@@ -614,34 +613,47 @@ namespace Taadol.Controls
             var items = DataGridView.Items;
             var blue = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2667FF"));
             var transparent = Brushes.Transparent;
-            var gray = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E5E7EB"));
+            var gray = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#D1D5DB"));
+
+            int lastRealIndex = -1;
+            for (int i = items.Count - 1; i >= 0; i--)
+            {
+                if (items[i] is IListRowItem rowItem && !rowItem.IsEmpty)
+                {
+                    lastRealIndex = i;
+                    break;
+                }
+            }
 
             for (int i = 0; i < items.Count; i++)
             {
                 var row = DataGridView.ItemContainerGenerator.ContainerFromIndex(i) as DataGridRow;
                 if (row == null) continue;
 
-                if (items[i] is not IListRowItem item)
+                // ردیف‌های خالیِ پرکننده نباید خط آبی یا خاکستری اضافی داشته باشند.
+                if (items[i] is not IListRowItem item || item.IsEmpty)
                 {
                     row.BorderBrush = transparent;
                     row.BorderThickness = new Thickness(0);
                     continue;
                 }
 
-                // فقط آخرین ردیفِ کل لیست (واقعی یا پرکننده) خط پایین ندارد؛ بردر پایین قاب
-                // همان خطِ انتهای جدول است. بقیه‌ی ردیف‌ها — از جمله ردیف‌های پرکننده —
-                // جداکننده‌ی خاکستری می‌گیرند تا جدول تا انتهای کادر پر و یکدست دیده شود.
-                bool isLastOverall = (i == items.Count - 1);
+                bool previousRowSelected = i > 0 &&
+                    items[i - 1] is IListRowItem previousItem &&
+                    !previousItem.IsEmpty &&
+                    previousItem.IsSelected;
+                bool isLastRealRow = i == lastRealIndex;
 
                 if (item.IsSelected)
                 {
-                    // ردیف انتخاب‌شده: خط پایین آبی ملایم (مطابق فیگما)
+                    // ردیف انتخاب‌شده: خط بالا و پایین آبی؛ در انتخاب چند ردیف پشت‌سرهم،
+                    // خط بالای ردیف‌های میانی حذف می‌شود تا مرز داخلی ضخیم دیده نشود.
                     row.BorderBrush = blue;
-                    row.BorderThickness = new Thickness(0, 0, 0, 1);
+                    row.BorderThickness = new Thickness(0, previousRowSelected ? 0 : 1, 0, 1);
                 }
-                else if (!isLastOverall)
+                else if (isLastRealRow)
                 {
-                    // جداکننده‌ی افقی یکدست بین ردیف‌ها: ۱ پیکسل خاکستری
+                    // آخرین ردیف واقعی خط پایانی خاکستری خود را حفظ می‌کند.
                     row.BorderBrush = gray;
                     row.BorderThickness = new Thickness(0, 0, 0, 1);
                 }
@@ -661,12 +673,13 @@ namespace Taadol.Controls
         {
             if (DataGridView == null || _scrollWired) return;
 
-            // اسکرول توسط خود DataGrid (اسکرول‌ویور داخلی) انجام می‌شود تا هدر ستون‌ها ثابت بماند؛
-            // Padding/Margin اسکرول‌ویور داخلی صفر می‌شود. اسکرول‌بار عمودی با Visibility=Auto
+            // اسکرول توسط OuterScrollViewer انجام می‌شود؛ هدر خارج از آن ثابت است. Padding/Margin
+            // اسکرول‌ویور داخلی صفر می‌شود. اسکرول‌بار عمودی داخلی غیرفعال است تا فقط بدنه حرکت کند.
             // فقط وقتی ردیف‌ها از ظرفیت کادر بلندتر شوند ظاهر می‌شود (استایل مینیمال ۸px) تا
             // کاربر بداند لیست اسکرول دارد؛ با ردیف کم هیچ اسکرول‌باری دیده نمی‌شود.
             if (FindDescendantByName(DataGridView, "DG_ScrollViewer") is ScrollViewer sv)
             {
+                _innerScrollViewer = sv;
                 sv.Padding = new Thickness(0);
                 sv.Margin = new Thickness(0);
                 sv.VerticalContentAlignment = VerticalAlignment.Top;
@@ -689,27 +702,11 @@ namespace Taadol.Controls
                 GridCornerRadius, GridCornerRadius);
         }
 
-        /// <summary>اسکرول بیرونی را به بالای لیست برمی‌گرداند (بعد از تغییر صفحه/فیلتر).</summary>
+        /// <summary>اسکرول داخلی DataGrid را به بالای لیست برمی‌گرداند.</summary>
         private void ScrollGridToTop()
         {
-            OuterScrollViewer?.ScrollToTop();
+            _innerScrollViewer?.ScrollToTop();
         }
 
-        /// <summary>
-        /// DataGrid رویداد چرخ ماوس را می‌بلعد؛ دلتا را به اسکرول بیرونی منتقل می‌کند تا
-        /// با ماوس روی هر جای گرید، چرخ اسکرول بیرونی را بچرخاند. فقط وقتی اسکرول واقعاً
-        /// ممکن است (محتوا بلندتر از viewport) رویداد مصرف می‌شود.
-        /// </summary>
-        private void DataGrid_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            if (OuterScrollViewer == null || e.Delta == 0) return;
-            if (OuterScrollViewer.ScrollableHeight <= 0) return;
-
-            double newOffset = OuterScrollViewer.VerticalOffset - e.Delta;
-            newOffset = Math.Max(0, Math.Min(newOffset, OuterScrollViewer.ScrollableHeight));
-
-            OuterScrollViewer.ScrollToVerticalOffset(newOffset);
-            e.Handled = true;
-        }
     }
 }

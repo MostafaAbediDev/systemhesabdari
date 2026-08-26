@@ -102,8 +102,7 @@
                         <StackPanel Orientation="Horizontal"
                                     Grid.Column="0">
 
-                            <Button Command="{Binding SaveCommand}"
-                                    Background="Transparent"
+                            <Button Background="Transparent"
                                     Foreground="#0D2159"
                                     Height="40"
                                     Width="135"

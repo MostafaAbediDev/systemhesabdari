@@ -99,6 +99,11 @@ namespace Taadol.Helpers
 
                 await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
                 {
+                    // The selection may change after the background query completes but
+                    // before this UI callback runs, so check again on the UI thread.
+                    if (getCurrentProvinceId() != provinceId)
+                        return;
+
                     cities.Clear();
                     foreach (var c in items)
                         cities.Add(c);
