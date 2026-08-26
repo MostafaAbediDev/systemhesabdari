@@ -161,6 +161,7 @@ namespace Taadol.Controls
                 {
                     var control = (UnifiedListView)d;
                     control.ShowLoading(e.NewValue as bool? == true);
+                    control.UpdateLoadError();
                     control.UpdateEmptyState();
                 }));
 
@@ -169,6 +170,27 @@ namespace Taadol.Controls
             get => (bool)GetValue(IsLoadingProperty);
             set => SetValue(IsLoadingProperty, value);
         }
+
+        /// <summary>
+        /// پیام خطای آخرین بارگذاری. وقتی مقدار داشته باشد، خطا جای Empty State را می‌گیرد.
+        /// این فقط وضعیت نمایشی FrontEnd است و به قراردادهای Backend وابسته نیست.
+        /// </summary>
+        public static readonly DependencyProperty LoadErrorTextProperty =
+            DependencyProperty.Register(nameof(LoadErrorText), typeof(string), typeof(UnifiedListView),
+                new PropertyMetadata(string.Empty, (d, _) =>
+                {
+                    var control = (UnifiedListView)d;
+                    control.UpdateLoadError();
+                    control.UpdateEmptyState();
+                }));
+
+        public string LoadErrorText
+        {
+            get => (string)GetValue(LoadErrorTextProperty);
+            set => SetValue(LoadErrorTextProperty, value);
+        }
+
+        private bool HasLoadError => !string.IsNullOrWhiteSpace(LoadErrorText);
 
         // ══════════════════════════════════════════════════════
         //  Empty State (وقتی هیچ رکورد واقعی‌ای وجود ندارد)
@@ -235,8 +257,8 @@ namespace Taadol.Controls
                 }
             }
 
-            // لودینگ اولویت دارد؛ و پیام فقط بعد از اولین بارگذاری نمایش داده می‌شود
-            var show = ShowEmptyState && _itemsSourceEverSet && !hasRealItems && !IsLoading;
+            // لودینگ و خطا اولویت دارند؛ Empty فقط بعد از بارگذاری موفق نمایش داده می‌شود.
+            var show = ShowEmptyState && _itemsSourceEverSet && !hasRealItems && !IsLoading && !HasLoadError;
             EmptyStateOverlay.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
 
             // در حالت خالی، گرید حداقل ارتفاع می‌گیرد تا پیام وسط جدول جا داشته باشد
@@ -365,7 +387,7 @@ namespace Taadol.Controls
         }
 
         // ══════════════════════════════════════════════════════
-        //  Loading
+        //  Loading / Error State
         // ══════════════════════════════════════════════════════
 
         private void ShowLoading(bool show)
@@ -377,6 +399,21 @@ namespace Taadol.Controls
 
             // در حالت لودینگ، گرید حداقل ارتفاع می‌گیرد تا کارت لودر جا داشته باشد
             UpdateGridMinHeight();
+        }
+
+        private void UpdateLoadError()
+        {
+            if (LoadErrorOverlay == null) return;
+
+            if (LoadErrorTextBlock != null)
+                LoadErrorTextBlock.Text = string.IsNullOrWhiteSpace(LoadErrorText)
+                    ? "خطا در بارگذاری اطلاعات"
+                    : LoadErrorText;
+
+            // هنگام بارگذاری، کارت لودینگ باید روی خطا اولویت داشته باشد.
+            LoadErrorOverlay.Visibility = HasLoadError && !IsLoading
+                ? Visibility.Visible
+                : Visibility.Collapsed;
         }
 
         // ══════════════════════════════════════════════════════
@@ -613,7 +650,6 @@ namespace Taadol.Controls
             var items = DataGridView.Items;
             var blue = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2667FF"));
             var transparent = Brushes.Transparent;
-            var gray = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#D1D5DB"));
 
             int lastRealIndex = -1;
             for (int i = items.Count - 1; i >= 0; i--)
@@ -635,6 +671,7 @@ namespace Taadol.Controls
                 {
                     row.BorderBrush = transparent;
                     row.BorderThickness = new Thickness(0);
+                    NormalizeOuterCellBorder(row);
                     continue;
                 }
 
@@ -653,15 +690,73 @@ namespace Taadol.Controls
                 }
                 else if (isLastRealRow)
                 {
-                    // آخرین ردیف واقعی خط پایانی خاکستری خود را حفظ می‌کند.
-                    row.BorderBrush = gray;
-                    row.BorderThickness = new Thickness(0, 0, 0, 1);
+                    // بردر پایین قاب بیرونی خط پایانی را رسم می‌کند؛ برای جلوگیری از دوپیکسلی شدن
+                    // لبه‌ی پایین، روی آخرین ردیف خط جداگانه رسم نمی‌کنیم.
+                    row.BorderBrush = transparent;
+                    row.BorderThickness = new Thickness(0);
                 }
                 else
                 {
                     row.BorderBrush = transparent;
                     row.BorderThickness = new Thickness(0);
                 }
+
+                NormalizeOuterCellBorder(row);
+            }
+
+            // هدرها هم مانند سلول‌ها یک خط داخلی در لبه‌ی راست دارند؛ قاب بیرونی همان خط را
+            // تأمین می‌کند، بنابراین فقط خط راست آخرین هدر حذف می‌شود تا ضخامت دوبرابر نشود.
+            NormalizeOuterHeaderBorders();
+        }
+
+        private void NormalizeOuterCellBorder(DataGridRow row)
+        {
+            if (row == null || DataGridView == null || DataGridView.Columns.Count == 0)
+                return;
+
+            int lastDisplayIndex = DataGridView.Columns.Count - 1;
+            foreach (var cell in FindVisualChildren<DataGridCell>(row))
+            {
+                if (cell.Column?.DisplayIndex == lastDisplayIndex)
+                {
+                    var thickness = cell.BorderThickness;
+                    cell.BorderThickness = new Thickness(
+                        thickness.Left, thickness.Top, 0, thickness.Bottom);
+                }
+            }
+        }
+
+        private void NormalizeOuterHeaderBorders()
+        {
+            if (DataGridView == null || DataGridView.Columns.Count == 0)
+                return;
+
+            int lastDisplayIndex = DataGridView.Columns.Count - 1;
+            foreach (var header in FindVisualChildren<DataGridColumnHeader>(DataGridView))
+            {
+                if (header.Column?.DisplayIndex == lastDisplayIndex)
+                {
+                    var thickness = header.BorderThickness;
+                    header.BorderThickness = new Thickness(
+                        thickness.Left, thickness.Top, 0, thickness.Bottom);
+                }
+            }
+        }
+
+        private static IEnumerable<T> FindVisualChildren<T>(DependencyObject parent)
+            where T : DependencyObject
+        {
+            if (parent == null)
+                yield break;
+
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                if (child is T match)
+                    yield return match;
+
+                foreach (var descendant in FindVisualChildren<T>(child))
+                    yield return descendant;
             }
         }
 

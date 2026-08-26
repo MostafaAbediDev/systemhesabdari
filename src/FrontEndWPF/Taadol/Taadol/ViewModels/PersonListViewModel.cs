@@ -71,6 +71,9 @@ namespace Taadol.ViewModels
         private bool _isLoading;
 
         [ObservableProperty]
+        private string _loadErrorText = string.Empty;
+
+        [ObservableProperty]
         private string _pageInfoText = string.Empty;
 
         [ObservableProperty]
@@ -173,6 +176,7 @@ namespace Taadol.ViewModels
         public async Task LoadDataAsync()
         {
             IsLoading = true;
+            LoadErrorText = null;
 
             // انتخاب‌های فعلی را حفظ کن تا بعد از بازسازی لیست (مثلاً بعد از حذف یک شخص)
             // بقیه‌ی آیتم‌های انتخابی از حالت انتخاب خارج نشوند.
@@ -325,6 +329,7 @@ namespace Taadol.ViewModels
                 // خطا را بی‌صدا نبلع: اگر رفرش بعد از ثبت شکست بخورد،
                 // لیست قبلی حفظ می‌شود و کاربر پیام می‌گیرد (به‌جای «۰ از ۰» گمراه‌کننده).
                 System.Diagnostics.Debug.WriteLine($"[ERROR] PersonListViewModel.LoadDataAsync: {ex}");
+                LoadErrorText = "خطا در بارگذاری اشخاص";
 
                 if (AllPersons == null || AllPersons.Count == 0)
                 {

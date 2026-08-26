@@ -422,6 +422,45 @@
                 </Border>
             </Border>
 
+            <!-- ═══ Error State — خطا در بارگذاری؛ تا زمانی که خطا وجود دارد Empty نشان داده نمی‌شود ═══ -->
+            <Border x:Name="LoadErrorOverlay"
+                    Background="#FDFDFE"
+                    Visibility="Collapsed"
+                    Panel.ZIndex="25">
+                <StackPanel HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Margin="24">
+                    <Border Width="76"
+                            Height="76"
+                            CornerRadius="38"
+                            Background="#FFF4E5"
+                            HorizontalAlignment="Center"
+                            Margin="0,0,0,16">
+                        <svg:SvgViewbox Width="30"
+                                        Height="30"
+                                        Source="/Assets/Icons/danger.svg"
+                                        FlowDirection="LeftToRight"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center" />
+                    </Border>
+                    <TextBlock x:Name="LoadErrorTextBlock"
+                               Text="خطا در بارگذاری اطلاعات"
+                               FontFamily="{StaticResource IRANSans}"
+                               FontSize="15"
+                               FontWeight="Bold"
+                               Foreground="#B45309"
+                               TextAlignment="Center"
+                               HorizontalAlignment="Center" />
+                    <TextBlock Text="برای تلاش مجدد، دکمه «بروزرسانی» را بزنید"
+                               FontFamily="{StaticResource IRANSans}"
+                               FontSize="12.5"
+                               Foreground="#94A3B8"
+                               TextAlignment="Center"
+                               Margin="0,6,0,0"
+                               HorizontalAlignment="Center" />
+                </StackPanel>
+            </Border>
+
             <!-- ═══ Empty State — وقتی هیچ رکورد واقعی‌ای (غیر از ردیف‌های خالی پرکننده) وجود ندارد ═══ -->
             <Border x:Name="EmptyStateOverlay"
                     Background="#FDFDFE"

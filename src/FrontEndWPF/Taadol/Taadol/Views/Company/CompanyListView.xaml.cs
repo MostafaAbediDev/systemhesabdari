@@ -194,11 +194,11 @@ namespace Taadol.Views
         private async System.Threading.Tasks.Task LoadDataAsync()
         {
             CompaniesGrid.IsLoading = true;
-
-            await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background);
+            CompaniesGrid.LoadErrorText = null;
 
             try
             {
+                await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background);
                 var items = await System.Threading.Tasks.Task.Run(() =>
                 {
                     using var scope = App.ServiceProvider.CreateScope();
@@ -226,6 +226,7 @@ namespace Taadol.Views
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"[CompanyListView] Load companies error: {ex}");
+                CompaniesGrid.LoadErrorText = "خطا در بارگذاری شرکت‌ها";
                 ToastManager.Error("خطا در لود شرکت‌ها");
 
                 AllCompanies = new ObservableCollection<CompanyItem>();

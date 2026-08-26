@@ -184,11 +184,11 @@ namespace Taadol.Views
         private async Task LoadDataAsync()
         {
             PeriodsGrid.IsLoading = true;
-
-            await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background);
+            PeriodsGrid.LoadErrorText = null;
 
             try
             {
+                await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background);
                 var items = await Task.Run(() =>
                 {
                     using var scope = App.ServiceProvider.CreateScope();
@@ -218,6 +218,7 @@ namespace Taadol.Views
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"[FinancialPeriodListView] Load periods error: {ex}");
+                PeriodsGrid.LoadErrorText = "خطا در بارگذاری دوره‌های مالی";
                 ToastManager.Error("خطا در لود دوره‌های مالی");
 
                 AllPeriods = new ObservableCollection<FinancialPeriodItem>();

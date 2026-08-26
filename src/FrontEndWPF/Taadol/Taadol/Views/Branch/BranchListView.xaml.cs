@@ -194,10 +194,11 @@ namespace Taadol.Views
         private async Task LoadDataAsync()
         {
             var cancellationToken = _loadCts?.Token ?? CancellationToken.None;
+            BranchesGrid.IsLoading = true;
+            BranchesGrid.LoadErrorText = null;
 
             try
             {
-                BranchesGrid.IsLoading = true;
                 App.Log($"[BranchListView] Loading branches. BaseDirectory: {AppContext.BaseDirectory}");
 
                 var items = await Task.Run(() =>
@@ -241,6 +242,7 @@ namespace Taadol.Views
             {
                 System.Diagnostics.Debug.WriteLine($"[BranchListView] Database timeout: {ex}");
                 App.Log($"[BranchListView] Database timeout while loading branches: {ex}");
+                BranchesGrid.LoadErrorText = "ارتباط با پایگاه‌داده بیش از حد طول کشید";
                 ToastManager.Error("ارتباط با پایگاه‌داده بیش از حد طول کشید");
 
                 AllBranches = new ObservableCollection<BranchItem>();
@@ -250,6 +252,7 @@ namespace Taadol.Views
             {
                 System.Diagnostics.Debug.WriteLine($"[BranchListView] Load branches error: {ex}");
                 App.Log($"[BranchListView] Load branches error: {ex}");
+                BranchesGrid.LoadErrorText = "خطا در بارگذاری شعبه‌ها";
                 ToastManager.Error("خطا در لود شعبه‌ها");
 
                 AllBranches = new ObservableCollection<BranchItem>();

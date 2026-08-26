@@ -38,6 +38,7 @@ namespace Taadol.ViewModels
         [ObservableProperty] private int _currentPage = 1;
         [ObservableProperty] private int _pageSize = 15;
         [ObservableProperty] private bool _isLoading;
+        [ObservableProperty] private string _loadErrorText = string.Empty;
         [ObservableProperty] private string _pageInfoText = string.Empty;
         [ObservableProperty] private string _selectedCountText = string.Empty;
         [ObservableProperty] private string _totalCountText = string.Empty;
@@ -110,6 +111,7 @@ namespace Taadol.ViewModels
         public async Task LoadDataAsync()
         {
             IsLoading = true;
+            LoadErrorText = null;
             try
             {
                 using var scope = _serviceProvider.CreateScope();
@@ -117,23 +119,16 @@ namespace Taadol.ViewModels
                 var branchApp = scope.ServiceProvider.GetRequiredService<IBranchApplication>();
                 var companyApp = scope.ServiceProvider.GetRequiredService<ICompanyApplication>();
 
+                // خطای هر منبع ضروری باید به حالت Error برسد؛ تبدیل خطا به لیست خالی
+                // باعث می‌شد کاربر پیام Empty ببیند و علت واقعی بارگذاری پنهان بماند.
                 var archives = await Task.Run(() =>
-                {
-                    try { return archiveApp.GetBranchArchives() ?? new List<BranchArchiveViewModel>(); }
-                    catch { return new List<BranchArchiveViewModel>(); }
-                });
+                    archiveApp.GetBranchArchives() ?? new List<BranchArchiveViewModel>());
 
                 var branches = await Task.Run(() =>
-                {
-                    try { return branchApp.GetBranches() ?? new List<BranchViewModel>(); }
-                    catch { return new List<BranchViewModel>(); }
-                });
+                    branchApp.GetBranches() ?? new List<BranchViewModel>());
 
                 var companies = await Task.Run(() =>
-                {
-                    try { return companyApp.GetCompanies() ?? new List<CompanyViewModel>(); }
-                    catch { return new List<CompanyViewModel>(); }
-                });
+                    companyApp.GetCompanies() ?? new List<CompanyViewModel>());
 
                 CompanyItems = new ObservableCollection<CompanyFilterItem>(
                     companies.Select(c => new CompanyFilterItem { Id = c.Id, Title = c.Title }));
@@ -171,6 +166,7 @@ namespace Taadol.ViewModels
             }
             catch (Exception ex)
             {
+                LoadErrorText = "خطا در بارگذاری آرشیو شعبه";
                 ToastManager.Error("خطا در لود آرشیو شعبه: " + ex.Message);
                 AllArchives = new ObservableCollection<BranchArchiveItem>();
                 ApplyFilters();

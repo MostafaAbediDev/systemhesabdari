@@ -438,7 +438,8 @@
                                                    PagesSource="{Binding Pages}"
                                                    PageInfoContent="{Binding PageInfoText}"
                                                    IsLoading="{Binding IsLoading}"
-                                                  >
+                                                   LoadErrorText="{Binding LoadErrorText}">
+
                              <controls:UnifiedListView.Columns>
 
 
