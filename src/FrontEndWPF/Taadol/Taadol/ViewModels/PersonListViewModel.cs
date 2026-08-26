@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Taadol.Models;
 using Taadol.Views;
@@ -26,6 +27,10 @@ namespace Taadol.ViewModels
 
         private int _totalPages = 1;
         private int _lastFilteredListCount;
+        private int _loadRequestVersion;
+        private string _lastAppliedFilterKey;
+        private string _cachedFilterKey;
+        private List<PersonItem> _cachedFilteredItems;
 
         // کش حساب‌های بانکی هر شخص — در LoadDataAsync همراه تماس‌ها و آدرس‌ها پر می‌شود
         private Dictionary<long, List<PersonBankViewModel>> _bankAccountsByPerson = new();
@@ -175,6 +180,10 @@ namespace Taadol.ViewModels
 
         public async Task LoadDataAsync()
         {
+            var requestVersion = Interlocked.Increment(ref _loadRequestVersion);
+            _lastAppliedFilterKey = null;
+            _cachedFilterKey = null;
+            _cachedFilteredItems = null;
             IsLoading = true;
             LoadErrorText = null;
 
@@ -319,6 +328,9 @@ namespace Taadol.ViewModels
                     };
                 }).ToList();
 
+                if (requestVersion != Volatile.Read(ref _loadRequestVersion))
+                    return;
+
                 AllPersons = new ObservableCollection<PersonItem>(items);
                 CurrentPage = 1;
                 UpdateTabCounts();
@@ -329,6 +341,9 @@ namespace Taadol.ViewModels
                 // خطا را بی‌صدا نبلع: اگر رفرش بعد از ثبت شکست بخورد،
                 // لیست قبلی حفظ می‌شود و کاربر پیام می‌گیرد (به‌جای «۰ از ۰» گمراه‌کننده).
                 System.Diagnostics.Debug.WriteLine($"[ERROR] PersonListViewModel.LoadDataAsync: {ex}");
+                if (requestVersion != Volatile.Read(ref _loadRequestVersion))
+                    return;
+
                 LoadErrorText = "خطا در بارگذاری اشخاص";
 
                 if (AllPersons == null || AllPersons.Count == 0)
@@ -339,7 +354,8 @@ namespace Taadol.ViewModels
             }
             finally
             {
-                IsLoading = false;
+                if (requestVersion == Volatile.Read(ref _loadRequestVersion))
+                    IsLoading = false;
             }
         }
 
@@ -347,7 +363,19 @@ namespace Taadol.ViewModels
         {
             if (AllPersons == null) return;
 
-            var query = AllPersons.AsEnumerable();
+            var filterKey = BuildFilterKey();
+            if (filterKey == _lastAppliedFilterKey)
+                return;
+
+            var filterOnlyKey = BuildFilterOnlyKey();
+            List<PersonItem> filteredList;
+            if (filterOnlyKey == _cachedFilterKey && _cachedFilteredItems != null)
+            {
+                filteredList = _cachedFilteredItems;
+            }
+            else
+            {
+                var query = AllPersons.AsEnumerable();
 
             if (!SelectedTabs.Contains("all"))
             {
@@ -392,7 +420,11 @@ namespace Taadol.ViewModels
                 );
             }
 
-            var filteredList = query.ToList();
+                filteredList = query.ToList();
+                _cachedFilterKey = filterOnlyKey;
+                _cachedFilteredItems = filteredList;
+            }
+
             _lastFilteredListCount = filteredList.Count;
 
             _totalPages = (int)Math.Ceiling(filteredList.Count / (double)PageSize);
@@ -414,6 +446,29 @@ namespace Taadol.ViewModels
             BuildPages();
             UpdatePageInfo();
             UpdateSummaryBar();
+            _lastAppliedFilterKey = filterKey;
+        }
+
+        private string BuildFilterOnlyKey()
+        {
+            return string.Join("|", SearchText,
+                string.Join(",", SelectedTabs.OrderBy(x => x)),
+                string.Join(",", SelectedStatuses.OrderBy(x => x)),
+                string.Join(",", SelectedProvinces.OrderBy(x => x)),
+                string.Join(",", SelectedCities.OrderBy(x => x)),
+                string.Join(",", SelectedLegalStatuses.OrderBy(x => x)),
+                string.Join(",", SelectedAccountStatuses.OrderBy(x => x)));
+        }
+
+        private string BuildFilterKey()
+        {
+            return string.Join("|", CurrentPage, PageSize, SearchText,
+                string.Join(",", SelectedTabs.OrderBy(x => x)),
+                string.Join(",", SelectedStatuses.OrderBy(x => x)),
+                string.Join(",", SelectedProvinces.OrderBy(x => x)),
+                string.Join(",", SelectedCities.OrderBy(x => x)),
+                string.Join(",", SelectedLegalStatuses.OrderBy(x => x)),
+                string.Join(",", SelectedAccountStatuses.OrderBy(x => x)));
         }
 
         private void BuildPages()

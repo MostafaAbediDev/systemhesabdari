@@ -20,6 +20,7 @@ namespace Taadol.Controls
     public partial class UnifiedListView : UserControl
     {
         private bool _scrollWired = false;
+        private bool _rowBordersUpdatePending = false;
         private bool _builtColumnsHandled = false;
         // فقط بعد از اولین ست شدن ItemsSource پیام خالی نمایش داده می‌شود؛
         // وگرنه قبل از شروع لود، فلش خالی وسط گرید دیده می‌شود.
@@ -84,8 +85,9 @@ namespace Taadol.Controls
 
                         // بعد از تغییر صفحه/فیلتر، وضعیت چک‌باکس سرستون باید دوباره محاسبه شود
                         // (چک‌باکس هدر فقط وقتی روشن است که همه‌ی ردیف‌های همین صفحه انتخاب باشند).
-                        control.Dispatcher.BeginInvoke(new Action(() => control.RefreshVisualState()),
-                            DispatcherPriority.Background);
+                        // تغییر ItemsSource ممکن است چندین LoadingRow پشت‌سرهم ایجاد کند؛
+                        // به‌جای صف‌کردن Refresh برای هر ردیف، فقط یک بروزرسانی تجمیعی ثبت می‌کنیم.
+                        control.ScheduleRowBordersUpdate();
 
                         // با تغییر صفحه/فیلتر، اسکرول عمودی باید به بالای لیست برگردد؛
                         // وگرنه کاربر در وسط/انتهای صفحه‌ی قبلی می‌ماند و ردیف‌های خالی/بی‌ساختار را می‌بیند.
@@ -565,9 +567,9 @@ namespace Taadol.Controls
 
         private void DataGridView_LoadingRow(object sender, DataGridRowEventArgs e)
         {
-            // هر ردیف تازه‌واقع‌شده — واقعی یا پرکننده — بلافاصله خط جداکننده‌اش را می‌گیرد
-            // (پوشش مجازی‌سازی و ردیف‌هایی که بعد از افزودن فیلرها ساخته می‌شوند)
-            UpdateRowBorders();
+            // ساخت چند ردیف پشت‌سرهم نباید برای هر ردیف کل گرید را دوباره پردازش کند؛
+            // بروزرسانی را به یک کار تجمیعی در پایان نوبت Dispatcher تبدیل می‌کنیم.
+            ScheduleRowBordersUpdate();
         }
 
         private static T FindChild<T>(DependencyObject parent) where T : DependencyObject
@@ -641,6 +643,20 @@ namespace Taadol.Controls
                     return result;
             }
             return null;
+        }
+
+        private void ScheduleRowBordersUpdate()
+        {
+            if (_rowBordersUpdatePending || Dispatcher.HasShutdownStarted)
+                return;
+
+            _rowBordersUpdatePending = true;
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                _rowBordersUpdatePending = false;
+                UpdateRowBorders();
+                UpdateHeaderSelectAllState();
+            }), DispatcherPriority.Background);
         }
 
         private void UpdateRowBorders()
@@ -780,8 +796,7 @@ namespace Taadol.Controls
                 sv.VerticalContentAlignment = VerticalAlignment.Top;
 
                 _scrollWired = true;
-                sv.ScrollChanged += (s, _) =>
-                    Dispatcher.BeginInvoke(new Action(UpdateRowBorders), DispatcherPriority.Background);
+                sv.ScrollChanged += (s, _) => ScheduleRowBordersUpdate();
             }
         }
 

@@ -34,6 +34,10 @@ namespace Taadol.Views
         private int _totalPages = 1;
         private bool _isLoadedOnce = false;
         private bool _sizeWired = false;
+        private int _loadRequestVersion;
+        private string _lastAppliedFilterKey;
+        private string _cachedFilterKey;
+        private List<BranchItem> _cachedFilteredItems;
         private HashSet<string> _selectedStatuses = new();
         private HashSet<string> _selectedCompanyNames = new();
         private HashSet<string> _selectedProvinces = new();
@@ -193,6 +197,10 @@ namespace Taadol.Views
 
         private async Task LoadDataAsync()
         {
+            var requestVersion = Interlocked.Increment(ref _loadRequestVersion);
+            _lastAppliedFilterKey = null;
+            _cachedFilterKey = null;
+            _cachedFilteredItems = null;
             var cancellationToken = _loadCts?.Token ?? CancellationToken.None;
             BranchesGrid.IsLoading = true;
             BranchesGrid.LoadErrorText = null;
@@ -230,6 +238,9 @@ namespace Taadol.Views
                     }).ToList();
                 }, cancellationToken).WaitAsync(TimeSpan.FromSeconds(30), cancellationToken);
 
+                if (requestVersion != Volatile.Read(ref _loadRequestVersion))
+                    return;
+
                 AllBranches = new ObservableCollection<BranchItem>(items);
 
                 ApplyFilters();
@@ -242,6 +253,9 @@ namespace Taadol.Views
             {
                 System.Diagnostics.Debug.WriteLine($"[BranchListView] Database timeout: {ex}");
                 App.Log($"[BranchListView] Database timeout while loading branches: {ex}");
+                if (requestVersion != Volatile.Read(ref _loadRequestVersion))
+                    return;
+
                 BranchesGrid.LoadErrorText = "ارتباط با پایگاه‌داده بیش از حد طول کشید";
                 ToastManager.Error("ارتباط با پایگاه‌داده بیش از حد طول کشید");
 
@@ -252,6 +266,9 @@ namespace Taadol.Views
             {
                 System.Diagnostics.Debug.WriteLine($"[BranchListView] Load branches error: {ex}");
                 App.Log($"[BranchListView] Load branches error: {ex}");
+                if (requestVersion != Volatile.Read(ref _loadRequestVersion))
+                    return;
+
                 BranchesGrid.LoadErrorText = "خطا در بارگذاری شعبه‌ها";
                 ToastManager.Error("خطا در لود شعبه‌ها");
 
@@ -261,7 +278,8 @@ namespace Taadol.Views
             }
             finally
             {
-                BranchesGrid.IsLoading = false;
+                if (requestVersion == Volatile.Read(ref _loadRequestVersion))
+                    BranchesGrid.IsLoading = false;
             }
         }
 
@@ -312,10 +330,22 @@ namespace Taadol.Views
             if (AllBranches == null)
                 return;
 
+            var filterKey = BuildFilterKey();
+            if (filterKey == _lastAppliedFilterKey)
+                return;
+
             var selectedIds = AllBranches.Where(b => !b.IsEmpty && b.IsSelected)
                                          .Select(b => b.UniqueId).ToHashSet();
 
-            var query = AllBranches.AsEnumerable();
+            var filterOnlyKey = BuildFilterOnlyKey();
+            List<BranchItem> filteredList;
+            if (filterOnlyKey == _cachedFilterKey && _cachedFilteredItems != null)
+            {
+                filteredList = _cachedFilteredItems;
+            }
+            else
+            {
+                var query = AllBranches.AsEnumerable();
 
             switch (_currentFilter)
             {
@@ -349,7 +379,11 @@ namespace Taadol.Views
             if (_selectedCities.Count > 0)
                 query = query.Where(b => _selectedCities.Contains(b.City));
 
-            var filteredList = query.ToList();
+                filteredList = query.ToList();
+                _cachedFilterKey = filterOnlyKey;
+                _cachedFilteredItems = filteredList;
+            }
+
             filteredListCount = filteredList.Count;
 
             UpdateTabCounts();
@@ -384,6 +418,25 @@ namespace Taadol.Views
 
             BuildPaginationButtons();
             UpdateSummary();
+            _lastAppliedFilterKey = filterKey;
+        }
+
+        private string BuildFilterOnlyKey()
+        {
+            return string.Join("|", _currentFilter, _searchText,
+                string.Join(",", _selectedStatuses.OrderBy(x => x)),
+                string.Join(",", _selectedCompanyNames.OrderBy(x => x)),
+                string.Join(",", _selectedProvinces.OrderBy(x => x)),
+                string.Join(",", _selectedCities.OrderBy(x => x)));
+        }
+
+        private string BuildFilterKey()
+        {
+            return string.Join("|", _currentPage, _pageSize, _currentFilter, _searchText,
+                string.Join(",", _selectedStatuses.OrderBy(x => x)),
+                string.Join(",", _selectedCompanyNames.OrderBy(x => x)),
+                string.Join(",", _selectedProvinces.OrderBy(x => x)),
+                string.Join(",", _selectedCities.OrderBy(x => x)));
         }
 
         private void UpdateTabCounts()

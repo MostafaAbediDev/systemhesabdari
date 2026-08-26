@@ -73,8 +73,16 @@ namespace Taadol.Controls
                 PageRequested?.Invoke(this, page);
         }
 
+        private int _lastRequestedPageSize = -1;
+
         private void PageSizeSelector_SelectionChanged(object sender, int newSize)
         {
+            // گارد دوم در لایه‌ی واسط: حتی اگر کنترل داخلی به‌دلیل رویداد ورودی
+            // چند بار پیام بدهد، فرم فقط یک بار برای همان مقدار Refresh می‌شود.
+            if (_lastRequestedPageSize == newSize)
+                return;
+
+            _lastRequestedPageSize = newSize;
             PageSizeRequested?.Invoke(this, newSize);
         }
     }

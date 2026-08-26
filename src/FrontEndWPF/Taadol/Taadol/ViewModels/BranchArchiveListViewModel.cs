@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Taadol.Controls;
 using Taadol.Models;
@@ -22,6 +23,10 @@ namespace Taadol.ViewModels
         private readonly IServiceProvider _serviceProvider;
         private int _totalPages = 1;
         private int _lastFilteredListCount;
+        private int _loadRequestVersion;
+        private string _lastAppliedFilterKey;
+        private string _cachedFilterKey;
+        private List<BranchArchiveItem> _cachedFilteredItems;
 
         public BranchArchiveListViewModel(IServiceProvider serviceProvider)
         {
@@ -110,6 +115,10 @@ namespace Taadol.ViewModels
 
         public async Task LoadDataAsync()
         {
+            var requestVersion = Interlocked.Increment(ref _loadRequestVersion);
+            _lastAppliedFilterKey = null;
+            _cachedFilterKey = null;
+            _cachedFilteredItems = null;
             IsLoading = true;
             LoadErrorText = null;
             try
@@ -160,12 +169,18 @@ namespace Taadol.ViewModels
                     };
                 }).ToList();
 
+                if (requestVersion != Volatile.Read(ref _loadRequestVersion))
+                    return;
+
                 AllArchives = new ObservableCollection<BranchArchiveItem>(items);
                 CurrentPage = 1;
                 ApplyFilters();
             }
             catch (Exception ex)
             {
+                if (requestVersion != Volatile.Read(ref _loadRequestVersion))
+                    return;
+
                 LoadErrorText = "خطا در بارگذاری آرشیو شعبه";
                 ToastManager.Error("خطا در لود آرشیو شعبه: " + ex.Message);
                 AllArchives = new ObservableCollection<BranchArchiveItem>();
@@ -173,7 +188,8 @@ namespace Taadol.ViewModels
             }
             finally
             {
-                IsLoading = false;
+                if (requestVersion == Volatile.Read(ref _loadRequestVersion))
+                    IsLoading = false;
             }
         }
 
@@ -222,7 +238,19 @@ namespace Taadol.ViewModels
         {
             if (AllArchives == null) return;
 
-            var query = AllArchives.AsEnumerable();
+            var filterKey = BuildFilterKey();
+            if (filterKey == _lastAppliedFilterKey)
+                return;
+
+            var filterOnlyKey = BuildFilterOnlyKey();
+            List<BranchArchiveItem> filteredList;
+            if (filterOnlyKey == _cachedFilterKey && _cachedFilteredItems != null)
+            {
+                filteredList = _cachedFilteredItems;
+            }
+            else
+            {
+                var query = AllArchives.AsEnumerable();
 
             if (SelectedCompany != null && _companyBranchIds.Count > 0)
                 query = query.Where(a => _companyBranchIds.Contains(a.BranchId));
@@ -241,7 +269,11 @@ namespace Taadol.ViewModels
                 );
             }
 
-            var filteredList = query.ToList();
+                filteredList = query.ToList();
+                _cachedFilterKey = filterOnlyKey;
+                _cachedFilteredItems = filteredList;
+            }
+
             _lastFilteredListCount = filteredList.Count;
 
             _totalPages = (int)Math.Ceiling(filteredList.Count / (double)PageSize);
@@ -263,6 +295,21 @@ namespace Taadol.ViewModels
             UpdatePageInfo();
             UpdateSelectedCount();
             UpdateTotalCount();
+            _lastAppliedFilterKey = filterKey;
+        }
+
+        private string BuildFilterOnlyKey()
+        {
+            return string.Join("|", SearchText,
+                SelectedCompany?.Id ?? 0,
+                SelectedBranch?.Id ?? 0);
+        }
+
+        private string BuildFilterKey()
+        {
+            return string.Join("|", CurrentPage, PageSize, SearchText,
+                SelectedCompany?.Id ?? 0,
+                SelectedBranch?.Id ?? 0);
         }
 
         private void BuildPages()

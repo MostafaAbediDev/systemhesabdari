@@ -34,6 +34,10 @@ namespace Taadol.Views
         private int _filteredListCount = 0;
         private bool _isLoadedOnce = false;
         private bool _sizeWired = false;
+        private int _loadRequestVersion;
+        private string _lastAppliedFilterKey;
+        private string _cachedFilterKey;
+        private List<FinancialPeriodItem> _cachedFilteredItems;
         private HashSet<string> _selectedStatuses = new();
         private HashSet<string> _selectedTitles = new();
 
@@ -183,6 +187,10 @@ namespace Taadol.Views
 
         private async Task LoadDataAsync()
         {
+            var requestVersion = Interlocked.Increment(ref _loadRequestVersion);
+            _lastAppliedFilterKey = null;
+            _cachedFilterKey = null;
+            _cachedFilteredItems = null;
             PeriodsGrid.IsLoading = true;
             PeriodsGrid.LoadErrorText = null;
 
@@ -211,6 +219,9 @@ namespace Taadol.Views
                     }).ToList();
                 });
 
+                if (requestVersion != Volatile.Read(ref _loadRequestVersion))
+                    return;
+
                 AllPeriods = new ObservableCollection<FinancialPeriodItem>(items);
 
                 ApplyFilters();
@@ -218,6 +229,9 @@ namespace Taadol.Views
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"[FinancialPeriodListView] Load periods error: {ex}");
+                if (requestVersion != Volatile.Read(ref _loadRequestVersion))
+                    return;
+
                 PeriodsGrid.LoadErrorText = "خطا در بارگذاری دوره‌های مالی";
                 ToastManager.Error("خطا در لود دوره‌های مالی");
 
@@ -227,7 +241,8 @@ namespace Taadol.Views
             }
             finally
             {
-                PeriodsGrid.IsLoading = false;
+                if (requestVersion == Volatile.Read(ref _loadRequestVersion))
+                    PeriodsGrid.IsLoading = false;
             }
         }
 
@@ -277,10 +292,22 @@ namespace Taadol.Views
             if (AllPeriods == null)
                 return;
 
+            var filterKey = BuildFilterKey();
+            if (filterKey == _lastAppliedFilterKey)
+                return;
+
             var selectedIds = AllPeriods.Where(p => !p.IsEmpty && p.IsSelected)
                                         .Select(p => p.UniqueId).ToHashSet();
 
-            var query = AllPeriods.AsEnumerable();
+            var filterOnlyKey = BuildFilterOnlyKey();
+            List<FinancialPeriodItem> filteredList;
+            if (filterOnlyKey == _cachedFilterKey && _cachedFilteredItems != null)
+            {
+                filteredList = _cachedFilteredItems;
+            }
+            else
+            {
+                var query = AllPeriods.AsEnumerable();
 
             switch (_currentFilter)
             {
@@ -306,7 +333,11 @@ namespace Taadol.Views
             if (_selectedTitles.Count > 0)
                 query = query.Where(p => _selectedTitles.Contains(p.Title));
 
-            var filteredList = query.ToList();
+                filteredList = query.ToList();
+                _cachedFilterKey = filterOnlyKey;
+                _cachedFilteredItems = filteredList;
+            }
+
             _filteredListCount = filteredList.Count;
 
             _totalPages = (int)Math.Ceiling(filteredList.Count / (double)_pageSize);
@@ -340,6 +371,21 @@ namespace Taadol.Views
             BuildPaginationButtons();
             UpdateSummary();
             UpdateTabCounts();
+            _lastAppliedFilterKey = filterKey;
+        }
+
+        private string BuildFilterOnlyKey()
+        {
+            return string.Join("|", _currentFilter, _searchText,
+                string.Join(",", _selectedStatuses.OrderBy(x => x)),
+                string.Join(",", _selectedTitles.OrderBy(x => x)));
+        }
+
+        private string BuildFilterKey()
+        {
+            return string.Join("|", _currentPage, _pageSize, _currentFilter, _searchText,
+                string.Join(",", _selectedStatuses.OrderBy(x => x)),
+                string.Join(",", _selectedTitles.OrderBy(x => x)));
         }
 
         private void UpdateTabCounts()

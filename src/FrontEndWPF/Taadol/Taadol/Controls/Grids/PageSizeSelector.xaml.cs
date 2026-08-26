@@ -12,6 +12,8 @@ namespace Taadol.Controls
     public partial class PageSizeSelector : UserControl
     {
         private bool _isOpen;
+        private bool _isSelecting;
+        private int _selectionRequestVersion;
         private static readonly SolidColorBrush BlueBrush = new(Color.FromRgb(0x25, 0x63, 0xEB));
         private static readonly SolidColorBrush GrayBrush = new(Color.FromRgb(0x6B, 0x72, 0x80));
         private static readonly SolidColorBrush BlueBgBrush = new(Color.FromRgb(0xEF, 0xF6, 0xFF));
@@ -120,6 +122,9 @@ namespace Taadol.Controls
         private void RootBorder_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             e.Handled = true;
+            if (_isSelecting)
+                return;
+
             if (e.Timestamp - _lastCloseTimestamp < 200)
                 return;
 
@@ -155,14 +160,52 @@ namespace Taadol.Controls
 
         private void Item_Click(object sender, MouseButtonEventArgs e)
         {
-            if (sender is Border b && b.Tag is int val)
+            // هر انتخاب باید فقط یک‌بار به PaginationBar برسد؛ مخصوصاً وقتی کاربر
+            // روی مقدار فعلی کلیک می‌کند یا رویداد ورودی در حال انتشار مجدد است.
+            if (_isSelecting || sender is not Border b || b.Tag is not int val)
             {
-                SelectedPageSize = val;
-                SelectedText.Text = val.ToString();
-                BuildItems();
-                DropdownPopup.IsOpen = false;
-                SelectionChanged?.Invoke(this, val);
+                e.Handled = _isSelecting;
+                return;
             }
+
+            e.Handled = true;
+
+            // انتخاب مقدار فعلی هیچ تغییری ایجاد نمی‌کند و نباید گرید را دوباره فیلتر کند.
+            if (val == SelectedPageSize)
+            {
+                DropdownPopup.IsOpen = false;
+                return;
+            }
+
+            _isSelecting = true;
+            SelectedPageSize = val;
+            SelectedText.Text = val.ToString();
+            BuildItems();
+            DropdownPopup.IsOpen = false;
+
+            // ابتدا کنترل را غیرفعال می‌کنیم و اجرای رویداد را به نوبت بعدی Dispatcher
+            // می‌سپاریم تا کاربر حالت در حال پردازش را ببیند و کلیک تکراری ثبت نشود.
+            IsEnabled = false;
+            var requestVersion = ++_selectionRequestVersion;
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                try
+                {
+                    SelectionChanged?.Invoke(this, val);
+                }
+                finally
+                {
+                    // بعد از پایان ApplyFilters و Layout مربوط به آن، کنترل دوباره فعال شود.
+                    Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        if (requestVersion == _selectionRequestVersion)
+                        {
+                            IsEnabled = true;
+                            _isSelecting = false;
+                        }
+                    }), DispatcherPriority.ContextIdle);
+                }
+            }), DispatcherPriority.Background);
         }
 
         private void DropdownPopup_Opened(object sender, EventArgs e)
