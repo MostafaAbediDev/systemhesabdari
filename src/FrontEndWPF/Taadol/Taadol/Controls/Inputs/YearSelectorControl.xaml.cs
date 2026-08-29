@@ -37,6 +37,8 @@ namespace Taadol.Controls
         private string _selectedYearTitle = "";
         private List<FinancialPeriodViewModel> _periods = new();
         private bool _isLoaded = false;
+        private CancellationTokenSource _loadCts = new();
+        private int _loadVersion;
         private static List<FinancialPeriodViewModel> _cachedPeriods = null;
         private static readonly SemaphoreSlim _cacheLock = new(1, 1);
         // ===== Constructor =====
@@ -46,6 +48,7 @@ namespace Taadol.Controls
 
             // لود دوره‌های مالی از دیتابیس
             Loaded += OnLoaded;
+            Unloaded += OnUnloaded;
         }
 
         // ======================================================
@@ -82,9 +85,8 @@ namespace Taadol.Controls
         /// </summary>
         public void Expand()
         {
-            // ★ مهم‌ترین خط: قبل از هرکاری، تایمر معلق Collapse رو متوقف کن
-            // وگرنه بعداً دیر-اجرا می‌شه و دوباره Visibility رو Collapsed می‌کنه
-            //_collapseTimer?.Stop();
+            // تایمر Collapse نباید پس از بازشدن سایدبار دوباره Visibility را تغییر دهد.
+            _collapseTimer?.Stop();
 
             YearText.Visibility = Visibility.Visible;
             Chevron.Visibility = Visibility.Visible;
@@ -132,7 +134,23 @@ namespace Taadol.Controls
         {
             _isLoaded = true;
             _cachedPeriods = null;
+            CancelPendingLoad();
             await LoadPeriodsAsync();
+        }
+
+        private void CancelPendingLoad()
+        {
+            Interlocked.Increment(ref _loadVersion);
+            var cts = Interlocked.Exchange(ref _loadCts, new CancellationTokenSource());
+            try { cts.Cancel(); } catch (ObjectDisposedException) { }
+            cts.Dispose();
+        }
+
+        private void OnUnloaded(object sender, RoutedEventArgs e)
+        {
+            CancelPendingLoad();
+            Loaded -= OnLoaded;
+            Unloaded -= OnUnloaded;
         }
 
         // ======================================================
@@ -153,9 +171,13 @@ namespace Taadol.Controls
         /// </summary>
         private async Task LoadPeriodsAsync()
         {
+            var version = Volatile.Read(ref _loadVersion);
+            var token = _loadCts.Token;
+
             // ★ اگه قبلاً کش شده، بدون هیچ اسپینر و تأخیری فوراً نمایش بده
             if (_cachedPeriods != null)
             {
+                if (token.IsCancellationRequested || version != Volatile.Read(ref _loadVersion)) return;
                 _periods = _cachedPeriods;
                 ApplyLoadedPeriods();
                 return;
@@ -166,7 +188,7 @@ namespace Taadol.Controls
 
             try
             {
-                await _cacheLock.WaitAsync();
+                await _cacheLock.WaitAsync(token);
                 try
                 {
                     // ★ دابل-چک: شاید در همین حین یه اینستنس دیگه کش کرده باشه
@@ -174,6 +196,7 @@ namespace Taadol.Controls
                     {
                         var items = await Task.Run(() =>
                         {
+                            token.ThrowIfCancellationRequested();
                             using var scope = App.ServiceProvider.CreateScope();
                             var app = scope.ServiceProvider.GetRequiredService<IFinancialPeriodApplication>();
                             var allPeriods = app.GetFinancialPeriods() ?? new List<FinancialPeriodViewModel>();
@@ -182,8 +205,9 @@ namespace Taadol.Controls
                                 .OrderByDescending(p => p.Id)
                                 .Take(10)
                                 .ToList();
-                        });
+                        }, token);
 
+                        token.ThrowIfCancellationRequested();
                         _cachedPeriods = items;
                     }
                 }
@@ -192,17 +216,24 @@ namespace Taadol.Controls
                     _cacheLock.Release();
                 }
 
+                if (token.IsCancellationRequested || version != Volatile.Read(ref _loadVersion)) return;
                 _periods = _cachedPeriods;
                 ApplyLoadedPeriods();
             }
+            catch (OperationCanceledException) when (token.IsCancellationRequested)
+            {
+                return;
+            }
             catch (Exception ex)
             {
+                if (version != Volatile.Read(ref _loadVersion)) return;
                 System.Diagnostics.Debug.WriteLine("YearSelector load failed: " + ex.Message);
                 YearText.Text = "خطا در بارگذاری";
             }
             finally
             {
-                ShowLoading(false);
+                if (version == Volatile.Read(ref _loadVersion) && !token.IsCancellationRequested)
+                    ShowLoading(false);
             }
         }
         private void ApplyLoadedPeriods()

@@ -138,8 +138,7 @@ namespace Taadol.Views
                 _selectedProvinceId = value;
                 OnPropertyChanged();
                 MarkUserChange();
-                _cityLoadCts.Cancel();
-                _cityLoadCts.Dispose();
+                CancelAndDispose(ref _cityLoadCts);
                 _cityLoadCts = new CancellationTokenSource();
                 _ = LoadCitiesSafeAsync(value, _cityLoadCts.Token);
             }
@@ -213,6 +212,14 @@ namespace Taadol.Views
             MarkUserChange();
         }
 
+        private static void CancelAndDispose(ref CancellationTokenSource cts)
+        {
+            var current = Interlocked.Exchange(ref cts, null);
+            if (current == null) return;
+            try { current.Cancel(); } catch (ObjectDisposedException) { }
+            current.Dispose();
+        }
+
         private void OnViewUnloaded(object sender, RoutedEventArgs e)
         {
             if (CategorySearch != null)
@@ -223,12 +230,9 @@ namespace Taadol.Views
                 PersonImagePicker.ImageRemoved -= PersonImagePicker_ImageRemoved;
             }
 
-            _loadCts?.Cancel();
-            _saveCts?.Cancel();
-            _loadCts?.Dispose();
-            _saveCts?.Dispose();
-            _cityLoadCts.Cancel();
-            _cityLoadCts.Dispose();
+            CancelAndDispose(ref _loadCts);
+            CancelAndDispose(ref _saveCts);
+            CancelAndDispose(ref _cityLoadCts);
             _loadCts = new CancellationTokenSource();
             _saveCts = new CancellationTokenSource();
             _cityLoadCts = new CancellationTokenSource();
@@ -308,9 +312,14 @@ namespace Taadol.Views
 
         private async Task LoadBranchesAsync()
         {
-            var items = await PersonFormHelper.LoadBranchesAsync(
-                replaceAll: list => Branches.ReplaceAll(list),
-                onError: ex => System.Diagnostics.Debug.WriteLine("[EditPersonView] LoadBranchesAsync FAILED: " + ex.Message));
+            await PersonFormHelper.LoadBranchesAsync(
+                replaceAll: list =>
+                {
+                    if (!_loadCts.IsCancellationRequested)
+                        Branches.ReplaceAll(list);
+                },
+                onError: ex => System.Diagnostics.Debug.WriteLine("[EditPersonView] LoadBranchesAsync FAILED: " + ex.Message),
+                cancellationToken: _loadCts.Token);
         }
 
         private async Task LoadPersonTypesAsync()
@@ -318,7 +327,8 @@ namespace Taadol.Views
             // EditPersonView doesn't populate a PersonTypes collection — pass null
             var items = await PersonFormHelper.LoadPersonTypesAsync(
                 null,
-                ex => System.Diagnostics.Debug.WriteLine("[EditPersonView] LoadPersonTypesAsync FAILED: " + ex.Message));
+                ex => System.Diagnostics.Debug.WriteLine("[EditPersonView] LoadPersonTypesAsync FAILED: " + ex.Message),
+                _loadCts.Token);
             if (items.Count > 0 && SelectedPersonTypeId == 0)
                 SelectedPersonTypeId = items[0].Id;
         }
@@ -328,14 +338,16 @@ namespace Taadol.Views
             await PersonFormHelper.LoadContactTypesAsync(
                 _contactTypes,
                 _contactTypeByName,
-                ex => System.Diagnostics.Debug.WriteLine("[EditPersonView] LoadContactTypesAsync FAILED: " + ex.Message));
+                ex => System.Diagnostics.Debug.WriteLine("[EditPersonView] LoadContactTypesAsync FAILED: " + ex.Message),
+                _loadCts.Token);
         }
 
         private async Task LoadProvincesAsync()
         {
             await PersonFormHelper.LoadProvincesAsync(
                 Provinces,
-                ex => System.Diagnostics.Debug.WriteLine("Provinces load failed: " + ex.Message));
+                ex => System.Diagnostics.Debug.WriteLine("Provinces load failed: " + ex.Message),
+                _loadCts.Token);
         }
 
         private async Task LoadCitiesAsync(long provinceId, CancellationToken cancellationToken)
@@ -357,6 +369,7 @@ namespace Taadol.Views
                 bankBranches: BankBranches,
                 hasBankBranchApp: _bankBranchApplication != null,
                 onError: ex => System.Diagnostics.Debug.WriteLine("[EditPersonView] LoadBankBranchesAsync FAILED: " + ex.Message),
+                cancellationToken: _loadCts.Token,
                 onSkipped: msg => System.Diagnostics.Debug.WriteLine("[EditPersonView] LoadBankBranchesAsync SKIPPED (null)"));
         }
 
@@ -407,9 +420,14 @@ namespace Taadol.Views
             {
                 await LoadCategoriesAsync(personTypeId);
             }
+            catch (OperationCanceledException)
+            {
+                // Cancellation is expected when the person type changes or the view closes.
+            }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"[EditPersonView] Error in LoadCategoriesSafeAsync: {ex}");
+                ToastManager.Error("خطا در بارگذاری اطلاعات. لطفاً اتصال به سرور را بررسی کنید.");
             }
         }
 
@@ -420,9 +438,14 @@ namespace Taadol.Views
             {
                 await LoadCitiesAsync(provinceId, cancellationToken);
             }
+            catch (OperationCanceledException)
+            {
+                // Cancellation is expected when the province or view changes.
+            }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"[EditPersonView] Error in LoadCitiesSafeAsync: {ex}");
+                ToastManager.Error("خطا در بارگذاری اطلاعات. لطفاً اتصال به سرور را بررسی کنید.");
             }
         }
 
@@ -433,9 +456,14 @@ namespace Taadol.Views
             {
                 await listView.RefreshGridAsync();
             }
+            catch (OperationCanceledException)
+            {
+                // Cancellation is expected when the view is closed or superseded.
+            }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"[EditPersonView] Error in RefreshListViewSafeAsync: {ex}");
+                ToastManager.Error("خطا در بارگذاری اطلاعات. لطفاً اتصال به سرور را بررسی کنید.");
             }
         }
 
@@ -476,10 +504,17 @@ namespace Taadol.Views
                 System.Diagnostics.Debug.WriteLine($"[EditPersonView] After LoadPersonData: Provinces={Provinces.Count}, Cities={Cities.Count}, SelectedProvinceId={SelectedProvinceId}, SelectedCityId={SelectedCityId}, SelectedBranchId={SelectedBranchId}, FirstName={FirstName}");
                 CaptureInitialSnapshot();
             }
+            catch (OperationCanceledException)
+            {
+                System.Diagnostics.Debug.WriteLine("[EditPersonView] LoadPersonData was cancelled");
+            }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"[EditPersonView] Load info error: {ex}");
-                ToastManager.Error("خطا در لود اطلاعات");
+                if (_loadCts?.IsCancellationRequested != true)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[EditPersonView] Load info error: {ex}");
+                    ToastManager.Error("خطا در لود اطلاعات");
+                }
             }
         }
 
@@ -487,30 +522,35 @@ namespace Taadol.Views
 
         private Task<EditPerson?> LoadDetailsFromDbAsync(long personId) => Task.Run(() =>
         {
+            (_loadCts?.Token ?? CancellationToken.None).ThrowIfCancellationRequested();
             using var scope = App.ServiceProvider.CreateScope();
             return scope.ServiceProvider.GetRequiredService<IPersonApplication>().GetDetails(personId);
         });
 
         private Task<List<PersonContactViewModel>> LoadContactsFromDbAsync(long personId) => Task.Run(() =>
         {
+            (_loadCts?.Token ?? CancellationToken.None).ThrowIfCancellationRequested();
             using var scope = App.ServiceProvider.CreateScope();
             return scope.ServiceProvider.GetRequiredService<IPersonContactApplication>().GetByPersonId(personId) ?? new();
         });
 
         private Task<List<PersonAddressViewModel>> LoadAddressesFromDbAsync(long personId) => Task.Run(() =>
         {
+            (_loadCts?.Token ?? CancellationToken.None).ThrowIfCancellationRequested();
             using var scope = App.ServiceProvider.CreateScope();
             return scope.ServiceProvider.GetRequiredService<IPersonAddressApplication>().GetByPersonId(personId) ?? new();
         });
 
         private Task<List<PersonBankViewModel>> LoadBanksFromDbAsync(long personId) => Task.Run(() =>
         {
+            (_loadCts?.Token ?? CancellationToken.None).ThrowIfCancellationRequested();
             using var scope = App.ServiceProvider.CreateScope();
             return scope.ServiceProvider.GetRequiredService<IPersonBankApplication>().GetByPersonId(personId) ?? new();
         });
 
         private Task<List<PictureViewModel>> LoadPicturesFromDbAsync(long personId) => Task.Run(() =>
         {
+            (_loadCts?.Token ?? CancellationToken.None).ThrowIfCancellationRequested();
             using var scope = App.ServiceProvider.CreateScope();
             return scope.ServiceProvider.GetRequiredService<IPictureApplication>().GetByOwner(personId, PictureOwnerTypeDTO.Person);
         });

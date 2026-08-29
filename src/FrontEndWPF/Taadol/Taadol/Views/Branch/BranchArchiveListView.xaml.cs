@@ -16,7 +16,6 @@ namespace Taadol.Views
     {
         public BranchArchiveListViewModel ViewModel { get; }
         private readonly DispatcherTimer _searchDebounceTimer;
-        private CancellationTokenSource _loadCts = new();
         private bool _isLoadedOnce;
 
         public BranchArchiveListView()
@@ -83,10 +82,7 @@ namespace Taadol.Views
 
         private void OnViewUnloaded(object sender, RoutedEventArgs e)
         {
-            _loadCts?.Cancel();
-            _loadCts?.Dispose();
-            _loadCts = null;
-
+            ViewModel.CancelPendingLoads();
             _searchDebounceTimer?.Stop();
 
             this.Unloaded -= OnViewUnloaded;
@@ -228,6 +224,7 @@ namespace Taadol.Views
 
         private async void BtnRefresh_Click(object sender, RoutedEventArgs e)
         {
+            ViewModel.CancelPendingLoads();
             try
             {
                 await ViewModel.RefreshAsync();

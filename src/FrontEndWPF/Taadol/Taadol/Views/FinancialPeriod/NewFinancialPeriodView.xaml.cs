@@ -19,6 +19,7 @@ namespace Taadol.Views
     {
         private bool _isSaving;
         private bool _userMadeChanges;
+        private CancellationTokenSource _saveCts = new();
         private bool _isLoading = true;
         private CancellationTokenSource _loadCts = new();
         private readonly IBranchApplication _branchApplication;
@@ -106,17 +107,31 @@ namespace Taadol.Views
 
         private void OnViewUnloaded(object sender, RoutedEventArgs e)
         {
-            _loadCts?.Cancel();
-            _loadCts?.Dispose();
-            _loadCts = null;
+            CancelAndDispose(ref _loadCts);
+            CancelAndDispose(ref _saveCts);
             this.Unloaded -= OnViewUnloaded;
+        }
+
+        private static void CancelAndDispose(ref CancellationTokenSource cts)
+        {
+            var current = Interlocked.Exchange(ref cts, null);
+            if (current == null) return;
+            try { current.Cancel(); } catch (ObjectDisposedException) { }
+            current.Dispose();
         }
 
         private async void NewFinancialPeriodView_Loaded(object sender, RoutedEventArgs e)
         {
+            if (_loadCts == null || _loadCts.IsCancellationRequested)
+                return;
+
             try
             {
                 await LoadBranchesAsync();
+            }
+            catch (OperationCanceledException)
+            {
+                return;
             }
             catch (Exception ex)
             {
@@ -124,7 +139,8 @@ namespace Taadol.Views
                 ToastManager.Error("خطا در بارگذاری شعبه‌ها");
             }
 
-            _isLoading = false;
+            if (_loadCts?.IsCancellationRequested != true)
+                _isLoading = false;
         }
 
         private async Task LoadBranchesAsync()
@@ -149,11 +165,12 @@ namespace Taadol.Views
                         .ToList();
                 }, token);
 
+                token.ThrowIfCancellationRequested();
                 Branches.Clear();
                 foreach (var b in branches)
                     Branches.Add(b);
 
-                if (Branches.Count > 0)
+                if (!token.IsCancellationRequested && Branches.Count > 0)
                     SelectedBranchId = Branches[0].Id;
             }
             catch (OperationCanceledException)
@@ -173,6 +190,7 @@ namespace Taadol.Views
         private async Task SaveFinancialPeriodAsync()
         {
             if (_isSaving) return;
+            if (_saveCts == null || _saveCts.IsCancellationRequested) return;
 
             if (string.IsNullOrWhiteSpace(PeriodTitle))
             {
@@ -214,6 +232,7 @@ namespace Taadol.Views
             try
             {
                 // عملیات دیتابیس از طریق سرویس Application روی ترد پس‌زمینه اجرا می‌شود تا UI فریز نشود
+                var saveToken = _saveCts.Token;
                 var dbMessage = await Task.Run(() =>
                 {
                     using var scope = App.ServiceProvider.CreateScope();
@@ -248,7 +267,7 @@ namespace Taadol.Views
                     }
 
                     return (string)null;
-                });
+                }, saveToken);
 
                 if (dbMessage != null)
                 {
@@ -267,8 +286,13 @@ namespace Taadol.Views
                 // Focus first focusable element (PeriodTitle field)
                 MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
             }
+            catch (OperationCanceledException) when (_saveCts?.IsCancellationRequested == true)
+            {
+                System.Diagnostics.Debug.WriteLine("[NewFinancialPeriodView] Save period was cancelled");
+            }
             catch (Exception ex)
             {
+                if (_saveCts?.IsCancellationRequested == true) return;
                 System.Diagnostics.Debug.WriteLine($"[NewFinancialPeriodView] Save period error: {ex}");
                 ToastManager.Error("خطا در ثبت دوره مالی");
             }
@@ -359,9 +383,14 @@ namespace Taadol.Views
             {
                 await yearSelector.RefreshAsync();
             }
+            catch (OperationCanceledException)
+            {
+                // Cancellation is expected when the view is closed or superseded.
+            }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"[NewFinancialPeriodView] Error in RefreshYearSelectorSafeAsync: {ex}");
+                ToastManager.Error("خطا در بارگذاری اطلاعات. لطفاً اتصال به سرور را بررسی کنید.");
             }
         }
 

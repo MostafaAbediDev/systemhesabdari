@@ -51,7 +51,7 @@
                                                                         Grid.Row="0"
                                                                         Margin="{TemplateBinding Padding}"
                                                                         CanContentScroll="{TemplateBinding CanContentScroll}"
-                                                                        CanHorizontallyScroll="False"
+                                                                        CanHorizontallyScroll="True"
                                                                         CanVerticallyScroll="False"
                                                                         Content="{TemplateBinding Content}"
                                                                         ContentTemplate="{TemplateBinding ContentTemplate}" />

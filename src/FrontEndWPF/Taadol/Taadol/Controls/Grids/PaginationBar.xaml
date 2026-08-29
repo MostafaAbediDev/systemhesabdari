@@ -67,7 +67,11 @@
                     </Button.Template>
                 </Button>
 
-                <ItemsControl x:Name="PageButtonsItemsControl">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                              VerticalScrollBarVisibility="Disabled"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Center">
+                    <ItemsControl x:Name="PageButtonsItemsControl">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <StackPanel Orientation="Horizontal" />
@@ -151,7 +155,8 @@
                             </Button>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                    </ItemsControl>
+                </ScrollViewer>
 
                 <Button Width="26"
                         Height="26"

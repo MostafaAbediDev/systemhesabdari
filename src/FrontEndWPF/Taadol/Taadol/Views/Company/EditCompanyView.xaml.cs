@@ -307,9 +307,14 @@ namespace Taadol.Views
             {
                 await listView.RefreshGridAsync();
             }
+            catch (OperationCanceledException)
+            {
+                // Cancellation is expected when the view is closed or superseded.
+            }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"[EditCompanyView] Error in RefreshListViewSafeAsync: {ex}");
+                ToastManager.Error("خطا در بارگذاری اطلاعات. لطفاً اتصال به سرور را بررسی کنید.");
             }
         }
 

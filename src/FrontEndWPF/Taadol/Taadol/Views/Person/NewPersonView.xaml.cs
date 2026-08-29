@@ -224,8 +224,7 @@ namespace Taadol.Views
                 _selectedProvinceId = value;
                 OnPropertyChanged();
                 MarkUserChange();
-                _cityLoadCts.Cancel();
-                _cityLoadCts.Dispose();
+                CancelAndDispose(ref _cityLoadCts);
                 _cityLoadCts = new CancellationTokenSource();
                 _ = LoadCitiesSafeAsync(value, _cityLoadCts.Token);
                 UpdateCityState();
@@ -377,15 +376,20 @@ namespace Taadol.Views
             MarkUserChange();
         }
 
+        private static void CancelAndDispose(ref CancellationTokenSource cts)
+        {
+            var current = Interlocked.Exchange(ref cts, null);
+            if (current == null) return;
+            try { current.Cancel(); } catch (ObjectDisposedException) { }
+            current.Dispose();
+        }
+
         /// <summary>لغو عملیات‌های در حال اجرا هنگام بسته شدن فرم</summary>
         private void OnViewUnloaded(object sender, RoutedEventArgs e)
         {
-            _loadCts?.Cancel();
-            _saveCts?.Cancel();
-            _loadCts?.Dispose();
-            _saveCts?.Dispose();
-            _cityLoadCts.Cancel();
-            _cityLoadCts.Dispose();
+            CancelAndDispose(ref _loadCts);
+            CancelAndDispose(ref _saveCts);
+            CancelAndDispose(ref _cityLoadCts);
             _loadCts = new CancellationTokenSource();
             _saveCts = new CancellationTokenSource();
             _cityLoadCts = new CancellationTokenSource();
@@ -438,14 +442,20 @@ namespace Taadol.Views
             {
                 var items = await PersonFormHelper.LoadBranchesAsync(
                     replaceAll: list => Branches.ReplaceAll(list),
-                    onError: ex => { System.Diagnostics.Debug.WriteLine($"[NewPersonView] Load branches error: {ex}"); ToastManager.Error("خطا در لود شعبه‌ها"); });
+                    onError: ex => { System.Diagnostics.Debug.WriteLine($"[NewPersonView] Load branches error: {ex}"); ToastManager.Error("خطا در لود شعبه‌ها"); },
+                    cancellationToken: _loadCts.Token);
 
-                if (Branches.Count > 0 && SelectedBranchId == 0)
+                if (!_loadCts.IsCancellationRequested && Branches.Count > 0 && SelectedBranchId == 0)
                     SelectedBranchId = Branches[0].Id;
+            }
+            catch (OperationCanceledException)
+            {
+                System.Diagnostics.Debug.WriteLine("[NewPersonView] LoadBranchesAsync was cancelled");
             }
             finally
             {
-                ShowBranchComboLoading(false);
+                if (_loadCts?.IsCancellationRequested != true)
+                    ShowBranchComboLoading(false);
             }
         }
 
@@ -462,7 +472,8 @@ namespace Taadol.Views
         {
             var items = await PersonFormHelper.LoadPersonTypesAsync(
                 PersonTypes,
-                ex => { System.Diagnostics.Debug.WriteLine($"[NewPersonView] Load person types error: {ex}"); ToastManager.Error("خطا در لود انواع شخص"); });
+                ex => { System.Diagnostics.Debug.WriteLine($"[NewPersonView] Load person types error: {ex}"); ToastManager.Error("خطا در لود انواع شخص"); },
+                _loadCts.Token);
 
             if (PersonTypes.Count > 0 && SelectedPersonTypeId == 0)
             {
@@ -484,14 +495,16 @@ namespace Taadol.Views
             await PersonFormHelper.LoadContactTypesAsync(
                 _contactTypes,
                 _contactTypeByName,
-                ex => { System.Diagnostics.Debug.WriteLine($"[NewPersonView] Load contact types error: {ex}"); ToastManager.Error("خطا در لود انواع تماس"); });
+                ex => { System.Diagnostics.Debug.WriteLine($"[NewPersonView] Load contact types error: {ex}"); ToastManager.Error("خطا در لود انواع تماس"); },
+                _loadCts.Token);
         }
 
         private async Task LoadProvincesAsync()
         {
             await PersonFormHelper.LoadProvincesAsync(
                 Provinces,
-                ex => { System.Diagnostics.Debug.WriteLine($"[NewPersonView] Load provinces error: {ex}"); ToastManager.Error("خطا در لود استان‌ها"); });
+                ex => { System.Diagnostics.Debug.WriteLine($"[NewPersonView] Load provinces error: {ex}"); ToastManager.Error("خطا در لود استان‌ها"); },
+                _loadCts.Token);
         }
 
         private async Task LoadCitiesAsync(long provinceId, CancellationToken cancellationToken)
@@ -513,9 +526,14 @@ namespace Taadol.Views
             {
                 await LoadCategoriesAsync(personTypeId);
             }
+            catch (OperationCanceledException)
+            {
+                // Cancellation is expected when the person type changes or the view closes.
+            }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"[NewPersonView] Error in LoadCategoriesSafeAsync: {ex}");
+                ToastManager.Error("خطا در بارگذاری اطلاعات. لطفاً اتصال به سرور را بررسی کنید.");
             }
         }
 
@@ -526,9 +544,14 @@ namespace Taadol.Views
             {
                 await LoadCitiesAsync(provinceId, cancellationToken);
             }
+            catch (OperationCanceledException)
+            {
+                // Cancellation is expected when the province or view changes.
+            }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"[NewPersonView] Error in LoadCitiesSafeAsync: {ex}");
+                ToastManager.Error("خطا در بارگذاری اطلاعات. لطفاً اتصال به سرور را بررسی کنید.");
             }
         }
 
@@ -538,6 +561,7 @@ namespace Taadol.Views
                 bankBranches: BankBranches,
                 hasBankBranchApp: _bankBranchApplication != null,
                 onError: ex => System.Diagnostics.Debug.WriteLine("BankBranches load failed: " + ex.Message),
+                cancellationToken: _loadCts.Token,
                 onSkipped: msg => System.Diagnostics.Debug.WriteLine("⚠️ " + msg));
         }
 

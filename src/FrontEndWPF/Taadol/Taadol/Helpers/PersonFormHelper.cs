@@ -31,24 +31,34 @@ namespace Taadol.Helpers
         /// <param name="onError">Error handler — each view uses a different reporter (ToastManager vs Debug).</param>
         public static async Task LoadProvincesAsync(
             ObservableCollection<ProvinceViewModel> provinces,
-            Action<Exception> onError)
+            Action<Exception> onError,
+            CancellationToken cancellationToken)
         {
             try
             {
                 var items = await Task.Run(() =>
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
                     var repo = scope.ServiceProvider.GetRequiredService<IProvinceRepository>();
-                    return repo.GetProvincesForSelectList();
-                }).ConfigureAwait(false);
+                    var result = repo.GetProvincesForSelectList();
+                    cancellationToken.ThrowIfCancellationRequested();
+                    return result;
+                }, cancellationToken).ConfigureAwait(false);
 
+                cancellationToken.ThrowIfCancellationRequested();
                 await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
                     provinces.Clear();
                     foreach (var p in items)
                         provinces.Add(p);
                 });
                 System.Diagnostics.Debug.WriteLine($"[PersonFormHelper] LoadProvincesAsync finished. Count = {provinces.Count}");
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                return;
             }
             catch (Exception ex)
             {
@@ -132,21 +142,30 @@ namespace Taadol.Helpers
         public static async Task LoadContactTypesAsync(
             List<ContactTypeViewModel> contactTypes,
             Dictionary<string, long> contactTypeByName,
-            Action<Exception> onError)
+            Action<Exception> onError,
+            CancellationToken cancellationToken)
         {
             try
             {
                 var items = await Task.Run(() =>
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
                     var app = scope.ServiceProvider.GetRequiredService<IContactTypeApplication>();
-                    return app.GetActive();
-                }).ConfigureAwait(false);
+                    var result = app.GetActive();
+                    cancellationToken.ThrowIfCancellationRequested();
+                    return result;
+                }, cancellationToken).ConfigureAwait(false);
+                cancellationToken.ThrowIfCancellationRequested();
                 contactTypes.Clear();
                 contactTypes.AddRange(items);
                 contactTypeByName.Clear();
                 foreach (var ct in items)
                     contactTypeByName[ct.Title] = ct.Id;
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                return;
             }
             catch (Exception ex)
             {
@@ -160,26 +179,40 @@ namespace Taadol.Helpers
         /// </summary>
         public static async Task<List<PersonTypeViewModel>> LoadPersonTypesAsync(
             ObservableCollection<PersonTypeViewModel> personTypes,
-            Action<Exception> onError)
+            Action<Exception> onError,
+            CancellationToken cancellationToken)
         {
             try
             {
                 var items = await Task.Run(() =>
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
                     var app = scope.ServiceProvider.GetRequiredService<IPersonTypeApplication>();
-                    return app.GetPersonTypes();
-                }).ConfigureAwait(false);
+                    var result = app.GetPersonTypes();
+                    cancellationToken.ThrowIfCancellationRequested();
+                    return result;
+                }, cancellationToken).ConfigureAwait(false);
                 if (personTypes != null)
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
                     await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
                     {
+                        cancellationToken.ThrowIfCancellationRequested();
                         personTypes.Clear();
                         foreach (var t in items)
                             personTypes.Add(t);
                     });
                 }
                 return items;
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                return new();
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                return new();
             }
             catch (Exception ex)
             {
@@ -195,20 +228,36 @@ namespace Taadol.Helpers
         /// </summary>
         public static async Task<List<BranchComboItem>> LoadBranchesAsync(
             Action<List<BranchComboItem>> replaceAll,
-            Action<Exception> onError)
+            Action<Exception> onError,
+            CancellationToken cancellationToken = default)
         {
             try
             {
                 var items = await Task.Run(() =>
                 {
                     using var scope = App.ServiceProvider.CreateScope();
+                    cancellationToken.ThrowIfCancellationRequested();
                     var app = scope.ServiceProvider.GetRequiredService<GeneralInfoManagement.Application.Contract.Branches.IBranchApplication>();
-                    return app.GetBranches()
+                    var branches = app.GetBranches();
+                    if (cancellationToken.IsCancellationRequested)
+                        return new List<BranchComboItem>();
+                    return branches
                                .Select(b => new BranchComboItem { Id = b.Id, Title = b.Title })
                                .ToList();
-                }).ConfigureAwait(false);
-                await System.Windows.Application.Current.Dispatcher.InvokeAsync(() => replaceAll(items));
+                }, cancellationToken).ConfigureAwait(false);
+                if (cancellationToken.IsCancellationRequested)
+                    return new();
+
+                await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    if (!cancellationToken.IsCancellationRequested)
+                        replaceAll(items);
+                }, System.Windows.Threading.DispatcherPriority.Normal);
                 return items;
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                return new();
             }
             catch (Exception ex)
             {
@@ -224,6 +273,7 @@ namespace Taadol.Helpers
             ObservableCollection<BankBranchViewModel> bankBranches,
             bool hasBankBranchApp,
             Action<Exception> onError,
+            CancellationToken cancellationToken,
             Action<string> onSkipped = null)
         {
             if (!hasBankBranchApp)
@@ -235,16 +285,29 @@ namespace Taadol.Helpers
             {
                 var items = await Task.Run(() =>
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
                     var app = scope.ServiceProvider.GetRequiredService<BankManagement.Application.Contracts.BankBranch.IBankBranchApplication>();
-                    return app.GetBankBranches();
-                }).ConfigureAwait(false);
+                    var result = app.GetBankBranches();
+                    cancellationToken.ThrowIfCancellationRequested();
+                    return result;
+                }, cancellationToken).ConfigureAwait(false);
+                cancellationToken.ThrowIfCancellationRequested();
                 await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
                     bankBranches.Clear();
                     foreach (var b in items)
                         bankBranches.Add(b);
                 });
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                return;
             }
             catch (Exception ex)
             {

@@ -24,6 +24,9 @@ namespace Taadol.ViewModels
         private int _totalPages = 1;
         private int _lastFilteredListCount;
         private int _loadRequestVersion;
+        private CancellationTokenSource _loadCts;
+        private CancellationTokenSource _branchFilterCts;
+        private int _branchFilterRequestVersion;
         private string _lastAppliedFilterKey;
         private string _cachedFilterKey;
         private List<BranchArchiveItem> _cachedFilteredItems;
@@ -113,9 +116,35 @@ namespace Taadol.ViewModels
             TotalCountText = $"{ToPersianNumber(total)} مورد";
         }
 
+        public void CancelPendingLoads()
+        {
+            Interlocked.Increment(ref _loadRequestVersion);
+            Interlocked.Increment(ref _branchFilterRequestVersion);
+            CancelAndDispose(ref _loadCts);
+            CancelAndDispose(ref _branchFilterCts);
+        }
+
+        private static void CancelAndDispose(ref CancellationTokenSource cts)
+        {
+            var current = Interlocked.Exchange(ref cts, null);
+            if (current == null) return;
+            try { current.Cancel(); }
+            catch (ObjectDisposedException) { }
+            finally { current.Dispose(); }
+        }
+
         public async Task LoadDataAsync()
         {
             var requestVersion = Interlocked.Increment(ref _loadRequestVersion);
+            var loadCts = new CancellationTokenSource();
+            var previousCts = Interlocked.Exchange(ref _loadCts, loadCts);
+            if (previousCts != null)
+            {
+                try { previousCts.Cancel(); }
+                catch (ObjectDisposedException) { }
+                previousCts.Dispose();
+            }
+            var cancellationToken = loadCts.Token;
             _lastAppliedFilterKey = null;
             _cachedFilterKey = null;
             _cachedFilteredItems = null;
@@ -123,21 +152,33 @@ namespace Taadol.ViewModels
             LoadErrorText = null;
             try
             {
-                using var scope = _serviceProvider.CreateScope();
-                var archiveApp = scope.ServiceProvider.GetRequiredService<IBranchArchiveApplication>();
-                var branchApp = scope.ServiceProvider.GetRequiredService<IBranchApplication>();
-                var companyApp = scope.ServiceProvider.GetRequiredService<ICompanyApplication>();
-
-                // خطای هر منبع ضروری باید به حالت Error برسد؛ تبدیل خطا به لیست خالی
-                // باعث می‌شد کاربر پیام Empty ببیند و علت واقعی بارگذاری پنهان بماند.
+                // Resolve a fresh scope for each background database operation.
+                // This prevents multiple synchronous application calls from sharing
+                // a scoped DbContext/connection during rapid navigation.
                 var archives = await Task.Run(() =>
-                    archiveApp.GetBranchArchives() ?? new List<BranchArchiveViewModel>());
+                {
+                    using var operationScope = _serviceProvider.CreateScope();
+                    var app = operationScope.ServiceProvider.GetRequiredService<IBranchArchiveApplication>();
+                    return app.GetBranchArchives() ?? new List<BranchArchiveViewModel>();
+                }, cancellationToken).WaitAsync(cancellationToken);
 
                 var branches = await Task.Run(() =>
-                    branchApp.GetBranches() ?? new List<BranchViewModel>());
+                {
+                    using var operationScope = _serviceProvider.CreateScope();
+                    var app = operationScope.ServiceProvider.GetRequiredService<IBranchApplication>();
+                    return app.GetBranches() ?? new List<BranchViewModel>();
+                }, cancellationToken).WaitAsync(cancellationToken);
 
                 var companies = await Task.Run(() =>
-                    companyApp.GetCompanies() ?? new List<CompanyViewModel>());
+                {
+                    using var operationScope = _serviceProvider.CreateScope();
+                    var app = operationScope.ServiceProvider.GetRequiredService<ICompanyApplication>();
+                    return app.GetCompanies() ?? new List<CompanyViewModel>();
+                }, cancellationToken).WaitAsync(cancellationToken);
+
+                cancellationToken.ThrowIfCancellationRequested();
+                if (requestVersion != Volatile.Read(ref _loadRequestVersion))
+                    return;
 
                 CompanyItems = new ObservableCollection<CompanyFilterItem>(
                     companies.Select(c => new CompanyFilterItem { Id = c.Id, Title = c.Title }));
@@ -176,6 +217,10 @@ namespace Taadol.ViewModels
                 CurrentPage = 1;
                 ApplyFilters();
             }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
             catch (Exception ex)
             {
                 if (requestVersion != Volatile.Read(ref _loadRequestVersion))
@@ -190,32 +235,54 @@ namespace Taadol.ViewModels
             {
                 if (requestVersion == Volatile.Read(ref _loadRequestVersion))
                     IsLoading = false;
+                Interlocked.CompareExchange(ref _loadCts, null, loadCts);
+                loadCts.Dispose();
             }
         }
 
         public void OnCompanyChanged()
         {
+            var requestVersion = Interlocked.Increment(ref _branchFilterRequestVersion);
+            var filterCts = new CancellationTokenSource();
+            var previousCts = Interlocked.Exchange(ref _branchFilterCts, filterCts);
+            if (previousCts != null)
+            {
+                try { previousCts.Cancel(); }
+                catch (ObjectDisposedException) { }
+                previousCts.Dispose();
+            }
+
             if (SelectedCompany == null)
             {
                 BranchItems = new ObservableCollection<BranchFilterItem>();
                 SelectedBranch = null;
                 _companyBranchIds = new List<long>();
                 ApplyFilters();
+                Interlocked.CompareExchange(ref _branchFilterCts, null, filterCts);
+                filterCts.Dispose();
                 return;
             }
 
-            _ = LoadBranchesForCompanyAsync();
+            _ = LoadBranchesForCompanyAsync(SelectedCompany.Id, requestVersion, filterCts);
         }
 
-        private async Task LoadBranchesForCompanyAsync()
+        private async Task LoadBranchesForCompanyAsync(long companyId, int requestVersion, CancellationTokenSource filterCts)
         {
+            var cancellationToken = filterCts.Token;
             try
             {
                 using var scope = _serviceProvider.CreateScope();
                 var branchApp = scope.ServiceProvider.GetRequiredService<IBranchApplication>();
-                var branches = await Task.Run(() => branchApp.GetBranches())
+                var branches = await Task.Run(() => branchApp.GetBranches(), cancellationToken)
+                    .WaitAsync(cancellationToken)
                     ?? new List<BranchViewModel>();
-                var filtered = branches.Where(b => b.CompanyId == SelectedCompany.Id).ToList();
+
+                // اگر کاربر شرکت دیگری را انتخاب کرده، نتیجه‌ی درخواست قبلی نباید اعمال شود.
+                if (requestVersion != Volatile.Read(ref _branchFilterRequestVersion) ||
+                    SelectedCompany?.Id != companyId)
+                    return;
+
+                var filtered = branches.Where(b => b.CompanyId == companyId).ToList();
                 _companyBranchIds = filtered.Select(b => b.Id).ToList();
 
                 BranchItems = new ObservableCollection<BranchFilterItem>(
@@ -223,9 +290,19 @@ namespace Taadol.ViewModels
                 SelectedBranch = null;
                 ApplyFilters();
             }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("BranchArchive OnCompanyChanged failed: " + ex.Message);
+                if (requestVersion == Volatile.Read(ref _branchFilterRequestVersion))
+                    System.Diagnostics.Debug.WriteLine("BranchArchive OnCompanyChanged failed: " + ex.Message);
+            }
+            finally
+            {
+                Interlocked.CompareExchange(ref _branchFilterCts, null, filterCts);
+                filterCts.Dispose();
             }
         }
 

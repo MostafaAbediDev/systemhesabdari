@@ -226,7 +226,7 @@
                 <!-- خط عمودی ۱ پیکسلی بین پنل و گرید (مارجین افقی ۵) -->
                 <Border Grid.Column="1"
                         Background="#E5E7EB"
-                        Margin="5,0"
+                        Margin="5,0,5,0"
                         SnapsToDevicePixels="True" />
 
                 <!-- ═══ پنل سمت راست — اطلاعات اشخاص انتخاب شده ═══ -->

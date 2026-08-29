@@ -204,6 +204,7 @@
                                     <TextBlock x:Name="CategoryText" Grid.Row="0" Grid.Column="2"
                                                FontSize="12" FontWeight="Medium"
                                                Foreground="#0D2159" VerticalAlignment="Center"
+                                               TextWrapping="Wrap"
                                                Margin="0,0,0,12" />
 
                                     <!-- Row 1: شناسه / کد ملی -->
@@ -217,6 +218,7 @@
                                     <TextBlock x:Name="NationalIdText" Grid.Row="1" Grid.Column="2"
                                                FontSize="12" FontWeight="Medium"
                                                Foreground="#0D2159" VerticalAlignment="Center"
+                                               TextWrapping="Wrap"
                                                Margin="0,0,0,12" />
 
                                     <!-- Row 2: تلفن / موبایل -->
@@ -230,6 +232,7 @@
                                     <TextBlock x:Name="PhoneText" Grid.Row="2" Grid.Column="2"
                                                FontSize="12" FontWeight="Medium"
                                                Foreground="#0D2159" VerticalAlignment="Center"
+                                               TextWrapping="Wrap"
                                                Margin="0,0,0,12" />
 
                                     <!-- Row 3: ایمیل -->
@@ -256,6 +259,7 @@
                                     <TextBlock x:Name="CityText" Grid.Row="4" Grid.Column="2"
                                                FontSize="12" FontWeight="Medium"
                                                Foreground="#0D2159" VerticalAlignment="Center"
+                                               TextWrapping="Wrap"
                                                Margin="0,0,0,12" />
 
                                     <!-- Row 5: آدرس / کدپستی -->
@@ -303,6 +307,7 @@
                                                 Background="#BED1FF" Margin="0,0,10,10" VerticalAlignment="Center" />
                                         <TextBlock x:Name="BankNameText" Grid.Row="0" Grid.Column="2"
                                                    FontSize="12" FontWeight="Medium" Foreground="#0D2159"
+                                                   TextWrapping="Wrap"
                                                    VerticalAlignment="Center" Margin="0,0,0,10" />
 
                                         <TextBlock Grid.Row="1" Grid.Column="0" Text="نام شعبه"
@@ -312,6 +317,7 @@
                                                 Background="#BED1FF" Margin="0,0,10,10" VerticalAlignment="Center" />
                                         <TextBlock x:Name="BranchNameText" Grid.Row="1" Grid.Column="2"
                                                    FontSize="12" FontWeight="Medium" Foreground="#0D2159"
+                                                   TextWrapping="Wrap"
                                                    VerticalAlignment="Center" Margin="0,0,0,10" />
 
                                         <TextBlock Grid.Row="2" Grid.Column="0" Text="شماره کارت"
@@ -321,6 +327,7 @@
                                                 Background="#BED1FF" Margin="0,0,10,10" VerticalAlignment="Center" />
                                         <TextBlock x:Name="CardNumberText" Grid.Row="2" Grid.Column="2"
                                                    FontSize="12" FontWeight="Medium" Foreground="#0D2159"
+                                                   TextWrapping="Wrap"
                                                    VerticalAlignment="Center"
                                                    Margin="0,0,0,10" />
 
@@ -331,6 +338,7 @@
                                                 Background="#BED1FF" Margin="0,0,10,10" VerticalAlignment="Center" />
                                         <TextBlock x:Name="ShebaNumberText" Grid.Row="3" Grid.Column="2"
                                                    FontSize="12" FontWeight="Medium" Foreground="#0D2159"
+                                                   TextWrapping="Wrap"
                                                    VerticalAlignment="Center"
                                                    Margin="0,0,0,10" />
 
@@ -341,6 +349,7 @@
                                                 Background="#BED1FF" Margin="0,0,10,0" VerticalAlignment="Center" />
                                         <TextBlock x:Name="OtherAccountText" Grid.Row="4" Grid.Column="2"
                                                    FontSize="12" FontWeight="Medium" Foreground="#0D2159"
+                                                   TextWrapping="Wrap"
                                                    VerticalAlignment="Center" />
                                     </Grid>
                                 </Border>

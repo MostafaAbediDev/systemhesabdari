@@ -87,7 +87,7 @@ namespace Taadol.Views
             FillEmptyRows();
 
             Loaded += FinancialPeriodListView_Loaded;
-            this.Unloaded += (s, e) => { _loadCts?.Cancel(); _loadCts?.Dispose(); _loadCts = null; };
+            this.Unloaded += (s, e) => { _loadCts?.Cancel(); _loadCts = null; };
         }
 
         private void HeaderClose_Click(object sender, MouseButtonEventArgs e)
@@ -103,8 +103,6 @@ namespace Taadol.Views
         private async void BtnRefresh_Click(object sender, RoutedEventArgs e)
         {
             _loadCts?.Cancel();
-            _loadCts?.Dispose();
-            _loadCts = new CancellationTokenSource();
             _isLoadedOnce = false;
             try
             {
@@ -155,10 +153,15 @@ namespace Taadol.Views
         /// </summary>
         public async Task RefreshGridAsync()
         {
+            _loadCts?.Cancel();
             _isLoadedOnce = false;
             try
             {
                 await LoadDataAsync();
+            }
+            catch (OperationCanceledException)
+            {
+                System.Diagnostics.Debug.WriteLine("[FinancialPeriodListView] RefreshGridAsync was cancelled");
             }
             catch (Exception ex)
             {
@@ -178,6 +181,10 @@ namespace Taadol.Views
             {
                 await LoadDataAsync();
             }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"[FinancialPeriodListView] Load periods error: {ex}");
@@ -188,6 +195,10 @@ namespace Taadol.Views
         private async Task LoadDataAsync()
         {
             var requestVersion = Interlocked.Increment(ref _loadRequestVersion);
+            var loadCts = new CancellationTokenSource();
+            var previousCts = Interlocked.Exchange(ref _loadCts, loadCts);
+            previousCts?.Cancel();
+            var cancellationToken = loadCts.Token;
             _lastAppliedFilterKey = null;
             _cachedFilterKey = null;
             _cachedFilteredItems = null;
@@ -217,7 +228,7 @@ namespace Taadol.Views
                         Status = p.IsActive && !p.IsDeleted ? "فعال" : "غیرفعال",
                         IsEmpty = false
                     }).ToList();
-                });
+                }, cancellationToken);
 
                 if (requestVersion != Volatile.Read(ref _loadRequestVersion))
                     return;
@@ -225,6 +236,10 @@ namespace Taadol.Views
                 AllPeriods = new ObservableCollection<FinancialPeriodItem>(items);
 
                 ApplyFilters();
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                return;
             }
             catch (Exception ex)
             {
@@ -243,6 +258,8 @@ namespace Taadol.Views
             {
                 if (requestVersion == Volatile.Read(ref _loadRequestVersion))
                     PeriodsGrid.IsLoading = false;
+                Interlocked.CompareExchange(ref _loadCts, null, loadCts);
+                loadCts.Dispose();
             }
         }
 

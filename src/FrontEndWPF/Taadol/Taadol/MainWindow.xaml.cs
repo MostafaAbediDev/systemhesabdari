@@ -1,5 +1,6 @@
 ﻿using GeneralInfoManagement.Application.Contract.Company;
 using Microsoft.Extensions.DependencyInjection;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -16,6 +17,8 @@ namespace Taadol
         private NavigationService _nav;
         private ViewFactory _factory;
         private ICompanyApplication _companyApplication;
+        private CancellationTokenSource _loadCts = new();
+        private int _loadVersion;
 
         public MainWindow()
         {
@@ -55,7 +58,16 @@ namespace Taadol
             {
                 Sidebar.SubMenuClicked -= OnSubMenuClicked;
                 Sidebar.SubMenuClicked += OnSubMenuClicked;
-                LoadCompanies();
+                _ = LoadCompaniesAsync();
+            };
+            this.Closing += (s, e) =>
+            {
+                var cts = Interlocked.Exchange(ref _loadCts, null);
+                if (cts != null)
+                {
+                    try { cts.Cancel(); } catch (ObjectDisposedException) { }
+                    cts.Dispose();
+                }
             };
 
             this.Closing += MainWindow_Closing;
@@ -99,11 +111,33 @@ namespace Taadol
                 e.Cancel = true;
         }
 
-        private void LoadCompanies()
+        private async System.Threading.Tasks.Task LoadCompaniesAsync()
         {
+            // Cancel previous load if still running
+            var version = Interlocked.Increment(ref _loadVersion);
+            var cts = new CancellationTokenSource();
+            var previousCts = Interlocked.Exchange(ref _loadCts, cts);
+            if (previousCts != null)
+            {
+                try { previousCts.Cancel(); } catch (ObjectDisposedException) { }
+                previousCts.Dispose();
+            }
+            var token = cts.Token;
+
+            CompanySelector.IsEnabled = false;
             try
             {
-                var companies = _companyApplication.GetCompanies();
+                var companies = await System.Threading.Tasks.Task.Run(() =>
+                {
+                    token.ThrowIfCancellationRequested();
+                    using var scope = App.ServiceProvider.CreateScope();
+                    var app = scope.ServiceProvider.GetRequiredService<ICompanyApplication>();
+                    return app.GetCompanies();
+                }, token);
+
+                token.ThrowIfCancellationRequested();
+                if (version != Volatile.Read(ref _loadVersion)) return;
+
                 CompanySelector.ItemsSource = companies;
 
                 if (companies != null && companies.Count > 0)
@@ -111,9 +145,20 @@ namespace Taadol
                     CompanySelector.SelectedIndex = 0;
                 }
             }
+            catch (OperationCanceledException) when (token.IsCancellationRequested)
+            {
+                // Normal cancellation — do not show error to user
+            }
             catch (Exception ex)
             {
+                if (version != Volatile.Read(ref _loadVersion)) return;
                 System.Diagnostics.Debug.WriteLine($"[ERROR] Failed to load companies: {ex.Message}");
+                ToastManager.Error("خطا در بارگذاری لیست شرکت‌ها");
+            }
+            finally
+            {
+                if (version == Volatile.Read(ref _loadVersion) && !token.IsCancellationRequested)
+                    CompanySelector.IsEnabled = true;
             }
         }
 
@@ -125,8 +170,19 @@ namespace Taadol
             }
         }
 
+        private string _pendingNavigationTag;
+        private bool _navigationQueued;
+
         private void OnSubMenuClicked(string tag)
         {
+            if (_navigationQueued)
+            {
+                _pendingNavigationTag = tag;
+                return;
+            }
+            _navigationQueued = true;
+            // ناوبری روی UI thread سبک و غیرمسدودکننده انجام می‌شود؛
+            // فرم قبلی با Unloaded بارگذاری‌های در حال اجرا را لغو می‌کند.
             // اگر مودالی باز است (مثلاً «شخص جدید» از دکمه لیست) و تغییرات ذخیره‌نشده دارد،
             // قبل از ناوبری هشدار بده تا اطلاعات کاربر بی‌صدا از بین نرود.
             if (ModalOverlay?.Visibility == Visibility.Visible &&
@@ -168,12 +224,13 @@ namespace Taadol
             MainContentBorder.Visibility = Visibility.Visible;
 
             _nav.Navigate(tag);
+            _navigationQueued = false;
+            _pendingNavigationTag = null;
 
-            Dispatcher.InvokeAsync(() =>
-            {
-                MainContentBorder.InvalidateVisual();
-                MainContentBorder.UpdateLayout();
-            });
+            // Navigation itself updates the visual tree; forcing UpdateLayout here can
+            // block the UI while the previous form is still unloading.
+            Dispatcher.BeginInvoke(new Action(() => MainContentBorder.InvalidateVisual()),
+                System.Windows.Threading.DispatcherPriority.Render);
         }
 
         private void Sidebar_Loaded(object sender, RoutedEventArgs e)
@@ -299,6 +356,11 @@ namespace Taadol
         {
             if (ModalOverlay == null) return;
 
+            // Detach the content immediately so its Unloaded handlers cancel work
+            // before the fade animation completes.
+            var contentBeingClosed = ModalContent.Content;
+            ModalContent.Content = null;
+
             // بستن نرم با فید-اوت تا فرم «یهویی» ناپدید نشود
             var fade = new System.Windows.Media.Animation.DoubleAnimation(
                 0, TimeSpan.FromMilliseconds(220));
@@ -309,7 +371,6 @@ namespace Taadol
             fade.Completed += (s, e) =>
             {
                 ModalOverlay.Visibility = Visibility.Collapsed;
-                ModalContent.Content = null;
                 ModalOverlay.Opacity = 1;
             };
             ModalOverlay.BeginAnimation(UIElement.OpacityProperty, fade);

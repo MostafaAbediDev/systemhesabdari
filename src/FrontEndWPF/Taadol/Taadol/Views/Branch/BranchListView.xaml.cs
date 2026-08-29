@@ -101,7 +101,7 @@ namespace Taadol.Views
             FillEmptyRows();
 
             Loaded += BranchListView_Loaded;
-            this.Unloaded += (s, e) => { _loadCts?.Cancel(); _loadCts?.Dispose(); _loadCts = null; };
+            this.Unloaded += (s, e) => { _loadCts?.Cancel(); _loadCts = null; };
         }
 
         // ─── هدر ستون‌های داخلی (چک‌باکس و شماره ردیف) را خاکستری می‌کند ───
@@ -135,8 +135,6 @@ namespace Taadol.Views
         private async void BtnRefresh_Click(object sender, RoutedEventArgs e)
         {
             _loadCts?.Cancel();
-            _loadCts?.Dispose();
-            _loadCts = new CancellationTokenSource();
             _isLoadedOnce = false;
             try
             {
@@ -159,8 +157,6 @@ namespace Taadol.Views
         public async Task RefreshGridAsync()
         {
             _loadCts?.Cancel();
-            _loadCts?.Dispose();
-            _loadCts = new CancellationTokenSource();
             _isLoadedOnce = false;
             try
             {
@@ -198,10 +194,13 @@ namespace Taadol.Views
         private async Task LoadDataAsync()
         {
             var requestVersion = Interlocked.Increment(ref _loadRequestVersion);
+            var loadCts = new CancellationTokenSource();
+            var previousCts = Interlocked.Exchange(ref _loadCts, loadCts);
+            previousCts?.Cancel();
+            var cancellationToken = loadCts.Token;
             _lastAppliedFilterKey = null;
             _cachedFilterKey = null;
             _cachedFilteredItems = null;
-            var cancellationToken = _loadCts?.Token ?? CancellationToken.None;
             BranchesGrid.IsLoading = true;
             BranchesGrid.LoadErrorText = null;
 
@@ -245,9 +244,9 @@ namespace Taadol.Views
 
                 ApplyFilters();
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
-                throw;
+                return;
             }
             catch (TimeoutException ex)
             {
@@ -280,6 +279,8 @@ namespace Taadol.Views
             {
                 if (requestVersion == Volatile.Read(ref _loadRequestVersion))
                     BranchesGrid.IsLoading = false;
+                Interlocked.CompareExchange(ref _loadCts, null, loadCts);
+                loadCts.Dispose();
             }
         }
 

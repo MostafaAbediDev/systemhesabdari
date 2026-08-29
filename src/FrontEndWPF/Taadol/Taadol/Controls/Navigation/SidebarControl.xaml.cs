@@ -20,6 +20,9 @@ namespace Taadol.Controls
         private bool _isSubMenuAnimating = false;
         private bool _isSidebarOpen = true;
         private bool _isAnimating = false;
+        private DispatcherTimer _sidebarAnimationTimer;
+        private DispatcherTimer _submenuAnimationTimer;
+        private DispatcherTimer _cornerAnimationTimer;
         private const double SIDEBAR_OPEN = 240;
         // ★ عرض حالت بسته از 62 به 76 افزایش یافت
         // چون آیکون‌ها از 20 به 24 بزرگ‌تر شدن، در عرض 62 ناقص دیده می‌شدن
@@ -227,7 +230,8 @@ namespace Taadol.Controls
                     SetSubMenuActive(_activeSubMenuButton);
             });
 
-            var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
+            _sidebarAnimationTimer?.Stop();
+            var timer = _sidebarAnimationTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
             timer.Tick += (s, e2) =>
             {
                 timer.Stop();
@@ -261,7 +265,8 @@ namespace Taadol.Controls
                 UpdateMenuCornerRadius(_activeMenuButton, activeTag);
             }
 
-            var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(120) };
+            _sidebarAnimationTimer?.Stop();
+            var timer = _sidebarAnimationTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(120) };
             timer.Tick += (s, e2) =>
             {
                 timer.Stop();
@@ -559,7 +564,8 @@ namespace Taadol.Controls
 
             int totalSteps = 18;
             int currentStep = 0;
-            var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(14) };
+            _submenuAnimationTimer?.Stop();
+            var timer = _submenuAnimationTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(14) };
             timer.Tick += (s, e) =>
             {
                 currentStep++;
@@ -655,7 +661,8 @@ namespace Taadol.Controls
 
             int totalSteps = 12;
             int currentStep = 0;
-            var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(14) };
+            _submenuAnimationTimer?.Stop();
+            var timer = _submenuAnimationTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(14) };
 
             timer.Tick += (s, e) =>
             {
@@ -817,7 +824,6 @@ namespace Taadol.Controls
         private void SetSubMenuInactive(Button btn)
         {
             btn.ApplyTemplate();
-            btn.UpdateLayout();
 
             var textBlock = btn.Template.FindName("PART_Text", btn) as TextBlock;
             var ellipse = btn.Template.FindName("PART_Dot", btn) as Ellipse;
@@ -879,7 +885,6 @@ namespace Taadol.Controls
         private void SetSubMenuActive(Button btn)
         {
             btn.ApplyTemplate();
-            btn.UpdateLayout();
 
             var textBlock = btn.Template.FindName("PART_Text", btn) as TextBlock;
             var ellipse = btn.Template.FindName("PART_Dot", btn) as Ellipse;

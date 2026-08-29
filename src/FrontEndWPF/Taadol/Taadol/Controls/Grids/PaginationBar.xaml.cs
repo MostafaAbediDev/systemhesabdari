@@ -59,27 +59,72 @@ namespace Taadol.Controls
 
         private void BtnNextPage_Click(object sender, RoutedEventArgs e)
         {
+            if (!TryBeginInteraction()) return;
             NextPageRequested?.Invoke(this, EventArgs.Empty);
         }
 
         private void BtnPrevPage_Click(object sender, RoutedEventArgs e)
         {
+            if (!TryBeginInteraction()) return;
             PreviousPageRequested?.Invoke(this, EventArgs.Empty);
         }
 
         private void BtnPage_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button btn && btn.Tag != null && int.TryParse(btn.Tag.ToString(), out var page))
-                PageRequested?.Invoke(this, page);
+            if (sender is not Button btn || btn.Tag == null ||
+                !int.TryParse(btn.Tag.ToString(), out var page) || page <= 0)
+                return;
+
+            if (!TryBeginInteraction()) return;
+            PageRequested?.Invoke(this, page);
         }
 
         private int _lastRequestedPageSize = -1;
+        private bool _interactionPending;
+        private int _interactionVersion;
+
+        public static readonly DependencyProperty IsProcessingProperty =
+            DependencyProperty.Register(nameof(IsProcessing), typeof(bool), typeof(PaginationBar),
+                new PropertyMetadata(false, (d, _) => ((PaginationBar)d).UpdateEnabledState()));
+
+        public bool IsProcessing
+        {
+            get => (bool)GetValue(IsProcessingProperty);
+            set => SetValue(IsProcessingProperty, value);
+        }
+
+        private bool TryBeginInteraction()
+        {
+            if (_interactionPending || IsProcessing)
+                return false;
+
+            _interactionPending = true;
+            UpdateEnabledState();
+            var version = ++_interactionVersion;
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                if (version == _interactionVersion)
+                {
+                    _interactionPending = false;
+                    UpdateEnabledState();
+                }
+            }), System.Windows.Threading.DispatcherPriority.ContextIdle);
+            return true;
+        }
+
+        private void UpdateEnabledState()
+        {
+            IsEnabled = !IsProcessing && !_interactionPending;
+        }
 
         private void PageSizeSelector_SelectionChanged(object sender, int newSize)
         {
             // گارد دوم در لایه‌ی واسط: حتی اگر کنترل داخلی به‌دلیل رویداد ورودی
             // چند بار پیام بدهد، فرم فقط یک بار برای همان مقدار Refresh می‌شود.
             if (_lastRequestedPageSize == newSize)
+                return;
+
+            if (!TryBeginInteraction())
                 return;
 
             _lastRequestedPageSize = newSize;

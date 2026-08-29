@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -22,6 +23,8 @@ namespace Taadol.Controls
         private DispatcherTimer _searchTimer;
         private string _lastSearchText = "";
         private Dictionary<TreeViewItem, Border> _dotCache = new Dictionary<TreeViewItem, Border>();
+        private CancellationTokenSource _operationCts = new();
+        private int _operationVersion;
 
         // Events
         public event Action<CategoryItem> CategorySelected;
@@ -72,7 +75,28 @@ namespace Taadol.Controls
 
         private void CategorySearchControl_Unloaded(object sender, RoutedEventArgs e)
         {
+            CancelAndDisposeOperation();
             Dispose();
+        }
+
+        private CancellationToken BeginOperation(out int version)
+        {
+            var next = new CancellationTokenSource();
+            var previous = Interlocked.Exchange(ref _operationCts, next);
+            Interlocked.Increment(ref _operationVersion);
+            try { previous?.Cancel(); } catch (ObjectDisposedException) { }
+            previous?.Dispose();
+            version = Volatile.Read(ref _operationVersion);
+            return next.Token;
+        }
+
+        private void CancelAndDisposeOperation()
+        {
+            Interlocked.Increment(ref _operationVersion);
+            var current = Interlocked.Exchange(ref _operationCts, null);
+            if (current == null) return;
+            try { current.Cancel(); } catch (ObjectDisposedException) { }
+            current.Dispose();
         }
         // این متد رو حذف کن:
         // private void LoadSampleData() { ... }
@@ -425,22 +449,30 @@ namespace Taadol.Controls
             if (string.IsNullOrWhiteSpace(title)) return;
             title = title.Trim();
 
+            var token = BeginOperation(out var version);
             try
             {
                 var result = await Task.Run(() =>
                 {
+                    token.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
                     var app = scope.ServiceProvider.GetRequiredService<IPersonCategoryApplication>();
-                    return app.Create(new CreatePersonCategory
+                    var operationResult = app.Create(new CreatePersonCategory
                     {
                         Title = title,
                         PersonTypeId = PersonTypeId,
                         ParentId = null
                     });
-                });
+                    token.ThrowIfCancellationRequested();
+                    return operationResult;
+                }, token);
+
+                token.ThrowIfCancellationRequested();
+                if (version != Volatile.Read(ref _operationVersion)) return;
 
                 if (result.IsSucceeded)
                 {
+                    if (version != Volatile.Read(ref _operationVersion)) return;
                     await RefreshTreeAsync();
                     DataChanged?.Invoke();
                     ToastManager.Success($"دسته «{title}» با موفقیت اضافه شد.");
@@ -460,6 +492,7 @@ namespace Taadol.Controls
         {
             if (PersonTypeId <= 0) return;
 
+            var token = BeginOperation(out var version);
             List<PersonCategoryTreeViewModel> tree = null;
             try
             {
@@ -468,7 +501,14 @@ namespace Taadol.Controls
                     using var scope = App.ServiceProvider.CreateScope();
                     var app = scope.ServiceProvider.GetRequiredService<IPersonCategoryApplication>();
                     return app.GetTree(PersonTypeId);
-                });
+                }, token);
+
+                token.ThrowIfCancellationRequested();
+                if (version != Volatile.Read(ref _operationVersion)) return;
+            }
+            catch (OperationCanceledException) when (token.IsCancellationRequested)
+            {
+                return;
             }
             catch (Exception ex)
             {
@@ -478,6 +518,7 @@ namespace Taadol.Controls
 
             if (tree == null) return;
 
+            if (token.IsCancellationRequested || version != Volatile.Read(ref _operationVersion)) return;
             LoadFromTreeDto(tree);
 
             if (expandToId.HasValue)
@@ -672,10 +713,12 @@ namespace Taadol.Controls
             newTitle = newTitle.Trim();
             if (newTitle == category.Title) return;
 
+            var token = BeginOperation(out var version);
             try
             {
                 var result = await Task.Run(() =>
                 {
+                    token.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
                     var app = scope.ServiceProvider.GetRequiredService<IPersonCategoryApplication>();
 
@@ -683,14 +726,19 @@ namespace Taadol.Controls
                     if (details == null)
                         return new OperationResult().Failed("رکورد یافت نشد.");
 
-                    return app.Edit(new EditPersonCategory
+                    var operationResult = app.Edit(new EditPersonCategory
                     {
                         Id = category.Id,
                         Title = newTitle,
                         PersonTypeId = details.PersonTypeId,
                         ParentId = details.ParentId
                     });
-                });
+                    token.ThrowIfCancellationRequested();
+                    return operationResult;
+                }, token);
+
+                token.ThrowIfCancellationRequested();
+                if (version != Volatile.Read(ref _operationVersion)) return;
 
                 if (result.IsSucceeded)
                 {
@@ -717,6 +765,10 @@ namespace Taadol.Controls
                         Window.GetWindow(this));
                 }
             }
+            catch (OperationCanceledException) when (token.IsCancellationRequested)
+            {
+                return;
+            }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"[CategorySearchControl] Category operation error: {ex}");
@@ -741,14 +793,21 @@ namespace Taadol.Controls
 
             if (!confirm) return;
 
+            var token = BeginOperation(out var version);
             try
             {
                 var result = await Task.Run(() =>
                 {
+                    token.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
                     var app = scope.ServiceProvider.GetRequiredService<IPersonCategoryApplication>();
-                    return app.Remove(category.Id);
-                });
+                    var operationResult = app.Remove(category.Id);
+                    token.ThrowIfCancellationRequested();
+                    return operationResult;
+                }, token);
+
+                token.ThrowIfCancellationRequested();
+                if (version != Volatile.Read(ref _operationVersion)) return;
 
                 if (result.IsSucceeded)
                 {
@@ -773,6 +832,10 @@ namespace Taadol.Controls
                         "بستن",
                         Window.GetWindow(this));
                 }
+            }
+            catch (OperationCanceledException) when (token.IsCancellationRequested)
+            {
+                return;
             }
             catch (Exception ex)
             {
@@ -807,19 +870,26 @@ namespace Taadol.Controls
             if (string.IsNullOrWhiteSpace(title)) return;
             title = title.Trim();
 
+            var token = BeginOperation(out var version);
             try
             {
                 var result = await Task.Run(() =>
                 {
+                    token.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
                     var app = scope.ServiceProvider.GetRequiredService<IPersonCategoryApplication>();
-                    return app.Create(new CreatePersonCategory
+                    var operationResult = app.Create(new CreatePersonCategory
                     {
                         Title = title,
                         PersonTypeId = PersonTypeId,
                         ParentId = parent.Id
                     });
-                });
+                    token.ThrowIfCancellationRequested();
+                    return operationResult;
+                }, token);
+
+                token.ThrowIfCancellationRequested();
+                if (version != Volatile.Read(ref _operationVersion)) return;
 
                 if (result.IsSucceeded)
                 {
@@ -832,6 +902,10 @@ namespace Taadol.Controls
                 {
                     ToastManager.Error(result.Message ?? "افزودن زیرمجموعه با خطا مواجه شد.");
                 }
+            }
+            catch (OperationCanceledException) when (token.IsCancellationRequested)
+            {
+                return;
             }
             catch (Exception ex)
             {

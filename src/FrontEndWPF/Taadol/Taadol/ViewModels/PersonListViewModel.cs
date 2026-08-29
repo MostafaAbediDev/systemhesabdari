@@ -28,9 +28,12 @@ namespace Taadol.ViewModels
         private int _totalPages = 1;
         private int _lastFilteredListCount;
         private int _loadRequestVersion;
+        private CancellationTokenSource _loadCts;
         private string _lastAppliedFilterKey;
         private string _cachedFilterKey;
         private List<PersonItem> _cachedFilteredItems;
+        private int _summaryDataVersion;
+        private string _lastSummaryKey;
 
         // کش حساب‌های بانکی هر شخص — در LoadDataAsync همراه تماس‌ها و آدرس‌ها پر می‌شود
         private Dictionary<long, List<PersonBankViewModel>> _bankAccountsByPerson = new();
@@ -178,9 +181,18 @@ namespace Taadol.ViewModels
             return string.IsNullOrWhiteSpace(address.PostalCode) ? null : address.PostalCode.Trim();
         }
 
+        public void CancelPendingLoads()
+        {
+            _loadCts?.Cancel();
+        }
+
         public async Task LoadDataAsync()
         {
             var requestVersion = Interlocked.Increment(ref _loadRequestVersion);
+            var loadCts = new CancellationTokenSource();
+            var previousCts = Interlocked.Exchange(ref _loadCts, loadCts);
+            previousCts?.Cancel();
+            var cancellationToken = loadCts.Token;
             _lastAppliedFilterKey = null;
             _cachedFilterKey = null;
             _cachedFilteredItems = null;
@@ -216,7 +228,7 @@ namespace Taadol.ViewModels
                         var app = s.ServiceProvider.GetRequiredService<IPersonContactApplication>();
                         try { return app.GetByPersonId(pid) ?? new List<PersonContactViewModel>(); }
                         catch { return new List<PersonContactViewModel>(); }
-                    })).ToList();
+                    }, cancellationToken)).ToList();
 
                 var addressTasks = personIds.Select(pid =>
                     Task.Run(() =>
@@ -225,7 +237,7 @@ namespace Taadol.ViewModels
                         var app = s.ServiceProvider.GetRequiredService<IPersonAddressApplication>();
                         try { return app.GetByPersonId(pid) ?? new List<PersonAddressViewModel>(); }
                         catch { return new List<PersonAddressViewModel>(); }
-                    })).ToList();
+                    }, cancellationToken)).ToList();
 
                 var bankTasks = personIds.Select(pid =>
                     Task.Run(() =>
@@ -234,20 +246,23 @@ namespace Taadol.ViewModels
                         var app = s.ServiceProvider.GetRequiredService<IPersonBankApplication>();
                         try { return app.GetByPersonId(pid) ?? new List<PersonBankViewModel>(); }
                         catch { return new List<PersonBankViewModel>(); }
-                    })).ToList();
+                    }, cancellationToken)).ToList();
 
                 var allTasks = new List<Task>(contactTasks.Count + addressTasks.Count + bankTasks.Count);
                 allTasks.AddRange(contactTasks);
                 allTasks.AddRange(addressTasks);
                 allTasks.AddRange(bankTasks);
-                await Task.WhenAll(allTasks);
+                await Task.WhenAll(allTasks).WaitAsync(cancellationToken);
+                cancellationToken.ThrowIfCancellationRequested();
 
                 foreach (var t in contactTasks) allContacts.AddRange(await t);
                 foreach (var t in addressTasks) allAddresses.AddRange(await t);
 
-                _bankAccountsByPerson = new Dictionary<long, List<PersonBankViewModel>>();
+                var bankAccountsByPerson = new Dictionary<long, List<PersonBankViewModel>>();
                 for (int i = 0; i < personIds.Count; i++)
-                    _bankAccountsByPerson[personIds[i]] = await bankTasks[i];
+                    bankAccountsByPerson[personIds[i]] = await bankTasks[i];
+
+                cancellationToken.ThrowIfCancellationRequested();
 
                 var contactsByPerson = allContacts
                     .GroupBy(c => c.PersonId)
@@ -256,9 +271,6 @@ namespace Taadol.ViewModels
                 var addressesByPerson = allAddresses
                     .GroupBy(a => a.PersonId)
                     .ToDictionary(g => g.Key, g => g.FirstOrDefault());
-
-                _contactsByPerson = contactsByPerson;
-                _addressesByPerson = addressesByPerson;
 
                 var items = persons.Select((p, index) =>
                 {
@@ -331,10 +343,19 @@ namespace Taadol.ViewModels
                 if (requestVersion != Volatile.Read(ref _loadRequestVersion))
                     return;
 
+                _bankAccountsByPerson = bankAccountsByPerson;
+                _contactsByPerson = contactsByPerson;
+                _addressesByPerson = addressesByPerson;
                 AllPersons = new ObservableCollection<PersonItem>(items);
+                _summaryDataVersion++;
+                _lastSummaryKey = null;
                 CurrentPage = 1;
                 UpdateTabCounts();
                 ApplyFilters();
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                return;
             }
             catch (Exception ex)
             {
@@ -356,6 +377,8 @@ namespace Taadol.ViewModels
             {
                 if (requestVersion == Volatile.Read(ref _loadRequestVersion))
                     IsLoading = false;
+                Interlocked.CompareExchange(ref _loadCts, null, loadCts);
+                loadCts.Dispose();
             }
         }
 
@@ -586,6 +609,15 @@ namespace Taadol.ViewModels
         {
             if (AllPersons == null) return;
 
+            var selectedIdsKey = string.Join(",", AllPersons
+                .Where(p => p.IsSelected && !p.IsEmpty)
+                .Select(p => p.Id)
+                .OrderBy(id => id));
+            var summaryKey = $"{_summaryDataVersion}|{selectedIdsKey}";
+            if (summaryKey == _lastSummaryKey)
+                return;
+
+            _lastSummaryKey = summaryKey;
             var validPersons = AllPersons.Where(p => !p.IsEmpty).ToList();
             var selectedItems = validPersons.Where(p => p.IsSelected).ToList();
 

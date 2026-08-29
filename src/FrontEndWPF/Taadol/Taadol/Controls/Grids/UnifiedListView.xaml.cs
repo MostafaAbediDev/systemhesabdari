@@ -80,10 +80,12 @@ namespace Taadol.Controls
                         // ابتدا ItemsSource را null کن تا کانتینرهای قدیمی (ردیف‌های صفحه قبلی)
                         // کاملاً تخریب شوند؛ وگرنه با reuse شدن کانتینرها و اشتراک آیتم‌ها،
                         // شماره ردیف قدیمی/تکراری نمایش داده می‌شود.
-                        control.DataGridView.ItemsSource = null;
-                        control.DataGridView.ItemsSource = control.ItemsSource;
+                        if (!ReferenceEquals(control.DataGridView.ItemsSource, control.ItemsSource))
+                        {
+                            control.DataGridView.ItemsSource = null;
+                            control.DataGridView.ItemsSource = control.ItemsSource;
 
-                        // بعد از تغییر صفحه/فیلتر، وضعیت چک‌باکس سرستون باید دوباره محاسبه شود
+                            // بعد از تغییر صفحه/فیلتر، وضعیت چک‌باکس سرستون باید دوباره محاسبه شود
                         // (چک‌باکس هدر فقط وقتی روشن است که همه‌ی ردیف‌های همین صفحه انتخاب باشند).
                         // تغییر ItemsSource ممکن است چندین LoadingRow پشت‌سرهم ایجاد کند؛
                         // به‌جای صف‌کردن Refresh برای هر ردیف، فقط یک بروزرسانی تجمیعی ثبت می‌کنیم.
@@ -91,8 +93,9 @@ namespace Taadol.Controls
 
                         // با تغییر صفحه/فیلتر، اسکرول عمودی باید به بالای لیست برگردد؛
                         // وگرنه کاربر در وسط/انتهای صفحه‌ی قبلی می‌ماند و ردیف‌های خالی/بی‌ساختار را می‌بیند.
-                        control.Dispatcher.BeginInvoke(new Action(control.ScrollGridToTop),
-                            DispatcherPriority.Background);
+                            control.Dispatcher.BeginInvoke(new Action(control.ScrollGridToTop),
+                                DispatcherPriority.Background);
+                        }
 
                         control._itemsSourceEverSet = true;
                         control.UpdateEmptyState();
@@ -394,6 +397,9 @@ namespace Taadol.Controls
 
         private void ShowLoading(bool show)
         {
+            if (PaginationBar != null)
+                PaginationBar.IsProcessing = show;
+
             if (LoadingOverlay != null)
                 LoadingOverlay.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
             if (DataGridView != null)

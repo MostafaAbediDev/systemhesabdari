@@ -204,10 +204,16 @@ namespace Taadol.Views
 
         private void OnViewUnloaded(object sender, RoutedEventArgs e)
         {
-            _loadCts?.Cancel();
-            _loadCts?.Dispose();
-            _loadCts = null;
+            CancelAndDispose(ref _loadCts);
             this.Unloaded -= OnViewUnloaded;
+        }
+
+        private static void CancelAndDispose(ref CancellationTokenSource cts)
+        {
+            var current = Interlocked.Exchange(ref cts, null);
+            if (current == null) return;
+            try { current.Cancel(); } catch (ObjectDisposedException) { }
+            current.Dispose();
         }
 
         public class ProvinceComboItem
@@ -377,9 +383,14 @@ namespace Taadol.Views
             {
                 await LoadCitiesAsync(provinceId);
             }
+            catch (OperationCanceledException)
+            {
+                // Cancellation is expected when the province or view changes.
+            }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"[EditBranchView] Error in LoadCitiesSafeAsync: {ex}");
+                ToastManager.Error("خطا در بارگذاری اطلاعات. لطفاً اتصال به سرور را بررسی کنید.");
             }
         }
 
@@ -390,9 +401,14 @@ namespace Taadol.Views
             {
                 await listView.RefreshGridAsync();
             }
+            catch (OperationCanceledException)
+            {
+                // Cancellation is expected when the view is closed or superseded.
+            }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"[EditBranchView] Error in RefreshListViewSafeAsync: {ex}");
+                ToastManager.Error("خطا در بارگذاری اطلاعات. لطفاً اتصال به سرور را بررسی کنید.");
             }
         }
 

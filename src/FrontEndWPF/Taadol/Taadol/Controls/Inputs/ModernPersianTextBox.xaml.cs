@@ -377,17 +377,33 @@ namespace Taadol.Controls
         /// </summary>
         private void UpdatePaddingForIcon(bool iconVisible)
         {
-            if (this.FlowDirection != FlowDirection.LeftToRight) return;
+            if (this.FlowDirection == FlowDirection.LeftToRight)
+            {
+                if (iconVisible)
+                {
+                    PART_TextBox.Padding = new Thickness(34, 0, 12, 0);
+                    PlaceholderText.Margin = new Thickness(34, 0, 0, 0);
+                }
+                else
+                {
+                    PART_TextBox.Padding = new Thickness(12, 0, 12, 0);
+                    PlaceholderText.Margin = new Thickness(12, 0, 0, 0);
+                }
+
+                return;
+            }
 
             if (iconVisible)
             {
-                PART_TextBox.Padding = new Thickness(34, 0, 12, 0);
-                PlaceholderText.Margin = new Thickness(34, 0, 0, 0);
+                // Icon: Width=22, Margin=5,0,10,0. Reserve the right-side
+                // margin and icon width, plus the existing right padding.
+                PART_TextBox.Padding = new Thickness(16, 0, 37, 0);
+                PlaceholderText.Margin = new Thickness(0, 0, 37, 0);
             }
             else
             {
-                PART_TextBox.Padding = new Thickness(12, 0, 12, 0);
-                PlaceholderText.Margin = new Thickness(12, 0, 0, 0);
+                PART_TextBox.Padding = new Thickness(16, 0, 12, 0);
+                PlaceholderText.Margin = new Thickness(16, 0, 0, 0);
             }
         }
 

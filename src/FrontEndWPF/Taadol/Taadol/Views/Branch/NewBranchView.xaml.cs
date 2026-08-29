@@ -63,22 +63,24 @@ namespace Taadol.Views
 
             await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background);
 
+            var loadToken = _loadCts?.Token ?? CancellationToken.None;
             try
             {
-                var token = _loadCts?.Token ?? CancellationToken.None;
                 var cities = await Task.Run(() =>
                 {
-                    token.ThrowIfCancellationRequested();
+                    loadToken.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
                     var cityRepo = scope.ServiceProvider.GetRequiredService<ICityRepository>();
                     return cityRepo.GetCitiesByProvince(provinceId);
-                }, token);
+                }, loadToken);
 
                 if (SelectedProvinceId != provinceId)
                     return;
 
                 await Application.Current.Dispatcher.InvokeAsync(() =>
                 {
+                    if (SelectedProvinceId != provinceId || loadToken.IsCancellationRequested)
+                        return;
                     Cities.Clear();
                     foreach (var c in cities)
                         Cities.Add(new CityComboItem { Id = c.Id, Title = c.Title });
@@ -93,7 +95,7 @@ namespace Taadol.Views
             }
             finally
             {
-                if (_loadCts?.IsCancellationRequested != true)
+                if (!loadToken.IsCancellationRequested && SelectedProvinceId == provinceId)
                 {
                     CityComboBox.IsEnabled = true;
                     CityLoadingOverlay.Visibility = Visibility.Collapsed;
@@ -156,12 +158,12 @@ namespace Taadol.Views
 
             await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background);
 
+            var loadToken = _loadCts?.Token ?? CancellationToken.None;
             try
             {
-                var token = _loadCts?.Token ?? CancellationToken.None;
                 await Task.Run(async () =>
                 {
-                    token.ThrowIfCancellationRequested();
+                    loadToken.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
                     var repo = scope.ServiceProvider.GetRequiredService<IProvinceRepository>();
 
@@ -175,11 +177,13 @@ namespace Taadol.Views
 
                     await Application.Current.Dispatcher.InvokeAsync(() =>
                     {
+                        if (loadToken.IsCancellationRequested)
+                            return;
                         Provinces.Clear();
                         foreach (var p in mappedProvinces)
                             Provinces.Add(p);
                     });
-                }, token);
+                }, loadToken);
             }
             catch (OperationCanceledException)
             {
@@ -206,22 +210,24 @@ namespace Taadol.Views
 
             await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background);
 
+            var loadToken = _loadCts?.Token ?? CancellationToken.None;
             try
             {
-                var token = _loadCts?.Token ?? CancellationToken.None;
                 var citiesFromBackend = await Task.Run(() =>
                 {
-                    token.ThrowIfCancellationRequested();
+                    loadToken.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
                     var cityRepo = scope.ServiceProvider.GetRequiredService<ICityRepository>();
                     return cityRepo.GetCitiesByProvince(provinceId);
-                }, token);
+                }, loadToken);
 
                 if (SelectedProvinceId != provinceId)
                     return;
 
                 await Application.Current.Dispatcher.InvokeAsync(() =>
                 {
+                    if (SelectedProvinceId != provinceId || loadToken.IsCancellationRequested)
+                        return;
                     Cities.Clear();
                     foreach (var c in citiesFromBackend)
                         Cities.Add(new CityComboItem { Id = c.Id, Title = c.Title });
@@ -279,6 +285,14 @@ namespace Taadol.Views
                 MarkUserChange();
             }
         }
+        private static void CancelAndDispose(ref CancellationTokenSource cts)
+        {
+            var current = Interlocked.Exchange(ref cts, null);
+            if (current == null) return;
+            try { current.Cancel(); } catch (ObjectDisposedException) { }
+            current.Dispose();
+        }
+
         private async void NewBranchView_Loaded(object sender, RoutedEventArgs e)
         {
             if (_isLoadedOnce) return;
@@ -301,6 +315,7 @@ namespace Taadol.Views
         private async Task LoadInitialDataAsync()
         {
             ShowCompanyComboLoading(true);
+            var loadToken = _loadCts?.Token ?? CancellationToken.None;
 
             // این خط باعث می‌شود اول UI و انیمیشن فرصت نمایش پیدا کند
             await Dispatcher.Yield(DispatcherPriority.Background);
@@ -309,18 +324,23 @@ namespace Taadol.Views
             {
                 var companiesTask = Task.Run(() =>
                 {
+                    loadToken.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
                     var companyApplication = scope.ServiceProvider.GetRequiredService<ICompanyApplication>();
-                    return companyApplication.GetCompanies();
-                });
+                    var companies = companyApplication.GetCompanies();
+                    loadToken.ThrowIfCancellationRequested();
+                    return companies;
+                }, loadToken);
 
                 var codeTask = Task.Run(() =>
                 {
+                    loadToken.ThrowIfCancellationRequested();
                     return GenerateNextUniqueCodeFromDatabase();
-                });
+                }, loadToken);
 
                 var companies = await companiesTask;
                 var nextCode = await codeTask;
+                loadToken.ThrowIfCancellationRequested();
 
                 Companies.Clear();
                 foreach (var c in companies)
@@ -331,14 +351,22 @@ namespace Taadol.Views
 
                 UniqueCode = nextCode;
             }
+            catch (OperationCanceledException)
+            {
+                System.Diagnostics.Debug.WriteLine("[NewBranchView] LoadInitialDataAsync was cancelled");
+            }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"[NewBranchView] Load info error: {ex}");
-                ToastManager.Error("خطا در لود اطلاعات");
+                if (_loadCts?.IsCancellationRequested != true)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[NewBranchView] Load info error: {ex}");
+                    ToastManager.Error("خطا در لود اطلاعات");
+                }
             }
             finally
             {
-                ShowCompanyComboLoading(false);
+                if (loadToken.IsCancellationRequested == false)
+                    ShowCompanyComboLoading(false);
             }
         }
         private string GenerateNextUniqueCodeFromDatabase()
@@ -619,9 +647,7 @@ namespace Taadol.Views
 
         private void OnViewUnloaded(object sender, RoutedEventArgs e)
         {
-            _loadCts?.Cancel();
-            _loadCts?.Dispose();
-            _loadCts = null;
+            CancelAndDispose(ref _loadCts);
             this.Unloaded -= OnViewUnloaded;
         }
 

@@ -24,6 +24,7 @@ namespace Taadol.Views
     public partial class EditFinancialPeriodView : UserControl, INotifyPropertyChanged, IUnsavedChangesAware
     {
         private CancellationTokenSource _loadCts = new();
+        private CancellationTokenSource _saveCts = new();
         private readonly IFinancialPeriodApplication _financialPeriodApplication;
         private readonly long _periodId;
 
@@ -92,17 +93,27 @@ namespace Taadol.Views
 
         private void OnViewUnloaded(object sender, RoutedEventArgs e)
         {
-            _loadCts?.Cancel();
-            _loadCts?.Dispose();
-            _loadCts = null;
+            CancelAndDispose(ref _loadCts);
+            CancelAndDispose(ref _saveCts);
             this.Unloaded -= OnViewUnloaded;
+        }
+
+        private static void CancelAndDispose(ref CancellationTokenSource cts)
+        {
+            var current = Interlocked.Exchange(ref cts, null);
+            if (current == null) return;
+            try { current.Cancel(); } catch (ObjectDisposedException) { }
+            current.Dispose();
         }
 
         private async void OnLoaded(object sender, RoutedEventArgs e)
         {
+            if (_loadCts == null || _loadCts.IsCancellationRequested)
+                return;
+
             try
             {
-                var token = _loadCts?.Token ?? CancellationToken.None;
+                var token = _loadCts.Token;
 
                 // جزئیات دوره و وضعیت فعال به‌صورت موازی لود می‌شوند
                 var detailsTask = Task.Run(() =>
@@ -160,12 +171,15 @@ namespace Taadol.Views
                         EndDatePicker.SelectedDate = details.EndDate;
                 }
 
+                token.ThrowIfCancellationRequested();
                 var branches = await branchesTask;
+                token.ThrowIfCancellationRequested();
                 Branches.Clear();
                 foreach (var b in branches)
                     Branches.Add(b);
 
                 // اگر شعبه‌ای که دوره به آن تعلق دارد غیرفعال شده، همچنان در لیست باشد
+                token.ThrowIfCancellationRequested();
                 if (SelectedBranchId > 0 && Branches.All(b => b.Id != SelectedBranchId))
                 {
                     Branches.Insert(0, new BranchComboItem { Id = details.BranchId, Title = "—" });
@@ -180,7 +194,8 @@ namespace Taadol.Views
             }
             catch (Exception ex)
             {
-                _isLoading = false;
+                if (_loadCts?.IsCancellationRequested != true)
+                    _isLoading = false;
                 if (_loadCts?.IsCancellationRequested != true)
                 {
                     System.Diagnostics.Debug.WriteLine($"[EditFinancialPeriodView] Load info error: {ex}");
@@ -216,6 +231,7 @@ namespace Taadol.Views
         private async Task SavePeriodAsync()
         {
             if (_isSaving) return;
+            if (_saveCts == null || _saveCts.IsCancellationRequested) return;
 
             // اعتبارسنجی اول — دکمه فقط وقتی وارد حالت «در حال ذخیره» می‌شود که فرم معتبر باشد
             if (string.IsNullOrWhiteSpace(PeriodTitle))
@@ -260,6 +276,7 @@ namespace Taadol.Views
                 // ذخیره از طریق سرویس Application روی ترد پس‌زمینه اجرا می‌شود تا UI فریز نشود.
                 // سرویس بک‌اند خودش چک همپوشانی و عنوان تکراری را انجام می‌دهد.
                 // خروجی null یعنی موفق؛ غیر null پیام هشدار است.
+                var saveToken = _saveCts.Token;
                 var dbMessage = await Task.Run(() =>
                 {
                     using var scope = App.ServiceProvider.CreateScope();
@@ -295,7 +312,7 @@ namespace Taadol.Views
                     }
 
                     return (string)null;
-                });
+                }, saveToken);
 
                 if (dbMessage != null)
                 {
@@ -319,8 +336,13 @@ namespace Taadol.Views
                 else
                     mainWindow?.NavigateTo(NavKeys.FinancialPeriod);
             }
+            catch (OperationCanceledException) when (_saveCts?.IsCancellationRequested == true)
+            {
+                System.Diagnostics.Debug.WriteLine("[EditFinancialPeriodView] Edit was cancelled");
+            }
             catch (Exception ex)
             {
+                if (_saveCts?.IsCancellationRequested == true) return;
                 System.Diagnostics.Debug.WriteLine($"[EditFinancialPeriodView] Edit error: {ex}");
                 ToastManager.Error("خطا در ویرایش");
             }
@@ -382,9 +404,14 @@ namespace Taadol.Views
             {
                 await yearSelector.RefreshAsync();
             }
+            catch (OperationCanceledException)
+            {
+                // Cancellation is expected when the view is closed or superseded.
+            }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"[EditFinancialPeriodView] Error in RefreshYearSelectorSafeAsync: {ex}");
+                ToastManager.Error("خطا در بارگذاری اطلاعات. لطفاً اتصال به سرور را بررسی کنید.");
             }
         }
 
@@ -395,9 +422,14 @@ namespace Taadol.Views
             {
                 await listView.RefreshGridAsync();
             }
+            catch (OperationCanceledException)
+            {
+                // Cancellation is expected when the view is closed or superseded.
+            }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"[EditFinancialPeriodView] Error in RefreshListViewSafeAsync: {ex}");
+                ToastManager.Error("خطا در بارگذاری اطلاعات. لطفاً اتصال به سرور را بررسی کنید.");
             }
         }
 

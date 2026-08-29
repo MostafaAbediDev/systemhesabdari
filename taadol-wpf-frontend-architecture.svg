@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1150" viewBox="0 0 1800 1150">
+<defs>
+ <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0b1220"/><stop offset="1" stop-color="#111c31"/></linearGradient>
+ <linearGradient id="hero" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#172554"/><stop offset="1" stop-color="#123c68"/></linearGradient>
+ <filter id="shadow"><feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000" flood-opacity=".28"/></filter>
+ <style>
+ .title{font:700 38px Arial,sans-serif;fill:#f8fafc}.sub{font:400 17px Arial,sans-serif;fill:#a9b9d4}
+ .section{font:700 22px Arial,sans-serif;fill:#f8fafc}.label{font:600 13px Arial,sans-serif;fill:#9fb3d5;letter-spacing:1px}
+ .folder{font:700 16px Arial,sans-serif;fill:#dbeafe}.file{font:400 13px Arial,sans-serif;fill:#cbd5e1}.note{font:400 12px Arial,sans-serif;fill:#93a4c2}
+ .card{fill:#111c30;stroke:#2a4165;stroke-width:1.5}.feature{fill:#101f37;stroke:#3768a5;stroke-width:1.5}.node{fill:#17263e;stroke:#395b87;stroke-width:1}.line{stroke:#5278a8;stroke-width:2;fill:none}.pill{font:600 12px Arial,sans-serif;fill:#bfdbfe}
+ </style>
+</defs>
+<rect width="1800" height="1150" fill="url(#bg)"/>
+<!-- Header -->
+<rect x="55" y="45" width="1690" height="125" rx="22" fill="url(#hero)" stroke="#315b91" filter="url(#shadow)"/>
+<circle cx="110" cy="107" r="28" fill="#38bdf8" opacity=".18"/><text x="110" y="118" text-anchor="middle" font-family="Arial" font-size="29" font-weight="700" fill="#7dd3fc">T</text>
+<text x="160" y="98" class="title">Taadol WPF Frontend Architecture</text>
+<text x="160" y="130" class="sub">Feature-Based MVVM + Reusable Controls + Shared UI Infrastructure</text>
+<text x="1630" y="94" class="label" text-anchor="end">WPF / MVVM</text><text x="1630" y="124" class="note" text-anchor="end">Frontend project structure</text>
+
+<!-- Root / entry -->
+<rect x="55" y="200" width="1690" height="105" rx="18" class="card" filter="url(#shadow)"/>
+<text x="82" y="233" class="label">PROJECT ROOT</text><text x="82" y="267" class="section">Taadol/</text>
+<text x="350" y="232" class="folder">Application Entry</text>
+<text x="350" y="260" class="file">App.xaml   •   App.xaml.cs   •   MainWindow.xaml   •   MainWindow.xaml.cs</text>
+<text x="350" y="286" class="note">Application startup, root window, and UI composition</text>
+
+<!-- Features -->
+<rect x="55" y="335" width="1690" height="410" rx="20" fill="#0e1b2f" stroke="#285a91" stroke-width="2" filter="url(#shadow)"/>
+<text x="82" y="373" class="section">Features/</text><text x="230" y="373" class="note">Feature-based architecture • each feature groups Views + ViewModels + Models</text>
+<!-- feature cards -->
+<g transform="translate(80,400)">
+ <rect width="300" height="310" rx="15" class="feature"/><text x="22" y="34" class="section" font-size="19">Person/</text>
+ <rect x="20" y="55" width="260" height="62" rx="10" class="node"/><text x="34" y="80" class="folder">Views/</text><text x="34" y="101" class="file">PersonListView.xaml</text><text x="155" y="101" class="file">NewPersonView.xaml</text>
+ <text x="34" y="114" class="file">EditPersonView.xaml • PersonDetailPanel.xaml</text>
+ <path d="M150 117 V137" class="line"/>
+ <rect x="20" y="140" width="260" height="58" rx="10" class="node"/><text x="34" y="165" class="folder">ViewModels/</text><text x="34" y="185" class="file">PersonListViewModel.cs • NewPersonViewModel.cs</text><text x="34" y="197" class="file">EditPersonViewModel.cs</text>
+ <path d="M150 198 V218" class="line"/>
+ <rect x="20" y="221" width="260" height="47" rx="10" class="node"/><text x="34" y="249" class="folder">Models/</text>
+ <text x="150" y="294" class="pill">Views ↓ ViewModels ↓ Models</text>
+</g>
+<g transform="translate(405,400)">
+ <rect width="300" height="310" rx="15" class="feature"/><text x="22" y="34" class="section" font-size="19">Branch/</text>
+ <rect x="20" y="55" width="260" height="62" rx="10" class="node"/><text x="34" y="80" class="folder">Views/</text><text x="34" y="101" class="file">BranchListView.xaml • NewBranchView.xaml</text><text x="34" y="114" class="file">EditBranchView.xaml • BranchArchiveListView.xaml</text>
+ <path d="M150 117 V137" class="line"/>
+ <rect x="20" y="140" width="260" height="58" rx="10" class="node"/><text x="34" y="165" class="folder">ViewModels/</text><text x="34" y="185" class="file">BranchListViewModel.cs • BranchArchiveListViewModel.cs</text>
+ <path d="M150 198 V218" class="line"/>
+ <rect x="20" y="221" width="260" height="47" rx="10" class="node"/><text x="34" y="249" class="folder">Models/</text>
+ <text x="150" y="294" class="pill">Views ↓ ViewModels ↓ Models</text>
+</g>
+<g transform="translate(730,400)">
+ <rect width="300" height="310" rx="15" class="feature"/><text x="22" y="34" class="section" font-size="19">Company/</text>
+ <rect x="20" y="55" width="260" height="62" rx="10" class="node"/><text x="34" y="80" class="folder">Views/</text><text x="34" y="101" class="file">Views/</text><text x="34" y="114" class="note">Company feature views</text>
+ <path d="M150 117 V137" class="line"/><rect x="20" y="140" width="260" height="58" rx="10" class="node"/><text x="34" y="175" class="folder">ViewModels/</text>
+ <path d="M150 198 V218" class="line"/><rect x="20" y="221" width="260" height="47" rx="10" class="node"/><text x="34" y="249" class="folder">Models/</text><text x="150" y="294" class="pill">Views ↓ ViewModels ↓ Models</text>
+</g>
+<g transform="translate(1055,400)">
+ <rect width="300" height="310" rx="15" class="feature"/><text x="22" y="34" class="section" font-size="19">FinancialPeriod/</text>
+ <rect x="20" y="55" width="260" height="62" rx="10" class="node"/><text x="34" y="80" class="folder">Views/</text><text x="34" y="101" class="file">Views/</text><text x="34" y="114" class="note">Financial period views</text>
+ <path d="M150 117 V137" class="line"/><rect x="20" y="140" width="260" height="58" rx="10" class="node"/><text x="34" y="175" class="folder">ViewModels/</text>
+ <path d="M150 198 V218" class="line"/><rect x="20" y="221" width="260" height="47" rx="10" class="node"/><text x="34" y="249" class="folder">Models/</text><text x="150" y="294" class="pill">Views ↓ ViewModels ↓ Models</text>
+</g>
+<g transform="translate(1380,400)">
+ <rect width="300" height="310" rx="15" class="feature"/><text x="22" y="34" class="section" font-size="19">Product/</text>
+ <rect x="20" y="55" width="260" height="62" rx="10" class="node"/><text x="34" y="80" class="folder">Views/</text><text x="34" y="101" class="file">Views/</text><text x="34" y="114" class="note">Product feature views</text>
+ <path d="M150 117 V137" class="line"/><rect x="20" y="140" width="260" height="58" rx="10" class="node"/><text x="34" y="175" class="folder">ViewModels/</text>
+ <path d="M150 198 V218" class="line"/><rect x="20" y="221" width="260" height="47" rx="10" class="node"/><text x="34" y="249" class="folder">Models/</text><text x="150" y="294" class="pill">Views ↓ ViewModels ↓ Models</text>
+</g>
+
+<!-- shared infrastructure row -->
+<text x="55" y="790" class="label">SHARED UI INFRASTRUCTURE</text>
+<g transform="translate(55,815)">
+ <rect width="390" height="245" rx="16" class="card"/><rect width="390" height="48" rx="16" fill="#123b57"/><text x="22" y="31" class="section">Controls/</text><text x="22" y="76" class="folder">Reusable WPF UserControls</text><text x="22" y="106" class="file">Buttons/   •   Dialogs/   •   Feedback/</text><text x="22" y="132" class="file">Grids/   •   Inputs/   •   Navigation/</text><text x="22" y="158" class="file">Toggles/</text><text x="22" y="202" class="note">Shared visual and interaction components</text>
+</g>
+<g transform="translate(470,815)">
+ <rect width="300" height="245" rx="16" class="card"/><rect width="300" height="48" rx="16" fill="#23415d"/><text x="22" y="31" class="section">Services/</text><text x="22" y="76" class="folder">Application/UI Services</text><text x="22" y="108" class="file">NavigationService.cs</text><text x="22" y="132" class="file">ViewFactory.cs</text><text x="22" y="156" class="file">ToastManager.cs</text><text x="22" y="180" class="file">IUnsavedChangesAware.cs</text></g>
+<g transform="translate(795,815)">
+ <rect width="260" height="245" rx="16" class="card"/><rect width="260" height="48" rx="16" fill="#3c315d"/><text x="22" y="31" class="section">Behaviors/</text><text x="22" y="76" class="folder">Reusable UI Behaviors</text><text x="22" y="110" class="file">NumberFontBehavior.cs</text><text x="22" y="136" class="file">FilterTabBehavior.cs</text></g>
+<g transform="translate(1080,815)">
+ <rect width="290" height="245" rx="16" class="card"/><rect width="290" height="48" rx="16" fill="#294b43"/><text x="22" y="31" class="section">Helpers/</text><text x="22" y="76" class="folder">Shared Helpers / Utilities</text><text x="22" y="110" class="file">BulkObservableCollection.cs</text><text x="22" y="136" class="file">NavKeys.cs</text><text x="22" y="162" class="file">ValidationHelper.cs</text></g>
+<g transform="translate(1395,815)">
+ <rect width="350" height="245" rx="16" class="card"/><rect width="350" height="48" rx="16" fill="#5b3c2f"/><text x="22" y="31" class="section">Models/</text><text x="22" y="76" class="folder">Shared Models</text><text x="22" y="105" class="file">BankAccountItem.cs • IListRowItem.cs</text><text x="22" y="128" class="file">MenuItem.cs • Product.cs • ProductModel.cs</text><text x="22" y="151" class="file">TransactionItem.cs • TreeComboItem.cs</text></g>
+
+<!-- resource band -->
+<rect x="55" y="1080" width="1690" height="48" rx="14" fill="#162238" stroke="#334b70"/>
+<text x="82" y="1111" class="folder">Resources/</text><text x="210" y="1111" class="file">Colors.xaml • Typography.xaml • Controls/ • Grids/ • Navigation/ • Dialogs/ • Fonts/</text>
+<text x="1090" y="1111" class="folder">Themes/</text><text x="1190" y="1111" class="file">Styles.xaml • GridStyles.xaml • SubmenuStyles.xaml</text>
+<text x="1540" y="1111" class="folder">Assets/Icons/</text>
+</svg>

@@ -88,6 +88,7 @@
                       VerticalScrollBarVisibility="Disabled"
                       HorizontalScrollBarVisibility="Disabled"
                       CanContentScroll="False"
+                      HorizontalContentAlignment="Stretch"
                       VerticalContentAlignment="Top">
             <ScrollViewer.Resources>
                 <Style TargetType="ScrollBar"
@@ -132,7 +133,7 @@
                           AlternationCount="2"
                           IsReadOnly="True"
                           VirtualizingPanel.VirtualizationMode="Standard"
-                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
                           ScrollViewer.VerticalScrollBarVisibility="Auto"
                           ScrollViewer.CanContentScroll="True"
                           VirtualizingPanel.ScrollUnit="Pixel"

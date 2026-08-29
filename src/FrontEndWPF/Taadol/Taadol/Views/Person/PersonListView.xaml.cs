@@ -101,6 +101,7 @@ namespace Taadol.Views
 
         private void PersonListView_Unloaded(object sender, RoutedEventArgs e)
         {
+            ViewModel.CancelPendingLoads();
             ViewModel.PropertyChanged -= ViewModel_PropertyChanged;
             this.Unloaded -= PersonListView_Unloaded;
         }
