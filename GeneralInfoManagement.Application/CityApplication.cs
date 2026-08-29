@@ -12,7 +12,7 @@ namespace GeneralInfoManagement.Application
             _cityRepository = cityRepository;
         }
 
-        public List<CityViewModel> GetCitiesByProvinceId(long provinceId)
+        public List<CityViewModel> GetCitiesByProvince(long provinceId)
         {
             return _cityRepository.GetCitiesByProvinceId(provinceId);
         }
