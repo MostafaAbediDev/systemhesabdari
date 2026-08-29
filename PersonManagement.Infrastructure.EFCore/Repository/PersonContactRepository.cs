@@ -47,6 +47,14 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
                                 !x.IsDeleted);
         }
 
+        public List<PersonContacts> GetEntitiesByPersonId(long personId)
+        {
+            return _context.PersonContacts
+                .Where(x => x.PersonId == personId && !x.IsDeleted)
+                .ToList();
+        }
+        
+
         public EditPersonContact GetDetails(long id)
         {
             return _context.PersonContacts

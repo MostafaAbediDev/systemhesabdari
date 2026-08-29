@@ -46,7 +46,8 @@ namespace PersonManagement.Application
             if (string.IsNullOrWhiteSpace(command.Value))
                 return operation.Failed("مقدار تماس الزامی است.");
 
-            if (_personContactRepository.Exists(x => x.Value == command.Value && x.ContactTypeId == command.ContactTypeId && x.PersonId == command.PersonId))
+            if (_personContactRepository.Exists(x => x.Value == command.Value && x.ContactTypeId == command.ContactTypeId
+                                                                              && x.PersonId == command.PersonId))
                 return operation.Failed("این اطلاعات تماس قبلاً برای این شخص ثبت شده است.");
 
             var entity = new PersonContacts(
@@ -88,10 +89,9 @@ namespace PersonManagement.Application
             if (entity == null)
                 return operation.Failed("رکوردی با این شناسه یافت نشد.");
 
-            if (_personContactRepository.Exists(x => command.Value == x.Value && x.ContactTypeId == command.ContactTypeId && x.PersonId == command.PersonId))
+            if (_personContactRepository.Exists(x => command.Value == x.Value && x.ContactTypeId == command.ContactTypeId 
+                                                                              && x.PersonId == command.PersonId && x.Id != command.Id))
                 return operation.Failed("این اطلاعات تماس قبلاً برای این شخص ثبت شده است.");
-
-            var oldContactTypeId = entity.ContactTypeId;
 
             entity.Edit(command.Value, command.Description, command.ContactTypeId);
 

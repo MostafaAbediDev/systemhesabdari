@@ -8,6 +8,7 @@ namespace CodeManagement.Application.Contracts.Code
         OperationResult Edit(EditCode command);
         OperationResult SetCode(CreateCode command);
         CodeViewModel GetByOwner(long ownerId, CodeOwnerTypeDTO ownerType);
+        OperationResult RemoveByOwner(long ownerId,CodeOwnerTypeDTO ownerType);
         List<CodeViewModel> Search(CodeSearchModel searchModel);
         List<CodeViewModel> GetListByOwners(List<long> ownerIds, CodeOwnerTypeDTO ownerType);
 

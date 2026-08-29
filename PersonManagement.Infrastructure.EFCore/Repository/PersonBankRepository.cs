@@ -118,5 +118,12 @@ namespace PersonManagement.Infrastructure.EFCore.Repository
             foreach (var item in defaults)
                 item.UnsetDefault();
         }
+
+        public List<PersonBanks> GetEntitiesByPersonId(long personId)
+        {
+            return _context.PersonBanks
+                .Where(x => x.PersonId == personId && !x.IsDeleted)
+                .ToList();
+        }
     }
 }

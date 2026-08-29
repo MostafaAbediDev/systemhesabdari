@@ -10,5 +10,6 @@ namespace PersonManagement.Domain.Person.PersonBankAgg
         List<PersonBankViewModel> GetByPersonId(long personId);
         PersonBankViewModel GetDefaultByPersonId(long personId);
         void UnsetAllDefaults(long personId);
+        List<PersonBanks> GetEntitiesByPersonId(long personId);
     }
 }

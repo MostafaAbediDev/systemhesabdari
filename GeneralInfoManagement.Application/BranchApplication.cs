@@ -2,23 +2,35 @@
 using CodeManagement.Application.Contracts.Code;
 using GeneralInfoManagement.Application.Contract.Branches;
 using GeneralInfoManagement.Domain.BaseInfo.BranchesAgg;
+using System.Transactions;
+using GeneralInfoManagement.Domain.BaseInfo.BranchArchiveAgg;
+using GeneralInfoManagement.Domain.BaseInfo.FinancialPeriodsAgg;
 
 namespace GeneralInfoManagement.Application
 {
     public class BranchApplication : IBranchApplication
     {
         private readonly IBranchRepository _branchRepository;
-        private readonly ICodeApplication  _codeApplication;
+        private readonly IFinancialPeriodRepository _financialPeriodRepository;
+        private readonly IBranchArchiveRepository _branchArchiveRepository;
+        private readonly ICodeApplication _codeApplication;
 
-        public BranchApplication(IBranchRepository branchRepository, ICodeApplication codeApplication)
+        public BranchApplication(IBranchRepository branchRepository, ICodeApplication codeApplication, 
+            IFinancialPeriodRepository financialPeriodRepository, IBranchArchiveRepository branchArchiveRepository)
         {
             _branchRepository = branchRepository;
             _codeApplication = codeApplication;
+            _financialPeriodRepository = financialPeriodRepository;
+            _branchArchiveRepository = branchArchiveRepository;
         }
 
         public OperationResult Create(CreateBranches command)
         {
             var operation = new OperationResult();
+
+            using var transaction = new TransactionScope(
+                TransactionScopeOption.Required,
+                TransactionScopeAsyncFlowOption.Enabled);
 
             var nationalId = command.NationalId;
 
@@ -27,7 +39,6 @@ namespace GeneralInfoManagement.Application
 
             if (_branchRepository.Exists(x => x.NationalId == nationalId))
                 return operation.Failed("شعبه‌ای با این شناسه ملی قبلاً ثبت شده است.");
-
 
             var location = new Location(command.Latitude, command.Longitude);
 
@@ -53,6 +64,8 @@ namespace GeneralInfoManagement.Application
                 command.IsMain);
 
             _branchRepository.Create(branch);
+
+            // برای تولید branch.Id
             _branchRepository.SaveChanges();
 
             var codeResult = _codeApplication.SetCode(new CreateCode
@@ -66,12 +79,19 @@ namespace GeneralInfoManagement.Application
             if (!codeResult.IsSucceeded)
                 return operation.Failed(codeResult.Message);
 
+            transaction.Complete();
+
             return operation.Succedded();
         }
+
 
         public OperationResult Edit(EditBranch command)
         {
             var operation = new OperationResult();
+
+            using var transaction = new TransactionScope(
+                TransactionScopeOption.Required,
+                TransactionScopeAsyncFlowOption.Enabled);
 
             var branch = _branchRepository.Get(command.Id);
 
@@ -83,10 +103,16 @@ namespace GeneralInfoManagement.Application
             if (string.IsNullOrWhiteSpace(nationalId))
                 return operation.Failed("شناسه ملی الزامی است.");
 
-            if (_branchRepository.Exists(x => x.NationalId == nationalId && x.Id != command.Id))
+            if (_branchRepository.Exists(x =>
+                x.NationalId == nationalId &&
+                x.Id != command.Id))
+            {
                 return operation.Failed("شناسه ملی تکراری است.");
+            }
 
-            var location = new Location(command.Latitude, command.Longitude);
+            var location = new Location(
+                command.Latitude,
+                command.Longitude);
 
             branch.Edit(
                 command.Title,
@@ -103,17 +129,6 @@ namespace GeneralInfoManagement.Application
                 command.ProvinceId,
                 command.CityId);
 
-            var codeResult = _codeApplication.SetCode(new CreateCode
-            {
-                OwnerId = branch.Id,
-                OwnerType = CodeOwnerTypeDTO.Branch,
-                IsAutomatic = command.IsCodeAutomatic,
-                Value = command.ManualCode
-            });
-
-            if (!codeResult.IsSucceeded)
-                return operation.Failed(codeResult.Message);
-
             if (command.IsMain)
             {
                 _branchRepository.ResetAllMainBranches(command.CompanyId);
@@ -125,13 +140,140 @@ namespace GeneralInfoManagement.Application
                 branch.UnsetMain();
             }
 
+            var codeResult = _codeApplication.SetCode(new CreateCode
+            {
+                OwnerId = branch.Id,
+                OwnerType = CodeOwnerTypeDTO.Branch,
+                IsAutomatic = command.IsCodeAutomatic,
+                Value = command.ManualCode
+            });
+
+            if (!codeResult.IsSucceeded)
+                return operation.Failed(codeResult.Message);
+
             _branchRepository.SaveChanges();
+
+            transaction.Complete();
+
             return operation.Succedded();
         }
 
+        //public OperationResult Create(CreateBranches command)
+        //{
+        //    var operation = new OperationResult();
+
+        //    var nationalId = command.NationalId;
+
+        //    if (string.IsNullOrWhiteSpace(nationalId))
+        //        return operation.Failed("شناسه ملی الزامی است.");
+
+        //    if (_branchRepository.Exists(x => x.NationalId == nationalId))
+        //        return operation.Failed("شعبه‌ای با این شناسه ملی قبلاً ثبت شده است.");
+
+
+        //    var location = new Location(command.Latitude, command.Longitude);
+
+        //    if (command.IsMain)
+        //    {
+        //        _branchRepository.ResetAllMainBranches(command.CompanyId);
+        //    }
+
+        //    var branch = new Branches(
+        //        command.Title,
+        //        nationalId,
+        //        command.EconomicCode,
+        //        command.RegisterNumber,
+        //        command.Email,
+        //        command.MobilePhone,
+        //        command.Address,
+        //        command.PostCode,
+        //        location,
+        //        command.CompanyId,
+        //        command.TelePhone,
+        //        command.ProvinceId,
+        //        command.CityId,
+        //        command.IsMain);
+
+        //    _branchRepository.Create(branch);
+        //    _branchRepository.SaveChanges();
+
+        //    var codeResult = _codeApplication.SetCode(new CreateCode
+        //    {
+        //        OwnerId = branch.Id,
+        //        OwnerType = CodeOwnerTypeDTO.Branch,
+        //        IsAutomatic = command.IsCodeAutomatic,
+        //        Value = command.ManualCode
+        //    });
+
+        //    if (!codeResult.IsSucceeded)
+        //        return operation.Failed(codeResult.Message);
+
+        //    return operation.Succedded();
+        //}
+
+        //public OperationResult Edit(EditBranch command)
+        //{
+        //    var operation = new OperationResult();
+
+        //    var branch = _branchRepository.Get(command.Id);
+
+        //    if (branch == null)
+        //        return operation.Failed(ApplicationMessages.RecordNotFound);
+
+        //    var nationalId = command.NationalId;
+
+        //    if (string.IsNullOrWhiteSpace(nationalId))
+        //        return operation.Failed("شناسه ملی الزامی است.");
+
+        //    if (_branchRepository.Exists(x => x.NationalId == nationalId && x.Id != command.Id))
+        //        return operation.Failed("شناسه ملی تکراری است.");
+
+        //    var location = new Location(command.Latitude, command.Longitude);
+
+        //    branch.Edit(
+        //        command.Title,
+        //        nationalId,
+        //        command.EconomicCode,
+        //        command.RegisterNumber,
+        //        command.Email,
+        //        command.MobilePhone,
+        //        command.Address,
+        //        command.PostCode,
+        //        location,
+        //        command.CompanyId,
+        //        command.TelePhone,
+        //        command.ProvinceId,
+        //        command.CityId);
+
+        //    var codeResult = _codeApplication.SetCode(new CreateCode
+        //    {
+        //        OwnerId = branch.Id,
+        //        OwnerType = CodeOwnerTypeDTO.Branch,
+        //        IsAutomatic = command.IsCodeAutomatic,
+        //        Value = command.ManualCode
+        //    });
+
+        //    if (!codeResult.IsSucceeded)
+        //        return operation.Failed(codeResult.Message);
+
+        //    if (command.IsMain)
+        //    {
+        //        _branchRepository.ResetAllMainBranches(command.CompanyId);
+
+        //        branch.SetAsMain();
+        //    }
+        //    else
+        //    {
+        //        branch.UnsetMain();
+        //    }
+
+        //    _branchRepository.SaveChanges();
+        //    return operation.Succedded();
+        //}
+
         public OperationResult Activate(long id)
         {
-            var operation = new OperationResult();  
+            var operation = new OperationResult();
 
             var branch = _branchRepository.Get(id);
             if (branch == null) return new OperationResult().Failed("یافت نشد.");
@@ -193,22 +335,34 @@ namespace GeneralInfoManagement.Application
             if (branch == null)
                 return operation.Failed(ApplicationMessages.RecordNotFound);
 
+            if (_financialPeriodRepository.ExistsByBranchId(id))
+                return operation.Failed(
+                    "این شعبه دارای دوره مالی است و امکان حذف آن وجود ندارد.");
+
+            if (_branchArchiveRepository.ExistsByBranchId(id))
+                return operation.Failed(
+                    "این شعبه دارای آرشیو است و امکان حذف آن وجود ندارد.");
+
             branch.Remove();
+
             _branchRepository.SaveChanges();
+
             return operation.Succedded();
         }
 
         public OperationResult Restore(long id)
         {
-            var operation = new OperationResult();  
+            var operation = new OperationResult();
 
-            var branch = _branchRepository.Get(id);
+            var branch = _branchRepository.GetIncludingDeleted(id);
+
             if (branch == null)
                 return operation.Failed(ApplicationMessages.RecordNotFound);
 
             branch.Restore();
 
             _branchRepository.SaveChanges();
+
             return operation.Succedded();
         }
 

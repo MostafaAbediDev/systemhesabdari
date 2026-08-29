@@ -5,6 +5,6 @@ namespace GeneralInfoManagement.Domain.General.CityAgg
 {
     public interface ICityRepository : IRepository<long, Cities>
     {
-        List<CityViewModel> GetCitiesByProvince(long provinceId);
+        List<CityViewModel> GetCitiesByProvinceId(long provinceId);
     }
 }
