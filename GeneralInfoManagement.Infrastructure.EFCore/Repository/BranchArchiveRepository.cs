@@ -30,6 +30,12 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
                 .ToList();
         }
 
+        public bool ExistsByBranchId(long branchId)
+        {
+            return _context.BranchArchives
+                .Any(x => x.BranchId == branchId && !x.IsDeleted);
+        }
+
         public EditBranchArchive GetDetails(long id)
         {
             return _context.BranchArchives.Where(x => !x.IsDeleted)

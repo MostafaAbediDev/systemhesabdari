@@ -230,7 +230,7 @@ namespace Taadol.Views
         {
             try
             {
-                var items = await Task.Run(() => _provinceRepository.GetProvincesForSelectList());
+                var items = await Task.Run(() => _provinceRepository.GetProvinces());
                 Provinces.Clear();
                 foreach (var p in items)
                     Provinces.Add(p);
@@ -246,7 +246,7 @@ namespace Taadol.Views
             if (provinceId <= 0) return;
             try
             {
-                var items = await Task.Run(() => _cityRepository.GetCitiesByProvince(provinceId));
+                var items = await Task.Run(() => _cityRepository.GetCitiesByProvinceId(provinceId));
                 Cities.Clear();
                 foreach (var c in items)
                     Cities.Add(c);

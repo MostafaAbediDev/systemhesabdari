@@ -412,7 +412,7 @@ namespace Taadol.Views
         {
             try
             {
-                var items = await Task.Run(() => _provinceRepository.GetProvincesForSelectList());
+                var items = await Task.Run(() => _provinceRepository.GetProvinces());
 
                 Provinces.Clear();
                 foreach (var p in items)
@@ -430,7 +430,7 @@ namespace Taadol.Views
 
             try
             {
-                var items = await Task.Run(() => _cityRepository.GetCitiesByProvince(provinceId));
+                var items = await Task.Run(() => _cityRepository.GetCitiesByProvinceId(provinceId));
 
                 Cities.Clear();
                 foreach (var c in items)

@@ -9,6 +9,7 @@ namespace PersonManagement.Domain.Person.PersonContactAgg
         List<PersonContactViewModel> Search(PersonContactSearchModel searchModel);
         List<PersonContactViewModel> GetByPersonId(long personId);
         PersonContacts GetDefault(long personId, long contactTypeId);
+        List<PersonContacts> GetEntitiesByPersonId(long personId);
 
     }
 }

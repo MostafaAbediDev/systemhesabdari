@@ -58,7 +58,7 @@ namespace Taadol.Views
             {
                 using var scope = App.ServiceProvider.CreateScope();
                 var cityRepo = scope.ServiceProvider.GetRequiredService<ICityRepository>();
-                var cities = cityRepo.GetCitiesByProvince(provinceId); // از زیرسیستم واقعی
+                var cities = cityRepo.GetCitiesByProvinceId(provinceId); // از زیرسیستم واقعی
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
@@ -119,7 +119,7 @@ namespace Taadol.Views
                 using var scope = App.ServiceProvider.CreateScope();
                 var repo = scope.ServiceProvider.GetRequiredService<IProvinceRepository>();
 
-                var provincesFromBackend = repo.GetProvincesForSelectList();
+                var provincesFromBackend = repo.GetProvinces();
 
                 var mappedProvinces = provincesFromBackend.Select(p => new ProvinceComboItem
                 {
@@ -150,7 +150,7 @@ namespace Taadol.Views
                 using var scope = App.ServiceProvider.CreateScope();
                 var cityRepo = scope.ServiceProvider.GetRequiredService<ICityRepository>();
 
-                var citiesFromBackend = cityRepo.GetCitiesByProvince(provinceId);
+                var citiesFromBackend = cityRepo.GetCitiesByProvinceId(provinceId);
 
                 var mappedCities = citiesFromBackend.Select(c => new CityComboItem
                 {

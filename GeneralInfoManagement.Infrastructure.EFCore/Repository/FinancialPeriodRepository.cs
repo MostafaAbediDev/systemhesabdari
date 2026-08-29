@@ -32,6 +32,12 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
                 .ToList();
         }
 
+        public bool ExistsByBranchId(long branchId)
+        {
+            return _context.FinancialPeriods
+                .Any(x => x.BranchId == branchId && !x.IsDeleted);
+        }
+
         public EditFinancialPeriod GetDetails(long id)
         {
             return _context.FinancialPeriods.Where(x => !x.IsDeleted)

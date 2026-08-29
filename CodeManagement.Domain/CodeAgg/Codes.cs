@@ -37,6 +37,11 @@ namespace CodeManagement.Domain.CodeAgg
             IsAutomatic = isAutomatic;
 
         }
+
+        public void Remove()
+        {
+            IsDeleted = true;
+        }
     }
 
 }

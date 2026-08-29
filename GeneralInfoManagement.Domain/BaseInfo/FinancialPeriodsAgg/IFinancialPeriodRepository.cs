@@ -8,5 +8,6 @@ namespace GeneralInfoManagement.Domain.BaseInfo.FinancialPeriodsAgg
         EditFinancialPeriod GetDetails(long id);
         List<FinancialPeriodViewModel> Search(FinancialPeriodSearchModel searchModel);
         List<FinancialPeriodViewModel> GetFinancialPeriods();
+        bool ExistsByBranchId(long branchId);
     }
 }
