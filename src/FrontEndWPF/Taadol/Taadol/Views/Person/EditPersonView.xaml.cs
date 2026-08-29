@@ -975,7 +975,7 @@ namespace Taadol.Views
             if (bankBranchId <= 0) return;
             try
             {
-                bankApp.Create(new CreatePersonBank
+                var result = bankApp.Create(new CreatePersonBank
                 {
                     PersonId = personId,
                     BankBranchId = bankBranchId,
@@ -984,10 +984,22 @@ namespace Taadol.Views
                     Shaba = shaba ?? "",
                     IsDefault = isDefault
                 });
+
+                if (!result.IsSucceeded)
+                {
+                    System.Diagnostics.Debug.WriteLine($"TryCreateBankAccountScoped failed: {result.Message}");
+                    // این متد روی Task.Run اجرا می‌شود؛ Toast باید روی UI thread نمایش داده شود.
+                    Application.Current?.Dispatcher.BeginInvoke(new Action(() =>
+                        ToastManager.Warning(string.IsNullOrWhiteSpace(result.Message)
+                            ? "ذخیره حساب بانکی انجام نشد."
+                            : result.Message)));
+                }
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"TryCreateBankAccountScoped exception: {ex.Message}");
+                Application.Current?.Dispatcher.BeginInvoke(new Action(() =>
+                    ToastManager.Error("خطا در ذخیره حساب بانکی")));
             }
         }
 

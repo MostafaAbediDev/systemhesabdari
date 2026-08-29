@@ -81,9 +81,13 @@ namespace Taadol.Views
 
         private void OnViewUnloaded(object sender, RoutedEventArgs e)
         {
-            _loadCts?.Cancel();
-            _loadCts?.Dispose();
-            _loadCts = null;
+            var current = Interlocked.Exchange(ref _loadCts, null);
+            if (current != null)
+            {
+                try { current.Cancel(); } catch (ObjectDisposedException) { }
+                current.Dispose();
+            }
+
             this.Unloaded -= OnViewUnloaded;
         }
 

@@ -101,7 +101,15 @@ namespace Taadol.Views
             FillEmptyRows();
 
             Loaded += BranchListView_Loaded;
-            this.Unloaded += (s, e) => { _loadCts?.Cancel(); _loadCts = null; };
+            this.Unloaded += (s, e) =>
+            {
+                var current = Interlocked.Exchange(ref _loadCts, null);
+                if (current != null)
+                {
+                    try { current.Cancel(); } catch (ObjectDisposedException) { }
+                    current.Dispose();
+                }
+            };
         }
 
         // ─── هدر ستون‌های داخلی (چک‌باکس و شماره ردیف) را خاکستری می‌کند ───
@@ -134,7 +142,12 @@ namespace Taadol.Views
 
         private async void BtnRefresh_Click(object sender, RoutedEventArgs e)
         {
-            _loadCts?.Cancel();
+            var current = Interlocked.Exchange(ref _loadCts, null);
+            if (current != null)
+            {
+                try { current.Cancel(); } catch (ObjectDisposedException) { }
+                current.Dispose();
+            }
             _isLoadedOnce = false;
             try
             {
@@ -156,7 +169,12 @@ namespace Taadol.Views
         /// </summary>
         public async Task RefreshGridAsync()
         {
-            _loadCts?.Cancel();
+            var current = Interlocked.Exchange(ref _loadCts, null);
+            if (current != null)
+            {
+                try { current.Cancel(); } catch (ObjectDisposedException) { }
+                current.Dispose();
+            }
             _isLoadedOnce = false;
             try
             {
@@ -709,14 +727,50 @@ namespace Taadol.Views
             {
                 BranchesGrid.IsLoading = true;
 
+                var deletedCount = 0;
+                var deleteErrors = new List<string>();
+
                 await Task.Run(() =>
                 {
                     foreach (var item in selectedItems.ToList())
                     {
-                        if (long.TryParse(item.UniqueId, out var branchId))
-                            _branchApplication.Remove(branchId);
+                        if (!long.TryParse(item.UniqueId, out var branchId))
+                            continue;
+
+                        var operation = _branchApplication.Remove(branchId);
+                        if (operation?.IsSucceeded == true)
+                        {
+                            deletedCount++;
+                        }
+                        else
+                        {
+                            var message = operation?.Message;
+                            deleteErrors.Add(string.IsNullOrWhiteSpace(message)
+                                ? "حذف شعبه انجام نشد."
+                                : message);
+                        }
                     }
                 });
+
+                if (deleteErrors.Count > 0)
+                {
+                    var failedMessage = string.Join("، ", deleteErrors.Distinct().Take(3));
+                    if (deleteErrors.Count > 3)
+                        failedMessage += " و موارد دیگر";
+
+                    ToastManager.Warning(
+                        $"{ToPersianNumber(deleteErrors.Count)} شعبه حذف نشدند: {failedMessage}");
+                }
+
+                if (deletedCount == 0)
+                {
+                    if (deleteErrors.Count == 0)
+                        ToastManager.Warning("هیچ شعبه‌ای حذف نشد.");
+                    return;
+                }
+
+                ToastManager.Success(
+                    $"{ToPersianNumber(deletedCount)} شعبه با موفقیت حذف شد.");
             }
             catch (Exception ex)
             {

@@ -97,7 +97,15 @@ namespace Taadol.Views
             FillEmptyRows();
 
             Loaded += CompanyListView_Loaded;
-            this.Unloaded += (s, e) => { _loadCts?.Cancel(); _loadCts = null; };
+            this.Unloaded += (s, e) =>
+            {
+                var current = Interlocked.Exchange(ref _loadCts, null);
+                if (current != null)
+                {
+                    try { current.Cancel(); } catch (ObjectDisposedException) { }
+                    current.Dispose();
+                }
+            };
         }
 
         private void HeaderClose_Click(object sender, MouseButtonEventArgs e)
@@ -112,7 +120,12 @@ namespace Taadol.Views
 
         private async void BtnRefresh_Click(object sender, RoutedEventArgs e)
         {
-            _loadCts?.Cancel();
+            var current = Interlocked.Exchange(ref _loadCts, null);
+            if (current != null)
+            {
+                try { current.Cancel(); } catch (ObjectDisposedException) { }
+                current.Dispose();
+            }
             _isLoadedOnce = false;
             try
             {
@@ -163,7 +176,12 @@ namespace Taadol.Views
         /// </summary>
         public async Task RefreshGridAsync()
         {
-            _loadCts?.Cancel();
+            var current = Interlocked.Exchange(ref _loadCts, null);
+            if (current != null)
+            {
+                try { current.Cancel(); } catch (ObjectDisposedException) { }
+                current.Dispose();
+            }
             _isLoadedOnce = false;
             try
             {

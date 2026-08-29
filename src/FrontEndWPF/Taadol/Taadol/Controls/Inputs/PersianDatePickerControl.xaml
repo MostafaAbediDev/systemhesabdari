@@ -8,30 +8,30 @@
              xmlns:primitives="clr-namespace:System.Windows.Controls.Primitives;assembly=PresentationFramework"
              FlowDirection="LeftToRight"
              mc:Ignorable="d"
-         
              d:DesignHeight="90" d:DesignWidth="400"
              HorizontalAlignment="Stretch" VerticalAlignment="Top">
+
     <UserControl.Resources>
+        <!-- استایل تکست‌باکس‌ها -->
         <Style x:Key="DatePickerTextBoxStyle" TargetType="TextBox">
             <Setter Property="Background" Value="White"/>
             <Setter Property="BorderBrush" Value="#B0B0B0"/>
-            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Foreground" Value="#404040"/>
             <Setter Property="FontSize" Value="15"/>
             <Setter Property="FontFamily" Value="{StaticResource Vazir}"/>
             <Setter Property="TextAlignment" Value="Center"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="MinHeight" Value="42"/>
+            <Setter Property="MinHeight" Value="38"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TextBox">
                         <Border x:Name="border"
+                                CornerRadius="4"
                                 Background="{TemplateBinding Background}"
-                             
                                 Padding="0">
                             <Grid>
-                                <ScrollViewer x:Name="PART_ContentHost" 
-                                              VerticalAlignment="Center"/>
+                                <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center"/>
                                 <TextBlock x:Name="PlaceholderText"
                                            Text="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
                                            Foreground="#B0B0B0"
@@ -39,7 +39,6 @@
                                            HorizontalAlignment="Center"
                                            VerticalAlignment="Center"
                                            Visibility="Collapsed"
-                                           
                                            IsHitTestVisible="False"
                                            FontFamily="{StaticResource IRANSans}" />
                             </Grid>
@@ -48,16 +47,13 @@
                             <Trigger Property="Text" Value="">
                                 <Setter TargetName="PlaceholderText" Property="Visibility" Value="Visible"/>
                             </Trigger>
-                            <Trigger Property="IsFocused" Value="True">
-                                <Setter TargetName="border" Property="BorderBrush" Value="#1A3A6B"/>
-                            </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
 
-        <!-- دکمه‌های ناوبری ماه (قبلی/بعدی) -->
+        <!-- دکمه‌های ناوبری ماه -->
         <Style x:Key="CalendarNavButtonStyle" TargetType="Button">
             <Setter Property="Width" Value="28"/>
             <Setter Property="Height" Value="28"/>
@@ -67,9 +63,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="bd"
-                                Background="{TemplateBinding Background}"
-                                CornerRadius="4">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}" CornerRadius="3">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -85,7 +79,7 @@
             </Setter>
         </Style>
 
-        <!-- دکمه‌های روزهای ماه (هاور در کد مدیریت می‌شود تا حالت انتخاب‌شده خراب نشود) -->
+        <!-- دکمه‌های روزهای ماه -->
         <Style x:Key="CalendarDayButtonStyle" TargetType="Button">
             <Setter Property="FontFamily" Value="{StaticResource IRANSans}"/>
             <Setter Property="FontSize" Value="13"/>
@@ -103,7 +97,7 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="4">
+                                CornerRadius="3">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                     </ControlTemplate>
@@ -120,7 +114,7 @@
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
 
-        <!-- دکمه «امروز» پایین تقویم -->
+        <!-- دکمه امروز -->
         <Style x:Key="CalendarTodayButtonStyle" TargetType="Button">
             <Setter Property="FontFamily" Value="{StaticResource IRANSans}"/>
             <Setter Property="FontSize" Value="12"/>
@@ -137,7 +131,7 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="4">
+                                CornerRadius="3">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -150,47 +144,48 @@
             </Setter>
         </Style>
     </UserControl.Resources>
-    <Grid Margin="10,0,10,0" HorizontalAlignment="Stretch">
+
+    <Grid Margin="0,0,0,0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-          
+            <!-- باکس‌های تاریخ -->
+            <RowDefinition Height="Auto"/>
+            <!-- پیغام خطا -->
         </Grid.RowDefinitions>
 
-     
-
-        <!-- Date Boxes -->
-        <Grid Grid.Row="1" HorizontalAlignment="Stretch">
+        <!-- باکس‌های تاریخ -->
+        <Grid Grid.Row="0" HorizontalAlignment="Stretch">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1.4*" MinWidth="110"/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="4"/>
                 <ColumnDefinition Width="*" MinWidth="70"/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="4"/>
                 <ColumnDefinition Width="*" MinWidth="70"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Year Box with Calendar Icon -->
+            <!-- سال همراه با آیکون تقویم -->
             <Border Grid.Column="0"
-                    BorderBrush="#CCD0D9" 
-                    BorderThickness="1.3"
+                    BorderBrush="#E5E7EB"
+                    BorderThickness="1"
                     CornerRadius="4"
                     Background="White"
-                    Margin="0,0,5,0">
+                    SnapsToDevicePixels="True"
+                    UseLayoutRounding="True">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    
-                    <!-- Calendar Icon (با کلیک روی آن تقویم باز می‌شود) -->
+
                     <Border Grid.Column="0" 
                             x:Name="CalendarIconBorder"
-                            Width="30" Height="30"
+                            Width="28" Height="28"
                             CornerRadius="4"
                             BorderBrush="#2667FF"
                             BorderThickness="1"
                             Background="White"
                             Cursor="Hand"
-                            Margin="8,0,5,0"
+                            Margin="6,0,5,0"
                             MouseLeftButtonUp="CalendarIcon_Click">
                         <Grid>
                             <svg:SvgViewbox Width="15"
@@ -199,57 +194,64 @@
                                             VerticalAlignment="Center" />
                         </Grid>
                     </Border>
-                    
-                    <!-- Year TextBox -->
+
                     <TextBox Grid.Column="1"
                              x:Name="YearTextBox"
                              Tag="سال"
+                             FontFamily="{StaticResource VazirFD}"
                              Style="{StaticResource DatePickerTextBoxStyle}"
                              MaxLength="4"
                              FlowDirection="LeftToRight"
                              Padding="6,0,10,0"
                              TextChanged="YearTextBox_TextChanged"
-                             GotFocus="DateTextBox_GotFocus"/>
+                             GotFocus="DateTextBox_GotFocus"
+                             PreviewTextInput="NumberValidationTextBox"/>
                 </Grid>
             </Border>
 
-            <!-- Month Box -->
+            <!-- ماه -->
             <Border Grid.Column="2"
-                    BorderBrush="#CCD0D9" 
-                    BorderThickness="1.3"
+                    BorderBrush="#E5E7EB"
+                    BorderThickness="1"
                     CornerRadius="4"
                     Background="White"
-                    Margin="5,0,5,0">
+                    SnapsToDevicePixels="True"
+                    UseLayoutRounding="True">
                 <TextBox x:Name="MonthTextBox"
                          Tag="ماه"
+                         FontFamily="{StaticResource VazirFD}"
                          Style="{StaticResource DatePickerTextBoxStyle}"
                          MaxLength="2"
                          FlowDirection="LeftToRight"
                          Padding="10,0,8,0"
                          TextChanged="MonthTextBox_TextChanged"
-                         GotFocus="DateTextBox_GotFocus"/>
+                         GotFocus="DateTextBox_GotFocus"
+                         PreviewTextInput="NumberValidationTextBox"/>
             </Border>
 
-            <!-- Day Box -->
+            <!-- روز -->
             <Border Grid.Column="4"
-                    BorderBrush="#CCD0D9" 
-                    BorderThickness="1.3"
+                    BorderBrush="#E5E7EB"
+                    BorderThickness="1"
                     CornerRadius="4"
                     Background="White"
-                    Margin="5,0,0,0">
+                    SnapsToDevicePixels="True"
+                    UseLayoutRounding="True">
                 <TextBox x:Name="DayTextBox"
                          Tag="روز"
+                         FontFamily="{StaticResource VazirFD}"
                          Style="{StaticResource DatePickerTextBoxStyle}"
                          MaxLength="2"
                          FlowDirection="LeftToRight"
                          Padding="10,0,8,0"
                          TextChanged="DayTextBox_TextChanged"
-                         GotFocus="DateTextBox_GotFocus"/>
+                         GotFocus="DateTextBox_GotFocus"
+                         PreviewTextInput="NumberValidationTextBox"/>
             </Border>
         </Grid>
 
-        <!-- Error Message -->
-        <TextBlock Grid.Row="2" 
+        <!-- پیغام خطا -->
+        <TextBlock Grid.Row="1" 
                    x:Name="ErrorMessage"
                    Foreground="#DC3545"
                    FontSize="11"
@@ -259,7 +261,7 @@
                    Margin="0,4,0,0"
                    FlowDirection="RightToLeft"/>
 
-        <!-- ═══ تقویم شمسی پاپ‌آپ ═══ -->
+        <!-- پاپ‌آپ تقویم شمسی -->
         <Popup x:Name="CalendarPopup"
                Placement="Bottom"
                AllowsTransparency="True"
@@ -281,7 +283,6 @@
                                       Color="#0D2159"/>
                 </Border.Effect>
                 <StackPanel>
-                    <!-- هدر: ماه قبل / نام ماه و سال / ماه بعد -->
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
@@ -326,9 +327,7 @@
                         </Button>
                     </Grid>
 
-                    <!-- روزهای هفته (شنبه تا جمعه) -->
-                    <Grid x:Name="CalendarWeekdayRow"
-                          Margin="0,8,0,4">
+                    <Grid x:Name="CalendarWeekdayRow" Margin="0,8,0,4">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
@@ -347,26 +346,10 @@
                         <TextBlock Grid.Column="6" Text="ج" Style="{StaticResource CalendarWeekdayStyle}"/>
                     </Grid>
 
-                    <!-- روزهای ماه -->
-                    <primitives:UniformGrid x:Name="CalendarDaysGrid"
-                                            Columns="7"
-                                            Margin="0,0,0,8"/>
+                    <primitives:UniformGrid x:Name="CalendarDaysGrid" Columns="7" Margin="0,0,0,8"/>
+                    <primitives:UniformGrid x:Name="CalendarMonthsGrid" Columns="3" MinHeight="192" Margin="0,0,0,8" Visibility="Collapsed"/>
+                    <primitives:UniformGrid x:Name="CalendarYearsGrid" Columns="3" MinHeight="192" Margin="0,0,0,8" Visibility="Collapsed"/>
 
-                    <!-- انتخاب ماه -->
-                    <primitives:UniformGrid x:Name="CalendarMonthsGrid"
-                                            Columns="3"
-                                            MinHeight="192"
-                                            Margin="0,0,0,8"
-                                            Visibility="Collapsed"/>
-
-                    <!-- انتخاب سال -->
-                    <primitives:UniformGrid x:Name="CalendarYearsGrid"
-                                            Columns="3"
-                                            MinHeight="192"
-                                            Margin="0,0,0,8"
-                                            Visibility="Collapsed"/>
-
-                    <!-- امروز -->
                     <Button x:Name="CalendarTodayButton"
                             Style="{StaticResource CalendarTodayButtonStyle}"
                             Content="امروز"

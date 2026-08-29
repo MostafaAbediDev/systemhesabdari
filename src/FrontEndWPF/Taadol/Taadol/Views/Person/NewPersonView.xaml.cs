@@ -1306,6 +1306,9 @@ namespace Taadol.Views
                 if (!result.IsSucceeded)
                 {
                     System.Diagnostics.Debug.WriteLine($"❌ Bank save FAILED: {result.Message}");
+                    ToastManager.Warning(string.IsNullOrWhiteSpace(result.Message)
+                        ? "ذخیره حساب بانکی انجام نشد."
+                        : result.Message);
                 }
                 else
                 {
