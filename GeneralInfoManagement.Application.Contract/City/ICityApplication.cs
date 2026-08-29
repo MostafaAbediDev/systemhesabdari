@@ -2,6 +2,6 @@
 {
     public interface ICityApplication
     {
-        List<CityViewModel> GetCitiesByProvinceId(long provinceId);
+        List<CityViewModel> GetCitiesByProvince(long provinceId);
     }
 }
