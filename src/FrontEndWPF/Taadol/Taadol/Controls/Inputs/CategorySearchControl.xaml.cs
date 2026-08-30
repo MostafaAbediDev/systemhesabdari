@@ -1,6 +1,9 @@
 ﻿using _0_Framework.Application;
 using Microsoft.Extensions.DependencyInjection;
+using PayrollSystemManagement.Application.Contracts.Department;
+using PayrollSystemManagement.Application.Contracts.JobTitle;
 using PersonManagement.Application.Contract.PersonCategory;
+using Taadol.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -38,6 +41,26 @@ namespace Taadol.Controls
         /// این مقدار باید قبل از عملیات Add/Edit/Delete توسط View والد ست شود.
         /// </summary>
         public long PersonTypeId { get; set; }
+
+        /// <summary>
+        /// نوع منبع داده کنترل در حالت SearchOnDemand (دپارتمان یا عنوان شغلی).
+        /// فقط برای کنترل‌های SearchOnDemand معنا دارد.
+        /// </summary>
+        public enum SearchSourceKind { None, Department, JobTitle }
+
+        public static readonly DependencyProperty SourceKindProperty =
+            DependencyProperty.Register(
+                nameof(SourceKind),
+                typeof(SearchSourceKind),
+                typeof(CategorySearchControl),
+                new PropertyMetadata(SearchSourceKind.None));
+
+        /// <summary>نوع منبع داده کنترل در حالت SearchOnDemand.</summary>
+        public SearchSourceKind SourceKind
+        {
+            get => (SearchSourceKind)GetValue(SourceKindProperty);
+            set => SetValue(SourceKindProperty, value);
+        }
         private static readonly Color[] DotColors = new[]
         {
             Color.FromRgb(0x26, 0x67, 0xFF),
@@ -119,6 +142,7 @@ namespace Taadol.Controls
             System.Diagnostics.Debug.WriteLine($"📊 LoadFromTreeDto: loading {tree.Count} root categories");
 
             _allCategories = new List<CategoryItem>();
+            int totalChildren = 0;
 
             foreach (var node in tree)
             {
@@ -132,14 +156,48 @@ namespace Taadol.Controls
                 };
 
                 if (node.Children != null && node.Children.Count > 0)
+                {
+                    totalChildren += node.Children.Count;
                     AddChildrenRecursive(item, node.Children, level + 1);
+                }
 
                 _allCategories.Add(item);
             }
 
-            System.Diagnostics.Debug.WriteLine($"✅ LoadFromTreeDto: built {_allCategories.Count} categories");
+            System.Diagnostics.Debug.WriteLine($"✅ LoadFromTreeDto: built {_allCategories.Count} root(s), total children in tree = {totalChildren}, _allCategories first root children = {(_allCategories.Count > 0 && _allCategories[0].HasChildren ? _allCategories[0].Children.Count : 0)}");
 
-            BuildTree(_allCategories);
+            // در حالت SearchOnDemand درخت کامل ساخته نمی‌شود؛ فقط پیش‌نمایش محدود + جستجو.
+            BuildTree(SearchOnDemand ? BuildSearchOnDemandPreview() : _allCategories);
+        }
+
+        /// <summary>
+        /// پیش‌نمایش سبک برای حالت SearchOnDemand:
+        /// فرزندانِ ریشه (دپارتمان‌ها/عناوین شغلی) به‌صورت سطح‌اول و با سقف MaxSearchResults
+        /// نمایش داده می‌شوند تا UI فریز نشود ولی لیست خالی به نظر نرسد.
+        /// </summary>
+        private List<CategoryItem> BuildSearchOnDemandPreview()
+        {
+            var result = new List<CategoryItem>();
+            if (_allCategories == null) return result;
+
+            foreach (var root in _allCategories)
+            {
+                if (root == null || result.Count >= MaxSearchResults) break;
+
+                if (root.HasChildren)
+                {
+                    foreach (var child in root.Children)
+                    {
+                        if (result.Count >= MaxSearchResults) break;
+                        result.Add(CloneCategoryTree(child, 0, true));
+                    }
+                }
+                else
+                {
+                    result.Add(CloneCategoryTree(root, 0, true));
+                }
+            }
+            return result;
         }
 
         private void AddChildrenRecursive(CategoryItem parent, List<PersonCategoryTreeViewModel> children, int level)
@@ -368,7 +426,9 @@ namespace Taadol.Controls
             RotateArrow(180);
             SearchBox.Focus();
             SearchBox.Text = "";
-            BuildTree(_allCategories);
+
+            // در حالت SearchOnDemand فقط پیش‌نمایش محدود رندر می‌شود تا ۵۰۰+ آیتم یکجا ساخته نشوند.
+            BuildTree(SearchOnDemand ? BuildSearchOnDemandPreview() : _allCategories);
         }
 
         private void ClosePopup()
@@ -431,6 +491,13 @@ namespace Taadol.Controls
 
         private async void AddRootButton_Click(object sender, RoutedEventArgs e)
         {
+            // حالت دپارتمان/عنوان شغلی: مستقیم از سرویس Payroll اضافه می‌شود
+            if (SearchOnDemand)
+            {
+                await AddPayrollItemAsync();
+                return;
+            }
+
             if (PersonTypeId <= 0)
             {
                 ToastManager.Warning("برای افزودن دسته‌بندی، ابتدا باید نوع شخص را انتخاب کنید.");
@@ -488,7 +555,102 @@ namespace Taadol.Controls
                 ToastManager.Error("خطا در عملیات دسته‌بندی");
             }
         }
-        public async Task RefreshTreeAsync(long? expandToId = null)
+        /// <summary>
+        /// افزودن مستقیم دپارتمان/عنوان شغلی از سرویس‌های Payroll (حالت SearchOnDemand).
+        /// </summary>
+        private async Task AddPayrollItemAsync()
+        {
+            var title = ModernDialog.ShowInput(
+                SourceKind == SearchSourceKind.JobTitle ? "افزودن عنوان شغلی" : "افزودن دپارتمان",
+                SourceKind == SearchSourceKind.JobTitle
+                    ? "نام عنوان شغلی جدید را وارد کنید:"
+                    : "نام دپارتمان جدید را وارد کنید:",
+                "",
+                ModernDialog.DialogType.Primary,
+                "افزودن",
+                "انصراف",
+                Window.GetWindow(this));
+            if (string.IsNullOrWhiteSpace(title)) return;
+            title = title.Trim();
+            var token = BeginOperation(out var version);
+            try
+            {
+                var result = await Task.Run(() =>
+                {
+                    token.ThrowIfCancellationRequested();
+                    using var scope = App.ServiceProvider.CreateScope();
+                    if (SourceKind == SearchSourceKind.JobTitle)
+                    {
+                        var app = scope.ServiceProvider.GetRequiredService<IJobTitleApplication>();
+                        return app.Create(new CreateJobTitle { Title = title });
+                    }
+                    else
+                    {
+                        var app = scope.ServiceProvider.GetRequiredService<IDepartmentApplication>();
+                        return app.Create(new CreateDepartment { Name = title });
+                    }
+                }, token);
+                token.ThrowIfCancellationRequested();
+                if (version != Volatile.Read(ref _operationVersion)) return;
+                if (result.IsSucceeded)
+                {
+                    await RefreshPayrollTreeAsync();
+                    DataChanged?.Invoke();
+                    ToastManager.Success($"«{title}» با موفقیت اضافه شد.");
+                }
+                else
+                {
+                    ToastManager.Error(result.Message ?? "افزودن با خطا مواجه شد.");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[CategorySearchControl] Payroll add error: {ex}");
+                ToastManager.Error("خطا در افزودن");
+            }
+        }
+        /// <summary>
+        /// رفرش درخت در حالت SearchOnDemand از سرویس Payroll مربوطه.
+        /// </summary>
+        public async Task RefreshPayrollTreeAsync()
+        {
+            var token = BeginOperation(out var version);
+            List<PersonCategoryTreeViewModel> tree;
+            try
+            {
+                tree = await Task.Run(() =>
+                {
+                    token.ThrowIfCancellationRequested();
+                    using var scope = App.ServiceProvider.CreateScope();
+                    if (SourceKind == SearchSourceKind.JobTitle)
+                    {
+                        var app = scope.ServiceProvider.GetRequiredService<IJobTitleApplication>();
+                        return PersonFormHelper.BuildJobTitleTree(
+                            app.GetJobTitles()?.Where(j => j.IsActive).ToList());
+                    }
+                    else
+                    {
+                        var app = scope.ServiceProvider.GetRequiredService<IDepartmentApplication>();
+                        return PersonFormHelper.BuildDepartmentTree(
+                            app.GetDepartments()?.Where(d => d.IsActive).ToList());
+        }
+                }, token);
+                token.ThrowIfCancellationRequested();
+                if (version != Volatile.Read(ref _operationVersion)) return;
+            }
+            catch (OperationCanceledException) when (token.IsCancellationRequested)
+            {
+                return;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("RefreshPayrollTreeAsync failed: " + ex.Message);
+                return;
+            }
+            if (tree == null) return;
+            LoadFromTreeDto(tree);
+        }
+        public async Task RefreshTreeAsync(long? expandToId = null)
         {
             if (PersonTypeId <= 0) return;
 
@@ -549,6 +711,28 @@ namespace Taadol.Controls
             set => SetValue(IsRequiredProperty, value);
         }
 
+        /// <summary>
+        /// وقتی true باشد، درخت خالی/سبک باز می‌شود و آیتم‌ها فقط بر اساس جستجو ساخته می‌شوند
+        /// (با سقف <see cref="MaxSearchResults"/>). برای لیست‌های بزرگ مثل دپارتمان/عنوان شغلی
+        /// (صدها رکورد) استفاده می‌شود تا از فریز UI روی کلیک جلوگیری شود.
+        /// وقتی false باشد (پیش‌فرض)، رفتار فعلی یعنی نمایش کامل درخت حفظ می‌شود.
+        /// </summary>
+        public static readonly DependencyProperty SearchOnDemandProperty =
+            DependencyProperty.Register(
+                nameof(SearchOnDemand),
+                typeof(bool),
+                typeof(CategorySearchControl),
+                new PropertyMetadata(false));
+
+        public bool SearchOnDemand
+        {
+            get => (bool)GetValue(SearchOnDemandProperty);
+            set => SetValue(SearchOnDemandProperty, value);
+        }
+
+        /// <summary>سقف تعداد نتایج در حالت SearchOnDemand.</summary>
+        public const int MaxSearchResults = 60;
+
         private void AnimatePopupOut(Action onComplete)
         {
             var container = PopupContainer;
@@ -608,14 +792,27 @@ namespace Taadol.Controls
             _lastSearchText = searchText;
 
             if (string.IsNullOrEmpty(searchText))
-                BuildTree(_allCategories);
+            {
+                if (SearchOnDemand)
+                {
+                    // در حالت SearchOnDemand متن خالی → پیش‌نمایش اولیه را دوباره نشان بده
+                    // (نه درخت خالی)
+                    BuildTree(BuildSearchOnDemandPreview());
+                }
+                else
+                {
+                    BuildTree(_allCategories);
+                }
+            }
             else
                 PerformSearch(searchText);
         }
 
         private void PerformSearch(string searchText)
         {
-            var filtered = FilterCategories(_allCategories, searchText);
+            var filtered = SearchOnDemand
+                ? FilterCategoriesCapped(_allCategories, searchText, MaxSearchResults)
+                : FilterCategories(_allCategories, searchText);
             BuildTree(filtered);
 
             Dispatcher.BeginInvoke(new Action(() =>
@@ -659,6 +856,42 @@ namespace Taadol.Controls
             return result;
         }
 
+        /// <summary>
+        /// نسخه‌ای از فیلتر که برای حالت SearchOnDemand استفاده می‌شود:
+        /// فقط آیتم‌های تکی (برگ‌های درخت) که عنوانشان شامل عبارت باشد را برمی‌گرداند
+        /// و حداکثر <paramref name="maxResults"/> نتیجه را برمی‌گرداند تا درخت سنگین نشود.
+        /// </summary>
+        private List<CategoryItem> FilterCategoriesCapped(List<CategoryItem> items, string searchText, int maxResults)
+        {
+            var result = new List<CategoryItem>();
+            searchText = searchText.Trim().ToLowerInvariant();
+
+            foreach (var item in items)
+            {
+                if (result.Count >= maxResults) break;
+                if (item == null) continue;
+
+                var excludeRoot =
+                    (item.Children == null || item.Children.Count == 0) &&
+                    ((item.Title ?? "").Trim().Length == 0 || item.Id == 0);
+
+                if (!excludeRoot && (item.Title ?? "").ToLowerInvariant().Contains(searchText))
+                {
+                    var clone = CloneCategoryTree(item, item.Level, true);
+                    result.Add(clone);
+                    if (result.Count >= maxResults) break;
+                }
+
+                if (item.HasChildren)
+                {
+                    foreach (var child in FilterCategoriesCapped(item.Children.ToList(), searchText, maxResults - result.Count))
+                        result.Add(child);
+                }
+            }
+
+            return result;
+        }
+
         private CategoryItem CloneCategoryTree(CategoryItem source, int level, bool includeAllChildren)
         {
             var clone = new CategoryItem
@@ -691,7 +924,6 @@ namespace Taadol.Controls
 
         // ==================== Item Operations ====================
 
-        // ==================== Item Operations ====================
         private async void EditButton_Click(object sender, MouseButtonEventArgs e)
         {
             e.Handled = true;
@@ -701,7 +933,7 @@ namespace Taadol.Controls
             if (treeItem?.Tag is not CategoryItem category) return;
 
             var newTitle = ModernDialog.ShowInput(
-                "ویرایش دسته",
+                SearchOnDemand ? "ویرایش" : "ویرایش دسته",
                 $"ویرایش «{category.Title}»:",
                 category.Title,
                 ModernDialog.DialogType.Success,
@@ -720,21 +952,28 @@ namespace Taadol.Controls
                 {
                     token.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
-                    var app = scope.ServiceProvider.GetRequiredService<IPersonCategoryApplication>();
 
-                    var details = app.GetDetails(category.Id);
-                    if (details == null)
-                        return new OperationResult().Failed("رکورد یافت نشد.");
-
-                    var operationResult = app.Edit(new EditPersonCategory
+                    if (SourceKind == SearchSourceKind.Department)
                     {
-                        Id = category.Id,
-                        Title = newTitle,
-                        PersonTypeId = details.PersonTypeId,
-                        ParentId = details.ParentId
-                    });
-                    token.ThrowIfCancellationRequested();
-                    return operationResult;
+                        var app = scope.ServiceProvider.GetRequiredService<IDepartmentApplication>();
+                        var details = app.GetDetails(category.Id);
+                        if (details == null) return new OperationResult().Failed("رکورد یافت نشد.");
+                        return app.Edit(new EditDepartment { Id = category.Id, Name = newTitle, Description = details.Description });
+                    }
+                    else if (SourceKind == SearchSourceKind.JobTitle)
+                    {
+                        var app = scope.ServiceProvider.GetRequiredService<IJobTitleApplication>();
+                        var details = app.GetDetails(category.Id);
+                        if (details == null) return new OperationResult().Failed("رکورد یافت نشد.");
+                        return app.Edit(new EditJobTitle { Id = category.Id, Title = newTitle, Description = details.Description, DepartmentId = details.DepartmentId });
+                    }
+                    else
+                    {
+                        var app = scope.ServiceProvider.GetRequiredService<IPersonCategoryApplication>();
+                        var details = app.GetDetails(category.Id);
+                        if (details == null) return new OperationResult().Failed("رکورد یافت نشد.");
+                        return app.Edit(new EditPersonCategory { Id = category.Id, Title = newTitle, PersonTypeId = details.PersonTypeId, ParentId = details.ParentId });
+                    }
                 }, token);
 
                 token.ThrowIfCancellationRequested();
@@ -744,25 +983,13 @@ namespace Taadol.Controls
                 {
                     category.Title = newTitle;
                     ItemEdited?.Invoke(category);
-                    await RefreshTreeAsync(expandToId: category.Id);
+                    if (SearchOnDemand) await RefreshPayrollTreeAsync(); else await RefreshTreeAsync(expandToId: category.Id);
                     DataChanged?.Invoke();
-                    ModernDialog.ShowConfirm(
-                        "ذخیره شد",
-                        $"دسته به «{newTitle}» تغییر یافت.",
-                        ModernDialog.DialogType.Success,
-                        "عالی",
-                        "بستن",
-                        Window.GetWindow(this));
+                    ModernDialog.ShowConfirm("ذخیره شد", $"تغییر با موفقیت اعمال شد.", ModernDialog.DialogType.Success, "عالی", "بستن", Window.GetWindow(this));
                 }
                 else
                 {
-                    ModernDialog.ShowConfirm(
-                        "خطا در ویرایش",
-                        result.Message ?? "ویرایش با خطا مواجه شد.",
-                        ModernDialog.DialogType.Warning,
-                        "متوجه شدم",
-                        "بستن",
-                        Window.GetWindow(this));
+                    ModernDialog.ShowConfirm("خطا در ویرایش", result.Message ?? "ویرایش با خطا مواجه شد.", ModernDialog.DialogType.Warning, "متوجه شدم", "بستن", Window.GetWindow(this));
                 }
             }
             catch (OperationCanceledException) when (token.IsCancellationRequested)
@@ -784,7 +1011,7 @@ namespace Taadol.Controls
             if (treeItem?.Tag is not CategoryItem category) return;
 
             bool confirm = ModernDialog.ShowConfirm(
-                "حذف دسته‌بندی",
+                "حذف",
                 $"آیا از حذف «{category.Title}» اطمینان دارید؟ این عملیات قابل بازگشت نیست.",
                 ModernDialog.DialogType.Danger,
                 "حذف",
@@ -800,10 +1027,13 @@ namespace Taadol.Controls
                 {
                     token.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
-                    var app = scope.ServiceProvider.GetRequiredService<IPersonCategoryApplication>();
-                    var operationResult = app.Remove(category.Id);
-                    token.ThrowIfCancellationRequested();
-                    return operationResult;
+
+                    if (SourceKind == SearchSourceKind.Department)
+                        return scope.ServiceProvider.GetRequiredService<IDepartmentApplication>().Remove(category.Id);
+                    else if (SourceKind == SearchSourceKind.JobTitle)
+                        return scope.ServiceProvider.GetRequiredService<IJobTitleApplication>().Remove(category.Id);
+                    else
+                        return scope.ServiceProvider.GetRequiredService<IPersonCategoryApplication>().Remove(category.Id);
                 }, token);
 
                 token.ThrowIfCancellationRequested();
@@ -812,15 +1042,9 @@ namespace Taadol.Controls
                 if (result.IsSucceeded)
                 {
                     ItemDeleted?.Invoke(category);
-                    await RefreshTreeAsync();
+                    if (SearchOnDemand) await RefreshPayrollTreeAsync(); else await RefreshTreeAsync();
                     DataChanged?.Invoke();
-                    ModernDialog.ShowConfirm(
-                        "حذف شد",
-                        $"دسته «{category.Title}» با موفقیت حذف شد.",
-                        ModernDialog.DialogType.Success,
-                        "عالی",
-                        "بستن",
-                        Window.GetWindow(this));
+                    ModernDialog.ShowConfirm("حذف شد", $"«{category.Title}» با موفقیت حذف شد.", ModernDialog.DialogType.Success, "عالی", "بستن", Window.GetWindow(this));
                 }
                 else
                 {
@@ -848,19 +1072,15 @@ namespace Taadol.Controls
         {
             e.Handled = true;
 
-            if (PersonTypeId <= 0)
-            {
-                ToastManager.Warning("برای افزودن زیرمجموعه، ابتدا باید نوع شخص را انتخاب کنید.");
-                return;
-            }
-
             var border = sender as Border;
             var treeItem = FindParentTreeViewItem(border);
             if (treeItem?.Tag is not CategoryItem parent) return;
 
             var title = ModernDialog.ShowInput(
-                "افزودن زیرمجموعه",
-                $"نام زیرمجموعه برای «{parent.Title}» را وارد کنید:",
+                SearchOnDemand ? "افزودن" : "افزودن زیرمجموعه",
+                SearchOnDemand
+                    ? $"نام جدید را وارد کنید:"
+                    : $"نام زیرمجموعه برای «{parent.Title}» را وارد کنید:",
                 "",
                 ModernDialog.DialogType.Primary,
                 "افزودن",
@@ -877,15 +1097,17 @@ namespace Taadol.Controls
                 {
                     token.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
-                    var app = scope.ServiceProvider.GetRequiredService<IPersonCategoryApplication>();
-                    var operationResult = app.Create(new CreatePersonCategory
+
+                    if (SourceKind == SearchSourceKind.Department)
+                        return scope.ServiceProvider.GetRequiredService<IDepartmentApplication>().Create(new CreateDepartment { Name = title });
+                    else if (SourceKind == SearchSourceKind.JobTitle)
+                        return scope.ServiceProvider.GetRequiredService<IJobTitleApplication>().Create(new CreateJobTitle { Title = title });
+                    else
                     {
-                        Title = title,
-                        PersonTypeId = PersonTypeId,
-                        ParentId = parent.Id
-                    });
-                    token.ThrowIfCancellationRequested();
-                    return operationResult;
+                        if (PersonTypeId <= 0) return new OperationResult().Failed("ابتدا نوع شخص را انتخاب کنید.");
+                        var app = scope.ServiceProvider.GetRequiredService<IPersonCategoryApplication>();
+                        return app.Create(new CreatePersonCategory { Title = title, PersonTypeId = PersonTypeId, ParentId = parent.Id });
+                    }
                 }, token);
 
                 token.ThrowIfCancellationRequested();
@@ -894,13 +1116,13 @@ namespace Taadol.Controls
                 if (result.IsSucceeded)
                 {
                     ItemAdded?.Invoke(parent);
-                    await RefreshTreeAsync(expandToId: parent.Id);
+                    if (SearchOnDemand) await RefreshPayrollTreeAsync(); else await RefreshTreeAsync(expandToId: parent.Id);
                     DataChanged?.Invoke();
-                    ToastManager.Success($"زیرمجموعه «{title}» به «{parent.Title}» اضافه شد.");
+                    ToastManager.Success($"«{title}» با موفقیت اضافه شد.");
                 }
                 else
                 {
-                    ToastManager.Error(result.Message ?? "افزودن زیرمجموعه با خطا مواجه شد.");
+                    ToastManager.Error(result.Message ?? "افزودن با خطا مواجه شد.");
                 }
             }
             catch (OperationCanceledException) when (token.IsCancellationRequested)
@@ -910,7 +1132,7 @@ namespace Taadol.Controls
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"[CategorySearchControl] Category operation error: {ex}");
-                ToastManager.Error("خطا در عملیات دسته‌بندی");
+                ToastManager.Error("خطا در عملیات");
             }
         }
         private bool ExpandToId(ItemsControl parent, long targetId)

@@ -14,6 +14,7 @@ using PersonManagement.Application.Contract.PersonCategory;
 using PersonManagement.Application.Contract.PersonContact;
 using PersonManagement.Application.Contract.Persons;
 using PersonManagement.Application.Contract.PersonTypes;
+using PayrollSystemManagement.Application.Contracts.Employee;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -179,32 +180,38 @@ namespace Taadol.Views
             if (CategorySearch != null)
                 CategorySearch.PersonTypeId = personTypeId;
 
-            if (CategorySearch2 != null)
-                CategorySearch2.PersonTypeId = personTypeId;
-
-            if (CategorySearch3 != null)
-                CategorySearch3.PersonTypeId = personTypeId;
-
             var token = _loadCts?.Token ?? CancellationToken.None;
-            var tree = await PersonFormHelper.LoadCategoryTreeAsync(
-                personTypeId,
-                token,
-                onError: ex => System.Diagnostics.Debug.WriteLine($"Categories load failed: {ex.Message}"),
-                onCancelled: () => System.Diagnostics.Debug.WriteLine("[NewPersonView] LoadCategoriesAsync was cancelled")
+
+            // لود همزمان: دستهبندی شخص + دپارتمان + عنوان شغلی
+            var categoryTask = PersonFormHelper.LoadCategoryTreeAsync(
+                personTypeId, token,
+                ex => System.Diagnostics.Debug.WriteLine($"Categories load failed: {ex.Message}"),
+                () => System.Diagnostics.Debug.WriteLine("[NewPersonView] LoadCategoriesAsync was cancelled")
             );
+            var deptTask = PersonFormHelper.LoadDepartmentsTreeAsync(token,
+                ex => System.Diagnostics.Debug.WriteLine($"Departments load failed: {ex.Message}"));
+            var jobTitleTask = PersonFormHelper.LoadJobTitlesTreeAsync(token,
+                ex => System.Diagnostics.Debug.WriteLine($"JobTitles load failed: {ex.Message}"));
 
-            if (tree == null) return;
+            var tree = await categoryTask;
+            var deptTree = await deptTask;
+            var jobTree = await jobTitleTask;
 
-            CategorySearch?.LoadFromTreeDto(tree);
-            CategorySearch?.ClearSelection();
-
-            // دپارتمان و عنوان شغل هم فعلاً همان درخت را نشان می‌دهند؛
-            // اگر روزی درخت جدا (PersonTypeId متفاوت) لازم شد، GetTree جدا صدا زده شود.
-            CategorySearch2?.LoadFromTreeDto(tree);
-            CategorySearch2?.ClearSelection();
-
-            CategorySearch3?.LoadFromTreeDto(tree);
-            CategorySearch3?.ClearSelection();
+            if (tree != null)
+            {
+                CategorySearch?.LoadFromTreeDto(tree);
+                CategorySearch?.ClearSelection();
+            }
+            if (deptTree != null)
+            {
+                CategorySearch2?.LoadFromTreeDto(deptTree);
+                CategorySearch2?.ClearSelection();
+            }
+            if (jobTree != null)
+            {
+                CategorySearch3?.LoadFromTreeDto(jobTree);
+                CategorySearch3?.ClearSelection();
+            }
         }
         public decimal CreditLimit { get => _creditLimit; set { _creditLimit = value; OnPropertyChanged(); MarkUserChange(); } }
 
@@ -305,6 +312,20 @@ namespace Taadol.Views
         public NewPersonView()
         {
             InitializeComponent();
+
+            // نوع منبع برای کنترل‌های دپارتمان و عنوان شغلی
+            if (CategorySearch2 != null)
+                CategorySearch2.SourceKind = Controls.CategorySearchControl.SearchSourceKind.Department;
+            if (CategorySearch3 != null)
+                CategorySearch3.SourceKind = Controls.CategorySearchControl.SearchSourceKind.JobTitle;
+
+            // پیش‌فرض نوع قرارداد در تب پرسنل: رسمی
+            if (ContractPermanent != null)
+            {
+                _suppressContractToggle = true;
+                ContractPermanent.IsChecked = true;
+                _suppressContractToggle = false;
+            }
 
             // رویدادهای جدول حساب‌های بانکی (کنترل مشترک) — در کد وصل می‌شوند چون delegate سفارشی دارد
             BankAccountsTable.EditRequested += BankAccountsTable_EditRequested;
@@ -701,6 +722,92 @@ namespace Taadol.Views
             }
         }
 
+        // ======================================================
+        //  Personnel (تب پرسنل) — فیلدها و نوع قرارداد
+        // ======================================================
+        private bool _suppressContractToggle;
+
+        private void ContractToggle_Checked(object sender, RoutedEventArgs e)
+        {
+            var tb = sender as ToggleButton;
+            if (tb == null || tb.IsChecked != true || _suppressContractToggle) return;
+
+            // رفتار رادیویی: با چک شدن یکی، بقیه خاموش می‌شوند
+            _suppressContractToggle = true;
+            try
+            {
+                foreach (var b in new[] { ContractPermanent, ContractContractual, ContractProject })
+                {
+                    if (b != null && b != tb && b.IsChecked == true)
+                        b.IsChecked = false;
+                }
+                MarkUserChange();
+            }
+            finally
+            {
+                _suppressContractToggle = false;
+            }
+        }
+
+        private bool IsPersonnelSelected => PersonTypePersonnel?.IsChecked == true;
+
+        /// <summary> نوع قرارداد انتخاب‌شده در تب پرسنل؛ پیش‌فرض رسمی (Permanent)</summary>
+        private EmployeeContractTypeDTO GetSelectedContractType()
+        {
+            if (ContractContractual?.IsChecked == true) return EmployeeContractTypeDTO.Contractual;
+            if (ContractProject?.IsChecked == true) return EmployeeContractTypeDTO.ProjectBased;
+            return EmployeeContractTypeDTO.Permanent;
+        }
+
+        private void SetContractType(EmployeeContractTypeDTO type)
+        {
+            if (ContractPermanent == null) return;
+            _suppressContractToggle = true;
+            try
+            {
+                ContractPermanent.IsChecked = type == EmployeeContractTypeDTO.Permanent;
+                ContractContractual.IsChecked = type == EmployeeContractTypeDTO.Contractual;
+                ContractProject.IsChecked = type == EmployeeContractTypeDTO.ProjectBased;
+            }
+            finally
+            {
+                _suppressContractToggle = false;
+            }
+        }
+
+        /// <summary> تبدیل ارقام فارسی/عربی به انگلیسی + parse عدد اعشاری</summary>
+        private static decimal ParsePersianDecimal(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return 0m;
+            var sb = new System.Text.StringBuilder();
+            foreach (var c in text.Trim())
+            {
+                if (c >= '۰' && c <= '۹') sb.Append((char)('0' + (c - '۰')));
+                else if (c >= '٠' && c <= '٩') sb.Append((char)('0' + (c - '٠')));
+                else if (c == '٬' || c == ',') sb.Append('.');
+                else sb.Append(c);
+            }
+            return decimal.TryParse(sb.ToString(), NumberStyles.Number, CultureInfo.InvariantCulture, out var v) ? v : 0m;
+        }
+
+        /// <summary> اعتبارسنجی فیلدهای اجباری تب پرسنل (کد پرسنلی، بیمه، حقوق، دپارتمان، عنوان شغلی)</summary>
+        private bool ValidatePersonnelFields()
+        {
+            if (!IsPersonnelSelected) return true;
+
+            if (string.IsNullOrWhiteSpace(PersonnelCodeInput?.Text))
+            { ToastManager.Warning("کد پرسنلی را وارد کنید."); return false; }
+            if (string.IsNullOrWhiteSpace(InsuranceNumberInput?.Text))
+            { ToastManager.Warning("شماره بیمه را وارد کنید."); return false; }
+            if (ParsePersianDecimal(BaseSalaryInput?.Text) <= 0)
+            { ToastManager.Warning("حقوق پایه را به درستی وارد کنید."); return false; }
+            if ((CategorySearch2?.SelectedCategoryId ?? 0) <= 0)
+            { ToastManager.Warning("دپارتمان را انتخاب کنید."); return false; }
+            if ((CategorySearch3?.SelectedCategoryId ?? 0) <= 0)
+            { ToastManager.Warning("عنوان شغلی را انتخاب کنید."); return false; }
+            return true;
+        }
+
         private void UpdatePersonTypeToggleSelection()
         {
             if (PersonTypeCustomer == null) return;
@@ -810,7 +917,10 @@ namespace Taadol.Views
             Dictionary<string, long> ContactTypeNames, string Address, string PostalCode,
             long ProvinceId, long CityId, string MainShaba, string MainCardNumber,
             long MainBankBranchId, string MainAccountNumber, bool MainBankIsDefault,
-            List<dynamic> BankAccountsSnapshot);
+            List<dynamic> BankAccountsSnapshot,
+            bool IsPersonnel, string EmployeeCode, string InsuranceNumber,
+            string Description, decimal BaseSalary, DateTime? HireDate, DateTime? TerminationDate,
+            long DepartmentId, long JobTitleId, EmployeeContractTypeDTO ContractType);
 
         private SaveSnapshot CaptureSaveSnapshot()
         {
@@ -824,7 +934,17 @@ namespace Taadol.Views
                 SelectedProvinceId, SelectedCityId, MainShaba, MainCardNumber,
                 SelectedBankBranchId, MainAccountNumber, MainBankIsDefault,
                 BankAccounts.Select(r => new { r.BankBranchId, r.BankName, r.CardNumber, r.Shaba, r.AccountNumber, r.IsDefault })
-                    .Select(r => (dynamic)r).ToList());
+                    .Select(r => (dynamic)r).ToList(),
+                IsPersonnelSelected,
+                PersonnelCodeInput?.Text?.Trim() ?? "",
+                InsuranceNumberInput?.Text?.Trim() ?? "",
+                DescriptionInput?.Text?.Trim() ?? "",
+                ParsePersianDecimal(BaseSalaryInput?.Text),
+                MyDatePicker3?.SelectedDate,
+                MyDatePicker2?.SelectedDate,
+                CategorySearch2?.SelectedCategoryId ?? 0,
+                CategorySearch3?.SelectedCategoryId ?? 0,
+                GetSelectedContractType());
         }
 
         /// <summary> persists person + contacts + address + banks in a single scoped Task.Run</summary>
@@ -877,6 +997,28 @@ namespace Taadol.Views
 
                 // --- Save bank accounts ---
                 SaveBankAccountsScoped(bankApp, personId, s);
+
+                // --- Save personnel (Employees) ---
+                if (s.IsPersonnel)
+                {
+                    var employeeApp = sp.GetRequiredService<IEmployeeApplication>();
+                    var employeeResult = employeeApp.Create(new CreateEmployee
+                    {
+                        EmployeeCode = s.EmployeeCode,
+                        InsuranceNumber = s.InsuranceNumber,
+                        Description = s.Description,
+                        HireDate = s.HireDate ?? DateTime.Today,
+                        TerminationDate = s.TerminationDate,
+                        BaseSalary = s.BaseSalary,
+                        BranchId = s.BranchId,
+                        PersonId = personId,
+                        DepartmentId = s.DepartmentId,
+                        JobTitleId = s.JobTitleId,
+                        ContractType = s.ContractType
+                    });
+                    if (!employeeResult.IsSucceeded)
+                        return (false, employeeResult.Message ?? "ثبت مشخصات پرسنلی ناموفق بود.", personId);
+                }
 
                 return (true, "", personId);
             });
@@ -1071,6 +1213,7 @@ namespace Taadol.Views
             else { if (!ValidateNaturalPersonFields()) return false; }
             if (!ValidateUniqueCode()) return false;
             if (!ValidateContactFormats()) return false;
+            if (!ValidatePersonnelFields()) return false;
             return true;
         }
 

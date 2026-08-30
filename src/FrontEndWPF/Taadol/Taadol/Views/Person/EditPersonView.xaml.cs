@@ -12,6 +12,7 @@ using PersonManagement.Application.Contract.PersonCategory;
 using PersonManagement.Application.Contract.PersonContact;
 using PersonManagement.Application.Contract.Persons;
 using PersonManagement.Application.Contract.PersonTypes;
+using PayrollSystemManagement.Application.Contracts.Employee;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -43,6 +44,9 @@ namespace Taadol.Views
         private readonly IPersonCategoryApplication _personCategoryApplication;
         private readonly IPictureApplication _pictureApplication;
         private long _personId;
+        private long _employeeId;              // رکورد Employees موجود برای این شخص (0 = ندارد)
+        private long _loadedDepartmentId;      // دپارتمان ذخیره‌شده در Employees
+        private long _loadedJobTitleId;        // عنوان شغلی ذخیره‌شده در Employees
         private long? _selectedPersonCategoryId;
         private List<ContactTypeViewModel> _contactTypes = new();
         private readonly Dictionary<string, long> _contactTypeByName = new(StringComparer.OrdinalIgnoreCase);
@@ -154,6 +158,12 @@ namespace Taadol.Views
         public EditPersonView(long personId)
         {
             InitializeComponent();   // ← اضافه کنید
+
+            // نوع منبع برای کنترل‌های دپارتمان و عنوان شغلی
+            if (CategorySearch2 != null)
+                CategorySearch2.SourceKind = Controls.CategorySearchControl.SearchSourceKind.Department;
+            if (CategorySearch3 != null)
+                CategorySearch3.SourceKind = Controls.CategorySearchControl.SearchSourceKind.JobTitle;
 
             // رویدادهای جدول حساب‌های بانکی (کنترل مشترک) — در کد وصل می‌شوند چون delegate سفارشی دارد
             BankAccountsTable.EditRequested += BankAccountsTable_EditRequested;
@@ -411,6 +421,20 @@ namespace Taadol.Views
             {
                 System.Diagnostics.Debug.WriteLine("❌ LoadCategoriesAsync: CategorySearch is null!");
             }
+
+            // دپارتمان و عنوان شغلی (بخش پرسنل) از سرویس‌های Payroll لود می‌شوند
+            var deptTask = PersonFormHelper.LoadDepartmentsTreeAsync(token,
+                ex => System.Diagnostics.Debug.WriteLine($"[EditPersonView] Departments load failed: {ex.Message}"));
+            var jobTitleTask = PersonFormHelper.LoadJobTitlesTreeAsync(token,
+                ex => System.Diagnostics.Debug.WriteLine($"[EditPersonView] JobTitles load failed: {ex.Message}"));
+
+            var deptTree = await deptTask;
+            var jobTree = await jobTitleTask;
+
+            if (deptTree != null && CategorySearch2 != null)
+                CategorySearch2.LoadFromTreeDto(deptTree);
+            if (jobTree != null && CategorySearch3 != null)
+                CategorySearch3.LoadFromTreeDto(jobTree);
         }
 
         /// <summary>Safe wrapper for LoadCategoriesAsync with error handling at call site.</summary>
@@ -492,6 +516,9 @@ namespace Taadol.Views
                 PopulateBankAccountsFromList(await banksTask);
                 await PopulateIsActiveAsync(details);
 
+                // 3.5) اطلاعات پرسنلی (Employees) — نام شخص بعد از PopulatePersonDetails در دسترس است
+                PopulatePersonnelFromDb(await LoadEmployeeFromDbAsync(BuildPersonDisplayName()));
+
                 // 4) Load categories
                 await LoadCategoriesAndSelectAsync();
 
@@ -554,6 +581,49 @@ namespace Taadol.Views
             using var scope = App.ServiceProvider.CreateScope();
             return scope.ServiceProvider.GetRequiredService<IPictureApplication>().GetByOwner(personId, PictureOwnerTypeDTO.Person);
         });
+
+        /// <summary> رکورد Employees شخص را پیدا می‌کند و جزئیاتش را برمی‌گرداند.
+        /// چون قرارداد بک‌اند فقط نام شخص را در خروجی دارد، با تطبیق نام پیدا می‌شود.</summary>
+        private Task<EditEmployee?> LoadEmployeeFromDbAsync(string expectedName) => Task.Run(() =>
+        {
+            (_loadCts?.Token ?? CancellationToken.None).ThrowIfCancellationRequested();
+            using var scope = App.ServiceProvider.CreateScope();
+            var employeeApp = scope.ServiceProvider.GetRequiredService<IEmployeeApplication>();
+            var employees = employeeApp.GetEmployees();
+            if (employees == null || employees.Count == 0) return null;
+
+            var expected = (expectedName ?? "").Trim();
+            var employee = employees.FirstOrDefault(x =>
+                string.Equals((x.PersonName ?? "").Trim(), expected, StringComparison.OrdinalIgnoreCase));
+            if (employee == null) return null;
+            return employeeApp.GetDetails(employee.Id);
+        });
+
+        /// <summary> نام نمایشی شخص به همان شکلی که بک‌اند در PersonName می‌سازد (FirstName + LastName).</summary>
+        private string BuildPersonDisplayName()
+        {
+            var first = (IsLegal ? CompanyName : FirstName) ?? "";
+            var last = LastName ?? "";
+            return (first + " " + last).Trim();
+        }
+
+        /// <summary> پر کردن فیلدهای بخش پرسنل از رکورد Employees.</summary>
+        private void PopulatePersonnelFromDb(EditEmployee? e)
+        {
+            _employeeId = e?.Id ?? 0;
+
+            if (PersonnelCodeInput != null) PersonnelCodeInput.Text = e?.EmployeeCode ?? "";
+            if (InsuranceNumberInput != null) InsuranceNumberInput.Text = e?.InsuranceNumber ?? "";
+            if (BaseSalaryInput != null)
+                BaseSalaryInput.Text = e == null ? "" : e.BaseSalary.ToString("0.##", CultureInfo.InvariantCulture);
+            if (DescriptionInput != null) DescriptionInput.Text = e?.Description ?? "";
+            if (MyDatePicker3 != null) MyDatePicker3.SelectedDate = e?.HireDate;
+            if (MyDatePicker2 != null) MyDatePicker2.SelectedDate = e?.TerminationDate;
+
+            _loadedDepartmentId = e?.DepartmentId ?? 0;
+            _loadedJobTitleId = e?.JobTitleId ?? 0;
+            SetContractType(e?.ContractType ?? EmployeeContractTypeDTO.Permanent);
+        }
 
         // --- UI population ---
 
@@ -637,6 +707,12 @@ namespace Taadol.Views
             await LoadCategoriesAsync(SelectedPersonTypeId);
             if (_selectedPersonCategoryId.HasValue && _selectedPersonCategoryId.Value > 0 && CategorySearch != null)
                 CategorySearch.SelectCategoryById(_selectedPersonCategoryId.Value);
+
+            // انتخاب دپارتمان و عنوان شغلی از رکورد Employees
+            if (_loadedDepartmentId > 0 && CategorySearch2 != null)
+                CategorySearch2.SelectCategoryById(_loadedDepartmentId);
+            if (_loadedJobTitleId > 0 && CategorySearch3 != null)
+                CategorySearch3.SelectCategoryById(_loadedJobTitleId);
         }
 
         private async Task LoadAndSetPictureAsync(List<PictureViewModel> pictures)
@@ -795,6 +871,75 @@ namespace Taadol.Views
                     : Visibility.Collapsed;
         }
 
+        // ======================================================
+        //  Personnel (بخش پرسنل) — فیلدها و نوع قرارداد
+        // ======================================================
+        private bool _suppressContractToggle;
+
+        private void ContractToggle_Checked(object sender, RoutedEventArgs e)
+        {
+            var tb = sender as ToggleButton;
+            if (tb == null || tb.IsChecked != true || _suppressContractToggle) return;
+
+            _suppressContractToggle = true;
+            try
+            {
+                foreach (var b in new[] { ContractPermanent, ContractContractual, ContractProject })
+                {
+                    if (b != null && b != tb && b.IsChecked == true)
+                        b.IsChecked = false;
+                }
+                MarkUserChange();
+            }
+            finally
+            {
+                _suppressContractToggle = false;
+            }
+        }
+
+        private bool IsPersonnelSelected => PersonTypePersonnel?.IsChecked == true;
+
+        private EmployeeContractTypeDTO GetSelectedContractType()
+        {
+            if (ContractContractual?.IsChecked == true) return EmployeeContractTypeDTO.Contractual;
+            if (ContractProject?.IsChecked == true) return EmployeeContractTypeDTO.ProjectBased;
+            return EmployeeContractTypeDTO.Permanent;
+        }
+
+        private void SetContractType(EmployeeContractTypeDTO type)
+        {
+            if (ContractPermanent == null) return;
+            _suppressContractToggle = true;
+            try
+            {
+                ContractPermanent.IsChecked = type == EmployeeContractTypeDTO.Permanent;
+                ContractContractual.IsChecked = type == EmployeeContractTypeDTO.Contractual;
+                ContractProject.IsChecked = type == EmployeeContractTypeDTO.ProjectBased;
+            }
+            finally
+            {
+                _suppressContractToggle = false;
+            }
+        }
+
+        /// <summary> اعتبارسنجی فیلدهای اجباری بخش پرسنل (کد پرسنلی، بیمه، حقوق، دپارتمان، عنوان شغلی)</summary>
+        private bool ValidatePersonnelFields()
+        {
+            if (!IsPersonnelSelected) return true;
+
+            if (string.IsNullOrWhiteSpace(PersonnelCodeInput?.Text))
+            { ToastManager.Warning("کد پرسنلی را وارد کنید."); return false; }
+            if (string.IsNullOrWhiteSpace(InsuranceNumberInput?.Text))
+            { ToastManager.Warning("شماره بیمه را وارد کنید."); return false; }
+            if (ParseCreditLimit(BaseSalaryInput?.Text) <= 0)
+            { ToastManager.Warning("حقوق پایه را به درستی وارد کنید."); return false; }
+            if ((CategorySearch2?.SelectedCategoryId ?? 0) <= 0)
+            { ToastManager.Warning("دپارتمان را انتخاب کنید."); return false; }
+            if ((CategorySearch3?.SelectedCategoryId ?? 0) <= 0)
+            { ToastManager.Warning("عنوان شغلی را انتخاب کنید."); return false; }
+            return true;
+        }
+
         // وضعیت تاگل «شناسه یکتا»: true = خودکار (کد را سیستم می‌سازد)، false = دستی
         private bool _isCodeAutomatic;
 
@@ -879,7 +1024,10 @@ namespace Taadol.Views
             decimal CreditLimit,
             string Phone, string Mobile, string Email, Dictionary<string, long> ContactTypeNames,
             string Address, string PostalCode, long ProvinceId, long CityId,
-            List<BankAccountRow> BankAccounts);
+            List<BankAccountRow> BankAccounts,
+            long EmployeeId, bool IsPersonnel, string EmployeeCode, string InsuranceNumber,
+            string Description, decimal BaseSalary, DateTime? HireDate, DateTime? TerminationDate,
+            long DepartmentId, long JobTitleId, EmployeeContractTypeDTO ContractType);
 
         private EditSaveSnapshot CaptureEditSnapshot()
         {
@@ -892,7 +1040,17 @@ namespace Taadol.Views
                 Phone?.Trim() ?? "", Mobile?.Trim() ?? "", Email?.Trim() ?? "",
                 new Dictionary<string, long>(_contactTypeByName),
                 Address, PostalCode, SelectedProvinceId, SelectedCityId,
-                BankAccounts.Select(r => new BankAccountRow { BankBranchId = r.BankBranchId, BankName = r.BankName, CardNumber = r.CardNumber, Shaba = r.Shaba, AccountNumber = r.AccountNumber, IsDefault = r.IsDefault }).ToList());
+                BankAccounts.Select(r => new BankAccountRow { BankBranchId = r.BankBranchId, BankName = r.BankName, CardNumber = r.CardNumber, Shaba = r.Shaba, AccountNumber = r.AccountNumber, IsDefault = r.IsDefault }).ToList(),
+                _employeeId, IsPersonnelSelected,
+                PersonnelCodeInput?.Text?.Trim() ?? "",
+                InsuranceNumberInput?.Text?.Trim() ?? "",
+                DescriptionInput?.Text?.Trim() ?? "",
+                ParseCreditLimit(BaseSalaryInput?.Text),
+                MyDatePicker3?.SelectedDate,
+                MyDatePicker2?.SelectedDate,
+                CategorySearch2?.SelectedCategoryId ?? 0,
+                CategorySearch3?.SelectedCategoryId ?? 0,
+                GetSelectedContractType());
         }
 
         /// <summary>
@@ -940,6 +1098,50 @@ namespace Taadol.Views
                 EditSaveContacts(contactApp, s.PersonId, s.ContactTypeNames, s.Phone, s.Mobile, s.Email);
                 EditSaveAddress(addressApp, s.PersonId, s);
                 EditSaveBanks(bankApp, s.PersonId, s.BankAccounts);
+
+                // --- ذخیره اطلاعات پرسنلی (Employees) ---
+                if (s.IsPersonnel)
+                {
+                    var employeeApp = sp.GetRequiredService<IEmployeeApplication>();
+                    if (s.EmployeeId > 0)
+                    {
+                        var editEmployeeResult = employeeApp.Edit(new EditEmployee
+                        {
+                            Id = s.EmployeeId,
+                            EmployeeCode = s.EmployeeCode,
+                            InsuranceNumber = s.InsuranceNumber,
+                            Description = s.Description,
+                            HireDate = s.HireDate ?? DateTime.Today,
+                            TerminationDate = s.TerminationDate,
+                            BaseSalary = s.BaseSalary,
+                            BranchId = s.BranchId,
+                            PersonId = s.PersonId,
+                            DepartmentId = s.DepartmentId,
+                            JobTitleId = s.JobTitleId,
+                            ContractType = s.ContractType
+                        });
+                        if (!editEmployeeResult.IsSucceeded) return editEmployeeResult;
+                    }
+                    else
+                    {
+                        var createEmployeeResult = employeeApp.Create(new CreateEmployee
+                        {
+                            EmployeeCode = s.EmployeeCode,
+                            InsuranceNumber = s.InsuranceNumber,
+                            Description = s.Description,
+                            HireDate = s.HireDate ?? DateTime.Today,
+                            TerminationDate = s.TerminationDate,
+                            BaseSalary = s.BaseSalary,
+                            BranchId = s.BranchId,
+                            PersonId = s.PersonId,
+                            DepartmentId = s.DepartmentId,
+                            JobTitleId = s.JobTitleId,
+                            ContractType = s.ContractType
+                        });
+                        if (!createEmployeeResult.IsSucceeded) return createEmployeeResult;
+                    }
+                }
+
                 return result;
             });
         }
@@ -1457,6 +1659,7 @@ namespace Taadol.Views
                 }
             }
 
+            if (!ValidatePersonnelFields()) return false;
             return true;
         }
 

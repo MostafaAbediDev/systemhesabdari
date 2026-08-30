@@ -318,6 +318,8 @@
     <ProjectReference Include="..\..\..\..\PersonManagement.Configuration\PersonManagement.Configuration.csproj" />
     <ProjectReference Include="..\..\..\..\PersonManagement.Domain\PersonManagement.Domain.csproj" />
     <ProjectReference Include="..\..\..\..\PersonManagement.Infrastructure.EFCore\PersonManagement.Infrastructure.EFCore.csproj" />
+    <ProjectReference Include="..\..\..\..\PayrollSystemManagement.Application.Contracts\PayrollSystemManagement.Application.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\..\PayrollSystemManagement.Configuration\PayrollSystemManagement.Configuration.csproj" />
     <Resource Include="Fonts\IRANSans\IRANSansXFaNum-Black.ttf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>

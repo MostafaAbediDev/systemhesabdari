@@ -36,6 +36,7 @@ namespace Taadol.Helpers
         {
             try
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 var items = await Task.Run(() =>
                 {
                     cancellationToken.ThrowIfCancellationRequested();
@@ -94,6 +95,7 @@ namespace Taadol.Helpers
             try
             {
                 var ct = token ?? CancellationToken.None;
+                ct.ThrowIfCancellationRequested();
                 var items = await Task.Run(() =>
                 {
                     ct.ThrowIfCancellationRequested();
@@ -147,6 +149,7 @@ namespace Taadol.Helpers
         {
             try
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 var items = await Task.Run(() =>
                 {
                     cancellationToken.ThrowIfCancellationRequested();
@@ -184,6 +187,7 @@ namespace Taadol.Helpers
         {
             try
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 var items = await Task.Run(() =>
                 {
                     cancellationToken.ThrowIfCancellationRequested();
@@ -233,6 +237,7 @@ namespace Taadol.Helpers
         {
             try
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 var items = await Task.Run(() =>
                 {
                     using var scope = App.ServiceProvider.CreateScope();
@@ -283,6 +288,7 @@ namespace Taadol.Helpers
             }
             try
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 var items = await Task.Run(() =>
                 {
                     cancellationToken.ThrowIfCancellationRequested();
@@ -331,6 +337,7 @@ namespace Taadol.Helpers
             try
             {
                 var ct = token ?? CancellationToken.None;
+                ct.ThrowIfCancellationRequested();
                 var tree = await Task.Run(() =>
                 {
                     ct.ThrowIfCancellationRequested();
@@ -352,6 +359,140 @@ namespace Taadol.Helpers
                 onError(ex);
                 return null;
             }
+        }
+
+        /// <summary>
+        /// لود لیست دپارتمان‌ها از بک‌اند Payroll و تبدیل به فرمت درختی برای CategorySearchControl.
+        /// خروجی: یک درخت تک‌ریشه با عنوان "دپارتمان" و تمام دپارتمان‌ها به‌عنوان فرزند.
+        /// </summary>
+        public static async Task<List<PersonCategoryTreeViewModel>> LoadDepartmentsTreeAsync(
+            CancellationToken cancellationToken,
+            Action<Exception> onError)
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var items = await Task.Run(() =>
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    using var scope = App.ServiceProvider.CreateScope();
+                    var app = scope.ServiceProvider.GetRequiredService<PayrollSystemManagement.Application.Contracts.Department.IDepartmentApplication>();
+                    return app.GetDepartments()?.Where(d => d.IsActive).ToList();
+                }, cancellationToken).ConfigureAwait(false);
+
+                cancellationToken.ThrowIfCancellationRequested();
+                var root = new PersonCategoryTreeViewModel
+                {
+                    Id = 0,
+                    Title = "دپارتمان",
+                    Children = (items ?? new List<PayrollSystemManagement.Application.Contracts.Department.DepartmentViewModel>())
+                        .Select(d => new PersonCategoryTreeViewModel
+                        {
+                            Id = d.Id,
+                            Title = d.Name ?? "",
+                            Children = new List<PersonCategoryTreeViewModel>()
+                        }).ToList()
+                };
+                return new List<PersonCategoryTreeViewModel> { root };
+            }
+            catch (OperationCanceledException)
+            {
+                return new();
+            }
+            catch (Exception ex)
+            {
+                onError(ex);
+                return new();
+            }
+        }
+
+        /// <summary>
+        /// لود لیست عناوین شغلی از بک‌اند Payroll و تبدیل به فرمت درختی برای CategorySearchControl.
+        /// خروجی: یک درخت تک‌ریشه با عنوان "عنوان شغلی" و تمام عناوین به‌عنوان فرزند.
+        /// </summary>
+        public static async Task<List<PersonCategoryTreeViewModel>> LoadJobTitlesTreeAsync(
+            CancellationToken cancellationToken,
+            Action<Exception> onError)
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var items = await Task.Run(() =>
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    using var scope = App.ServiceProvider.CreateScope();
+                    var app = scope.ServiceProvider.GetRequiredService<PayrollSystemManagement.Application.Contracts.JobTitle.IJobTitleApplication>();
+                    return app.GetJobTitles()?.Where(j => j.IsActive).ToList();
+                }, cancellationToken).ConfigureAwait(false);
+
+                cancellationToken.ThrowIfCancellationRequested();
+                var root = new PersonCategoryTreeViewModel
+                {
+                    Id = 0,
+                    Title = "عنوان شغلی",
+                    Children = (items ?? new List<PayrollSystemManagement.Application.Contracts.JobTitle.JobTitleViewModel>())
+                        .Select(j => new PersonCategoryTreeViewModel
+                        {
+                            Id = j.Id,
+                            Title = j.Title ?? "",
+                            Children = new List<PersonCategoryTreeViewModel>()
+                        }).ToList()
+                };
+                return new List<PersonCategoryTreeViewModel> { root };
+            }
+            catch (OperationCanceledException)
+            {
+                return new();
+            }
+            catch (Exception ex)
+            {
+                onError(ex);
+                return new();
+            }
+        }
+
+        /// <summary>
+        /// تبدیل مستقیم لیست دپارتمان‌ها به فرمت درختی (همگام).
+        /// برای رفرش کنترل‌های SearchOnDemand بعد از افزودن/ویرایش.
+        /// </summary>
+        public static List<PersonCategoryTreeViewModel> BuildDepartmentTree(
+            List<PayrollSystemManagement.Application.Contracts.Department.DepartmentViewModel> items)
+        {
+            var root = new PersonCategoryTreeViewModel
+            {
+                Id = 0,
+                Title = "دپارتمان",
+                Children = (items ?? new List<PayrollSystemManagement.Application.Contracts.Department.DepartmentViewModel>())
+                    .Select(d => new PersonCategoryTreeViewModel
+                    {
+                        Id = d.Id,
+                        Title = d.Name ?? "",
+                        Children = new List<PersonCategoryTreeViewModel>()
+                    }).ToList()
+            };
+            return new List<PersonCategoryTreeViewModel> { root };
+        }
+
+        /// <summary>
+        /// تبدیل مستقیم لیست عناوین شغلی به فرمت درختی (همگام).
+        /// برای رفرش کنترل‌های SearchOnDemand بعد از افزودن/ویرایش.
+        /// </summary>
+        public static List<PersonCategoryTreeViewModel> BuildJobTitleTree(
+            List<PayrollSystemManagement.Application.Contracts.JobTitle.JobTitleViewModel> items)
+        {
+            var root = new PersonCategoryTreeViewModel
+            {
+                Id = 0,
+                Title = "عنوان شغلی",
+                Children = (items ?? new List<PayrollSystemManagement.Application.Contracts.JobTitle.JobTitleViewModel>())
+                    .Select(j => new PersonCategoryTreeViewModel
+                    {
+                        Id = j.Id,
+                        Title = j.Title ?? "",
+                        Children = new List<PersonCategoryTreeViewModel>()
+                    }).ToList()
+            };
+            return new List<PersonCategoryTreeViewModel> { root };
         }
     }
 }

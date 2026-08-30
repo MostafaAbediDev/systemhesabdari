@@ -15,6 +15,7 @@ using PersonManagement.Configuration;
 using PersonManagement.Domain.Person.PersonAgg;
 using PersonManagement.Infrastructure.EFCore;
 using PersonManagement.Infrastructure.EFCore.Repository;
+using PayrollSystemManagement.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -77,6 +78,9 @@ namespace Taadol
 
                 LogStep("Configuring BankManagementBoostrapper...");
                 BankManagementBoostrapper.Configure(services, connectionString);
+
+                LogStep("Configuring PayrollSystemManagementBoostrapper...");
+                PayrollSystemManagementBoostrapper.Configure(services, connectionString);
 
                 LogStep("Registering Person repositories...");
                 services.AddTransient<IPersonRepository, PersonRepository>();

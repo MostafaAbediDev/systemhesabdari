@@ -921,19 +921,19 @@
                                     <ColumnDefinition Width="16" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <StackPanel Grid.Column="0">
-                                    <controls:CategorySearchControl x:Name="CategorySearch2"
-                                                                    HorizontalAlignment="Stretch"
-                                                                    HeaderText="دپارتمان"
-                                                                    IsRequired="True"
-                                                                    MainIconSource="/Assets/Icons/custom_icon.svg" />
+                                <StackPanel Grid.Column="0">      <controls:CategorySearchControl x:Name="CategorySearch2"
+                                      HorizontalAlignment="Stretch"
+                                      HeaderText="دپارتمان"
+                                      IsRequired="True"
+                                      SearchOnDemand="True"
+                                      MainIconSource="/Assets/Icons/custom_icon.svg" />
                                 </StackPanel>
-                                <StackPanel Grid.Column="2">
-                                    <controls:CategorySearchControl x:Name="CategorySearch3"
-                                                                    HorizontalAlignment="Stretch"
-                                                                    HeaderText="عنوان شغلی"
-                                                                    IsRequired="True"
-                                                                    MainIconSource="/Assets/Icons/custom_icon.svg" />
+                                <StackPanel Grid.Column="2">      <controls:CategorySearchControl x:Name="CategorySearch3"
+                                      HorizontalAlignment="Stretch"
+                                      HeaderText="عنوان شغلی"
+                                      IsRequired="True"
+                                      SearchOnDemand="True"
+                                      MainIconSource="/Assets/Icons/custom_icon.svg" />
                                 </StackPanel>
                                 <StackPanel Grid.Column="4">
                                     <TextBlock Text="نوع همکاری"
@@ -945,17 +945,23 @@
                                             Background="White">
                                         <StackPanel Orientation="Horizontal"
                                                     HorizontalAlignment="Center">
-                                            <ToggleButton Content="رسمی"
+                                            <ToggleButton x:Name="ContractPermanent"
+                                                          Content="رسمی"
+                                                          Checked="ContractToggle_Checked"
                                                           FlowDirection="LeftToRight"
                                                           Style="{StaticResource StatusToggleButton}"
                                                           IsChecked="False"
                                                           Margin="0,0,8,0" />
-                                            <ToggleButton Content="قراردادی"
+                                            <ToggleButton x:Name="ContractContractual"
+                                                          Content="قراردادی"
+                                                          Checked="ContractToggle_Checked"
                                                           FlowDirection="LeftToRight"
                                                           Style="{StaticResource StatusToggleButton}"
                                                           IsChecked="False"
                                                           Margin="0,0,8,0" />
-                                            <ToggleButton Content="پروژه ای"
+                                            <ToggleButton x:Name="ContractProject"
+                                                          Content="پروژه ای"
+                                                          Checked="ContractToggle_Checked"
                                                           FlowDirection="LeftToRight"
                                                           Style="{StaticResource StatusToggleButton}"
                                                           IsChecked="False" />
@@ -974,14 +980,16 @@
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0">
                                     <TextBlock Style="{StaticResource FormLabel}"><Run Text="کد پرسنلی"/><Run Text=" *" Foreground="#DC2626"/></TextBlock>
-                                    <controls:ModernPersianTextBox HorizontalAlignment="Stretch"
+                                    <controls:ModernPersianTextBox x:Name="PersonnelCodeInput"
+                                                                   HorizontalAlignment="Stretch"
                                                                    InputType="Number"
                                                                    FlowDirection="LeftToRight"
                                                                    Placeholder="**** **** **** ****" />
                                 </StackPanel>
                                 <StackPanel Grid.Column="2">
                                     <TextBlock Style="{StaticResource FormLabel}"><Run Text="شماره بیمه"/><Run Text=" *" Foreground="#DC2626"/></TextBlock>
-                                    <controls:ModernPersianTextBox HorizontalAlignment="Stretch"
+                                    <controls:ModernPersianTextBox x:Name="InsuranceNumberInput"
+                                                                   HorizontalAlignment="Stretch"
                                                                    InputType="Number"
                                                                    FlowDirection="LeftToRight"
                                                                    Placeholder="12345" />
@@ -992,6 +1000,7 @@
                                     <controls:ModernPersianTextBox HorizontalAlignment="Stretch"
                                                                    InputType="Number"
                                                                    FlowDirection="LeftToRight"
+                                                                   x:Name="BaseSalaryInput"
                                                                    Placeholder="ریال" />
                                 </StackPanel>
                             </Grid>
@@ -1019,7 +1028,8 @@
                                 <StackPanel Grid.Column="4">
                                     <TextBlock Text="توضیحات"
                                                Style="{StaticResource FormLabel}" />
-                                    <controls:ModernPersianTextBox HorizontalAlignment="Stretch"
+                                    <controls:ModernPersianTextBox x:Name="DescriptionInput"
+                                                                   HorizontalAlignment="Stretch"
                                                                    Placeholder="" />
                                 </StackPanel>
                             </Grid>

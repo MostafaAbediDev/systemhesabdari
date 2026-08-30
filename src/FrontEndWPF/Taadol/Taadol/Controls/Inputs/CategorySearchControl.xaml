@@ -110,7 +110,7 @@
                                             Width="8"
                                             Height="8"
                                             CornerRadius="4"
-                                            Margin="6,0,16,0"
+                                            Margin="4,0,6,0"
                                             Visibility="Collapsed">
                                         <Border.Background>
                                             <SolidColorBrush x:Name="DotBrush"
@@ -124,7 +124,7 @@
                                         <svg:SvgViewbox x:Name="ItemIcon"
                                                         Width="20"
                                                         Height="20"
-                                                        Margin="0,0,6,0"
+                                                        Margin="0,0,4,0"
                                                         VerticalAlignment="Center" />
                                         <ContentPresenter x:Name="PART_Header"
                                                           Content="{TemplateBinding Header}"
@@ -136,20 +136,19 @@
                                                 Grid.Column="2"
                                                 Orientation="Horizontal"
                                                 HorizontalAlignment="Left"
-                                                Margin="5,0,0,0"
                                                 Opacity="0">
 
                                         <Border x:Name="AddButton"
-                                                Width="28"
-                                                Height="28"
-                                                CornerRadius="6"
-                                                Margin="2,0"
+                                                Width="24"
+                                                Height="24"
+                                                CornerRadius="5"
+                                                Margin="1,0"
                                                 Cursor="Hand"
                                                 Background="Transparent"
                                                 MouseLeftButtonUp="AddButton_Click"
                                                 ToolTip="اضافه کردن زیرمجموعه">
-                                            <svg:SvgViewbox Width="14"
-                                                            Height="14"
+                                            <svg:SvgViewbox Width="12"
+                                                            Height="12"
                                                             Source="/Assets/Icons/Plus.svg"
                                                             HorizontalAlignment="Center"
                                                             VerticalAlignment="Center" />
@@ -167,16 +166,16 @@
                                         </Border>
 
                                         <Border x:Name="EditButton"
-                                                Width="28"
-                                                Height="28"
-                                                CornerRadius="6"
-                                                Margin="2,0"
+                                                Width="24"
+                                                Height="24"
+                                                CornerRadius="5"
+                                                Margin="1,0"
                                                 Cursor="Hand"
                                                 Background="Transparent"
                                                 MouseLeftButtonUp="EditButton_Click"
                                                 ToolTip="ویرایش">
-                                            <svg:SvgViewbox Width="14"
-                                                            Height="14"
+                                            <svg:SvgViewbox Width="12"
+                                                            Height="12"
                                                             Source="/Assets/Icons/edit.svg"
                                                             HorizontalAlignment="Center"
                                                             VerticalAlignment="Center" />
@@ -194,16 +193,16 @@
                                         </Border>
 
                                         <Border x:Name="trashButton"
-                                                Width="28"
-                                                Height="28"
-                                                CornerRadius="6"
-                                                Margin="2,0"
+                                                Width="24"
+                                                Height="24"
+                                                CornerRadius="5"
+                                                Margin="1,0"
                                                 Cursor="Hand"
                                                 Background="Transparent"
                                                 MouseLeftButtonUp="DeleteButton_Click"
                                                 ToolTip="حذف">
-                                            <svg:SvgViewbox Width="14"
-                                                            Height="14"
+                                            <svg:SvgViewbox Width="12"
+                                                            Height="12"
                                                             Source="/Assets/Icons/trash.svg"
                                                             HorizontalAlignment="Center"
                                                             VerticalAlignment="Center" />
@@ -436,7 +435,7 @@
                                             Width="8"
                                             Height="8"
                                             CornerRadius="4"
-                                            Margin="6,0,10,0"
+                                            Margin="4,0,6,0"
                                             VerticalAlignment="Center"
                                             Visibility="Collapsed">
                                         <Border.Background>
@@ -450,7 +449,7 @@
                                         <svg:SvgViewbox x:Name="ItemIcon"
                                                         Width="16"
                                                         Height="16"
-                                                        Margin="0,0,5,0"
+                                                        Margin="0,0,4,0"
                                                         VerticalAlignment="Center" />
                                         <ContentPresenter x:Name="PART_Header"
                                                           Content="{TemplateBinding Header}"
@@ -461,14 +460,13 @@
                                                 Grid.Column="2"
                                                 Orientation="Horizontal"
                                                 HorizontalAlignment="Left"
-                                                Opacity="0"
-                                                Margin="5,0,0,0">
+                                                Opacity="0">
 
                                         <Border x:Name="AddButton"
                                                 Width="24"
                                                 Height="24"
                                                 CornerRadius="5"
-                                                Margin="2,0"
+                                                Margin="1,0"
                                                 Cursor="Hand"
                                                 Background="Transparent"
                                                 MouseLeftButtonUp="AddButton_Click"
@@ -495,7 +493,7 @@
                                                 Width="24"
                                                 Height="24"
                                                 CornerRadius="5"
-                                                Margin="2,0"
+                                                Margin="1,0"
                                                 Cursor="Hand"
                                                 Background="Transparent"
                                                 MouseLeftButtonUp="EditButton_Click"
@@ -522,7 +520,7 @@
                                                 Width="24"
                                                 Height="24"
                                                 CornerRadius="5"
-                                                Margin="2,0"
+                                                Margin="1,0"
                                                 Cursor="Hand"
                                                 Background="Transparent"
                                                 MouseLeftButtonUp="DeleteButton_Click"
@@ -689,7 +687,7 @@
                                             Width="8"
                                             Height="8"
                                             CornerRadius="4"
-                                            Margin="6,0,10,0"
+                                            Margin="4,0,6,0"
                                             VerticalAlignment="Center">
                                         <Border.Background>
                                             <SolidColorBrush x:Name="DotBrush"
@@ -708,14 +706,40 @@
                                                 Grid.Column="2"
                                                 Orientation="Horizontal"
                                                 HorizontalAlignment="Left"
-                                                Opacity="0"
-                                                Margin="5,0,0,0">
+                                                Opacity="0">
+
+                                        <Border x:Name="AddButton"
+                                                Width="24"
+                                                Height="24"
+                                                CornerRadius="5"
+                                                Margin="1,0"
+                                                Cursor="Hand"
+                                                Background="Transparent"
+                                                MouseLeftButtonUp="AddButton_Click"
+                                                ToolTip="اضافه کردن">
+                                            <svg:SvgViewbox Width="12"
+                                                            Height="12"
+                                                            Source="/Assets/Icons/Plus.svg"
+                                                            HorizontalAlignment="Center"
+                                                            VerticalAlignment="Center" />
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsMouseOver"
+                                                                 Value="True">
+                                                            <Setter Property="Background"
+                                                                    Value="#E9F0FF" />
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                        </Border>
 
                                         <Border x:Name="EditButton"
                                                 Width="24"
                                                 Height="24"
                                                 CornerRadius="5"
-                                                Margin="2,0"
+                                                Margin="1,0"
                                                 Cursor="Hand"
                                                 Background="Transparent"
                                                 MouseLeftButtonUp="EditButton_Click"
@@ -742,7 +766,7 @@
                                                 Width="24"
                                                 Height="24"
                                                 CornerRadius="5"
-                                                Margin="2,0"
+                                                Margin="1,0"
                                                 Cursor="Hand"
                                                 Background="Transparent"
                                                 MouseLeftButtonUp="DeleteButton_Click"
@@ -957,6 +981,7 @@
                                   Grid.Row="2"
                                   Style="{StaticResource MinimalScrollViewer}"
                                   VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled"
                                   PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
                         <TreeView x:Name="CategoryTree"
                                   BorderThickness="0"
