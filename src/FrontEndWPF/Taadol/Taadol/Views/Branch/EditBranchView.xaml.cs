@@ -258,7 +258,7 @@ namespace Taadol.Views
                 {
                     using var scope = App.ServiceProvider.CreateScope();
                     var repo = scope.ServiceProvider.GetRequiredService<IProvinceRepository>();
-                    return repo.GetProvincesForSelectList();
+                    return repo.GetProvinces();
                 });
 
                 var details = await detailsTask;
@@ -335,7 +335,7 @@ namespace Taadol.Views
                     token.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
                     var repo = scope.ServiceProvider.GetRequiredService<ICityRepository>();
-                    return repo.GetCitiesByProvince(provinceId)
+                    return repo.GetCitiesByProvinceId(provinceId)
                         .Select(c => new CityComboItem { Id = c.Id, Title = c.Title })
                         .ToList();
                 }, token);

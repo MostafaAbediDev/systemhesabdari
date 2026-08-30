@@ -16,17 +16,17 @@ namespace CodeManagement.Infrastructure.EFCore.Repository
 
         public Codes GetByOwner(long ownerId, CodeOwnerType ownerType)
         {
-            return _context.Codes.FirstOrDefault(x => x.OwnerId == ownerId && x.OwnerType == ownerType);
+            return _context.Codes.FirstOrDefault(x => x.OwnerId == ownerId && x.OwnerType == ownerType && !x.IsDeleted);
         }
 
         public List<Codes> GetByOwners(List<long> ownerIds, CodeOwnerType ownerType)
         {
-            return _context.Codes.Where(x => ownerIds.Contains(x.OwnerId) && x.OwnerType == ownerType).ToList();
+            return _context.Codes.Where(x => ownerIds.Contains(x.OwnerId) && x.OwnerType == ownerType && !x.IsDeleted).ToList();
         }
 
         public EditCode GetDetails(long id)
         {
-            return _context.Codes
+            return _context.Codes.Where(x => x.Id == id && !x.IsDeleted)
                             .Select(x => new EditCode
                             {
                                 Id = x.Id,
@@ -40,7 +40,7 @@ namespace CodeManagement.Infrastructure.EFCore.Repository
         public List<CodeViewModel> Search(CodeSearchModel searchModel)
         {
             var query = _context.Codes
-                            .AsNoTracking()
+                .AsNoTracking().Where(x => !x.IsDeleted)
                             .Select(x => new CodeViewModel
                             {
                                 Id = x.Id,

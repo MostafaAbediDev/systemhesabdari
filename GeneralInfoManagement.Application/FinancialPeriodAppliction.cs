@@ -31,6 +31,7 @@ namespace GeneralInfoManagement.Application
                 return operation.Failed("تاریخ پایان باید بعد از تاریخ شروع باشد.");
 
             var hasOverlap = _financialPeriodRepository.Exists(x =>
+                x.BranchId == command.BranchId &&
                 command.StartDate <= x.EndDate &&
                 command.EndDate >= x.StartDate);
 
@@ -67,7 +68,8 @@ namespace GeneralInfoManagement.Application
             if (command.StartDate >= command.EndDate)
                 return operation.Failed("تاریخ پایان باید بعد از تاریخ شروع باشد.");
 
-            var hasOverlap = _financialPeriodRepository.Exists(x =>
+            var hasOverlap = _financialPeriodRepository.Exists(x => 
+                x.BranchId == command.BranchId &&
                 x.Id != command.Id &&
                 command.StartDate <= x.EndDate &&
                 command.EndDate >= x.StartDate);

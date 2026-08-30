@@ -74,6 +74,24 @@ namespace CodeManagement.Application
             };
         }
 
+        public OperationResult RemoveByOwner(long ownerId, CodeOwnerTypeDTO ownerType)
+        {
+            var operation = new OperationResult();
+
+            var code = _codeRepository.GetByOwner(
+                ownerId,
+                (CodeOwnerType)ownerType);
+
+            if (code == null)
+                return operation.Succedded();
+
+            code.Remove();
+
+            _codeRepository.SaveChanges();
+
+            return operation.Succedded();
+        }
+
         public List<CodeViewModel> GetListByOwners(List<long> ownerIds, CodeOwnerTypeDTO ownerType)
         {
             var codes = _codeRepository.GetByOwners(ownerIds, (CodeOwnerType)ownerType);
@@ -121,7 +139,7 @@ namespace CodeManagement.Application
                 existingCode.Edit(finalValue, command.OwnerId, (CodeOwnerType)command.OwnerType, command.IsAutomatic);
             }
 
-            _codeRepository.SaveChanges();
+            //_codeRepository.SaveChanges();
 
             return operation.Succedded();
         }

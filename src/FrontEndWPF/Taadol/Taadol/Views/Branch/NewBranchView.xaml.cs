@@ -71,7 +71,7 @@ namespace Taadol.Views
                     loadToken.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
                     var cityRepo = scope.ServiceProvider.GetRequiredService<ICityRepository>();
-                    return cityRepo.GetCitiesByProvince(provinceId);
+                    return cityRepo.GetCitiesByProvinceId(provinceId);
                 }, loadToken);
 
                 if (SelectedProvinceId != provinceId)
@@ -167,7 +167,7 @@ namespace Taadol.Views
                     using var scope = App.ServiceProvider.CreateScope();
                     var repo = scope.ServiceProvider.GetRequiredService<IProvinceRepository>();
 
-                    var provincesFromBackend = repo.GetProvincesForSelectList();
+                    var provincesFromBackend = repo.GetProvinces();
 
                     var mappedProvinces = provincesFromBackend.Select(p => new ProvinceComboItem
                     {
@@ -218,7 +218,7 @@ namespace Taadol.Views
                     loadToken.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
                     var cityRepo = scope.ServiceProvider.GetRequiredService<ICityRepository>();
-                    return cityRepo.GetCitiesByProvince(provinceId);
+                    return cityRepo.GetCitiesByProvinceId(provinceId);
                 }, loadToken);
 
                 if (SelectedProvinceId != provinceId)

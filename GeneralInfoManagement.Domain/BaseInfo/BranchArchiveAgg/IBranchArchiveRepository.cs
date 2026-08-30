@@ -8,5 +8,6 @@ namespace GeneralInfoManagement.Domain.BaseInfo.BranchArchiveAgg
         EditBranchArchive GetDetails(long id);
         List<BranchArchiveViewModel> Search(BranchArchiveSearchModel searchModel);
         List<BranchArchiveViewModel> GetBranchArchives();
+        bool ExistsByBranchId(long branchId);
     }
 }

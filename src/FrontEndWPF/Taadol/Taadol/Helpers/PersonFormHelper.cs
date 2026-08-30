@@ -41,7 +41,7 @@ namespace Taadol.Helpers
                     cancellationToken.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
                     var repo = scope.ServiceProvider.GetRequiredService<IProvinceRepository>();
-                    var result = repo.GetProvincesForSelectList();
+                    var result = repo.GetProvinces();
                     cancellationToken.ThrowIfCancellationRequested();
                     return result;
                 }, cancellationToken).ConfigureAwait(false);
@@ -99,7 +99,7 @@ namespace Taadol.Helpers
                     ct.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
                     var repo = scope.ServiceProvider.GetRequiredService<ICityRepository>();
-                    return repo.GetCitiesByProvince(provinceId);
+                    return repo.GetCitiesByProvinceId(provinceId);
                 }, ct).ConfigureAwait(false);
 
                 ct.ThrowIfCancellationRequested();

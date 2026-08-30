@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 
 namespace _0_FrameWork.Infrastructure
 {
-    public class RepositoryBase<Tkey, T> : IRepository<Tkey, T> where T : class
+    public class RepositoryBase<Tkey, T> : IRepository<Tkey, T> where T : EntityBase
     {
         private readonly DbContext _context;
 
@@ -20,17 +20,25 @@ namespace _0_FrameWork.Infrastructure
 
         public bool Exists(Expression<Func<T, bool>> expression)
         {
-            return _context.Set<T>().Any(expression);
+            return _context.Set<T>().Where(x => !x.IsDeleted)
+                .Any(expression);
         }
 
         public T Get(Tkey id)
         {
-            return _context.Find<T>(id);
+            return _context.Set<T>().FirstOrDefault(x => x.Id.Equals(id) && !x.IsDeleted);
         }
 
         public List<T> Get()
         {
-            return _context.Set<T>().ToList();  
+            return _context.Set<T>().Where(x => !x.IsDeleted)
+                .ToList();  
+        }
+
+        public T GetIncludingDeleted(Tkey id)
+        {
+            return _context.Set<T>()
+                .FirstOrDefault(x => x.Id.Equals(id));
         }
 
         public void SaveChanges()
