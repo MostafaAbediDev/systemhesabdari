@@ -181,51 +181,62 @@ namespace Taadol
                 return;
             }
             _navigationQueued = true;
-            // ناوبری روی UI thread سبک و غیرمسدودکننده انجام می‌شود؛
-            // فرم قبلی با Unloaded بارگذاری‌های در حال اجرا را لغو می‌کند.
-            // اگر مودالی باز است (مثلاً «شخص جدید» از دکمه لیست) و تغییرات ذخیره‌نشده دارد،
-            // قبل از ناوبری هشدار بده تا اطلاعات کاربر بی‌صدا از بین نرود.
-            if (ModalOverlay?.Visibility == Visibility.Visible &&
-                ModalContent.Content is IUnsavedChangesAware dirtyModal &&
-                dirtyModal.HasUnsavedChanges)
+            try
             {
-                var confirmNav = Controls.ModernDialog.ShowConfirm(
-                    "تغییرات ذخیره‌نشده",
-                    "فرم بازشده تغییرات ذخیره‌نشده دارد. آیا بدون ذخیره از آن خارج می‌شوید؟",
-                    Controls.ModernDialog.DialogType.Warning,
-                    "خروج از فرم",
-                    "بازگشت",
-                    this);
+                // اگر مودالی باز است (مثلاً «شخص جدید» از دکمه لیست) و تغییرات ذخیره‌نشده دارد،
+                // قبل از ناوبری هشدار بده تا اطلاعات کاربر بی‌صدا از بین نرود.
+                if (ModalOverlay?.Visibility == Visibility.Visible &&
+                    ModalContent.Content is IUnsavedChangesAware dirtyModal &&
+                    dirtyModal.HasUnsavedChanges)
+                {
+                    var confirmNav = Controls.ModernDialog.ShowConfirm(
+                        "تغییرات ذخیره‌نشده",
+                        "فرم بازشده تغییرات ذخیره‌نشده دارد. آیا بدون ذخیره از آن خارج می‌شوید؟",
+                        Controls.ModernDialog.DialogType.Warning,
+                        "خروج از فرم",
+                        "بازگشت",
+                        this);
 
-                if (!confirmNav)
-                    return; // ناوبری لغو شد؛ مودال و اطلاعات کاربر می‌ماند
+                    if (!confirmNav)
+                        return; // ناوبری لغو شد؛ finally flag را ریست می‌کند
+                }
+
+                // مودال بدون تغییرات (یا تأییدشده) هنگام ناوبری بسته شود تا روی صفحه جدید معلق نماند
+                if (ModalOverlay?.Visibility == Visibility.Visible)
+                    CloseModal();
+
+                // اگر فرم فعلی (مثلاً «شخص جدید» از سایدبار) تغییرات ذخیره‌نشده دارد،
+                // قبل از ناوبری هشدار بده تا اطلاعات کاربر بی‌صدا از بین نرود.
+                if (MainContent.Content is IUnsavedChangesAware dirtyForm && dirtyForm.HasUnsavedChanges)
+                {
+                    var confirmNav = Controls.ModernDialog.ShowConfirm(
+                        "تغییرات ذخیره‌نشده",
+                        "فرم فعلی تغییرات ذخیره‌نشده دارد. آیا بدون ذخیره از آن خارج می‌شوید؟",
+                        Controls.ModernDialog.DialogType.Warning,
+                        "خروج از فرم",
+                        "بازگشت",
+                        this);
+
+                    if (!confirmNav)
+                        return; // ناوبری لغو شد；finally flag را ریست می‌کند
+                }
+
+                MainContentBorder.Visibility = Visibility.Visible;
+                _nav.Navigate(tag);
+            }
+            finally
+            {
+                // ✅ در هر حالتی (موفق، لغو، یا خطا) flag ریست شود تا کلیک‌های بعدی بلاک نشوند
+                _navigationQueued = false;
             }
 
-            // مودال بدون تغییرات (یا تأییدشده) هنگام ناوبری بسته شود تا روی صفحه جدید معلق نماند
-            if (ModalOverlay?.Visibility == Visibility.Visible)
-                CloseModal();
-
-            // اگر فرم فعلی (مثلاً «شخص جدید» از سایدبار) تغییرات ذخیره‌نشده دارد،
-            // قبل از ناوبری هشدار بده تا اطلاعات کاربر بی‌صدا از بین نرود.
-            if (MainContent.Content is IUnsavedChangesAware dirtyForm && dirtyForm.HasUnsavedChanges)
-            {
-                var confirmNav = Controls.ModernDialog.ShowConfirm(
-                    "تغییرات ذخیره‌نشده",
-                    "فرم فعلی تغییرات ذخیره‌نشده دارد. آیا بدون ذخیره از آن خارج می‌شوید؟",
-                    Controls.ModernDialog.DialogType.Warning,
-                    "خروج از فرم",
-                    "بازگشت",
-                    this);
-
-                if (!confirmNav)
-                    return; // ناوبری لغو شد؛ فرم و اطلاعات کاربر می‌ماند
-            }
-
-            MainContentBorder.Visibility = Visibility.Visible;
-
-            _nav.Navigate(tag);
-            _navigationQueued = false;
+            // ✅ اگر ناوبری در حین انتظار queue شده بود، آن را اجرا کن
+            var pending = _pendingNavigationTag;
             _pendingNavigationTag = null;
+            if (pending != null)
+            {
+                OnSubMenuClicked(pending);
+            }
 
             // Navigation itself updates the visual tree; forcing UpdateLayout here can
             // block the UI while the previous form is still unloading.

@@ -787,11 +787,19 @@ namespace Taadol.Controls
 
         private void AnimateSizeWithBounce(Ellipse ellipse, double from, double to, int durationMs)
         {
+            // ✅ توقف تایمر bounce قبلی — جلوگیری از تجمع انیمیشن
+            if (_activeBounceTimer != null)
+            {
+                _activeBounceTimer.Stop();
+                _activeBounceTimer = null;
+            }
+
             int totalSteps = 20;
             int currentStep = 0;
             double stepDuration = (double)durationMs / totalSteps;
             double overshoot = to + (to - from) * 0.3; 
             var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(stepDuration) };
+            _activeBounceTimer = timer;
             timer.Tick += (s, e) =>
             {
                 currentStep++;
@@ -800,12 +808,12 @@ namespace Taadol.Controls
 
                 if (progress < 0.6)
                 {
-                                        double subProgress = progress / 0.6;
+                    double subProgress = progress / 0.6;
                     currentSize = from + (overshoot - from) * EaseOutQuad(subProgress);
                 }
                 else
                 {
-                                        double subProgress = (progress - 0.6) / 0.4;
+                    double subProgress = (progress - 0.6) / 0.4;
                     currentSize = overshoot + (to - overshoot) * EaseOutQuad(subProgress);
                 }
 
@@ -815,6 +823,7 @@ namespace Taadol.Controls
                 if (currentStep >= totalSteps)
                 {
                     timer.Stop();
+                    _activeBounceTimer = null;
                     ellipse.Width = to;
                     ellipse.Height = to;
                 }
@@ -944,13 +953,27 @@ namespace Taadol.Controls
         {
             return 1 - (1 - t) * (1 - t);
         }
+
+        // ✅ تایمرهای فعال برای جلوگیری از تجمع انیمیشن
+        private DispatcherTimer _activeSizeTimer;
+        private DispatcherTimer _activeBounceTimer;
+        private DispatcherTimer _activeFontSizeTimer;
+
         private void AnimateSize(Ellipse ellipse, double from, double to, int durationMs)
         {
+            // توقف تایمر قبلی — اگر انیمیشن قبلی تمام نشده، آن را لغو کن
+            if (_activeSizeTimer != null)
+            {
+                _activeSizeTimer.Stop();
+                _activeSizeTimer = null;
+            }
+
             int totalSteps = 15;
             int currentStep = 0;
             double stepDuration = (double)durationMs / totalSteps;
 
             var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(stepDuration) };
+            _activeSizeTimer = timer;
             timer.Tick += (s, e) =>
             {
                 currentStep++;
@@ -963,19 +986,29 @@ namespace Taadol.Controls
                 if (currentStep >= totalSteps)
                 {
                     timer.Stop();
+                    _activeSizeTimer = null;
                     ellipse.Width = to;
                     ellipse.Height = to;
                 }
             };
             timer.Start();
         }
+
         private void AnimateFontSize(TextBlock textBlock, double from, double to, int durationMs)
         {
+            // توقف تایمر قبلی
+            if (_activeFontSizeTimer != null)
+            {
+                _activeFontSizeTimer.Stop();
+                _activeFontSizeTimer = null;
+            }
+
             int totalSteps = 15;
             int currentStep = 0;
             double stepDuration = (double)durationMs / totalSteps;
 
             var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(stepDuration) };
+            _activeFontSizeTimer = timer;
             timer.Tick += (s, e) =>
             {
                 currentStep++;
@@ -985,6 +1018,7 @@ namespace Taadol.Controls
                 if (currentStep >= totalSteps)
                 {
                     timer.Stop();
+                    _activeFontSizeTimer = null;
                     textBlock.FontSize = to;
                 }
             };

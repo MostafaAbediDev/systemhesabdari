@@ -427,7 +427,7 @@
                                                   Margin="0,0,8,0" />
                                     <ToggleButton x:Name="PersonTypeBoth"
                                                   Content="هردو"
-                                                  Tag="1"
+                                                  Tag="4"
                                                   FlowDirection="LeftToRight"
                                                   Style="{StaticResource PersonTypeCheckBox}"
                                                   IsChecked="False"

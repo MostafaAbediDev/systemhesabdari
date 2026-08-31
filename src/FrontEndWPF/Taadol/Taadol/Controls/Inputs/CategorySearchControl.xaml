@@ -982,12 +982,39 @@
                                   Style="{StaticResource MinimalScrollViewer}"
                                   VerticalScrollBarVisibility="Auto"
                                   HorizontalScrollBarVisibility="Disabled"
-                                  PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
-                        <TreeView x:Name="CategoryTree"
-                                  BorderThickness="0"
-                                  Background="Transparent"
-                                  SelectedItemChanged="CategoryTree_SelectedItemChanged"
-                                  Padding="8,8,8,8" />
+                                  PreviewMouseWheel="ScrollViewer_PreviewMouseWheel"
+                                  ScrollChanged="CategoryScrollViewer_ScrollChanged">
+                        <Grid>
+                            <TreeView x:Name="CategoryTree"
+                                      BorderThickness="0"
+                                      Background="Transparent"
+                                      SelectedItemChanged="CategoryTree_SelectedItemChanged"
+                                      Padding="8,8,8,8" />
+                            <Border x:Name="LazyLoadingPanel"
+                                    Panel.ZIndex="10"
+                                    VerticalAlignment="Bottom"
+                                    HorizontalAlignment="Stretch"
+                                    Margin="8,0"
+                                    Height="3"
+                                    Background="#DCE7FF"
+                                    CornerRadius="2"
+                                    Visibility="Collapsed"
+                                    IsHitTestVisible="False"
+                                    ClipToBounds="True">
+                                <Border x:Name="LazyLoadingHighlight"
+                                        Width="72"
+                                        HorizontalAlignment="Left"
+                                        Background="#2667FF"
+                                        CornerRadius="2"
+                                        Opacity="0.9">
+                                    <Border.RenderTransform>
+                                        <TranslateTransform x:Name="LazyLoadingHighlightTransform"
+                                                            X="-72" />
+                                    </Border.RenderTransform>
+                                </Border>
+
+                            </Border>
+                        </Grid>
                     </ScrollViewer>
                 </Grid>
             </Border>

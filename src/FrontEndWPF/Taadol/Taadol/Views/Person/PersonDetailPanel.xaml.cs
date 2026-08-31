@@ -55,6 +55,21 @@ namespace Taadol.Controls
             e.Handled = true;
         }
 
+        /// <summary>
+        /// کوتاه‌سازی نوع دسته‌بندی برای نمایش در پنل — «مشتری و تامین کننده» → «هردو»
+        /// </summary>
+        private static string ShortPersonType(string personType)
+        {
+            if (string.IsNullOrWhiteSpace(personType)) return personType;
+
+            return personType.Trim() switch
+            {
+                "مشتری و تامین کننده" => "هردو",
+                "مشتری و تأمین‌کننده" => "هردو",
+                _ => personType.Trim()
+            };
+        }
+
         public void LoadData(long id, string name, string personType,
             string category, string nationalId, string phone, string email,
             string city, string address, string postalCode, string balance,
@@ -62,7 +77,8 @@ namespace Taadol.Controls
         {
             _personId = id;
             PersonNameText.Text = name;
-            CategoryText.Text = category;
+            PersonTypeText.Text = ShortPersonType(personType) ?? "";
+            CategoryText.Text = category ?? "";
             NationalIdText.Text = nationalId;
             PhoneText.Text = phone;
             EmailText.Text = email;

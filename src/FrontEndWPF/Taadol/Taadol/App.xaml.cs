@@ -229,6 +229,19 @@ namespace Taadol
         // ===== هندلر خطای Task های غیرمشاهده =====
         private void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
         {
+            // لغو شدن عملیات (Cancellation) رفتار عادی برنامه است — نه خطا.
+            // وقتی فرم بسته می‌شود و CTS لغو می‌شود، Task های در حال اجرا
+            // OperationCanceledException پرتاب می‌کنند؛ این را نباید خطا نمایش داد.
+            var isCancellation =
+                e.Exception is OperationCanceledException ||
+                (e.Exception is AggregateException agg &&
+                 agg.InnerExceptions.Any(x => x is OperationCanceledException));
+            if (isCancellation)
+            {
+                e.SetObserved();
+                return;
+            }
+
             var msg = "🔴 خطای Task غیرمشاهده:" + Environment.NewLine + Environment.NewLine +
                       BuildExceptionMessage(e.Exception);
             LogStep("!!! TaskScheduler.UnobservedTaskException !!!");

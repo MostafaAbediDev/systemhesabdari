@@ -201,11 +201,24 @@
                                     <Border Grid.Row="0" Grid.Column="1" Width="2" Height="16"
                                             Background="#BED1FF" Margin="0,0,10,12"
                                             VerticalAlignment="Center" />
-                                    <TextBlock x:Name="CategoryText" Grid.Row="0" Grid.Column="2"
-                                               FontSize="12" FontWeight="Medium"
-                                               Foreground="#0D2159" VerticalAlignment="Center"
-                                               TextWrapping="Wrap"
-                                               Margin="0,0,0,12" />
+                                    <StackPanel Grid.Row="0" Grid.Column="2"
+                                                Orientation="Horizontal"
+                                                VerticalAlignment="Center"
+                                                Margin="0,0,0,12">
+                                        <TextBlock x:Name="PersonTypeText"
+                                                   FontSize="12" FontWeight="Medium"
+                                                   Foreground="#0D2159"
+                                                   VerticalAlignment="Center" />
+                                        <Border Width="2" Height="16"
+                                                Background="#BED1FF"
+                                                Margin="10,0"
+                                                VerticalAlignment="Center" />
+                                        <TextBlock x:Name="CategoryText"
+                                                   FontSize="12" FontWeight="Medium"
+                                                   Foreground="#0D2159"
+                                                   VerticalAlignment="Center"
+                                                   TextWrapping="Wrap" />
+                                    </StackPanel>
 
                                     <!-- Row 1: شناسه / کد ملی -->
                                     <TextBlock Grid.Row="1" Grid.Column="0" Text="شناسه / کد ملی"

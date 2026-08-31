@@ -33,6 +33,7 @@ namespace Taadol.Views
         private CancellationTokenSource _loadCts = new();
         private CancellationTokenSource _saveCts = new();
         private CancellationTokenSource _cityLoadCts = new();
+        private CancellationTokenSource _jobTitleLoadCts = new();
 
         private readonly IPersonApplication _personApplication;
         private readonly IBranchApplication _branchApplication;
@@ -163,7 +164,16 @@ namespace Taadol.Views
             if (CategorySearch2 != null)
                 CategorySearch2.SourceKind = Controls.CategorySearchControl.SearchSourceKind.Department;
             if (CategorySearch3 != null)
+            {
                 CategorySearch3.SourceKind = Controls.CategorySearchControl.SearchSourceKind.JobTitle;
+                CategorySearch3.IsEnabled = false;
+                CategorySearch3.SelectionCleared += OnJobTitleSelectionCleared;
+            }
+            if (CategorySearch2 != null)
+            {
+                CategorySearch2.CategorySelected += OnDepartmentSelected;
+                CategorySearch2.SelectionCleared += OnDepartmentSelectionCleared;
+            }
 
             // رویدادهای جدول حساب‌های بانکی (کنترل مشترک) — در کد وصل می‌شوند چون delegate سفارشی دارد
             BankAccountsTable.EditRequested += BankAccountsTable_EditRequested;
@@ -243,6 +253,14 @@ namespace Taadol.Views
             CancelAndDispose(ref _loadCts);
             CancelAndDispose(ref _saveCts);
             CancelAndDispose(ref _cityLoadCts);
+            CancelAndDispose(ref _jobTitleLoadCts);
+            if (CategorySearch2 != null)
+            {
+                CategorySearch2.CategorySelected -= OnDepartmentSelected;
+                CategorySearch2.SelectionCleared -= OnDepartmentSelectionCleared;
+            }
+            if (CategorySearch3 != null)
+                CategorySearch3.SelectionCleared -= OnJobTitleSelectionCleared;
             _loadCts = new CancellationTokenSource();
             _saveCts = new CancellationTokenSource();
             _cityLoadCts = new CancellationTokenSource();
@@ -422,19 +440,20 @@ namespace Taadol.Views
                 System.Diagnostics.Debug.WriteLine("❌ LoadCategoriesAsync: CategorySearch is null!");
             }
 
-            // دپارتمان و عنوان شغلی (بخش پرسنل) از سرویس‌های Payroll لود می‌شوند
-            var deptTask = PersonFormHelper.LoadDepartmentsTreeAsync(token,
+            // دپارتمان لود می‌شود؛ عنوان شغلی بعد از انتخاب دپارتمان لود خواهد شد.
+            var deptTree = await PersonFormHelper.LoadDepartmentsTreeAsync(token,
                 ex => System.Diagnostics.Debug.WriteLine($"[EditPersonView] Departments load failed: {ex.Message}"));
-            var jobTitleTask = PersonFormHelper.LoadJobTitlesTreeAsync(token,
-                ex => System.Diagnostics.Debug.WriteLine($"[EditPersonView] JobTitles load failed: {ex.Message}"));
-
-            var deptTree = await deptTask;
-            var jobTree = await jobTitleTask;
 
             if (deptTree != null && CategorySearch2 != null)
                 CategorySearch2.LoadFromTreeDto(deptTree);
-            if (jobTree != null && CategorySearch3 != null)
-                CategorySearch3.LoadFromTreeDto(jobTree);
+
+            CategorySearch3?.ClearSelection(false);
+            if (CategorySearch3 != null)
+            {
+                CategorySearch3.DepartmentFilterName = null;
+                CategorySearch3.DepartmentId = 0;
+                CategorySearch3.IsEnabled = false;
+            }
         }
 
         /// <summary>Safe wrapper for LoadCategoriesAsync with error handling at call site.</summary>
@@ -708,11 +727,84 @@ namespace Taadol.Views
             if (_selectedPersonCategoryId.HasValue && _selectedPersonCategoryId.Value > 0 && CategorySearch != null)
                 CategorySearch.SelectCategoryById(_selectedPersonCategoryId.Value);
 
-            // انتخاب دپارتمان و عنوان شغلی از رکورد Employees
+            // ترتیب Edit: دپارتمان انتخاب می‌شود، سپس عنوان‌های همان دپارتمان لود می‌شوند.
             if (_loadedDepartmentId > 0 && CategorySearch2 != null)
+            {
                 CategorySearch2.SelectCategoryById(_loadedDepartmentId);
-            if (_loadedJobTitleId > 0 && CategorySearch3 != null)
-                CategorySearch3.SelectCategoryById(_loadedJobTitleId);
+                await LoadJobTitlesForDepartmentAsync(
+                    _loadedDepartmentId,
+                    CategorySearch2.SelectedCategoryTitle,
+                    selectJobTitleId: _loadedJobTitleId);
+            }
+            else
+            {
+                CategorySearch3?.ClearSelection(false);
+                if (CategorySearch3 != null)
+                    CategorySearch3.IsEnabled = false;
+            }
+        }
+
+        private async void OnDepartmentSelected(CategorySearchControl.CategoryItem department)
+        {
+            await LoadJobTitlesForDepartmentAsync(department?.Id ?? 0, department?.Title, 0);
+        }
+
+        private async void OnDepartmentSelectionCleared()
+        {
+            await LoadJobTitlesForDepartmentAsync(0, null, 0);
+        }
+
+        private void OnJobTitleSelectionCleared()
+        {
+            OnPropertyChanged(nameof(IsDirty));
+            MarkUserChange();
+        }
+
+        private async Task LoadJobTitlesForDepartmentAsync(
+            long departmentId,
+            string departmentName,
+            long selectJobTitleId)
+        {
+            CancelAndDispose(ref _jobTitleLoadCts);
+            _jobTitleLoadCts = new CancellationTokenSource();
+            var token = _jobTitleLoadCts.Token;
+
+            CategorySearch3?.ClearSelection(false);
+            if (CategorySearch3 == null) return;
+
+            CategorySearch3.DepartmentFilterName = departmentName;
+            CategorySearch3.DepartmentId = departmentId;
+            CategorySearch3.IsEnabled = false;
+
+            if (departmentId <= 0 || string.IsNullOrWhiteSpace(departmentName))
+                return;
+
+            try
+            {
+                var tree = await PersonFormHelper.LoadJobTitlesTreeAsync(
+                    token,
+                    ex => System.Diagnostics.Debug.WriteLine($"[EditPersonView] JobTitles load failed: {ex.Message}"),
+                    departmentName);
+
+                token.ThrowIfCancellationRequested();
+                if (CategorySearch2?.SelectedCategoryId != departmentId)
+                    return;
+
+                CategorySearch3.LoadFromTreeDto(tree ?? new List<PersonCategoryTreeViewModel>());
+                CategorySearch3.ClearSelection(false);
+                CategorySearch3.IsEnabled = true;
+
+                if (selectJobTitleId > 0)
+                    CategorySearch3.SelectCategoryById(selectJobTitleId);
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[EditPersonView] Dependent job title load failed: {ex}");
+            }
         }
 
         private async Task LoadAndSetPictureAsync(List<PictureViewModel> pictures)
@@ -803,14 +895,21 @@ namespace Taadol.Views
             var tb = sender as ToggleButton;
             if (tb == null) return;
 
-            // اگه toggle از حالت checked خارج شد (Unchecked event)، IsChecked == false
             if (tb.IsChecked == true && tb.Tag != null && long.TryParse(tb.Tag.ToString(), out var id))
             {
+                // ✅ ابتدا دسته‌بندی قبلی پاک شود تا با PersonType جدید تداخل نکند
+                // نکته: این event هنگام InitializeComponent (به‌خاطر IsChecked="True" در XAML)
+                // قبل از مقداردهی CategorySearch هم فراخوانی می‌شود، پس باید null-safe باشد.
+                if (CategorySearch != null)
+                {
+                    CategorySearch.ClearSelection(false);
+                    CategorySearch.IsEnabled = true;
+                }
+
                 SelectedPersonTypeId = id;
                 UncheckOtherPersonTypeToggles(tb);
             }
 
-            // ★ نمایش/مخفی کردن بخش پرسنل بر اساس وضعیت PersonTypePersonnel
             UpdatePersonnelSectionVisibility();
         }
 
@@ -830,6 +929,7 @@ namespace Taadol.Views
                 }
             }
 
+            // ✅ اگر هیچ PersonType انتخاب نشده، CategorySearch غیرفعال و پاک شود
             if (!anyChecked)
             {
                 tb.IsChecked = true;

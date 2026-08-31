@@ -319,6 +319,7 @@ namespace Taadol.ViewModels
                         RowNumber = index + 1,
                         Code = string.IsNullOrWhiteSpace(p.Code) ? "—" : p.Code,
                         Category = string.IsNullOrWhiteSpace(p.PersonType) ? "—" : p.PersonType,
+                        PersonCategoryTitle = string.IsNullOrWhiteSpace(p.PersonCategoryTitle) ? "" : p.PersonCategoryTitle,
                         Status = p.IsActive ? "فعال" : "غیرفعال",
                         Nickname = "—",
                         FullNameText = fullName,

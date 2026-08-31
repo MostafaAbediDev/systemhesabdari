@@ -28,6 +28,7 @@ namespace Taadol.Views
         private bool _isLoadedOnce = false;
         private bool _isPanelOpen = true;
         private bool _sizeWired = false;
+        private bool _isUpdatingPanels = false;
 
         public PersonListView()
         {
@@ -332,6 +333,9 @@ namespace Taadol.Views
             try
             {
                 await ViewModel.RefreshAsync();
+                // پنل‌های موجود حذف شوند تا با داده‌ی جدید دوباره ساخته شوند
+                ClearDetailPanels();
+                UpdateDetailPanels();
             }
             catch (Exception ex)
             {
@@ -346,6 +350,8 @@ namespace Taadol.Views
             try
             {
                 await ViewModel.RefreshAsync();
+                ClearDetailPanels();
+                UpdateDetailPanels();
             }
             catch (Exception ex)
             {
@@ -476,8 +482,27 @@ namespace Taadol.Views
         // ======================================================
         //  Detail Panel Management
         // ======================================================
+        /// <summary>
+        /// تمام پنل‌های جزئیات باز را حذف می‌کند (با cleanup handlerها).
+        /// </summary>
+        private void ClearDetailPanels()
+        {
+            var panels = DetailPanelsStack.Children
+                .OfType<Taadol.Controls.PersonDetailPanel>()
+                .ToList();
+            foreach (var panel in panels)
+            {
+                panel.CloseRequested -= DetailPanel_CloseRequested;
+                panel.EditRequested -= DetailPanel_EditRequested;
+                panel.DeleteRequested -= DetailPanel_DeleteRequested;
+                DetailPanelsStack.Children.Remove(panel);
+            }
+        }
+
         private async void UpdateDetailPanels()
         {
+            if (_isUpdatingPanels) return;
+            _isUpdatingPanels = true;
             try
             {
                 // پنل‌هایی که دیگر انتخاب نیستند حذف شوند
@@ -516,8 +541,14 @@ namespace Taadol.Views
 
                     var panel = new Taadol.Controls.PersonDetailPanel();
 
-                    var personType = item.IsLegal ? "حقوقی" : "حقیقی";
-                    var category = item.Category ?? "";
+                    // PersonType نام نوع انتخاب‌شده (مثلاً «مشتری و تامین کننده») است؛
+                    // IsLegal فقط حقیقی/حقوقی را نشان می‌دهد و نباید در ردیف دسته‌بندی نمایش داده شود.
+                    var personType = string.IsNullOrWhiteSpace(item.PersonType)
+                        ? "—"
+                        : item.PersonType;
+                    var category = string.IsNullOrWhiteSpace(item.PersonCategoryTitle)
+                        ? "—"
+                        : item.PersonCategoryTitle;
                     var balance = item.BalanceDisplay ?? "\u2014";
                     var balanceStatus = item.AccountStatus ?? "";
                     var phone = !string.IsNullOrEmpty(item.Phone) && !string.IsNullOrEmpty(item.Mobile)
@@ -581,6 +612,10 @@ namespace Taadol.Views
             {
                 System.Diagnostics.Debug.WriteLine($"[PersonListView] Show details error: {ex}");
                 ToastManager.Error("خطا در نمایش جزئیات");
+            }
+            finally
+            {
+                _isUpdatingPanels = false;
             }
         }
 
@@ -879,6 +914,7 @@ namespace Taadol.Views
         public string EconomicId { get; set; }
         public string AccountStatus { get; set; }
         public string PersonType { get; set; }
+        public string PersonCategoryTitle { get; set; }
         public bool IsEmpty { get; set; }
         public string LastTransaction { get; set; } = "\u2014";
         public bool IsLegal { get; set; }

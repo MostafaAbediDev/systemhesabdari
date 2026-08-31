@@ -50,6 +50,7 @@ namespace Taadol.Views
         private CancellationTokenSource _loadCts = new();
         private CancellationTokenSource _saveCts = new();
         private CancellationTokenSource _cityLoadCts = new();
+        private CancellationTokenSource _jobTitleLoadCts = new();
 
         // ===== Services (از DI رزولو می‌شوند) =====
         private readonly IPersonApplication _personApplication;
@@ -181,8 +182,9 @@ namespace Taadol.Views
                 CategorySearch.PersonTypeId = personTypeId;
 
             var token = _loadCts?.Token ?? CancellationToken.None;
+            CancelAndDispose(ref _jobTitleLoadCts);
 
-            // لود همزمان: دستهبندی شخص + دپارتمان + عنوان شغلی
+            // دسته‌بندی شخص و دپارتمان بارگذاری می‌شوند؛ عنوان شغلی بعد از انتخاب دپارتمان لود می‌شود.
             var categoryTask = PersonFormHelper.LoadCategoryTreeAsync(
                 personTypeId, token,
                 ex => System.Diagnostics.Debug.WriteLine($"Categories load failed: {ex.Message}"),
@@ -190,12 +192,8 @@ namespace Taadol.Views
             );
             var deptTask = PersonFormHelper.LoadDepartmentsTreeAsync(token,
                 ex => System.Diagnostics.Debug.WriteLine($"Departments load failed: {ex.Message}"));
-            var jobTitleTask = PersonFormHelper.LoadJobTitlesTreeAsync(token,
-                ex => System.Diagnostics.Debug.WriteLine($"JobTitles load failed: {ex.Message}"));
-
             var tree = await categoryTask;
             var deptTree = await deptTask;
-            var jobTree = await jobTitleTask;
 
             if (tree != null)
             {
@@ -205,12 +203,14 @@ namespace Taadol.Views
             if (deptTree != null)
             {
                 CategorySearch2?.LoadFromTreeDto(deptTree);
-                CategorySearch2?.ClearSelection();
+                CategorySearch2?.ClearSelection(false);
             }
-            if (jobTree != null)
+            CategorySearch3?.ClearSelection(false);
+            if (CategorySearch3 != null)
             {
-                CategorySearch3?.LoadFromTreeDto(jobTree);
-                CategorySearch3?.ClearSelection();
+                CategorySearch3.DepartmentFilterName = null;
+                CategorySearch3.DepartmentId = 0;
+                CategorySearch3.IsEnabled = false;
             }
         }
         public decimal CreditLimit { get => _creditLimit; set { _creditLimit = value; OnPropertyChanged(); MarkUserChange(); } }
@@ -231,9 +231,9 @@ namespace Taadol.Views
                 _selectedProvinceId = value;
                 OnPropertyChanged();
                 MarkUserChange();
-                CancelAndDispose(ref _cityLoadCts);
-                _cityLoadCts = new CancellationTokenSource();
-                _ = LoadCitiesSafeAsync(value, _cityLoadCts.Token);
+            CancelAndDispose(ref _cityLoadCts);
+            _cityLoadCts = new CancellationTokenSource();
+            _ = LoadCitiesSafeAsync(value, _cityLoadCts.Token);
                 UpdateCityState();
             }
         }
@@ -317,7 +317,16 @@ namespace Taadol.Views
             if (CategorySearch2 != null)
                 CategorySearch2.SourceKind = Controls.CategorySearchControl.SearchSourceKind.Department;
             if (CategorySearch3 != null)
+            {
                 CategorySearch3.SourceKind = Controls.CategorySearchControl.SearchSourceKind.JobTitle;
+                CategorySearch3.IsEnabled = false;
+                CategorySearch3.SelectionCleared += OnJobTitleSelectionCleared;
+            }
+            if (CategorySearch2 != null)
+            {
+                CategorySearch2.CategorySelected += OnDepartmentSelected;
+                CategorySearch2.SelectionCleared += OnDepartmentSelectionCleared;
+            }
 
             // پیش‌فرض نوع قرارداد در تب پرسنل: رسمی
             if (ContractPermanent != null)
@@ -397,6 +406,62 @@ namespace Taadol.Views
             MarkUserChange();
         }
 
+        private async void OnDepartmentSelected(CategorySearchControl.CategoryItem department)
+        {
+            await LoadJobTitlesForDepartmentAsync(department?.Id ?? 0, department?.Title);
+        }
+
+        private async void OnDepartmentSelectionCleared()
+        {
+            await LoadJobTitlesForDepartmentAsync(0, null);
+        }
+
+        private void OnJobTitleSelectionCleared()
+        {
+            MarkUserChange();
+        }
+
+        private async Task LoadJobTitlesForDepartmentAsync(long departmentId, string departmentName)
+        {
+            CancelAndDispose(ref _jobTitleLoadCts);
+            _jobTitleLoadCts = new CancellationTokenSource();
+            var token = _jobTitleLoadCts.Token;
+
+            CategorySearch3?.ClearSelection(false);
+            if (CategorySearch3 == null) return;
+
+            CategorySearch3.DepartmentFilterName = departmentName;
+            CategorySearch3.DepartmentId = departmentId;
+            CategorySearch3.IsEnabled = false;
+
+            if (departmentId <= 0 || string.IsNullOrWhiteSpace(departmentName))
+                return;
+
+            try
+            {
+                var tree = await PersonFormHelper.LoadJobTitlesTreeAsync(
+                    token,
+                    ex => System.Diagnostics.Debug.WriteLine($"[NewPersonView] JobTitles load failed: {ex.Message}"),
+                    departmentName);
+
+                token.ThrowIfCancellationRequested();
+                if (CategorySearch2?.SelectedCategoryId != departmentId)
+                    return;
+
+                CategorySearch3.LoadFromTreeDto(tree ?? new List<PersonCategoryTreeViewModel>());
+                CategorySearch3.ClearSelection(false);
+                CategorySearch3.IsEnabled = true;
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[NewPersonView] Dependent job title load failed: {ex}");
+            }
+        }
+
         private static void CancelAndDispose(ref CancellationTokenSource cts)
         {
             var current = Interlocked.Exchange(ref cts, null);
@@ -411,6 +476,14 @@ namespace Taadol.Views
             CancelAndDispose(ref _loadCts);
             CancelAndDispose(ref _saveCts);
             CancelAndDispose(ref _cityLoadCts);
+            CancelAndDispose(ref _jobTitleLoadCts);
+            if (CategorySearch2 != null)
+            {
+                CategorySearch2.CategorySelected -= OnDepartmentSelected;
+                CategorySearch2.SelectionCleared -= OnDepartmentSelectionCleared;
+            }
+            if (CategorySearch3 != null)
+                CategorySearch3.SelectionCleared -= OnJobTitleSelectionCleared;
             _loadCts = new CancellationTokenSource();
             _saveCts = new CancellationTokenSource();
             _cityLoadCts = new CancellationTokenSource();
@@ -669,6 +742,15 @@ namespace Taadol.Views
 
             if (tb.IsChecked == true && tb.Tag != null && long.TryParse(tb.Tag.ToString(), out var id))
             {
+                // ✅ ابتدا دسته‌بندی قبلی پاک شود تا با PersonType جدید تداخل نکند
+                // نکته: این event هنگام InitializeComponent (به‌خاطر IsChecked="True" در XAML)
+                // قبل از مقداردهی CategorySearch هم فراخوانی می‌شود، پس باید null-safe باشد.
+                if (CategorySearch != null)
+                {
+                    CategorySearch.ClearSelection(false);
+                    CategorySearch.IsEnabled = true;
+                }
+
                 SelectedPersonTypeId = id;
                 UncheckOtherPersonTypeToggles(tb);
             }
@@ -693,7 +775,7 @@ namespace Taadol.Views
                 }
             }
 
-            // If no toggle is checked, re-check the last one
+            // ✅ اگر هیچ PersonType انتخاب نشده، CategorySearch غیرفعال و پاک شود
             if (!anyChecked)
             {
                 tb.IsChecked = true;

@@ -25,12 +25,18 @@ namespace Taadol.Controls
         private List<CategoryItem> _allCategories;
         private DispatcherTimer _searchTimer;
         private string _lastSearchText = "";
+        private int _visibleItemCount;
+        private string _visibleSearchText = "";
+        private bool _isLoadingNextPage;
+        private int _lazyRenderVersion;
+        private List<CategoryItem> _visibleSourceItems = new();
         private Dictionary<TreeViewItem, Border> _dotCache = new Dictionary<TreeViewItem, Border>();
         private CancellationTokenSource _operationCts = new();
         private int _operationVersion;
 
         // Events
         public event Action<CategoryItem> CategorySelected;
+        public event Action SelectionCleared;
         public event Action<CategoryItem> ItemAdded;
         public event Action<CategoryItem> ItemEdited;
         public event Action<CategoryItem> ItemDeleted;
@@ -61,6 +67,16 @@ namespace Taadol.Controls
             get => (SearchSourceKind)GetValue(SourceKindProperty);
             set => SetValue(SourceKindProperty, value);
         }
+
+        /// <summary>
+        /// نام دپارتمان انتخاب‌شده برای فیلتر عنوان‌های شغلی در سمت Frontend.
+        /// </summary>
+        public string DepartmentFilterName { get; set; }
+
+        /// <summary>
+        /// شناسه دپارتمان انتخاب‌شده برای ایجاد عنوان شغلی.
+        /// </summary>
+        public long DepartmentId { get; set; }
         private static readonly Color[] DotColors = new[]
         {
             Color.FromRgb(0x26, 0x67, 0xFF),
@@ -167,7 +183,7 @@ namespace Taadol.Controls
             System.Diagnostics.Debug.WriteLine($"✅ LoadFromTreeDto: built {_allCategories.Count} root(s), total children in tree = {totalChildren}, _allCategories first root children = {(_allCategories.Count > 0 && _allCategories[0].HasChildren ? _allCategories[0].Children.Count : 0)}");
 
             // در حالت SearchOnDemand درخت کامل ساخته نمی‌شود؛ فقط پیش‌نمایش محدود + جستجو.
-            BuildTree(SearchOnDemand ? BuildSearchOnDemandPreview() : _allCategories);
+            ResetLazyItems(SearchOnDemand ? BuildSearchOnDemandSource() : _allCategories);
         }
 
         /// <summary>
@@ -175,29 +191,135 @@ namespace Taadol.Controls
         /// فرزندانِ ریشه (دپارتمان‌ها/عناوین شغلی) به‌صورت سطح‌اول و با سقف MaxSearchResults
         /// نمایش داده می‌شوند تا UI فریز نشود ولی لیست خالی به نظر نرسد.
         /// </summary>
-        private List<CategoryItem> BuildSearchOnDemandPreview()
+        private List<CategoryItem> BuildSearchOnDemandSource()
         {
             var result = new List<CategoryItem>();
             if (_allCategories == null) return result;
 
             foreach (var root in _allCategories)
             {
-                if (root == null || result.Count >= MaxSearchResults) break;
-
+                if (root == null) continue;
                 if (root.HasChildren)
+                    result.AddRange(root.Children.Where(child => child != null));
+                else if (root.Id != 0 || !string.IsNullOrWhiteSpace(root.Title))
+                    result.Add(root);
+            }
+            return result;
+        }
+
+        private void ResetLazyItems(List<CategoryItem> source, string searchText = "")
+        {
+            _lazyRenderVersion++;
+            _isLoadingNextPage = false;
+            SetLazyLoadingVisualState(false);
+
+            _visibleSourceItems = source ?? new List<CategoryItem>();
+            _visibleSearchText = searchText ?? "";
+            _visibleItemCount = Math.Min(LazyPageSize, _visibleSourceItems.Count);
+            BuildLazyItems();
+        }
+
+        private void LoadNextLazyPage()
+        {
+            if (!SearchOnDemand || _isLoadingNextPage || _visibleItemCount >= _visibleSourceItems.Count)
+                return;
+
+            _isLoadingNextPage = true;
+            SetLazyLoadingVisualState(true);
+
+            var renderVersion = _lazyRenderVersion;
+            var startIndex = _visibleItemCount;
+            var endIndex = Math.Min(_visibleItemCount + LazyPageSize, _visibleSourceItems.Count);
+            _visibleItemCount = endIndex;
+
+            // صفحه‌ی جدید در batchهای کوچک اضافه می‌شود تا Render فرصت اجرای Shimmer داشته باشد.
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                AppendLazyItemsInBatches(startIndex, endIndex, renderVersion);
+            }), DispatcherPriority.ContextIdle);
+        }
+
+        private void AppendLazyItemsInBatches(int startIndex, int endIndex, int renderVersion)
+        {
+            if (renderVersion != _lazyRenderVersion)
+                return;
+
+            try
+            {
+                var batchEnd = Math.Min(startIndex + LazyBatchSize, endIndex);
+                var batch = _visibleSourceItems
+                    .Skip(startIndex)
+                    .Take(batchEnd - startIndex)
+                    .Select(item => CloneCategoryTree(item, 0, true))
+                    .ToList();
+
+                // فقط آیتم‌های جدید اضافه می‌شوند؛ آیتم‌های قبلی دوباره ساخته نمی‌شوند.
+                BuildTree(batch, null, clearRoot: false);
+
+                if (batchEnd < endIndex)
                 {
-                    foreach (var child in root.Children)
+                    Dispatcher.BeginInvoke(new Action(() =>
                     {
-                        if (result.Count >= MaxSearchResults) break;
-                        result.Add(CloneCategoryTree(child, 0, true));
-                    }
+                        AppendLazyItemsInBatches(batchEnd, endIndex, renderVersion);
+                    }), DispatcherPriority.Background);
                 }
                 else
                 {
-                    result.Add(CloneCategoryTree(root, 0, true));
+                    _isLoadingNextPage = false;
+                    SetLazyLoadingVisualState(false);
                 }
             }
-            return result;
+            catch
+            {
+                if (renderVersion == _lazyRenderVersion)
+                {
+                    _isLoadingNextPage = false;
+                    SetLazyLoadingVisualState(false);
+                }
+                throw;
+            }
+        }
+
+        private void SetLazyLoadingVisualState(bool isLoading)
+        {
+            if (LazyLoadingPanel == null || LazyLoadingHighlight == null) return;
+
+            if (isLoading)
+            {
+                LazyLoadingPanel.Visibility = Visibility.Visible;
+                LazyLoadingHighlightTransform.X = -LazyLoadingHighlight.Width;
+
+                var shimmer = new DoubleAnimation
+                {
+                    From = -LazyLoadingHighlight.Width,
+                    To = LazyLoadingPanel.ActualWidth > 0
+                        ? LazyLoadingPanel.ActualWidth
+                        : 900,
+                    Duration = TimeSpan.FromSeconds(0.9),
+                    RepeatBehavior = RepeatBehavior.Forever
+                };
+
+                LazyLoadingHighlightTransform.BeginAnimation(
+                    TranslateTransform.XProperty,
+                    shimmer,
+                    HandoffBehavior.SnapshotAndReplace);
+            }
+            else
+            {
+                LazyLoadingHighlightTransform.BeginAnimation(
+                    TranslateTransform.XProperty,
+                    null);
+                LazyLoadingPanel.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void BuildLazyItems()
+        {
+            var items = _visibleSourceItems
+                .Take(_visibleItemCount)
+                .Select(item => CloneCategoryTree(item, 0, true))
+                .ToList();
+            BuildTree(items);
         }
 
         private void AddChildrenRecursive(CategoryItem parent, List<PersonCategoryTreeViewModel> children, int level)
@@ -222,13 +344,13 @@ namespace Taadol.Controls
             }
         }
 
-        private void BuildTree(List<CategoryItem> items, TreeViewItem parent = null)
+        private void BuildTree(List<CategoryItem> items, TreeViewItem parent = null, bool clearRoot = true)
         {
             // ★ جلوگیری از NullReferenceException
             if (items == null) return;
             if (CategoryTree == null) return;
 
-            if (parent == null)
+            if (parent == null && clearRoot)
             {
                 CategoryTree.Items.Clear();
                 _dotCache.Clear();
@@ -428,7 +550,7 @@ namespace Taadol.Controls
             SearchBox.Text = "";
 
             // در حالت SearchOnDemand فقط پیش‌نمایش محدود رندر می‌شود تا ۵۰۰+ آیتم یکجا ساخته نشوند.
-            BuildTree(SearchOnDemand ? BuildSearchOnDemandPreview() : _allCategories);
+            ResetLazyItems(SearchOnDemand ? BuildSearchOnDemandSource() : _allCategories);
         }
 
         private void ClosePopup()
@@ -570,19 +692,26 @@ namespace Taadol.Controls
                 "افزودن",
                 "انصراف",
                 Window.GetWindow(this));
-            if (string.IsNullOrWhiteSpace(title)) return;
-            title = title.Trim();
-            var token = BeginOperation(out var version);
+
+            if (string.IsNullOrWhiteSpace(title)) return;
+            title = title.Trim();            var token = BeginOperation(out var version);
+            // DependencyProperty به UI thread وابسته است؛ قبل از Task.Run کپی می‌کنیم.
+            var sourceKind = SourceKind;
+            var departmentId = DepartmentId;
             try
             {
                 var result = await Task.Run(() =>
                 {
                     token.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
-                    if (SourceKind == SearchSourceKind.JobTitle)
+
+                    if (sourceKind == SearchSourceKind.JobTitle)
                     {
+                        if (departmentId <= 0)
+                            return new OperationResult().Failed("ابتدا دپارتمان را انتخاب کنید.");
+
                         var app = scope.ServiceProvider.GetRequiredService<IJobTitleApplication>();
-                        return app.Create(new CreateJobTitle { Title = title });
+                        return app.Create(new CreateJobTitle { Title = title, DepartmentId = departmentId });
                     }
                     else
                     {
@@ -590,9 +719,11 @@ namespace Taadol.Controls
                         return app.Create(new CreateDepartment { Name = title });
                     }
                 }, token);
-                token.ThrowIfCancellationRequested();
+
+                token.ThrowIfCancellationRequested();
                 if (version != Volatile.Read(ref _operationVersion)) return;
-                if (result.IsSucceeded)
+
+                if (result.IsSucceeded)
                 {
                     await RefreshPayrollTreeAsync();
                     DataChanged?.Invoke();
@@ -609,12 +740,15 @@ namespace Taadol.Controls
                 ToastManager.Error("خطا در افزودن");
             }
         }
-        /// <summary>
+
+        /// <summary>
         /// رفرش درخت در حالت SearchOnDemand از سرویس Payroll مربوطه.
         /// </summary>
         public async Task RefreshPayrollTreeAsync()
-        {
-            var token = BeginOperation(out var version);
+        {            var token = BeginOperation(out var version);
+            // DependencyProperty به UI thread وابسته است؛ قبل از Task.Run کپی می‌کنیم.
+            var sourceKind = SourceKind;
+            var departmentFilterName = DepartmentFilterName;
             List<PersonCategoryTreeViewModel> tree;
             try
             {
@@ -622,11 +756,14 @@ namespace Taadol.Controls
                 {
                     token.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
-                    if (SourceKind == SearchSourceKind.JobTitle)
+
+                    if (sourceKind == SearchSourceKind.JobTitle)
                     {
                         var app = scope.ServiceProvider.GetRequiredService<IJobTitleApplication>();
-                        return PersonFormHelper.BuildJobTitleTree(
-                            app.GetJobTitles()?.Where(j => j.IsActive).ToList());
+                        var jobTitles = app.GetJobTitles()?.Where(j => j.IsActive).ToList();
+                        if (!string.IsNullOrWhiteSpace(departmentFilterName))
+                            jobTitles = jobTitles?.Where(j => j.DepartmentName == departmentFilterName).ToList();
+                        return PersonFormHelper.BuildJobTitleTree(jobTitles);
                     }
                     else
                     {
@@ -635,7 +772,8 @@ namespace Taadol.Controls
                             app.GetDepartments()?.Where(d => d.IsActive).ToList());
         }
                 }, token);
-                token.ThrowIfCancellationRequested();
+
+                token.ThrowIfCancellationRequested();
                 if (version != Volatile.Read(ref _operationVersion)) return;
             }
             catch (OperationCanceledException) when (token.IsCancellationRequested)
@@ -647,10 +785,13 @@ namespace Taadol.Controls
                 System.Diagnostics.Debug.WriteLine("RefreshPayrollTreeAsync failed: " + ex.Message);
                 return;
             }
-            if (tree == null) return;
-            LoadFromTreeDto(tree);
+
+            if (tree == null) return;
+
+            LoadFromTreeDto(tree);
         }
-        public async Task RefreshTreeAsync(long? expandToId = null)
+
+        public async Task RefreshTreeAsync(long? expandToId = null)
         {
             if (PersonTypeId <= 0) return;
 
@@ -732,6 +873,8 @@ namespace Taadol.Controls
 
         /// <summary>سقف تعداد نتایج در حالت SearchOnDemand.</summary>
         public const int MaxSearchResults = 60;
+        private const int LazyPageSize = 20;
+        private const int LazyBatchSize = 4;
 
         private void AnimatePopupOut(Action onComplete)
         {
@@ -791,19 +934,15 @@ namespace Taadol.Controls
             if (_lastSearchText == searchText) return;
             _lastSearchText = searchText;
 
-            if (string.IsNullOrEmpty(searchText))
+            if (SearchOnDemand)
             {
-                if (SearchOnDemand)
-                {
-                    // در حالت SearchOnDemand متن خالی → پیش‌نمایش اولیه را دوباره نشان بده
-                    // (نه درخت خالی)
-                    BuildTree(BuildSearchOnDemandPreview());
-                }
-                else
-                {
-                    BuildTree(_allCategories);
-                }
+                var source = string.IsNullOrEmpty(searchText)
+                    ? BuildSearchOnDemandSource()
+                    : FilterCategoriesCapped(BuildSearchOnDemandSource(), searchText, MaxSearchResults);
+                ResetLazyItems(source, searchText);
             }
+            else if (string.IsNullOrEmpty(searchText))
+                BuildTree(_allCategories);
             else
                 PerformSearch(searchText);
         }
@@ -896,6 +1035,7 @@ namespace Taadol.Controls
         {
             var clone = new CategoryItem
             {
+                Id = source.Id,
                 Title = source.Title,
                 IconPath = source.IconPath,
                 Level = level
@@ -946,6 +1086,9 @@ namespace Taadol.Controls
             if (newTitle == category.Title) return;
 
             var token = BeginOperation(out var version);
+            // DependencyProperty به UI thread وابسته است؛ قبل از Task.Run کپی می‌کنیم.
+            var sourceKind = SourceKind;
+            var departmentId = DepartmentId;
             try
             {
                 var result = await Task.Run(() =>
@@ -953,14 +1096,14 @@ namespace Taadol.Controls
                     token.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
 
-                    if (SourceKind == SearchSourceKind.Department)
+                    if (sourceKind == SearchSourceKind.Department)
                     {
                         var app = scope.ServiceProvider.GetRequiredService<IDepartmentApplication>();
                         var details = app.GetDetails(category.Id);
                         if (details == null) return new OperationResult().Failed("رکورد یافت نشد.");
                         return app.Edit(new EditDepartment { Id = category.Id, Name = newTitle, Description = details.Description });
                     }
-                    else if (SourceKind == SearchSourceKind.JobTitle)
+                    else if (sourceKind == SearchSourceKind.JobTitle)
                     {
                         var app = scope.ServiceProvider.GetRequiredService<IJobTitleApplication>();
                         var details = app.GetDetails(category.Id);
@@ -1021,6 +1164,9 @@ namespace Taadol.Controls
             if (!confirm) return;
 
             var token = BeginOperation(out var version);
+            // DependencyProperty به UI thread وابسته است؛ قبل از Task.Run کپی می‌کنیم.
+            var sourceKind = SourceKind;
+            var departmentId = DepartmentId;
             try
             {
                 var result = await Task.Run(() =>
@@ -1028,9 +1174,9 @@ namespace Taadol.Controls
                     token.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
 
-                    if (SourceKind == SearchSourceKind.Department)
+                    if (sourceKind == SearchSourceKind.Department)
                         return scope.ServiceProvider.GetRequiredService<IDepartmentApplication>().Remove(category.Id);
-                    else if (SourceKind == SearchSourceKind.JobTitle)
+                    else if (sourceKind == SearchSourceKind.JobTitle)
                         return scope.ServiceProvider.GetRequiredService<IJobTitleApplication>().Remove(category.Id);
                     else
                         return scope.ServiceProvider.GetRequiredService<IPersonCategoryApplication>().Remove(category.Id);
@@ -1091,6 +1237,9 @@ namespace Taadol.Controls
             title = title.Trim();
 
             var token = BeginOperation(out var version);
+            // DependencyProperty به UI thread وابسته است؛ قبل از Task.Run کپی می‌کنیم.
+            var sourceKind = SourceKind;
+            var departmentId = DepartmentId;
             try
             {
                 var result = await Task.Run(() =>
@@ -1098,10 +1247,16 @@ namespace Taadol.Controls
                     token.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
 
-                    if (SourceKind == SearchSourceKind.Department)
+                    if (sourceKind == SearchSourceKind.Department)
                         return scope.ServiceProvider.GetRequiredService<IDepartmentApplication>().Create(new CreateDepartment { Name = title });
-                    else if (SourceKind == SearchSourceKind.JobTitle)
-                        return scope.ServiceProvider.GetRequiredService<IJobTitleApplication>().Create(new CreateJobTitle { Title = title });
+                    else if (sourceKind == SearchSourceKind.JobTitle)
+                    {
+                        if (departmentId <= 0)
+                            return new OperationResult().Failed("ابتدا دپارتمان را انتخاب کنید.");
+
+                        return scope.ServiceProvider.GetRequiredService<IJobTitleApplication>().Create(
+                            new CreateJobTitle { Title = title, DepartmentId = departmentId });
+                    }
                     else
                     {
                         if (PersonTypeId <= 0) return new OperationResult().Failed("ابتدا نوع شخص را انتخاب کنید.");
@@ -1192,10 +1347,20 @@ namespace Taadol.Controls
             }
         }
 
+        private void CategoryScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            if (!SearchOnDemand || e.VerticalChange <= 0) return;
+            if (e.VerticalOffset + e.ViewportHeight >= e.ExtentHeight - 24)
+                LoadNextLazyPage();
+        }
+
         private void ScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
             var scrollViewer = sender as ScrollViewer;
             if (scrollViewer == null) return;
+
+            if (SearchOnDemand && e.Delta < 0 && scrollViewer.VerticalOffset + scrollViewer.ViewportHeight >= scrollViewer.ExtentHeight - 24)
+                LoadNextLazyPage();
 
             if (e.Delta > 0)
                 scrollViewer.LineUp();
@@ -1283,13 +1448,19 @@ namespace Taadol.Controls
             BuildTree(_allCategories);
         }
 
-        public void ClearSelection()
+        public void ClearSelection(bool notify = true)
         {
             SelectedText.Text = "یک دسته جستجو کنید...";
             SelectedText.Foreground = new SolidColorBrush(
                 (Color)ColorConverter.ConvertFromString("#737791"));
             _selectedCategoryId = null;
+            if (notify)
+                SelectionCleared?.Invoke();
         }
+
+        public string SelectedCategoryTitle => _selectedCategoryId.HasValue
+            ? SelectedText.Text
+            : null;
 
         // ==================== Helper Methods ====================
 

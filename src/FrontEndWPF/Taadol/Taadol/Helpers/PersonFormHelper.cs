@@ -210,11 +210,7 @@ namespace Taadol.Helpers
                 }
                 return items;
             }
-            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-            {
-                return new();
-            }
-            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            catch (OperationCanceledException)
             {
                 return new();
             }
@@ -307,12 +303,9 @@ namespace Taadol.Helpers
                         bankBranches.Add(b);
                 });
             }
-            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            catch (OperationCanceledException)
             {
-                return;
-            }
-            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-            {
+                // لغو شده — بدون خطا
                 return;
             }
             catch (Exception ex)
@@ -412,7 +405,8 @@ namespace Taadol.Helpers
         /// </summary>
         public static async Task<List<PersonCategoryTreeViewModel>> LoadJobTitlesTreeAsync(
             CancellationToken cancellationToken,
-            Action<Exception> onError)
+            Action<Exception> onError,
+            string departmentName = null)
         {
             try
             {
@@ -422,7 +416,10 @@ namespace Taadol.Helpers
                     cancellationToken.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
                     var app = scope.ServiceProvider.GetRequiredService<PayrollSystemManagement.Application.Contracts.JobTitle.IJobTitleApplication>();
-                    return app.GetJobTitles()?.Where(j => j.IsActive).ToList();
+                    var jobTitles = app.GetJobTitles()?.Where(j => j.IsActive).ToList();
+                    if (!string.IsNullOrWhiteSpace(departmentName))
+                        jobTitles = jobTitles?.Where(j => j.DepartmentName == departmentName).ToList();
+                    return jobTitles;
                 }, cancellationToken).ConfigureAwait(false);
 
                 cancellationToken.ThrowIfCancellationRequested();

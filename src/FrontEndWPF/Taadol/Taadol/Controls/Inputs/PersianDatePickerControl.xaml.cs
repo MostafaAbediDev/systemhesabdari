@@ -16,6 +16,8 @@ namespace Taadol.Controls
         private int _displayedYear;
         private int _displayedMonth;
         private bool _isInternalChange = false;
+        private enum CalendarView { Days, Months, Years }
+        private CalendarView _currentView = CalendarView.Days;
 
         // اسامی ماه‌های شمسی
         private static readonly string[] MonthNames = {
@@ -419,7 +421,7 @@ namespace Taadol.Controls
                 InitializeCurrentDate();
             }
 
-            RenderCalendar();
+            ShowDaysView();
             CalendarPopup.IsOpen = true;
         }
 
@@ -499,30 +501,62 @@ namespace Taadol.Controls
 
         private void CalendarPrevButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_displayedMonth == 1)
+            switch (_currentView)
             {
-                _displayedMonth = 12;
-                _displayedYear--;
+                case CalendarView.Days:
+                    if (_displayedMonth == 1)
+                    {
+                        _displayedMonth = 12;
+                        _displayedYear--;
+                    }
+                    else
+                    {
+                        _displayedMonth--;
+                    }
+                    RenderCalendar();
+                    CalendarMonthLabel.Text = $"{MonthNames[_displayedMonth - 1]} {_displayedYear}";
+                    break;
+                case CalendarView.Months:
+                    _displayedYear--;
+                    CalendarMonthLabel.Text = _displayedYear.ToString();
+                    RenderMonths();
+                    break;
+                case CalendarView.Years:
+                    _displayedYear -= 12;
+                    CalendarMonthLabel.Text = $"{_displayedYear - 5} - {_displayedYear + 6}";
+                    RenderYears();
+                    break;
             }
-            else
-            {
-                _displayedMonth--;
-            }
-            RenderCalendar();
         }
 
         private void CalendarNextButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_displayedMonth == 12)
+            switch (_currentView)
             {
-                _displayedMonth = 1;
-                _displayedYear++;
+                case CalendarView.Days:
+                    if (_displayedMonth == 12)
+                    {
+                        _displayedMonth = 1;
+                        _displayedYear++;
+                    }
+                    else
+                    {
+                        _displayedMonth++;
+                    }
+                    RenderCalendar();
+                    CalendarMonthLabel.Text = $"{MonthNames[_displayedMonth - 1]} {_displayedYear}";
+                    break;
+                case CalendarView.Months:
+                    _displayedYear++;
+                    CalendarMonthLabel.Text = _displayedYear.ToString();
+                    RenderMonths();
+                    break;
+                case CalendarView.Years:
+                    _displayedYear += 12;
+                    CalendarMonthLabel.Text = $"{_displayedYear - 5} - {_displayedYear + 6}";
+                    RenderYears();
+                    break;
             }
-            else
-            {
-                _displayedMonth++;
-            }
-            RenderCalendar();
         }
 
         private void TodayButton_Click(object sender, RoutedEventArgs e)
@@ -548,6 +582,193 @@ namespace Taadol.Controls
 
         private void CalendarLabel_Click(object sender, MouseButtonEventArgs e)
         {
+            switch (_currentView)
+            {
+                case CalendarView.Days:
+                    // نمایش لیست ماه‌ها
+                    _currentView = CalendarView.Months;
+                    CalendarDaysGrid.Visibility = Visibility.Collapsed;
+                    CalendarWeekdayRow.Visibility = Visibility.Collapsed;
+                    CalendarMonthsGrid.Visibility = Visibility.Visible;
+                    CalendarYearsGrid.Visibility = Visibility.Collapsed;
+                    CalendarMonthLabel.Text = _displayedYear.ToString();
+                    RenderMonths();
+                    break;
+                case CalendarView.Months:
+                    // نمایش لیست سال‌ها
+                    _currentView = CalendarView.Years;
+                    CalendarDaysGrid.Visibility = Visibility.Collapsed;
+                    CalendarWeekdayRow.Visibility = Visibility.Collapsed;
+                    CalendarMonthsGrid.Visibility = Visibility.Collapsed;
+                    CalendarYearsGrid.Visibility = Visibility.Visible;
+                    CalendarMonthLabel.Text = $"{_displayedYear - 5} - {_displayedYear + 6}";
+                    RenderYears();
+                    break;
+                case CalendarView.Years:
+                    // برگشت به نمایش روزها
+                    ShowDaysView();
+                    break;
+            }
+        }
+
+        private void ShowDaysView()
+        {
+            _currentView = CalendarView.Days;
+            CalendarDaysGrid.Visibility = Visibility.Visible;
+            CalendarWeekdayRow.Visibility = Visibility.Visible;
+            CalendarMonthsGrid.Visibility = Visibility.Collapsed;
+            CalendarYearsGrid.Visibility = Visibility.Collapsed;
+            CalendarMonthLabel.Text = $"{MonthNames[_displayedMonth - 1]} {_displayedYear}";
+            RenderCalendar();
+        }
+
+        private void RenderMonths()
+        {
+            CalendarMonthsGrid.Children.Clear();
+            for (int m = 1; m <= 12; m++)
+            {
+                bool isSelected = m == _displayedMonth;
+                var monthBtn = new Button
+                {
+                    Content = MonthNames[m - 1],
+                    Tag = m,
+                    Height = 36,
+                    Margin = new Thickness(2),
+                    Cursor = Cursors.Hand,
+                    FontFamily = (System.Windows.Media.FontFamily)FindResource("IRANSans"),
+                    FontSize = 12,
+                    Foreground = isSelected
+                        ? System.Windows.Media.Brushes.White
+                        : new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#404040")),
+                    Background = isSelected
+                        ? new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#2667FF"))
+                        : System.Windows.Media.Brushes.Transparent,
+                    BorderThickness = new Thickness(0),
+                    // ✅ Concentric radius: دکمه‌های داخل popup با radius 6 هماهنگ با popup radius 8
+                    Template = CreateMonthYearButtonTemplate()
+                };
+
+                monthBtn.Click += MonthButton_Click;
+                monthBtn.MouseEnter += CalendarButton_MouseEnter;
+                monthBtn.MouseLeave += CalendarButton_MouseLeave;
+                CalendarMonthsGrid.Children.Add(monthBtn);
+            }
+        }
+
+        private void MonthButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is int month)
+            {
+                _displayedMonth = month;
+                ShowDaysView();
+            }
+        }
+
+        private void RenderYears()
+        {
+            CalendarYearsGrid.Children.Clear();
+            // 12 سال نمایش داده می‌شود (3×4) تا ردیف آخر کامل باشد
+            for (int y = _displayedYear - 5; y <= _displayedYear + 6; y++)
+            {
+                bool isSelected = y == _displayedYear;
+                var yearBtn = new Button
+                {
+                    Content = y.ToString(),
+                    Tag = y,
+                    Height = 36,
+                    Margin = new Thickness(2),
+                    Cursor = Cursors.Hand,
+                    FontFamily = (System.Windows.Media.FontFamily)FindResource("IRANSans"),
+                    FontSize = 12,
+                    Foreground = isSelected
+                        ? System.Windows.Media.Brushes.White
+                        : new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#404040")),
+                    Background = isSelected
+                        ? new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#2667FF"))
+                        : System.Windows.Media.Brushes.Transparent,
+                    BorderThickness = new Thickness(0),
+                    Template = CreateMonthYearButtonTemplate()
+                };
+
+                yearBtn.Click += YearButton_Click;
+                yearBtn.MouseEnter += CalendarButton_MouseEnter;
+                yearBtn.MouseLeave += CalendarButton_MouseLeave;
+                CalendarYearsGrid.Children.Add(yearBtn);
+            }
+        }
+
+        private void YearButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is int year)
+            {
+                _displayedYear = year;
+                _currentView = CalendarView.Months;
+                CalendarDaysGrid.Visibility = Visibility.Collapsed;
+                CalendarWeekdayRow.Visibility = Visibility.Collapsed;
+                CalendarMonthsGrid.Visibility = Visibility.Visible;
+                CalendarYearsGrid.Visibility = Visibility.Collapsed;
+                CalendarMonthLabel.Text = _displayedYear.ToString();
+                RenderMonths();
+            }
+        }
+
+        // ===== Hover Effects =====
+        private readonly System.Windows.Media.Color _hoverColor =
+            (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#F0F4FF");
+        private readonly System.Windows.Media.Color _selectedColor =
+            (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#2667FF");
+
+        /// <summary>
+        /// ✅ Template یکسان برای دکمه‌های ماه و سال با CornerRadius=6
+        /// </summary>
+        private ControlTemplate CreateMonthYearButtonTemplate()
+        {
+            string xaml = @"
+                <ControlTemplate xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation""
+                                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml""
+                                TargetType=""Button"">
+                    <Border x:Name=""bd""
+                            Background=""{TemplateBinding Background}""
+                            CornerRadius=""6""
+                            Padding=""8,6,8,6"">
+                        <ContentPresenter HorizontalAlignment=""Center""
+                                          VerticalAlignment=""Center""/>
+                    </Border>
+                </ControlTemplate>";
+            return (ControlTemplate)System.Windows.Markup.XamlReader.Parse(xaml);
+        }
+
+        private void CalendarButton_MouseEnter(object sender, MouseEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is int)
+            {
+                bool isSelected = IsButtonSelected(btn);
+                if (!isSelected)
+                {
+                    btn.Background = new SolidColorBrush(_hoverColor);
+                }
+            }
+        }
+
+        private void CalendarButton_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is int)
+            {
+                bool isSelected = IsButtonSelected(btn);
+                if (!isSelected)
+                {
+                    btn.Background = System.Windows.Media.Brushes.Transparent;
+                }
+            }
+        }
+
+        private bool IsButtonSelected(Button btn)
+        {
+            if (_currentView == CalendarView.Months && btn.Tag is int m)
+                return m == _displayedMonth;
+            if (_currentView == CalendarView.Years && btn.Tag is int y)
+                return y == _displayedYear;
+            return false;
         }
 
         #endregion
