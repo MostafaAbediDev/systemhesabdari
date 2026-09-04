@@ -309,6 +309,11 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <ProjectReference Include="..\..\..\..\BankManagement.Configuration\BankManagement.Configuration.csproj" />
+    <ProjectReference Include="..\..\..\..\FinancialManagement.Application.Contracts\FinancialManagement.Application.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\..\FinancialManagement.Configuration\FinancialManagement.Configuration.csproj" />
+    <ProjectReference Include="..\..\..\..\FinancialManagement.Application\FinancialManagement.Application.csproj" />
+    <ProjectReference Include="..\..\..\..\BankManagement.Application\BankManagement.Application.csproj" />
+    <ProjectReference Include="..\..\..\..\BankManagement.Application.Contracts\BankManagement.Application.Contracts.csproj" />
     <ProjectReference Include="..\..\..\..\CodeManagement.Configuration\CodeManagement.Configuration.csproj" />
     <ProjectReference Include="..\..\..\..\GeneralInfoManagement.Application.Contract\GeneralInfoManagement.Application.Contract.csproj" />
     <ProjectReference Include="..\..\..\..\GeneralInfoManagement.Application\GeneralInfoManagement.Application.csproj" />

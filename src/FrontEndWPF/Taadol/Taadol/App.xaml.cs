@@ -2,6 +2,7 @@
 using CodeManagement.Application;
 using CodeManagement.Application.Contracts.Code;
 using CodeManagement.Configuration;
+using FinancialManagement.Configuration;
 using GeneralInfoManagement.Configuration;
 using GeneralInfoManagement.Domain.General.CityAgg;
 using GeneralInfoManagement.Domain.General.ProvinceAgg;
@@ -81,6 +82,9 @@ namespace Taadol
 
                 LogStep("Configuring PayrollSystemManagementBoostrapper...");
                 PayrollSystemManagementBoostrapper.Configure(services, connectionString);
+
+                LogStep("Configuring FinancialManagementBoostrapper...");
+                FinancialManagementBoostrapper.Configure(services, connectionString);
 
                 LogStep("Registering Person repositories...");
                 services.AddTransient<IPersonRepository, PersonRepository>();

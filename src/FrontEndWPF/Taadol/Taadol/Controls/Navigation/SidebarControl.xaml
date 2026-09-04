@@ -761,9 +761,14 @@
                                                 Click="SubMenuClick"
                                                 Style="{StaticResource SubmenuItem}" />
 
-                                        <Button Content="صندوق"
+                                        <Button Content="بانک جدید"
+                                                Tag="bank_new"
                                                 Click="SubMenuClick"
-                                                Tag="bank_cash"
+                                                Style="{StaticResource SubmenuItem}" />
+
+                                        <Button Content="صندوق جدید"
+                                                Click="SubMenuClick"
+                                                Tag="fund_new"
                                                 Style="{StaticResource SubmenuItem}" />
 
                                         <Border Height="6" />

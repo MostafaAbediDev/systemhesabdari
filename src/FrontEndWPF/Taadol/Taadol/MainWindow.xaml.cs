@@ -8,6 +8,8 @@ using Taadol.Controls;
 using Taadol.Helpers;
 using Taadol.Services;
 using Taadol.Views;
+using Taadol.Views.Fund;
+using Taadol.Views.Bank;
 
 namespace Taadol
 {
@@ -44,6 +46,8 @@ namespace Taadol
 
             _factory.Register(NavKeys.FinancialPeriod, () => new FinancialPeriodListView());
             _factory.Register(NavKeys.FinancialPeriodNew, () => new NewFinancialPeriodView());
+            _factory.Register(NavKeys.FundNew, () => new NewFundView());
+            _factory.Register(NavKeys.BankNew, () => new NewBankView());
 
             _nav = new NavigationService(MainContent, _factory);
 
