@@ -2,9 +2,11 @@
 using GeneralInfoManagement.Application;
 using GeneralInfoManagement.Application.Contract.BranchArchice;
 using GeneralInfoManagement.Application.Contract.Branches;
+using GeneralInfoManagement.Application.Contract.City;
 using GeneralInfoManagement.Application.Contract.Company;
 using GeneralInfoManagement.Application.Contract.FinancialPeriod;
 using GeneralInfoManagement.Application.Contract.Picture;
+using GeneralInfoManagement.Application.Contract.Province;
 using GeneralInfoManagement.Domain.BaseInfo.BranchArchiveAgg;
 using GeneralInfoManagement.Domain.BaseInfo.BranchesAgg;
 using GeneralInfoManagement.Domain.BaseInfo.CompaniesAgg;
@@ -35,6 +37,9 @@ namespace GeneralInfoManagement.Configuration
 
             services.AddTransient<IPictureRepository, PictureRepository>();
             services.AddTransient<IPictureApplication, PictureApplication>();
+
+            services.AddTransient<ICityApplication, CityApplication>();
+            services.AddTransient<IProvinceApplication, ProvinceApplication>();
 
             //Add DB Context For Real Data
             services.AddDbContext<GeneralInfoSystemContext>(x => x.UseSqlServer(connectionString));

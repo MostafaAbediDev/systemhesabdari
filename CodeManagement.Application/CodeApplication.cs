@@ -74,7 +74,9 @@ namespace CodeManagement.Application
             };
         }
 
-        public OperationResult RemoveByOwner(long ownerId, CodeOwnerTypeDTO ownerType)
+        public OperationResult RemoveByOwner(
+            long ownerId,
+            CodeOwnerTypeDTO ownerType)
         {
             var operation = new OperationResult();
 
@@ -86,8 +88,6 @@ namespace CodeManagement.Application
                 return operation.Succedded();
 
             code.Remove();
-
-            _codeRepository.SaveChanges();
 
             return operation.Succedded();
         }
@@ -121,25 +121,39 @@ namespace CodeManagement.Application
             if (string.IsNullOrWhiteSpace(finalValue))
                 return operation.Failed("خطا در تولید یا دریافت کد.");
 
-            var existingCode = _codeRepository.GetByOwner(command.OwnerId, (CodeOwnerType)command.OwnerType);
+            var existingCode = _codeRepository.GetByOwner(
+                command.OwnerId,
+                (CodeOwnerType)command.OwnerType);
 
             if (existingCode == null)
             {
                 if (_codeRepository.Exists(x => x.Value == finalValue))
                     return operation.Failed("کد تولید شده یا وارد شده تکراری است.");
 
-                var newCode = new Codes(finalValue, command.OwnerId, (CodeOwnerType)command.OwnerType, command.IsAutomatic);
+                var newCode = new Codes(
+                    finalValue,
+                    command.OwnerId,
+                    (CodeOwnerType)command.OwnerType,
+                    command.IsAutomatic);
+
                 _codeRepository.Create(newCode);
             }
             else
             {
-                if (_codeRepository.Exists(x => x.Value == finalValue && x.Id != existingCode.Id))
-                    return operation.Failed("کد جدید با رکورد دیگری تکراری است.");
+                if (_codeRepository.Exists(
+                        x => x.Value == finalValue &&
+                             x.Id != existingCode.Id))
+                {
+                    return operation.Failed(
+                        "کد جدید با رکورد دیگری تکراری است.");
+                }
 
-                existingCode.Edit(finalValue, command.OwnerId, (CodeOwnerType)command.OwnerType, command.IsAutomatic);
+                existingCode.Edit(
+                    finalValue,
+                    command.OwnerId,
+                    (CodeOwnerType)command.OwnerType,
+                    command.IsAutomatic);
             }
-
-            //_codeRepository.SaveChanges();
 
             return operation.Succedded();
         }
