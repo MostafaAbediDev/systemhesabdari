@@ -8,7 +8,7 @@
              Background="Transparent"
              Loaded="View_Loaded"
              Unloaded="View_Unloaded">
-    <Border Background="White" CornerRadius="4">
+    <Border Background="White" CornerRadius="4" ClipToBounds="False">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -34,6 +34,8 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -42,25 +44,77 @@
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Grid.Row="0" Grid.Column="0">
-                            <TextBlock Text="عنوان صندوق" Style="{StaticResource FormLabel}" />
-                            <controls:ModernPersianTextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" Placeholder="صندوق اصلی" />
-                        </StackPanel>
-                        <StackPanel Grid.Row="0" Grid.Column="2">
                             <TextBlock Text="شعبه (کسب و کار)" Style="{StaticResource FormLabel}" />
-                            <ComboBox Style="{StaticResource SearchableComboBox}" Tag="انتخاب شعبه" ItemsSource="{Binding Branches}" DisplayMemberPath="Title" SelectedValuePath="Id" SelectedValue="{Binding SelectedBranchId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ItemContainerStyle="{StaticResource SearchableComboBoxItem}" />
+                            <ComboBox Style="{StaticResource SearchableComboBox}"
+                                      Tag="انتخاب شعبه"
+                                      ItemsSource="{Binding Branches}"
+                                      DisplayMemberPath="Title"
+                                      SelectedValuePath="Id"
+                                      SelectedValue="{Binding SelectedBranchId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      ItemContainerStyle="{StaticResource SearchableComboBoxItem}" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="0" Grid.Column="2">
+                            <TextBlock Text="عنوان صندوق" Style="{StaticResource FormLabel}" />
+                            <controls:ModernPersianTextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"
+                                                           Placeholder="صندوق اصلی" />
                         </StackPanel>
 
                         <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,16,0,0">
-                            <TextBlock Text="حساب صندوق" Style="{StaticResource FormLabel}" />
-                            <ComboBox Style="{StaticResource SearchableComboBox}" Tag="انتخاب حساب" ItemsSource="{Binding Accounts}" DisplayMemberPath="Title" SelectedValuePath="Id" SelectedValue="{Binding SelectedAccountId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ItemContainerStyle="{StaticResource SearchableComboBoxItem}" />
+                            <TextBlock Text="بانک" Style="{StaticResource FormLabel}" />
+                            <ComboBox Style="{StaticResource SearchableComboBox}"
+                                      Tag="انتخاب بانک"
+                                      ItemsSource="{Binding Banks}"
+                                      DisplayMemberPath="Title"
+                                      SelectedValuePath="Id"
+                                      SelectedValue="{Binding SelectedBankId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      ItemContainerStyle="{StaticResource SearchableComboBoxItem}" />
                         </StackPanel>
+
                         <StackPanel Grid.Row="1" Grid.Column="2" Margin="0,16,0,0">
-                            <TextBlock Text="راهنما" Style="{StaticResource FormLabel}" />
-                            <TextBlock Text="اطلاعات کارت و حساب بانکی پس از آماده‌شدن Contract مربوطه اضافه خواهد شد."
-                                       Foreground="#737791"
-                                       FontSize="12"
+                            <TextBlock Text="تاریخ ثبت حساب" Style="{StaticResource FormLabel}" />
+                            <controls:PersianDatePickerControl SelectedDate="{Binding AccountRegistrationDate, Mode=TwoWay}" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="2" Grid.Column="0" Margin="0,16,0,0">
+                            <TextBlock Text="شماره حساب" Style="{StaticResource FormLabel}" />
+                            <controls:ModernPersianTextBox Text="{Binding AccountNumber, UpdateSourceTrigger=PropertyChanged}"
+                                                           InputType="Number"
+                                                           FlowDirection="LeftToRight"
+                                                           Placeholder="۴۵۶" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="2" Grid.Column="2" Margin="0,16,0,0">
+                            <TextBlock Text="شماره شبا" Style="{StaticResource FormLabel}" />
+                            <controls:ModernPersianTextBox Text="{Binding Shaba, UpdateSourceTrigger=PropertyChanged}"
+                                                           FlowDirection="LeftToRight"
+                                                           Placeholder="IR" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="3" Grid.Column="0" Margin="0,16,0,0">
+                            <TextBlock Text="شماره کارت" Style="{StaticResource FormLabel}" />
+                            <controls:ModernPersianTextBox Text="{Binding CardNumber, UpdateSourceTrigger=PropertyChanged}"
+                                                           InputType="Number"
+                                                           MaxLength="16"
+                                                           FlowDirection="LeftToRight"
+                                                           Placeholder="**** **** **** ****" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="3" Grid.Column="2" Margin="0,16,0,0">
+                            <TextBlock Text="حساب صندوق" Style="{StaticResource FormLabel}" />
+                            <ComboBox Style="{StaticResource SearchableComboBox}"
+                                      Tag="انتخاب حساب"
+                                      ItemsSource="{Binding Accounts}"
+                                      DisplayMemberPath="Title"
+                                      SelectedValuePath="Id"
+                                      SelectedValue="{Binding SelectedAccountId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      IsEnabled="{Binding IsAccountServiceAvailable}"
+                                      ItemContainerStyle="{StaticResource SearchableComboBoxItem}" />
+                            <TextBlock Text="{Binding AccountServiceHint}"
+                                       Foreground="#B45309"
+                                       FontSize="11"
                                        TextWrapping="Wrap"
-                                       Margin="0,5,0,0" />
+                                       Margin="4,4,0,0" />
                         </StackPanel>
                     </Grid>
                 </Border>
@@ -73,8 +127,19 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width=".3*" />
                     </Grid.ColumnDefinitions>
-                    <controls:IconButton Grid.Column="0" ButtonText="ثبت صندوق" IconSource="/Assets/Icons/save.svg" ButtonCommand="{Binding SaveCommand}" ButtonBackground="#2667FF" CornerRadius="4" />
-                    <Button Grid.Column="1" Background="Transparent" BorderThickness="0" Cursor="Hand" HorizontalAlignment="Right" Margin="0,0,20,0" Click="Cancel_Click">
+                    <controls:IconButton Grid.Column="0"
+                                         ButtonText="ثبت"
+                                         IconSource="/Assets/Icons/save.svg"
+                                         ButtonCommand="{Binding SaveCommand}"
+                                         ButtonBackground="#2667FF"
+                                         CornerRadius="4" />
+                    <Button Grid.Column="1"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Cursor="Hand"
+                            HorizontalAlignment="Right"
+                            Margin="0,0,20,0"
+                            Command="{Binding CancelCommand}">
                         <StackPanel Orientation="Horizontal">
                             <svg:SvgViewbox Source="/Assets/Icons/redo.svg" Width="14" Height="14" FlowDirection="LeftToRight" Margin="6,0,15,0" />
                             <TextBlock Text="انصراف" FontSize="14" Foreground="#2667FF" VerticalAlignment="Center" />

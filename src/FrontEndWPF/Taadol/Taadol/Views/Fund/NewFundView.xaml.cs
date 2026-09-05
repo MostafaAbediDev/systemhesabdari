@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Taadol.Helpers;
 using Taadol.ViewModels;
 
 namespace Taadol.Views.Fund
@@ -29,7 +30,8 @@ namespace Taadol.Views.Fund
 
         private void OnSaved()
         {
-            // فرم برای ثبت رکورد بعدی باز می‌ماند؛ مشابه فرم‌های ثبت فعلی پروژه.
+            // پس از ثبت موفق، با بازسازی لیست، رکورد جدید فوراً نمایش داده می‌شود.
+            (Window.GetWindow(this) as MainWindow)?.NavigateTo(NavKeys.FundList);
         }
 
         private void HeaderClose_Click(object sender, MouseButtonEventArgs e) => CloseForm();

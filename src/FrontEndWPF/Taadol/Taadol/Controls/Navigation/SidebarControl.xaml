@@ -756,13 +756,18 @@
                                         <Border Style="{StaticResource SubmenuDivider}"
                                                 Margin="0,15,0,0" />
 
-                                        <Button Content="لیست حساب‌ها"
+                                        <Button Content="لیست بانک‌ها"
                                                 Tag="bank_list"
                                                 Click="SubMenuClick"
                                                 Style="{StaticResource SubmenuItem}" />
 
                                         <Button Content="بانک جدید"
                                                 Tag="bank_new"
+                                                Click="SubMenuClick"
+                                                Style="{StaticResource SubmenuItem}" />
+
+                                        <Button Content="لیست صندوق‌ها"
+                                                Tag="fund_list"
                                                 Click="SubMenuClick"
                                                 Style="{StaticResource SubmenuItem}" />
 

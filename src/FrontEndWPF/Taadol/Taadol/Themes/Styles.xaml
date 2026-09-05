@@ -1448,9 +1448,25 @@
                 <ControlTemplate TargetType="ToggleButton">
                     <StackPanel Orientation="Horizontal"
                                 VerticalAlignment="Center">
+                        <Border x:Name="CheckBoxBorder"
+                                Width="20"
+                                Height="20"
+                                CornerRadius="4"
+                                Background="White"
+                                BorderBrush="#E5E7EB"
+                                BorderThickness="1"
+                                Margin="0,0,10,0">
+                            <svg:SvgViewbox x:Name="CheckMark"
+                                            Width="8"
+                                            Height="8"
+                                            Source="/Assets/Icons/CHECK_w.svg"
+                                            FlowDirection="LeftToRight"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Visibility="Collapsed" />
+                        </Border>
                         <ContentPresenter Content="{TemplateBinding Content}"
-                                          VerticalAlignment="Center"
-                                          Margin="0,0,10,0">
+                                          VerticalAlignment="Center">
                             <ContentPresenter.Resources>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="FontSize"
@@ -1464,22 +1480,6 @@
                                 </Style>
                             </ContentPresenter.Resources>
                         </ContentPresenter>
-                        <Border x:Name="CheckBoxBorder"
-                                Width="20"
-                                Height="20"
-                                CornerRadius="4"
-                                Background="White"
-                                BorderBrush="#E5E7EB"
-                                BorderThickness="1">
-                            <svg:SvgViewbox x:Name="CheckMark"
-                                            Width="8"
-                                            Height="8"
-                                            Source="/Assets/Icons/CHECK_w.svg"
-                                            FlowDirection="LeftToRight"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Visibility="Collapsed" />
-                        </Border>
                     </StackPanel>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsChecked" Value="True">

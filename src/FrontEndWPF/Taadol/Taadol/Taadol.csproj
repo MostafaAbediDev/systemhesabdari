@@ -19,6 +19,7 @@
     <None Remove="Assets\Icons\arrowDowN.svg" />
     <None Remove="Assets\Icons\ArrowLeft.svg" />
     <None Remove="Assets\Icons\ArrowUP.svg" />
+    <None Remove="Assets\Icons\bank.svg" />
     <None Remove="Assets\Icons\Black.svg" />
     <None Remove="Assets\Icons\box-add.svg" />
     <None Remove="Assets\Icons\briefcase.svg" />
@@ -131,6 +132,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Icons\ArrowUP.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Icons\bank.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Icons\Black.svg">

@@ -1,0 +1,168 @@
+<UserControl x:Class="Taadol.Views.Fund.FundListView"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:svg="http://sharpvectors.codeplex.com/svgc/"
+              xmlns:controls="clr-namespace:Taadol.Controls"
+              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+              mc:Ignorable="d"
+              FlowDirection="RightToLeft"
+              Loaded="UserControl_Loaded"
+              Padding="0"
+              FontFamily="{StaticResource IRANSans}"
+              Background="White">
+
+    <Border Background="White"
+            CornerRadius="4"
+            ClipToBounds="True">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0"
+                    BorderBrush="#E5E7EB"
+                    BorderThickness="0,0,0,1"
+                    Padding="0,12,15,12"
+                    Background="White">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center">
+                        <Border Cursor="Hand"
+                                Background="Transparent"
+                                Margin="20,0,10,0"
+                                MouseLeftButtonDown="HeaderClose_Click">
+                            <svg:SvgViewbox FlowDirection="LeftToRight"
+                                            Width="14"
+                                            Height="14"
+                                            Source="/Assets/Icons/closeTHIN.svg" />
+                        </Border>
+                        <TextBlock Text="لیست صندوق‌ها"
+                                   FontSize="20"
+                                   FontFamily="{StaticResource IRANSans}"
+                                   FontWeight="Bold"
+                                   Foreground="#0D2159"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center"
+                                FlowDirection="LeftToRight">
+
+                        <controls:ActionButton Text="صندوق جدید"
+                                               TextColor="#2563EB"
+                                               BorderColor="#E9F0FF"
+                                               IconPath="/Assets/Icons/Plus.svg"
+                                               Margin="6,0,0,0"
+                                               Click="BtnNewFund_Click" />
+
+                        <controls:ActionButton Text="حذف"
+                                               TextColor="#DC2626"
+                                               BorderColor="#E9F0FF"
+                                               IconPath="/Assets/Icons/trash.svg"
+                                               Margin="6,0,0,0"
+                                               Click="BtnDelete_Click" />
+
+                        <controls:ActionButton Text="چاپ"
+                                               TextColor="#2563EB"
+                                               BorderColor="#E9F0FF"
+                                               IconPath="/Assets/Icons/printer.svg"
+                                               Margin="6,0,0,0"
+                                               Click="BtnPrint_Click" />
+
+                        <controls:ActionButton Text="بروزرسانی"
+                                               TextColor="#2563EB"
+                                               IconPath="/Assets/Icons/arrow-reload-horizontal-2.svg"
+                                               Margin="6,0,0,0"
+                                               Click="BtnRefresh_Click" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <Border Grid.Row="1"
+                    BorderBrush="#E5E7EB"
+                    Background="White"
+                    Padding="15,6,25,6"
+                    Margin="0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <controls:SearchBoxControl x:Name="FundSearchBox"
+                                               Grid.Column="0"
+                                               Margin="0,0,4,0"
+                                               Placeholder="جستجو در عنوان صندوق ، شعبه" />
+                </Grid>
+            </Border>
+
+            <Border Grid.Row="2"
+                    Background="Transparent"
+                    ClipToBounds="False"
+                    Padding="15,0">
+                <controls:UnifiedListView x:Name="FundsGrid"
+                                          Padding="0,0,10,0"
+                                          EmptyStateText="صندوقی یافت نشد"
+                                          EmptyStateHintText="برای ثبت اولین صندوق، از دکمه «صندوق جدید» استفاده کنید.">
+                    <controls:UnifiedListView.Columns>
+                        <!-- عنوان صندوق -->
+                        <DataGridTextColumn Header="عنوان صندوق" Width="1.6*" MinWidth="160"
+                                            Binding="{Binding Title}"
+                                            ElementStyle="{StaticResource FullNameColumnStyle}">
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource UnifiedGridColumnHeaderStyle}">
+                                    <Setter Property="BorderThickness" Value="0,0,1,1" />
+                                    <Setter Property="BorderBrush" Value="#E5E7EB" />
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                        </DataGridTextColumn>
+
+                        <!-- شعبه -->
+                        <DataGridTextColumn Header="شعبه (کسب و کار)" Width="1.4*" MinWidth="150"
+                                            Binding="{Binding BranchTitle}"
+                                            ElementStyle="{StaticResource FullNameColumnStyle}">
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource UnifiedGridColumnHeaderStyle}">
+                                    <Setter Property="BorderThickness" Value="0,0,1,1" />
+                                    <Setter Property="BorderBrush" Value="#E5E7EB" />
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                            <DataGridTextColumn.CellStyle>
+                                <Style TargetType="DataGridCell" BasedOn="{StaticResource UnifiedGridCellStyle}">
+                                    <Setter Property="BorderThickness" Value="0,0,1,0" />
+                                </Style>
+                            </DataGridTextColumn.CellStyle>
+                        </DataGridTextColumn>
+
+                        <!-- تاریخ ثبت -->
+                        <DataGridTextColumn Header="تاریخ ثبت" Width="120" MinWidth="110"
+                                            Binding="{Binding RegisterDate}"
+                                            ElementStyle="{StaticResource LtrTextColumnStyle}">
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource UnifiedGridColumnHeaderStyle}">
+                                    <Setter Property="BorderThickness" Value="0,0,1,1" />
+                                    <Setter Property="BorderBrush" Value="#E5E7EB" />
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                        </DataGridTextColumn>
+                    </controls:UnifiedListView.Columns>
+                </controls:UnifiedListView>
+            </Border>
+
+            <controls:ListSummaryBar x:Name="FundSummaryBar"
+                                     Grid.Row="3"
+                                     Margin="0,0" />
+        </Grid>
+    </Border>
+</UserControl>

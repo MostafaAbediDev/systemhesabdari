@@ -25,12 +25,14 @@ namespace Taadol.Helpers
 
         // دوره‌های مالی
         public const string FinancialPeriod = "financial_period";
-
-        // صندوق
-        public const string FundNew = "fund_new";
+        public const string FinancialPeriodNew = "financial_period_new";
 
         // بانک
+        public const string BankList = "bank_list";
         public const string BankNew = "bank_new";
-        public const string FinancialPeriodNew = "financial_period_new";
+
+        // صندوق
+        public const string FundList = "fund_list";
+        public const string FundNew = "fund_new";
     }
 }

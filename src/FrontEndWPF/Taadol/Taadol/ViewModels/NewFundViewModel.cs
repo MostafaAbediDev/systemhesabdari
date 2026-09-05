@@ -1,12 +1,13 @@
+using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Linq;
 using System.Windows.Input;
+using BankManagement.Application.Contracts.Bank;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using FinancialManagement.Application.Contracts.Fund;
-using System;
 using GeneralInfoManagement.Application.Contract.Branches;
 using Microsoft.Extensions.DependencyInjection;
 using Taadol.Controls;
@@ -14,73 +15,188 @@ using Taadol.Helpers;
 
 namespace Taadol.ViewModels
 {
-    public sealed class NewFundViewModel : INotifyPropertyChanged
+    public sealed class NewFundViewModel : ObservableObject, IDisposable
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly IBranchApplication _branchApplication;
         private string _title = string.Empty;
         private long _selectedBranchId;
+        private long _selectedBankId;
         private long _selectedAccountId;
+        private string _accountNumber = string.Empty;
+        private string _shaba = string.Empty;
+        private string _cardNumber = string.Empty;
+        private DateTime? _accountRegistrationDate;
         private bool _isSaving;
         private bool _isLoading;
+        private bool _isAccountServiceAvailable;
         private CancellationTokenSource _loadCts = new();
 
         public NewFundViewModel(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
-            _branchApplication = serviceProvider.GetRequiredService<IBranchApplication>();
-            SaveCommand = new AsyncRelayCommand(SaveAsync, () => !_isSaving);
-            CancelCommand = new RelayCommand(() => CancelRequested?.Invoke());
+            SaveCommand = new AsyncRelayCommand(SaveAsync, CanSave);
+            CancelCommand = new CommunityToolkit.Mvvm.Input.RelayCommand(() => CancelRequested?.Invoke());
         }
 
         public ObservableCollection<BranchOption> Branches { get; } = new();
+        public ObservableCollection<BankOption> Banks { get; } = new();
         public ObservableCollection<AccountOption> Accounts { get; } = new();
-        public ICommand SaveCommand { get; }
+        public AsyncRelayCommand SaveCommand { get; }
         public ICommand CancelCommand { get; }
-        public event Action CancelRequested;
-        public event Action Saved;
+        public event Action? CancelRequested;
+        public event Action? Saved;
 
-        public string Title { get => _title; set => Set(ref _title, value); }
-        public long SelectedBranchId { get => _selectedBranchId; set => Set(ref _selectedBranchId, value); }
-        public long SelectedAccountId { get => _selectedAccountId; set => Set(ref _selectedAccountId, value); }
-        public bool IsLoading { get => _isLoading; private set => Set(ref _isLoading, value); }
+        public string Title
+        {
+            get => _title;
+            set
+            {
+                if (SetProperty(ref _title, value))
+                    SaveCommand.NotifyCanExecuteChanged();
+            }
+        }
+
+        public long SelectedBranchId
+        {
+            get => _selectedBranchId;
+            set
+            {
+                if (SetProperty(ref _selectedBranchId, value))
+                    SaveCommand.NotifyCanExecuteChanged();
+            }
+        }
+
+        public long SelectedBankId { get => _selectedBankId; set => SetProperty(ref _selectedBankId, value); }
+        public long SelectedAccountId { get => _selectedAccountId; set => SetProperty(ref _selectedAccountId, value); }
+        public string AccountNumber { get => _accountNumber; set => SetProperty(ref _accountNumber, value); }
+        public string Shaba { get => _shaba; set => SetProperty(ref _shaba, value); }
+        public string CardNumber { get => _cardNumber; set => SetProperty(ref _cardNumber, value); }
+        public DateTime? AccountRegistrationDate { get => _accountRegistrationDate; set => SetProperty(ref _accountRegistrationDate, value); }
+
+        public bool IsLoading
+        {
+            get => _isLoading;
+            private set
+            {
+                if (SetProperty(ref _isLoading, value))
+                    SaveCommand.NotifyCanExecuteChanged();
+            }
+        }
+
+        public bool IsSaving
+        {
+            get => _isSaving;
+            private set
+            {
+                if (SetProperty(ref _isSaving, value))
+                    SaveCommand.NotifyCanExecuteChanged();
+            }
+        }
+
+        public bool IsAccountServiceAvailable
+        {
+            get => _isAccountServiceAvailable;
+            private set
+            {
+                if (SetProperty(ref _isAccountServiceAvailable, value))
+                {
+                    OnPropertyChanged(nameof(AccountServiceHint));
+                    SaveCommand.NotifyCanExecuteChanged();
+                }
+            }
+        }
+
+        public string AccountServiceHint => IsAccountServiceAvailable
+            ? string.Empty
+            : "لیست حساب‌ها پس از آماده‌شدن Contract مربوطه در دسترس خواهد بود.";
 
         public async Task LoadAsync()
         {
             if (IsLoading) return;
+
             IsLoading = true;
             try
             {
-                var branches = await Task.Run(() =>
+                var token = _loadCts.Token;
+                var data = await Task.Run(() =>
                 {
+                    token.ThrowIfCancellationRequested();
                     using var scope = _serviceProvider.CreateScope();
-                    return scope.ServiceProvider.GetRequiredService<IBranchApplication>().GetBranches()
+
+                    var branches = scope.ServiceProvider.GetRequiredService<IBranchApplication>()
+                        .GetBranches()
                         .Where(x => x.IsActive)
                         .Select(x => new BranchOption { Id = x.Id, Title = x.Title })
                         .ToList();
-                }, _loadCts.Token);
+
+                    var banks = scope.ServiceProvider.GetRequiredService<IBankApplication>()
+                        .Search(new BankSearchModel())
+                        .Select(x => new BankOption { Id = x.Id, Title = x.Title })
+                        .ToList();
+
+                    return (branches, banks);
+                }, token);
 
                 Branches.Clear();
-                foreach (var branch in branches) Branches.Add(branch);
-                if (SelectedBranchId <= 0 && Branches.Count > 0) SelectedBranchId = Branches[0].Id;
+                foreach (var branch in data.branches)
+                    Branches.Add(branch);
+
+                Banks.Clear();
+                foreach (var bank in data.banks)
+                    Banks.Add(bank);
+
+                if (SelectedBranchId <= 0 && Branches.Count > 0)
+                    SelectedBranchId = Branches[0].Id;
+
+                // TODO: پس از ارائه Contract دریافت حساب‌های قابل انتخاب توسط بک‌اند،
+                // این placeholder حذف و با حساب‌های فعال، حذف‌نشده و مجاز جایگزین شود.
+                Accounts.Clear();
+                Accounts.Add(new AccountOption
+                {
+                    Id = 0,
+                    Title = "حساب‌ها در انتظار سرویس بک‌اند هستند"
+                });
+                IsAccountServiceAvailable = false;
             }
-            catch (OperationCanceledException) { }
+            catch (OperationCanceledException) when (_loadCts.IsCancellationRequested)
+            {
+            }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"[NewFundViewModel] Load error: {ex}");
-                ToastManager.Error("خطا در بارگذاری شعبه‌ها");
+                ToastManager.Error("خطا در بارگذاری اطلاعات صندوق");
             }
-            finally { IsLoading = false; }
+            finally
+            {
+                IsLoading = false;
+            }
         }
+
+        private bool CanSave() => !IsSaving && !IsLoading;
 
         private async Task SaveAsync()
         {
-            if (_isSaving) return;
-            if (string.IsNullOrWhiteSpace(Title)) { ToastManager.Warning("عنوان صندوق را وارد کنید."); return; }
-            if (SelectedBranchId <= 0) { ToastManager.Warning("لطفاً شعبه را انتخاب کنید."); return; }
-            if (SelectedAccountId <= 0) { ToastManager.Warning("لطفاً حساب صندوق را انتخاب کنید."); return; }
+            if (IsSaving) return;
 
-            _isSaving = true;
+            if (string.IsNullOrWhiteSpace(Title))
+            {
+                ToastManager.Warning("عنوان صندوق را وارد کنید.");
+                return;
+            }
+
+            if (SelectedBranchId <= 0)
+            {
+                ToastManager.Warning("لطفاً شعبه را انتخاب کنید.");
+                return;
+            }
+
+            if (!IsAccountServiceAvailable || SelectedAccountId <= 0)
+            {
+                ToastManager.Warning("ثبت صندوق تا آماده‌شدن سرویس حساب‌ها امکان‌پذیر نیست.");
+                return;
+            }
+
+            IsSaving = true;
             try
             {
                 var result = await Task.Run(() =>
@@ -88,45 +204,70 @@ namespace Taadol.ViewModels
                     using var scope = _serviceProvider.CreateScope();
                     return scope.ServiceProvider.GetRequiredService<IFundApplication>().Create(new CreateFunds
                     {
-                        Title = Title.Trim(), BranchId = SelectedBranchId, AccountId = SelectedAccountId
+                        Title = Title.Trim(),
+                        BranchId = SelectedBranchId,
+                        AccountId = SelectedAccountId
                     });
                 });
-                if (!result.IsSucceeded) { ToastManager.Warning(result.Message ?? "ثبت صندوق انجام نشد."); return; }
-                ToastManager.Success("صندوق با موفقیت ثبت شد.");
+
+                if (!result.IsSucceeded)
+                {
+                    ToastManager.Warning(result.Message ?? "ثبت صندوق انجام نشد.");
+                    return;
+                }
+
+                // TODO: Contract فعلی CreateFunds فیلدهای بانک، کارت، شبا، شماره حساب و تاریخ ثبت حساب را ندارد؛
+                // این مقادیر فعلاً فقط در فرم نگه‌داری می‌شوند و پس از تکمیل Contract باید ارسال شوند.
+                ToastManager.Success(result.Message ?? "صندوق با موفقیت ثبت شد.");
                 Saved?.Invoke();
+                ClearForm();
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"[NewFundViewModel] Save error: {ex}");
                 ToastManager.Error("خطا در ثبت صندوق");
             }
-            finally { _isSaving = false; }
+            finally
+            {
+                IsSaving = false;
+            }
+        }
+
+        private void ClearForm()
+        {
+            Title = string.Empty;
+            SelectedBankId = 0;
+            SelectedAccountId = 0;
+            AccountNumber = string.Empty;
+            Shaba = string.Empty;
+            CardNumber = string.Empty;
+            AccountRegistrationDate = null;
+            if (Branches.Count > 0)
+                SelectedBranchId = Branches[0].Id;
         }
 
         public void Dispose()
         {
-            try { _loadCts.Cancel(); } catch { }
+            try { _loadCts.Cancel(); } catch (ObjectDisposedException) { }
             _loadCts.Dispose();
         }
 
-        private void Set<T>(ref T field, T value, [CallerMemberName] string name = null)
+        public sealed class BranchOption
         {
-            if (Equals(field, value)) return;
-            field = value;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            public long Id { get; set; }
+            public string Title { get; set; } = string.Empty;
         }
-        public event PropertyChangedEventHandler PropertyChanged;
-    }
 
-    public sealed class BranchOption { public long Id { get; set; } public string Title { get; set; } }
-    public sealed class AccountOption { public long Id { get; set; } public string Title { get; set; } }
+        public sealed class BankOption
+        {
+            public long Id { get; set; }
+            public string Title { get; set; } = string.Empty;
+        }
 
-    internal sealed class AsyncRelayCommand : ICommand
-    {
-        private readonly Func<Task> _execute; private readonly Func<bool> _canExecute;
-        public AsyncRelayCommand(Func<Task> execute, Func<bool> canExecute) { _execute = execute; _canExecute = canExecute; }
-        public bool CanExecute(object parameter) => _canExecute?.Invoke() ?? true;
-        public async void Execute(object parameter) => await _execute();
-        public event EventHandler CanExecuteChanged { add { } remove { } }
+        public sealed class AccountOption
+        {
+            public long Id { get; set; }
+            public string Title { get; set; } = string.Empty;
+        }
     }
 }

@@ -46,8 +46,10 @@ namespace Taadol
 
             _factory.Register(NavKeys.FinancialPeriod, () => new FinancialPeriodListView());
             _factory.Register(NavKeys.FinancialPeriodNew, () => new NewFinancialPeriodView());
-            _factory.Register(NavKeys.FundNew, () => new NewFundView());
+            _factory.Register(NavKeys.BankList, () => new BankListView());
             _factory.Register(NavKeys.BankNew, () => new NewBankView());
+            _factory.Register(NavKeys.FundList, () => new FundListView());
+            _factory.Register(NavKeys.FundNew, () => new NewFundView());
 
             _nav = new NavigationService(MainContent, _factory);
 
