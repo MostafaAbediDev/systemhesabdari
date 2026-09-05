@@ -6,6 +6,7 @@ using PersonManagement.Domain.Person.PersonAgg;
 using PersonManagement.Domain.Person.PersonBankAgg;
 using PersonManagement.Domain.Person.PersonContactAgg;
 using System.Transactions;
+using CodeManagement.Domain.CodeAgg;
 
 namespace PersonManagement.Application
 {
@@ -13,19 +14,21 @@ namespace PersonManagement.Application
     {
         private readonly IPersonRepository _personRepository;
         private readonly ICodeApplication _codeApplication;
+        private readonly ICodeRepository _codeRepository; 
         private readonly IPersonContactRepository _personContactRepository;
         private readonly IPersonAddressRepository _personAddressRepository;
         private readonly IPersonBankRepository _personBankRepository;
 
         public PersonApplication(IPersonRepository personRepository, ICodeApplication codeApplication,
             IPersonContactRepository personContactRepository, IPersonAddressRepository personAddressRepository, 
-            IPersonBankRepository personBankRepository)
+            IPersonBankRepository personBankRepository, ICodeRepository codeRepository)
         {
             _personRepository = personRepository;
             _codeApplication = codeApplication;
             _personContactRepository = personContactRepository;
             _personAddressRepository = personAddressRepository;
             _personBankRepository = personBankRepository;
+            _codeRepository = codeRepository;
         }
 
         public OperationResult Create(CreatePerson command)
@@ -36,6 +39,7 @@ namespace PersonManagement.Application
                 TransactionScopeOption.Required,
                 TransactionScopeAsyncFlowOption.Enabled);
 
+            // Validation
             if (!command.IsLegal &&
                 _personRepository.ExistsNationalCode(command.NationalCode))
             {
@@ -48,6 +52,7 @@ namespace PersonManagement.Application
                 return result.Failed("کد اقتصادی تکراری است.");
             }
 
+            // Create Person
             var person = new Persons(
                 command.FirstName,
                 command.LastName,
@@ -62,11 +67,10 @@ namespace PersonManagement.Application
                 command.CreditLimit,
                 command.PersonCategoryId);
 
-            // ابتدا Person ذخیره می‌شود تا Id تولید شود
             _personRepository.Create(person);
             _personRepository.SaveChanges();
 
-            // سپس Code برای Person ایجاد می‌شود
+            // Create Code
             var codeResult = _codeApplication.SetCode(new CreateCode
             {
                 OwnerId = person.Id,
@@ -78,7 +82,10 @@ namespace PersonManagement.Application
             if (!codeResult.IsSucceeded)
                 return result.Failed(codeResult.Message);
 
-            // اگر تمام عملیات موفق بودند Transaction نهایی می‌شود
+            // چون DbContext جداست
+            _codeRepository.SaveChanges();
+
+            // Commit
             transaction.Complete();
 
             return result.Succedded();
@@ -98,18 +105,26 @@ namespace PersonManagement.Application
             if (person == null)
                 return result.Failed(ApplicationMessages.RecordNotFound);
 
+            // بررسی کد ملی
             if (!command.IsLegal &&
-                _personRepository.ExistsNationalCode(command.NationalCode, command.Id))
+                _personRepository.ExistsNationalCode(
+                    command.NationalCode,
+                    command.Id))
             {
-                return result.Failed("کد ملی وارد شده برای شخص دیگری ثبت شده است.");
+                return result.Failed(
+                    "کد ملی وارد شده برای شخص دیگری ثبت شده است.");
             }
 
+            // بررسی کد اقتصادی
             if (command.IsLegal &&
-                _personRepository.ExistsEconomicCode(command.EconomicCode, command.Id))
+                _personRepository.ExistsEconomicCode(
+                    command.EconomicCode,
+                    command.Id))
             {
                 return result.Failed("کد اقتصادی تکراری است.");
             }
 
+            // ویرایش اطلاعات شخص
             person.Edit(
                 command.FirstName,
                 command.LastName,
@@ -123,14 +138,13 @@ namespace PersonManagement.Application
                 command.IsLegal,
                 command.PersonCategoryId);
 
-            // فقط اگر CreditLimit ارسال شده باشد
-            // اطلاعات مالی تغییر می‌کند
+            // فقط در صورت ارسال CreditLimit
             if (command.CreditLimit.HasValue)
             {
                 person.UpdateFinancialInfo(command.CreditLimit.Value);
             }
 
-            // ابتدا Code تغییر می‌کند
+            // ایجاد یا ویرایش Code
             var codeResult = _codeApplication.SetCode(new CreateCode
             {
                 OwnerId = person.Id,
@@ -142,11 +156,13 @@ namespace PersonManagement.Application
             if (!codeResult.IsSucceeded)
                 return result.Failed(codeResult.Message);
 
-            // ذخیره تغییرات Person
+            // چون DbContext مربوط به Person جداست
             _personRepository.SaveChanges();
 
-            // اگر Person و Code هر دو موفق بودند
-            // Transaction نهایی می‌شود
+            // چون DbContext مربوط به Code جداست
+            _codeRepository.SaveChanges();
+
+            // نهایی کردن Transaction
             transaction.Complete();
 
             return result.Succedded();
@@ -236,34 +252,55 @@ namespace PersonManagement.Application
         {
             var operation = new OperationResult();
 
+            using var transaction = new TransactionScope(
+                TransactionScopeOption.Required,
+                TransactionScopeAsyncFlowOption.Enabled);
+
             var person = _personRepository.Get(id);
 
             if (person == null)
                 return operation.Failed(ApplicationMessages.RecordNotFound);
 
-            var contacts = _personContactRepository.GetEntitiesByPersonId(id);
+            // حذف Contact ها
+            var contacts = _personContactRepository
+                .GetEntitiesByPersonId(id);
 
             foreach (var contact in contacts)
                 contact.Remove();
 
-            var addresses = _personAddressRepository.GetEntitiesByPersonId(id);
+            // حذف Address ها
+            var addresses = _personAddressRepository
+                .GetEntitiesByPersonId(id);
 
             foreach (var address in addresses)
                 address.Remove();
 
-            var banks = _personBankRepository.GetEntitiesByPersonId(id);
+            // حذف Bank ها
+            var banks = _personBankRepository
+                .GetEntitiesByPersonId(id);
 
             foreach (var bank in banks)
                 bank.Remove();
 
-            var codeResult = _codeApplication.RemoveByOwner(id,CodeOwnerTypeDTO.Person);
+            // حذف Code
+            var codeResult = _codeApplication.RemoveByOwner(
+                id,
+                CodeOwnerTypeDTO.Person);
 
             if (!codeResult.IsSucceeded)
                 return operation.Failed(codeResult.Message);
 
+            // حذف Person
             person.Remove();
 
+            // ذخیره تغییرات Person
             _personRepository.SaveChanges();
+
+            // ذخیره تغییرات Code
+            _codeRepository.SaveChanges();
+
+            // نهایی کردن Transaction
+            transaction.Complete();
 
             return operation.Succedded();
         }
