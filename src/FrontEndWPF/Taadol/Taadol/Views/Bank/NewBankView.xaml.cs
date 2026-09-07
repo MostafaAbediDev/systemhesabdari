@@ -1,86 +1,68 @@
 using System;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Threading.Tasks;
 using Taadol.Controls;
 using Taadol.Helpers;
 using Taadol.ViewModels;
 
 namespace Taadol.Views.Bank
 {
-    public partial class NewBankView : UserControl
+    public partial class NewBankView : UserControl, IUnsavedChangesAware
     {
         public NewBankViewModel ViewModel { get; }
+
+        public bool HasUnsavedChanges => ViewModel?.HasUnsavedChanges ?? false;
 
         public NewBankView()
         {
             InitializeComponent();
             ViewModel = new NewBankViewModel(App.ServiceProvider);
-            ViewModel.CancelRequested += HandleCancelRequested;
-            ViewModel.BankSaved += OnBankSaved;
             DataContext = ViewModel;
         }
 
-        private async void View_Loaded(object sender, RoutedEventArgs e) => await ViewModel.LoadAsync();
-
         private void View_Unloaded(object sender, RoutedEventArgs e)
         {
-            ViewModel.CancelRequested -= HandleCancelRequested;
-            ViewModel.BankSaved -= OnBankSaved;
             ViewModel.Dispose();
         }
 
-        private void OnBankSaved()
-        {
-            if (Window.GetWindow(this) is not MainWindow mainWindow)
-                return;
+        private async void HeaderClose_Click(object sender, MouseButtonEventArgs e)
+            => await HandleCancelAsync();
 
-            if (mainWindow.MainContent.Content is BankListView listView)
-            {
-                _ = RefreshBankListSafeAsync(listView);
-                return;
-            }
+        private async void Cancel_Click(object sender, RoutedEventArgs e)
+            => await HandleCancelAsync();
 
-            mainWindow.NavigateTo(NavKeys.BankList);
-        }
-
-        private async Task RefreshBankListSafeAsync(BankListView listView)
+        private async Task HandleCancelAsync()
         {
             try
             {
-                await listView.RefreshGridAsync();
-            }
-            catch (OperationCanceledException)
-            {
-                // لغو رفرش هنگام بسته‌شدن یا جابه‌جایی صفحه، رفتار عادی است.
+                if (ViewModel.HasUnsavedChanges)
+                {
+                    var result = MessageBox.Show(
+                        "تغییراتی که ایجاد کرده‌اید ذخیره نشده است.\nآیا می‌خواهید آن‌ها را ذخیره کنید؟",
+                        "ذخیره تغییرات",
+                        MessageBoxButton.YesNoCancel,
+                        MessageBoxImage.Question);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        await ViewModel.SaveAsync();
+                        return;
+                    }
+
+                    if (result == MessageBoxResult.Cancel)
+                        return;
+                }
+
+                CloseForm();
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"[NewBankView] خطا در رفرش لیست بانک: {ex}");
+                System.Diagnostics.Debug.WriteLine($"[NewBankView] خطا در عملیات انصراف: {ex}");
                 Application.Current?.Dispatcher.BeginInvoke(new Action(() =>
-                    ToastManager.Error("خطا در بروزرسانی لیست بانک‌ها")));
+                    ToastManager.Error("خطا در عملیات")));
             }
-        }
-
-        private void HeaderClose_Click(object sender, MouseButtonEventArgs e) => HandleCancelRequested();
-        private void Cancel_Click(object sender, RoutedEventArgs e) => HandleCancelRequested();
-
-        private void HandleCancelRequested()
-        {
-            if (ViewModel.HasUnsavedChanges)
-            {
-                var result = MessageBox.Show(
-                    "تغییرات ذخیره‌نشده وجود دارد. آیا می‌خواهید از فرم خارج شوید؟",
-                    "تأیید خروج",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Question);
-
-                if (result != MessageBoxResult.Yes)
-                    return;
-            }
-
-            CloseForm();
         }
 
         private void CloseForm()

@@ -60,18 +60,11 @@
                                 VerticalAlignment="Center"
                                 FlowDirection="LeftToRight">
 
-                        <controls:ActionButton Text="بانک جدید"
-                                               TextColor="#2563EB"
-                                               BorderColor="#E9F0FF"
-                                               IconPath="/Assets/Icons/Plus.svg"
-                                               Margin="6,0,0,0"
-                                               Click="BtnNewBank_Click" />
-
                         <controls:ActionButton Text="حذف"
                                                TextColor="#DC2626"
                                                BorderColor="#E9F0FF"
                                                IconPath="/Assets/Icons/trash.svg"
-                                               Margin="6,0,0,0"
+                                               Margin="10,0,0,0"
                                                Click="BtnDelete_Click" />
 
                         <controls:ActionButton Text="چاپ"
@@ -80,6 +73,16 @@
                                                IconPath="/Assets/Icons/printer.svg"
                                                Margin="6,0,0,0"
                                                Click="BtnPrint_Click" />
+
+                        <controls:ActionButton Text="Excel"
+                                               TextColor="#374151"
+                                               BorderColor="#E5E7EB"
+                                               Margin="6,0,0,0" />
+
+                        <controls:ActionButton Text="PDF"
+                                               TextColor="#374151"
+                                               BorderColor="#E5E7EB"
+                                               Margin="6,0,0,0" />
 
                         <controls:ActionButton Text="بروزرسانی"
                                                TextColor="#2563EB"
@@ -97,7 +100,11 @@
                     Margin="0">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="1.6*" MinWidth="120" />
+                        <ColumnDefinition Width="*" MinWidth="70" />
+                        <ColumnDefinition Width="*" MinWidth="70" />
+                        <ColumnDefinition Width="*" MinWidth="70" />
+                        <ColumnDefinition Width="*" MinWidth="70" />
                     </Grid.ColumnDefinitions>
 
                     <controls:SearchBoxControl x:Name="BankSearchBox"
@@ -113,6 +120,11 @@
                     Padding="15,0">
                 <controls:UnifiedListView x:Name="BanksGrid"
                                           Padding="0,0,10,0"
+                                          ItemsSource="{Binding FilteredBanks}"
+                                          PagesSource="{Binding Pages}"
+                                          PageInfoContent="{Binding PageInfoText}"
+                                          IsLoading="{Binding IsLoading}"
+                                          LoadErrorText="{Binding LoadErrorText}"
                                           EmptyStateText="بانکی یافت نشد"
                                           EmptyStateHintText="برای ثبت اولین بانک، از دکمه «بانک جدید» استفاده کنید.">
                     <controls:UnifiedListView.Columns>
@@ -128,25 +140,8 @@
                             </DataGridTextColumn.HeaderStyle>
                         </DataGridTextColumn>
 
-                        <!-- کشور -->
-                        <DataGridTextColumn Header="کشور" Width="1*" MinWidth="100"
-                                            Binding="{Binding Country}"
-                                            ElementStyle="{StaticResource BaseTextColumnStyle}">
-                            <DataGridTextColumn.HeaderStyle>
-                                <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource UnifiedGridColumnHeaderStyle}">
-                                    <Setter Property="BorderThickness" Value="0,0,1,1" />
-                                    <Setter Property="BorderBrush" Value="#E5E7EB" />
-                                </Style>
-                            </DataGridTextColumn.HeaderStyle>
-                            <DataGridTextColumn.CellStyle>
-                                <Style TargetType="DataGridCell" BasedOn="{StaticResource UnifiedGridCellStyle}">
-                                    <Setter Property="BorderThickness" Value="0,0,1,0" />
-                                </Style>
-                            </DataGridTextColumn.CellStyle>
-                        </DataGridTextColumn>
-
-                        <!-- نوع بانک -->
-                        <DataGridTemplateColumn Header="نوع بانک" Width="110" MinWidth="100">
+                        <!-- کشور با فیلتر ستونی -->
+                        <DataGridTemplateColumn Width="1*" MinWidth="100">
                             <DataGridTemplateColumn.HeaderStyle>
                                 <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource UnifiedGridColumnHeaderStyle}">
                                     <Setter Property="BorderThickness" Value="0,0,1,1" />
@@ -155,39 +150,42 @@
                             </DataGridTemplateColumn.HeaderStyle>
                             <DataGridTemplateColumn.HeaderTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="نوع بانک"
-                                               FontFamily="{StaticResource IRANSans}"
-                                               FontSize="13"
-                                               FontWeight="SemiBold"
-                                               Foreground="#1F2937"
-                                               HorizontalAlignment="Center"
-                                               VerticalAlignment="Center" />
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <TextBlock Text="کشور" FontFamily="{StaticResource IRANSans}" FontSize="13" FontWeight="SemiBold" Foreground="#1F2937" />
+                                        <Button Click="CountryFilter_Click" Background="Transparent" BorderThickness="0" Cursor="Hand" Padding="2" Margin="8,0,0,0">
+                                            <svg:SvgViewbox Width="12" Height="12" Source="/Assets/Icons/Filter.svg" />
+                                        </Button>
+                                    </StackPanel>
                                 </DataTemplate>
                             </DataGridTemplateColumn.HeaderTemplate>
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <!-- بج آبی لایت برای نوع بانک -->
-                                    <Border Padding="8,4" CornerRadius="6" HorizontalAlignment="Center"
-                                            Background="#E9F0FF">
-                                        <Border.Style>
-                                            <Style TargetType="Border">
-                                                <Style.Triggers>
-                                                    <!-- در ردیف‌های پرکننده و سلول‌های خالی، بج دیده نشود -->
-                                                    <DataTrigger Binding="{Binding IsEmpty}" Value="True">
-                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding BankType}" Value="">
-                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Border.Style>
-                                        <TextBlock Text="{Binding BankType}"
-                                                   FontSize="11.5"
-                                                   FontWeight="Medium"
-                                                   FontFamily="{StaticResource IRANSans}"
-                                                   Foreground="#2563EB" />
-                                    </Border>
+                                    <TextBlock Text="{Binding Country}" Style="{StaticResource BaseTextColumnStyle}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <!-- نوع بانک با فیلتر ستونی و متن ساده -->
+                        <DataGridTemplateColumn Width="110" MinWidth="100">
+                            <DataGridTemplateColumn.HeaderStyle>
+                                <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource UnifiedGridColumnHeaderStyle}">
+                                    <Setter Property="BorderThickness" Value="0,0,1,1" />
+                                    <Setter Property="BorderBrush" Value="#E5E7EB" />
+                                </Style>
+                            </DataGridTemplateColumn.HeaderStyle>
+                            <DataGridTemplateColumn.HeaderTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <TextBlock Text="نوع بانک" FontFamily="{StaticResource IRANSans}" FontSize="13" FontWeight="SemiBold" Foreground="#1F2937" />
+                                        <Button Click="BankTypeFilter_Click" Background="Transparent" BorderThickness="0" Cursor="Hand" Padding="2" Margin="8,0,0,0">
+                                            <svg:SvgViewbox Width="12" Height="12" Source="/Assets/Icons/Filter.svg" />
+                                        </Button>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.HeaderTemplate>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding BankType}" Style="{StaticResource BaseTextColumnStyle}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
@@ -209,7 +207,9 @@
 
             <controls:ListSummaryBar x:Name="BankSummaryBar"
                                      Grid.Row="3"
-                                     Margin="0,0" />
+                                     Margin="0,0"
+                                     SelectedSummaryText="{Binding SelectedSummaryText}"
+                                     TotalCountText="{Binding TotalCountText}" />
         </Grid>
     </Border>
 </UserControl>

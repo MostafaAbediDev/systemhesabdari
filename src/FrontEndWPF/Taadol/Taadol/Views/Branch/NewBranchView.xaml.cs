@@ -2,8 +2,6 @@
 using GeneralInfoManagement.Application.Contract.City;
 using GeneralInfoManagement.Application.Contract.Company;
 using GeneralInfoManagement.Application.Contract.Province;
-using GeneralInfoManagement.Domain.General.CityAgg;
-using GeneralInfoManagement.Domain.General.ProvinceAgg;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -11,11 +9,9 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Threading;
 using Taadol.Controls;
 using Taadol.Helpers;
@@ -70,8 +66,8 @@ namespace Taadol.Views
                 {
                     loadToken.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
-                    var cityRepo = scope.ServiceProvider.GetRequiredService<ICityRepository>();
-                    return cityRepo.GetCitiesByProvinceId(provinceId);
+                    var cityApplication = scope.ServiceProvider.GetRequiredService<ICityApplication>();
+                    return cityApplication.GetCitiesByProvinceId(provinceId);
                 }, loadToken);
 
                 if (SelectedProvinceId != provinceId)
@@ -165,9 +161,9 @@ namespace Taadol.Views
                 {
                     loadToken.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
-                    var repo = scope.ServiceProvider.GetRequiredService<IProvinceRepository>();
+                    var provinceApplication = scope.ServiceProvider.GetRequiredService<IProvinceApplication>();
 
-                    var provincesFromBackend = repo.GetProvinces();
+                    var provincesFromBackend = provinceApplication.GetProvinces();
 
                     var mappedProvinces = provincesFromBackend.Select(p => new ProvinceComboItem
                     {
@@ -217,8 +213,8 @@ namespace Taadol.Views
                 {
                     loadToken.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
-                    var cityRepo = scope.ServiceProvider.GetRequiredService<ICityRepository>();
-                    return cityRepo.GetCitiesByProvinceId(provinceId);
+                    var cityApplication = scope.ServiceProvider.GetRequiredService<ICityApplication>();
+                    return cityApplication.GetCitiesByProvinceId(provinceId);
                 }, loadToken);
 
                 if (SelectedProvinceId != provinceId)

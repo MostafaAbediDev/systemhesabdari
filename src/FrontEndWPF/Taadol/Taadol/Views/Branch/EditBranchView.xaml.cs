@@ -10,9 +10,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using GeneralInfoManagement.Application.Contract.Branches;
+using GeneralInfoManagement.Application.Contract.City;
 using GeneralInfoManagement.Application.Contract.Company;
-using GeneralInfoManagement.Domain.General.CityAgg;
-using GeneralInfoManagement.Domain.General.ProvinceAgg;
+using GeneralInfoManagement.Application.Contract.Province;
 using Microsoft.Extensions.DependencyInjection;
 using Taadol.Controls;
 using Taadol.Helpers;
@@ -257,8 +257,8 @@ namespace Taadol.Views
                 var provincesTask = Task.Run(() =>
                 {
                     using var scope = App.ServiceProvider.CreateScope();
-                    var repo = scope.ServiceProvider.GetRequiredService<IProvinceRepository>();
-                    return repo.GetProvinces();
+                    var provinceApplication = scope.ServiceProvider.GetRequiredService<IProvinceApplication>();
+                    return provinceApplication.GetProvinces();
                 });
 
                 var details = await detailsTask;
@@ -334,8 +334,8 @@ namespace Taadol.Views
                 {
                     token.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
-                    var repo = scope.ServiceProvider.GetRequiredService<ICityRepository>();
-                    return repo.GetCitiesByProvinceId(provinceId)
+                    var cityApplication = scope.ServiceProvider.GetRequiredService<ICityApplication>();
+                    return cityApplication.GetCitiesByProvinceId(provinceId)
                         .Select(c => new CityComboItem { Id = c.Id, Title = c.Title })
                         .ToList();
                 }, token);

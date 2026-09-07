@@ -733,34 +733,40 @@ namespace Taadol.Controls
 
         private void NormalizeOuterCellBorder(DataGridRow row)
         {
-            if (row == null || DataGridView == null || DataGridView.Columns.Count == 0)
+            if (row == null || DataGridView == null)
                 return;
 
-            int lastDisplayIndex = DataGridView.Columns.Count - 1;
             foreach (var cell in FindVisualChildren<DataGridCell>(row))
             {
-                if (cell.Column?.DisplayIndex == lastDisplayIndex)
+                // بردر بیرونی قاب مسئول لبه‌های چپ و راست است؛ سلول‌ها فقط خطوط داخلی را رسم می‌کنند.
+                var thickness = cell.BorderThickness;
+                if (cell.TransformToAncestor(DataGridView).Transform(new Point(0, 0)).X <= 0)
+                    cell.BorderThickness = new Thickness(0, thickness.Top, thickness.Right, thickness.Bottom);
+
+                if (cell.TransformToAncestor(DataGridView).Transform(new Point(cell.ActualWidth, 0)).X >= DataGridView.ActualWidth)
                 {
-                    var thickness = cell.BorderThickness;
-                    cell.BorderThickness = new Thickness(
-                        thickness.Left, thickness.Top, 0, thickness.Bottom);
+                    thickness = cell.BorderThickness;
+                    cell.BorderThickness = new Thickness(thickness.Left, thickness.Top, 0, thickness.Bottom);
                 }
             }
         }
 
         private void NormalizeOuterHeaderBorders()
         {
-            if (DataGridView == null || DataGridView.Columns.Count == 0)
+            if (DataGridView == null)
                 return;
 
-            int lastDisplayIndex = DataGridView.Columns.Count - 1;
             foreach (var header in FindVisualChildren<DataGridColumnHeader>(DataGridView))
             {
-                if (header.Column?.DisplayIndex == lastDisplayIndex)
+                var position = header.TransformToAncestor(DataGridView).Transform(new Point(0, 0));
+                var thickness = header.BorderThickness;
+                if (position.X <= 0)
+                    header.BorderThickness = new Thickness(0, thickness.Top, thickness.Right, thickness.Bottom);
+
+                if (position.X + header.ActualWidth >= DataGridView.ActualWidth)
                 {
-                    var thickness = header.BorderThickness;
-                    header.BorderThickness = new Thickness(
-                        thickness.Left, thickness.Top, 0, thickness.Bottom);
+                    thickness = header.BorderThickness;
+                    header.BorderThickness = new Thickness(thickness.Left, thickness.Top, 0, thickness.Bottom);
                 }
             }
         }

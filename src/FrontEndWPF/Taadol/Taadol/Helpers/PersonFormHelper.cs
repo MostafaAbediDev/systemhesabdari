@@ -1,7 +1,5 @@
 using GeneralInfoManagement.Application.Contract.City;
 using GeneralInfoManagement.Application.Contract.Province;
-using GeneralInfoManagement.Domain.General.CityAgg;
-using GeneralInfoManagement.Domain.General.ProvinceAgg;
 using Microsoft.Extensions.DependencyInjection;
 using BankManagement.Application.Contracts.BankBranch;
 using PersonManagement.Application.Contract.ContactTypes;
@@ -25,7 +23,7 @@ namespace Taadol.Helpers
     public static class PersonFormHelper
     {
         /// <summary>
-        /// Loads provinces into the given collection via IProvinceRepository.
+        /// استان‌ها را از طریق لایه Application بارگذاری می‌کند.
         /// </summary>
         /// <param name="provinces">Target collection to populate (will be cleared first).</param>
         /// <param name="onError">Error handler — each view uses a different reporter (ToastManager vs Debug).</param>
@@ -41,8 +39,8 @@ namespace Taadol.Helpers
                 {
                     cancellationToken.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
-                    var repo = scope.ServiceProvider.GetRequiredService<IProvinceRepository>();
-                    var result = repo.GetProvinces();
+                    var application = scope.ServiceProvider.GetRequiredService<IProvinceApplication>();
+                    var result = application.GetProvinces();
                     cancellationToken.ThrowIfCancellationRequested();
                     return result;
                 }, cancellationToken).ConfigureAwait(false);
@@ -57,7 +55,7 @@ namespace Taadol.Helpers
                 });
                 System.Diagnostics.Debug.WriteLine($"[PersonFormHelper] LoadProvincesAsync finished. Count = {provinces.Count}");
             }
-            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            catch (OperationCanceledException)
             {
                 return;
             }
@@ -68,7 +66,7 @@ namespace Taadol.Helpers
         }
 
         /// <summary>
-        /// Loads cities for a given province via ICityRepository, with staleness check and city-reset logic.
+        /// شهرهای یک استان را از طریق لایه Application بارگذاری می‌کند و نتیجه‌های قدیمی را نادیده می‌گیرد.
         /// </summary>
         /// <param name="cities">Target collection to populate (will be cleared first).</param>
         /// <param name="provinceId">Province to load cities for.</param>
@@ -100,8 +98,8 @@ namespace Taadol.Helpers
                 {
                     ct.ThrowIfCancellationRequested();
                     using var scope = App.ServiceProvider.CreateScope();
-                    var repo = scope.ServiceProvider.GetRequiredService<ICityRepository>();
-                    return repo.GetCitiesByProvinceId(provinceId);
+                    var application = scope.ServiceProvider.GetRequiredService<ICityApplication>();
+                    return application.GetCitiesByProvinceId(provinceId);
                 }, ct).ConfigureAwait(false);
 
                 ct.ThrowIfCancellationRequested();
@@ -166,7 +164,7 @@ namespace Taadol.Helpers
                 foreach (var ct in items)
                     contactTypeByName[ct.Title] = ct.Id;
             }
-            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            catch (OperationCanceledException)
             {
                 return;
             }
@@ -256,7 +254,7 @@ namespace Taadol.Helpers
                 }, System.Windows.Threading.DispatcherPriority.Normal);
                 return items;
             }
-            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            catch (OperationCanceledException)
             {
                 return new();
             }

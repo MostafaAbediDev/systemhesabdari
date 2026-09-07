@@ -18,6 +18,7 @@ namespace Taadol
 
         private NavigationService _nav;
         private ViewFactory _factory;
+        private readonly IModalService _modalService;
         private ICompanyApplication _companyApplication;
         private CancellationTokenSource _loadCts = new();
         private int _loadVersion;
@@ -26,30 +27,14 @@ namespace Taadol
         {
             InitializeComponent();
 
+            _modalService = new ModalService(ModalContent, ModalOverlay);
+
             ToastManager.Initialize(ToastContainer);
 
             _factory = new ViewFactory(App.ServiceProvider);
             _companyApplication = App.ServiceProvider.GetRequiredService<ICompanyApplication>();
 
-            _factory.Register(NavKeys.PersonList, () => new PersonListView());
-            _factory.Register(NavKeys.PersonNew, () => new NewPersonView());
-
-            _factory.Register(NavKeys.ProductList, () => new ProductListView());
-            _factory.Register(NavKeys.ProductNew, () => new NewProductView());
-
-            _factory.Register(NavKeys.CompanyInfo, () => new NewCompanyView());
-            _factory.Register(NavKeys.CompanyList, () => new CompanyListView());
-
-            _factory.Register(NavKeys.BranchNew, () => new NewBranchView());
-            _factory.Register(NavKeys.BranchList, () => new BranchListView());
-            _factory.Register(NavKeys.BranchArchive, () => new BranchArchiveListView());
-
-            _factory.Register(NavKeys.FinancialPeriod, () => new FinancialPeriodListView());
-            _factory.Register(NavKeys.FinancialPeriodNew, () => new NewFinancialPeriodView());
-            _factory.Register(NavKeys.BankList, () => new BankListView());
-            _factory.Register(NavKeys.BankNew, () => new NewBankView());
-            _factory.Register(NavKeys.FundList, () => new FundListView());
-            _factory.Register(NavKeys.FundNew, () => new NewFundView());
+            ViewFactoryRegistrations.RegisterDefaults(_factory, CreateBankListView, CreateNewBankView);
 
             _nav = new NavigationService(MainContent, _factory);
 
@@ -252,12 +237,86 @@ namespace Taadol
 
         private void Sidebar_Loaded(object sender, RoutedEventArgs e)
         {
+            // Intentionally empty. Reserved for future sidebar initialization logic.
         }
 
         public void NavigateTo(string tag)
         {
             MainContentBorder.Visibility = Visibility.Visible;
             _nav.Navigate(tag);
+        }
+
+        private BankListView CreateBankListView()
+        {
+            var bankListView = new BankListView();
+            bankListView.EditBankRequestedForModal += OnEditBankRequestedForModal;
+            bankListView.Unloaded += BankListView_Unloaded;
+            return bankListView;
+        }
+
+        private void BankListView_Unloaded(object sender, RoutedEventArgs e)
+        {
+            if (sender is not BankListView bankListView)
+                return;
+
+            bankListView.EditBankRequestedForModal -= OnEditBankRequestedForModal;
+            bankListView.Unloaded -= BankListView_Unloaded;
+        }
+
+        private void OnEditBankRequestedForModal(long bankId)
+        {
+            try
+            {
+                var editView = new EditBankView(bankId);
+                Action? bankUpdatedHandler = null;
+                RoutedEventHandler? unloadedHandler = null;
+
+                bankUpdatedHandler = () =>
+                {
+                    editView.ViewModel.BankUpdated -= bankUpdatedHandler;
+                    editView.Unloaded -= unloadedHandler;
+
+                    if (MainContent.Content is BankListView listView)
+                        _ = RefreshBankListSafeAsync(listView);
+
+                    if (ReferenceEquals(_modalService.Current, editView))
+                        CloseModal();
+                };
+
+                unloadedHandler = (_, _) =>
+                {
+                    editView.ViewModel.BankUpdated -= bankUpdatedHandler;
+                    editView.Unloaded -= unloadedHandler;
+                };
+
+                editView.ViewModel.BankUpdated += bankUpdatedHandler;
+                editView.Unloaded += unloadedHandler;
+
+                _modalService.Open(editView);
+            }
+            catch (Exception exception)
+            {
+                System.Diagnostics.Debug.WriteLine($"[MainWindow] خطا در باز کردن فرم ویرایش بانک: {exception}");
+                Application.Current?.Dispatcher.BeginInvoke(new Action(() =>
+                    ToastManager.Error("خطا در باز کردن فرم ویرایش بانک.")));
+            }
+        }
+
+        /// <summary>
+        /// Generic edit modal opener. Any EditXxxView with a public constructor (long id) can be opened via this helper.
+        /// </summary>
+        private void OpenEditModal<TView>(long id, Func<long, TView> factory) where TView : UserControl
+        {
+            try
+            {
+                var view = factory(id);
+                _modalService.Open(view);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"OpenEditModal<{typeof(TView).Name}> error: {ex}");
+                ToastManager.Error($"خطا در باز کردن فرم ویرایش.");
+            }
         }
 
         public void NavigateToEditPerson(long personId)
@@ -268,11 +327,8 @@ namespace Taadol
 
                 var editView = new EditPersonView(personId);
                 System.Diagnostics.Debug.WriteLine("[DEBUG] EditPersonView created successfully");
-                ModalContent.Content = editView;
+                _modalService.Open(editView);
                 System.Diagnostics.Debug.WriteLine("[DEBUG] ModalContent.Content set");
-                ModalOverlay.BeginAnimation(UIElement.OpacityProperty, null);
-                ModalOverlay.Opacity = 1;
-                ModalOverlay.Visibility = Visibility.Visible;
                 System.Diagnostics.Debug.WriteLine("[DEBUG] ModalOverlay set to Visible");
             }
             catch (Exception ex)
@@ -305,39 +361,21 @@ namespace Taadol
         /// اگر ذخیره شود، گرید لیست پشت مودال رفرش می‌شود.
         /// </summary>
         public void NavigateToEditCompany(long companyId)
-        {
-            var editView = new EditCompanyView(companyId);
-            ModalContent.Content = editView;
-            ModalOverlay.BeginAnimation(UIElement.OpacityProperty, null);
-            ModalOverlay.Opacity = 1;
-            ModalOverlay.Visibility = Visibility.Visible;
-        }
+            => OpenEditModal(companyId, id => new EditCompanyView(id));
 
         /// <summary>
         /// فرم «ویرایش دوره مالی» را به‌صورت مودال روی محتوای فعلی باز می‌کند (گرید پشت آن می‌ماند).
         /// اگر ذخیره شود، گرید لیست پشت مودال رفرش می‌شود.
         /// </summary>
         public void NavigateToEditFinancialPeriod(long periodId)
-        {
-            var editView = new EditFinancialPeriodView(periodId);
-            ModalContent.Content = editView;
-            ModalOverlay.BeginAnimation(UIElement.OpacityProperty, null);
-            ModalOverlay.Opacity = 1;
-            ModalOverlay.Visibility = Visibility.Visible;
-        }
+            => OpenEditModal(periodId, id => new EditFinancialPeriodView(id));
 
         /// <summary>
         /// فرم «ویرایش شعبه» را به‌صورت مودال روی محتوای فعلی باز می‌کند (گرید پشت آن می‌ماند).
         /// اگر ذخیره شود، گرید لیست پشت مودال رفرش می‌شود.
         /// </summary>
         public void NavigateToEditBranch(long branchId)
-        {
-            var editView = new EditBranchView(branchId);
-            ModalContent.Content = editView;
-            ModalOverlay.BeginAnimation(UIElement.OpacityProperty, null);
-            ModalOverlay.Opacity = 1;
-            ModalOverlay.Visibility = Visibility.Visible;
-        }
+            => OpenEditModal(branchId, id => new EditBranchView(id));
 
         /// <summary>
         /// فرم «شخص جدید» را به‌صورت مودال روی محتوای فعلی باز می‌کند (گرید پشت آن می‌ماند).
@@ -352,10 +390,51 @@ namespace Taadol
                     _ = listView.RefreshGridAsync();
             };
 
-            ModalContent.Content = newView;
-            ModalOverlay.BeginAnimation(UIElement.OpacityProperty, null);
-            ModalOverlay.Opacity = 1;
-            ModalOverlay.Visibility = Visibility.Visible;
+            _modalService.Open(newView);
+        }
+
+        /// <summary>
+        /// فرم ثبت بانک را به‌صورت مودال باز می‌کند و بعد از ذخیره موفق،
+        /// لیست بانک‌ها را دقیقاً از همین‌جا رفرش می‌کند.
+        /// </summary>
+        public void OpenNewBank()
+        {
+            var newView = CreateNewBankView();
+            _modalService.Open(newView);
+        }
+
+        private NewBankView CreateNewBankView()
+        {
+            var newView = new NewBankView();
+            newView.ViewModel.BankSaved += () =>
+            {
+                if (MainContent.Content is BankListView listView)
+                    _ = RefreshBankListSafeAsync(listView);
+
+                if (ReferenceEquals(_modalService.Current, newView))
+                    CloseModal();
+                else if (MainContent.Content is not BankListView)
+                    NavigateTo(NavKeys.BankList);
+            };
+            return newView;
+        }
+
+        private async System.Threading.Tasks.Task RefreshBankListSafeAsync(BankListView listView)
+        {
+            try
+            {
+                await listView.RefreshGridAsync();
+            }
+            catch (OperationCanceledException)
+            {
+                // لغو رفرش هنگام بسته‌شدن یا جابه‌جایی صفحه طبیعی است.
+            }
+            catch (Exception exception)
+            {
+                System.Diagnostics.Debug.WriteLine($"[MainWindow] خطا در رفرش لیست بانک: {exception}");
+                Application.Current?.Dispatcher.BeginInvoke(new Action(() =>
+                    ToastManager.Error("خطا در بروزرسانی لیست بانک‌ها")));
+            }
         }
 
         /// <summary>
@@ -369,29 +448,7 @@ namespace Taadol
             Sidebar.DeselectActiveSubMenu();
         }
 
-        public void CloseModal()
-        {
-            if (ModalOverlay == null) return;
-
-            // Detach the content immediately so its Unloaded handlers cancel work
-            // before the fade animation completes.
-            var contentBeingClosed = ModalContent.Content;
-            ModalContent.Content = null;
-
-            // بستن نرم با فید-اوت تا فرم «یهویی» ناپدید نشود
-            var fade = new System.Windows.Media.Animation.DoubleAnimation(
-                0, TimeSpan.FromMilliseconds(220));
-            fade.EasingFunction = new System.Windows.Media.Animation.QuadraticEase
-            {
-                EasingMode = System.Windows.Media.Animation.EasingMode.EaseIn
-            };
-            fade.Completed += (s, e) =>
-            {
-                ModalOverlay.Visibility = Visibility.Collapsed;
-                ModalOverlay.Opacity = 1;
-            };
-            ModalOverlay.BeginAnimation(UIElement.OpacityProperty, fade);
-        }
+        public void CloseModal() => _modalService.Close();
 
         private void ModalOverlay_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {

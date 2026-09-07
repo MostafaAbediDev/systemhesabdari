@@ -170,7 +170,7 @@
                                 <Style TargetType="DataGridColumnHeader"
                                        BasedOn="{StaticResource UnifiedGridColumnHeaderStyle}">
                                     <Setter Property="BorderThickness"
-                                            Value="0,0,0,1" />
+                                            Value="1,0,0,1" />
                                     <Setter Property="BorderBrush"
                                             Value="#E5E7EB" />
                                 </Style>
@@ -178,10 +178,9 @@
                             <DataGridTemplateColumn.CellStyle>
                                 <Style TargetType="DataGridCell"
                                        BasedOn="{StaticResource UnifiedGridCellStyle}">
-                                    <!-- سلول چک‌باکس هیچ خطی نمی‌کشد؛ لبه‌ی راست گرید فقط بردر قاب را دارد
-                                         و جداکننده‌ی بین چک‌باکس و # از سلول ستون # می‌آید -->
+                                    <!-- در چیدمان راست‌به‌چپ، لبه‌ی چپ چک‌باکس مرز مشترک با ستون # است. -->
                                     <Setter Property="BorderThickness"
-                                            Value="0" />
+                                            Value="1,0,0,0" />
                                     <Setter Property="Padding"
                                             Value="0" />
                                     <Setter Property="HorizontalContentAlignment"
@@ -222,12 +221,24 @@
                                             MinWidth="45"
                                             Binding="{Binding RowNumberDisplay}"
                                             ElementStyle="{StaticResource RowNumberColumnStyle}">
+                            <DataGridTextColumn.CellStyle>
+                                <Style TargetType="DataGridCell"
+                                       BasedOn="{StaticResource UnifiedGridCellStyle}">
+                                    <!-- ستون # باید از هر دو سمت از ستون‌های مجاور جدا باشد. -->
+                                    <!-- ستون # باید از هر دو سمت از ستون‌های مجاور جدا باشد. -->
+                                    <Setter Property="BorderThickness"
+                                            Value="1,0,1,0" />
+                                    <Setter Property="BorderBrush"
+                                            Value="#E5E7EB" />
+                                </Style>
+                            </DataGridTextColumn.CellStyle>
                             <DataGridTextColumn.HeaderStyle>
                                 <Style TargetType="DataGridColumnHeader"
                                        BasedOn="{StaticResource UnifiedGridColumnHeaderStyle}">
-                                    <!-- خط راست = جداکننده با چک‌باکس؛ خط چپ حذف شد تا با خط راست هدر «کد یکتا» دوتایی نشود -->
+                                    <!-- خط‌های چپ و راست هدر # و خط پایینی حفظ می‌شوند. -->
+                                    <!-- خط‌های چپ و راست هدر # و خط پایینی حفظ می‌شوند. -->
                                     <Setter Property="BorderThickness"
-                                            Value="0,0,1,1" />
+                                            Value="1,0,1,1" />
                                     <Setter Property="BorderBrush"
                                             Value="#E5E7EB" />
                                 </Style>
