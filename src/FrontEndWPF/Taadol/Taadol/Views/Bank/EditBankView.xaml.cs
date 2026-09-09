@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Taadol.Controls;
+using Taadol.Helpers;
 using Taadol.ViewModels;
 
 namespace Taadol.Views.Bank
@@ -72,45 +73,42 @@ namespace Taadol.Views.Bank
             OnUnloaded(sender, e);
         }
 
-        private async void HeaderClose_Click(object sender, MouseButtonEventArgs e)
+        private async void HeaderClose_Click(object sender, RoutedEventArgs e)
             => await HandleCancelAsync();
 
         private async void Cancel_Click(object sender, RoutedEventArgs e)
             => await HandleCancelAsync();
 
+        // کلید Escape مسیر لغو/بستن و کلید Enter مسیر ذخیره را اجرا میکند؛
+        // Enter در فیلدهای چندخطی به خط بعدی میگذارد.
+        private void View_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+            {
+                e.Handled = true;
+                _ = HandleCancelAsync();
+                return;
+            }
+
+            if (e.Key != Key.Enter)
+                return;
+
+            if (Keyboard.FocusedElement is TextBox { AcceptsReturn: true })
+                return; // فیلد چندخطی: Enter باید خط جدید ایجاد کند
+
+            if (ViewModel?.IsFormInteractive == true && ViewModel.SaveCommand.CanExecute(null))
+            {
+                e.Handled = true;
+                ViewModel.SaveCommand.Execute(null);
+            }
+        }
+
         private async Task HandleCancelAsync()
         {
-            try
-            {
-                if (ViewModel.HasUnsavedChanges)
-                {
-                    var result = MessageBox.Show(
-                        "تغییراتی که ایجاد کرده‌اید ذخیره نشده است.\nآیا می‌خواهید آن‌ها را ذخیره کنید؟",
-                        "ذخیره تغییرات",
-                        MessageBoxButton.YesNoCancel,
-                        MessageBoxImage.Question);
-
-                    if (result == MessageBoxResult.Yes)
-                    {
-                        var saved = await ViewModel.SaveAsync();
-                        if (saved)
-                            return;
-
-                        return;
-                    }
-
-                    if (result == MessageBoxResult.Cancel)
-                        return;
-                }
-
-                RequestClose();
-            }
-            catch (Exception exception)
-            {
-                System.Diagnostics.Debug.WriteLine($"[EditBankView] خطا در عملیات انصراف: {exception}");
-                Application.Current?.Dispatcher.BeginInvoke(new Action(() =>
-                    ToastManager.Error("خطا در عملیات")));
-            }
+            await FormCloseHelper.ConfirmAndCloseAsync(
+                ViewModel,
+                () => ViewModel.SaveAsync(),
+                RequestClose);
         }
 
         private void RequestClose()

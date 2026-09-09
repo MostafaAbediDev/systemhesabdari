@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using BankManagement.Application.Contracts.Bank;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -42,7 +43,7 @@ namespace Taadol.ViewModels
             NextPageCommand = new RelayCommand(GoToNextPage);
             PreviousPageCommand = new RelayCommand(GoToPreviousPage);
             RefreshCommand = new AsyncRelayCommand(RefreshAsync);
-            DeleteBankCommand = new AsyncRelayCommand(async () => await DeleteSelectedAsync());
+            DeleteBankCommand = new AsyncRelayCommand(DeleteWithConfirmationAsync);
             EditBankCommand = new RelayCommand<BankItem?>(RequestEdit);
         }
 
@@ -366,6 +367,47 @@ namespace Taadol.ViewModels
             }
         }
 
+        private async Task DeleteWithConfirmationAsync()
+        {
+            if (IsDisposed)
+                return;
+
+            var selectedItems = GetSelectedItems();
+            if (selectedItems.Count == 0)
+            {
+                ShowWarningToast("لطفاً یک بانک انتخاب کنید.");
+                return;
+            }
+
+            var result = MessageBox.Show(
+                $"آیا از حذف {selectedItems.Count} بانک مطمئن هستید؟",
+                "حذف بانک",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning,
+                MessageBoxResult.No);
+
+            if (result != MessageBoxResult.Yes)
+                return;
+
+            try
+            {
+                var deletion = await DeleteSelectedAsync();
+                if (deletion.Errors.Count == 0)
+                    ShowSuccessToast("عملیات حذف انجام شد.");
+                else
+                    ShowWarningToast($"{deletion.Errors.Count} مورد از بانک‌های انتخاب‌شده حذف نشد.");
+            }
+            catch (OperationCanceledException)
+            {
+                // لغو عملیات هنگام خروج طبیعی است.
+            }
+            catch (Exception exception)
+            {
+                System.Diagnostics.Debug.WriteLine($"[BankListViewModel] خطا در حذف: {exception}");
+                ShowErrorToast("خطا در حذف");
+            }
+        }
+
         public void CancelPendingLoads()
         {
             var current = Interlocked.Exchange(ref _loadCts, null);
@@ -531,16 +573,20 @@ namespace Taadol.ViewModels
             return "حذف بانک انجام نشد.";
         }
 
-        private static void ShowErrorToast(string message)
+        private static void ShowWarningToast(string message) => ShowToast(() => Taadol.Controls.ToastManager.Warning(message));
+        private static void ShowSuccessToast(string message) => ShowToast(() => Taadol.Controls.ToastManager.Success(message));
+        private static void ShowErrorToast(string message) => ShowToast(() => Taadol.Controls.ToastManager.Error(message));
+
+        private static void ShowToast(Action showAction)
         {
-            var dispatcher = System.Windows.Application.Current?.Dispatcher;
+            var dispatcher = Application.Current?.Dispatcher;
             if (dispatcher == null)
             {
-                Taadol.Controls.ToastManager.Error(message);
+                showAction();
                 return;
             }
 
-            dispatcher.BeginInvoke(new Action(() => Taadol.Controls.ToastManager.Error(message)));
+            dispatcher.BeginInvoke(new Action(showAction));
         }
 
         private static void CancelAndDispose(CancellationTokenSource? cts)

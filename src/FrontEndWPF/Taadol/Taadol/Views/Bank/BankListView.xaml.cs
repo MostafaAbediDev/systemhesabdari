@@ -91,7 +91,7 @@ namespace Taadol.Views.Bank
                 return;
 
             ViewModel.SelectOnly(bank);
-            BtnDelete_Click(this, new RoutedEventArgs());
+            ViewModel.DeleteBankCommand.Execute(null);
         }
 
         private void UpdateSelectedBank()
@@ -150,23 +150,6 @@ namespace Taadol.Views.Bank
         private void BtnPrint_Click(object sender, RoutedEventArgs e)
         {
             ToastManager.Warning("چاپ این بخش به‌زودی اضافه می‌شود.");
-        }
-
-        private async void BtnRefresh_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                await ViewModel.RefreshAsync();
-            }
-            catch (OperationCanceledException)
-            {
-                // لغو هنگام جابه‌جایی صفحه طبیعی است.
-            }
-            catch (Exception exception)
-            {
-                System.Diagnostics.Debug.WriteLine($"[BankListView] خطا در بروزرسانی: {exception}");
-                ToastManager.Error("خطا در بروزرسانی");
-            }
         }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
@@ -233,42 +216,5 @@ namespace Taadol.Views.Bank
             }
         }
 
-        private async void BtnDelete_Click(object sender, RoutedEventArgs e)
-        {
-            var selectedItems = ViewModel.GetSelectedItems();
-            if (selectedItems.Count == 0)
-            {
-                ToastManager.Warning("لطفاً یک بانک انتخاب کنید.");
-                return;
-            }
-
-            var result = MessageBox.Show(
-                $"آیا از حذف {selectedItems.Count} بانک مطمئن هستید؟",
-                "حذف بانک",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Warning,
-                MessageBoxResult.No);
-
-            if (result != MessageBoxResult.Yes)
-                return;
-
-            try
-            {
-                var deletion = await ViewModel.DeleteSelectedAsync();
-                if (deletion.Errors.Count == 0)
-                    ToastManager.Success("عملیات حذف انجام شد.");
-                else
-                    ToastManager.Warning($"{deletion.Errors.Count} مورد از بانک‌های انتخاب‌شده حذف نشد.");
-            }
-            catch (OperationCanceledException)
-            {
-                // لغو عملیات هنگام خروج طبیعی است.
-            }
-            catch (Exception exception)
-            {
-                System.Diagnostics.Debug.WriteLine($"[BankListView] خطا در حذف: {exception}");
-                ToastManager.Error("خطا در حذف");
-            }
-        }
     }
 }

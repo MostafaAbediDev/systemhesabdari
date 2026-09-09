@@ -65,7 +65,7 @@
                                                BorderColor="#E9F0FF"
                                                IconPath="/Assets/Icons/trash.svg"
                                                Margin="10,0,0,0"
-                                               Click="BtnDelete_Click" />
+                                               Command="{Binding DeleteBankCommand}" />
 
                         <controls:ActionButton Text="چاپ"
                                                TextColor="#2563EB"
@@ -88,7 +88,7 @@
                                                TextColor="#2563EB"
                                                IconPath="/Assets/Icons/arrow-reload-horizontal-2.svg"
                                                Margin="6,0,0,0"
-                                               Click="BtnRefresh_Click" />
+                                               Command="{Binding RefreshCommand}" />
                     </StackPanel>
                 </Grid>
             </Border>

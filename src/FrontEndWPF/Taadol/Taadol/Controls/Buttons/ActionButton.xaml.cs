@@ -27,6 +27,14 @@ namespace Taadol.Controls
             DependencyProperty.Register(nameof(IconColor), typeof(Brush), typeof(ActionButton),
                 new PropertyMetadata(Brushes.Black));
 
+        public static readonly DependencyProperty CommandProperty =
+            DependencyProperty.Register(nameof(Command), typeof(ICommand), typeof(ActionButton),
+                new PropertyMetadata(null));
+
+        public static readonly DependencyProperty CommandParameterProperty =
+            DependencyProperty.Register(nameof(CommandParameter), typeof(object), typeof(ActionButton),
+                new PropertyMetadata(null));
+
         public string Text
         {
             get => (string)GetValue(TextProperty);
@@ -55,6 +63,18 @@ namespace Taadol.Controls
         {
             get => (Brush)GetValue(IconColorProperty);
             set => SetValue(IconColorProperty, value);
+        }
+
+        public ICommand Command
+        {
+            get => (ICommand)GetValue(CommandProperty);
+            set => SetValue(CommandProperty, value);
+        }
+
+        public object CommandParameter
+        {
+            get => GetValue(CommandParameterProperty);
+            set => SetValue(CommandParameterProperty, value);
         }
 
         public event RoutedEventHandler Click;
@@ -102,6 +122,13 @@ namespace Taadol.Controls
 
         private void BtnBorder_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            if (Command != null)
+            {
+                if (Command.CanExecute(CommandParameter))
+                    Command.Execute(CommandParameter);
+                return;
+            }
+
             Click?.Invoke(this, e);
         }
 

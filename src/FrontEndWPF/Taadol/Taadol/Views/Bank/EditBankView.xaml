@@ -6,8 +6,9 @@
              FlowDirection="RightToLeft"
              FontFamily="{StaticResource IRANSans}"
              Background="Transparent"
+             PreviewKeyDown="View_PreviewKeyDown"
              Unloaded="View_Unloaded">
-    <Border Background="White" CornerRadius="4" ClipToBounds="False">
+    <Border Background="White" CornerRadius="12" ClipToBounds="True">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -18,15 +19,16 @@
 
             <Grid Grid.Row="0" Margin="10,15,10,10">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <Border Cursor="Hand"
+                    <Button Cursor="Hand"
                             Background="Transparent"
+                            BorderThickness="0"
                             Margin="10,0,10,0"
-                            MouseLeftButtonDown="HeaderClose_Click">
+                            Click="HeaderClose_Click">
                         <svg:SvgViewbox FlowDirection="LeftToRight"
                                         Width="14"
                                         Height="14"
                                         Source="/Assets/Icons/closeTHIN.svg" />
-                    </Border>
+                    </Button>
                     <TextBlock Text="ویرایش بانک"
                                FontSize="20"
                                FontWeight="Bold"
@@ -38,8 +40,29 @@
             <Border Grid.Row="0"
                     Height="1"
                     Margin="7,0,7,2"
-                    VerticalAlignment="Bottom"
-                    Background="#D4E0FF" />
+                    VerticalAlignment="Bottom">
+                <Border.Background>
+                    <VisualBrush TileMode="Tile"
+                                 Viewport="0,0,10,1"
+                                 ViewportUnits="Absolute"
+                                 Viewbox="0,0,10,1"
+                                 ViewboxUnits="Absolute">
+                        <VisualBrush.Visual>
+                            <Grid Width="10"
+                                  Height="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="5" />
+                                    <ColumnDefinition Width="5" />
+                                </Grid.ColumnDefinitions>
+                                <Rectangle Grid.Column="0"
+                                           Fill="#D4E0FF" />
+                                <Rectangle Grid.Column="1"
+                                           Fill="#D4E0FF" />
+                            </Grid>
+                        </VisualBrush.Visual>
+                    </VisualBrush>
+                </Border.Background>
+            </Border>
 
             <ScrollViewer Grid.Row="2"
                           IsEnabled="{Binding IsFormInteractive}"
@@ -81,18 +104,16 @@
                             </Grid>
 
                             <!-- نام بانک -->
-                            <TextBlock Text="نام بانک"
-                                       Style="{StaticResource FormLabel}"
-                                       Margin="0,16,0,0" />
+                            <TextBlock Style="{StaticResource FormLabel}"
+                                       Margin="0,16,0,0"><Run Text="نام بانک" /><Run Text=" *" Foreground="#DC2626" /></TextBlock>
                             <controls:ModernPersianTextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"
                                                            Margin="0,8,0,0"
                                                            MaxLength="200"
                                                            Placeholder="بنویسید" />
 
                             <!-- نوع بانک -->
-                            <TextBlock Text="نوع بانک"
-                                       Style="{StaticResource FormLabel}"
-                                       Margin="0,16,0,0" />
+                            <TextBlock Style="{StaticResource FormLabel}"
+                                       Margin="0,16,0,0"><Run Text="نوع بانک" /><Run Text=" *" Foreground="#DC2626" /></TextBlock>
                             <Grid Margin="0,8,0,0">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
@@ -121,9 +142,8 @@
                             </Grid>
 
                             <!-- کشور -->
-                            <TextBlock Text="کشور"
-                                       Style="{StaticResource FormLabel}"
-                                       Margin="0,16,0,0" />
+                            <TextBlock Style="{StaticResource FormLabel}"
+                                       Margin="0,16,0,0"><Run Text="کشور" /><Run Text=" *" Foreground="#DC2626" /></TextBlock>
                             <ComboBox Style="{StaticResource SearchableComboBox}"
                                       ItemsSource="{Binding Countries}"
                                       SelectedItem="{Binding Country, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -160,7 +180,8 @@
                     IsEnabled="{Binding IsFormInteractive}"
                     BorderBrush="#E5E7EB"
                     BorderThickness="0,1,0,0"
-                    Background="White">
+                    Background="White"
+                    CornerRadius="0,0,12,12">
                 <Grid Margin="16,10"
                       FlowDirection="RightToLeft">
                     <Grid.ColumnDefinitions>
