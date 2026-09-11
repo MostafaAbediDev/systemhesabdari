@@ -189,7 +189,13 @@ namespace Taadol
                         this);
 
                     if (!confirmNav)
-                        return; // ناوبری لغو شد؛ finally flag را ریست می‌کند
+                    {
+                        // ناوبری لغو شد؛ ردیف زیرمنویی که SidebarControl پیش از نمایش این دیالوگ
+                        // «فعال» کرده است باید آزاد شود، وگرنه کلیک بعدی روی همان ردیف
+                        // نادیده گرفته می‌شود و سایدبار تا ری‌استارت پاسخ نمی‌دهد.
+                        Sidebar.DeselectActiveSubMenu();
+                        return; // finally flag را ریست می‌کند
+                    }
                 }
 
                 // مودال بدون تغییرات (یا تأییدشده) هنگام ناوبری بسته شود تا روی صفحه جدید معلق نماند
@@ -209,7 +215,13 @@ namespace Taadol
                         this);
 
                     if (!confirmNav)
-                        return; // ناوبری لغو شد；finally flag را ریست می‌کند
+                    {
+                        // ناوبری لغو شد؛ ردیف زیرمنویی که SidebarControl پیش از نمایش این دیالوگ
+                        // «فعال» کرده است باید آزاد شود، وگرنه کلیک بعدی روی همان ردیف
+                        // نادیده گرفته می‌شود و سایدبار تا ری‌استارت پاسخ نمی‌دهد.
+                        Sidebar.DeselectActiveSubMenu();
+                        return; // finally flag را ریست می‌کند
+                    }
                 }
 
                 MainContentBorder.Visibility = Visibility.Visible;

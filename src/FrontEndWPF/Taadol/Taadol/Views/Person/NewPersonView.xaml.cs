@@ -1181,7 +1181,19 @@ namespace Taadol.Views
             var mainWindow = Window.GetWindow(this) as MainWindow;
             bool isModal = mainWindow?.ModalContent.Content == this;
             if (isModal) { PersonSaved?.Invoke(); mainWindow?.CloseModal(); }
-            else ClearForm();
+            else
+            {
+                ClearForm();
+
+                // بعد از ذخیره‌ی موفق، فرم باید «بدون تغییر ذخیره‌نشده» باشد.
+                // ClearForm خودش مقادیر را ست می‌کند و setterها فرم را dirty می‌کنند؛
+                // همچنین بایندینگ‌ها در اولویت DataBind مقدار را به کنترل‌ها می‌برند و
+                // گردش برگشتی TwoWay ممکن است دوباره dirty کند. بنابراین ریست باید
+                // بعد از تخلیه‌ی کامل صف Dispatcher (ContextIdle) انجام شود.
+                Dispatcher.BeginInvoke(
+                    new Action(() => _userMadeChanges = false),
+                    System.Windows.Threading.DispatcherPriority.ContextIdle);
+            }
         }
 
         /// <summary> logs exception to debug + file</summary>
