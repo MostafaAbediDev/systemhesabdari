@@ -5,6 +5,7 @@
               xmlns:controls="clr-namespace:Taadol.Controls"
               xmlns:local="clr-namespace:Taadol.Views"
               xmlns:svg="http://sharpvectors.codeplex.com/svgc/"
+              PreviewKeyDown="EditPersonView_PreviewKeyDown"
               FlowDirection="RightToLeft"
               Background="Transparent">
 

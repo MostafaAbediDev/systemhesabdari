@@ -168,14 +168,18 @@
                                 VerticalAlignment="Center"
                                 FlowDirection="LeftToRight">
 
-                        <controls:ActionButton Text="حذف"
+                        <controls:ActionButton x:Name="BtnDelete"
+                                               AutomationProperties.AutomationId="BtnDelete"
+                                               Text="حذف"
                                                TextColor="#DC2626"
                                                BorderColor="#E9F0FF"
                                                IconPath="/Assets/Icons/trash.svg"
                                                Margin="10,0,0,0"
                                                Click="BtnDelete_Click" />
 
-                        <controls:ActionButton Text="چاپ"
+                        <controls:ActionButton x:Name="BtnPrint"
+                                               AutomationProperties.AutomationId="BtnPrint"
+                                               Text="چاپ"
                                                TextColor="#2563EB"
                                                BorderColor="#E9F0FF"
                                                IconPath="/Assets/Icons/printer.svg"
@@ -192,7 +196,9 @@
                                                BorderColor="#E5E7EB"
                                                Margin="6,0,0,0" />
 
-                        <controls:ActionButton Text="بروزرسانی"
+                        <controls:ActionButton x:Name="BtnRefresh"
+                                               AutomationProperties.AutomationId="BtnRefresh"
+                                               Text="بروزرسانی"
                                                TextColor="#2563EB"
                                                IconPath="/Assets/Icons/arrow-reload-horizontal-2.svg"
                                                Margin="6,0,0,0"
@@ -390,12 +396,14 @@
 
                                 <!-- جستجو -->
                                 <controls:SearchBoxControl x:Name="SearchBox"
+                                    AutomationProperties.AutomationId="SearchBox"
                                                            Grid.Column="0"
                                                            Margin="0,0,4,0"
                                                            Placeholder="جستجو در نام ، شماره موبایل" />
 
                                 <!-- تب‌ها -->
                                 <ToggleButton x:Name="tabAll"
+                                 AutomationProperties.AutomationId="tabAll"
                                               Grid.Column="1"
                                               Style="{StaticResource FilterTabStyle2}"
                                               controls:FilterTabBehavior.ShowClose="False"
@@ -406,6 +414,7 @@
                                               Margin="4,0,0,0" />
 
                                 <ToggleButton x:Name="tabCustomers"
+                                 AutomationProperties.AutomationId="tabCustomers"
                                               Grid.Column="2"
                                               Style="{StaticResource FilterTabStyle2}"
                                               Content="مشتری"
@@ -414,6 +423,7 @@
                                               Margin="4,0,0,0" />
 
                                 <ToggleButton x:Name="tabSuppliers"
+                                 AutomationProperties.AutomationId="tabSuppliers"
                                               Grid.Column="3"
                                               Style="{StaticResource FilterTabStyle2}"
                                               Content="تامین کننده"
@@ -422,6 +432,7 @@
                                               Margin="4,0,0,0" />
 
                                 <ToggleButton x:Name="tabPersonnel"
+                                 AutomationProperties.AutomationId="tabPersonnel"
                                               Grid.Column="4"
                                               Style="{StaticResource FilterTabStyle2}"
                                               Content="پرسنل"
@@ -432,6 +443,7 @@
                         </Border>
                          <!-- ═══ DataGrid (کنترل مشترک) ═══ -->
                          <controls:UnifiedListView x:Name="PersonsGrid"
+                                                   AutomationProperties.AutomationId="PersonsGrid"
                                                    Grid.Row="1"
                                                    Padding="0,0,10,0"
                                                    ItemsSource="{Binding FilteredPersons}"
@@ -928,6 +940,7 @@
 
             <!-- ═══ Toggle Button — direct grid child, last = on top ═══ -->
             <Button x:Name="BtnToggleSidebar"
+                    AutomationProperties.AutomationId="BtnToggleSidebar"
                     Grid.Row="1" Grid.ColumnSpan="3"
                     Click="BtnToggleSidebar_Click"
                     HorizontalAlignment="Left"
