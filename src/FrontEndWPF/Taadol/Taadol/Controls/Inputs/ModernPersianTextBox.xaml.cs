@@ -398,7 +398,7 @@ namespace Taadol.Controls
                 // Icon: Width=22, Margin=5,0,10,0. Reserve the right-side
                 // margin and icon width, plus the existing right padding.
                 PART_TextBox.Padding = new Thickness(16, 0, 37, 0);
-                PlaceholderText.Margin = new Thickness(0, 0, 37, 0);
+                PlaceholderText.Margin = new Thickness(16, 0, 37, 0);
             }
             else
             {
