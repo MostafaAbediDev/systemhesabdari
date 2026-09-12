@@ -301,6 +301,7 @@ namespace Taadol.Views
                 System.Diagnostics.Debug.WriteLine("[DEBUG] EditPersonView: all load tasks completed, calling LoadPersonData");
                 await LoadPersonData();
                 System.Diagnostics.Debug.WriteLine("[DEBUG] EditPersonView: LoadPersonData completed");
+                Dispatcher.BeginInvoke(new Action(() => _userMadeChanges = false), System.Windows.Threading.DispatcherPriority.ContextIdle);
             }
             catch (OperationCanceledException)
             {
@@ -1764,6 +1765,36 @@ namespace Taadol.Views
         }
 
         private void SavePerson_Click(object sender, RoutedEventArgs e) => SavePerson();
+
+        // کلید Escape مسیر لغو/بستن و کلید Enter مسیر ذخیره را اجرا میکند؛
+        // Enter در فیلدهای چندخطی به خط بعدی میگذارد.
+        private void EditPersonView_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+            {
+                e.Handled = true;
+                Cancel_Click(this, new MouseButtonEventArgs(InputManager.Current.PrimaryMouseDevice, 0, MouseButton.Left));
+                return;
+            }
+
+            if (e.Key != Key.Enter)
+                return;
+
+            if (Keyboard.FocusedElement is TextBox { AcceptsReturn: true })
+                return;
+
+            if (Keyboard.FocusedElement is ComboBox)
+                return;
+
+            if (Keyboard.FocusedElement is System.Windows.Controls.DatePicker)
+                return;
+
+            if (SaveCommand?.CanExecute(null) == true)
+            {
+                e.Handled = true;
+                SaveCommand.Execute(null);
+            }
+        }
 
         /// <summary>
         /// اگر تغییرات ذخیره‌نشده وجود داشته باشد، از کاربر می‌پرسد (ذخیره/انصراف/بستن).

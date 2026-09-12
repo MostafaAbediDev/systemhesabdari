@@ -257,6 +257,36 @@ namespace Taadol.Views
             e.Handled = true;
         }
 
+        // کلید Escape مسیر لغو/بستن و کلید Enter مسیر ذخیره را اجرا میکند؛
+        // Enter در فیلدهای چندخطی به خط بعدی میگذارد.
+        private void NewPersonView_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+            {
+                e.Handled = true;
+                Cancel_Click(this, new RoutedEventArgs());
+                return;
+            }
+
+            if (e.Key != Key.Enter)
+                return;
+
+            if (Keyboard.FocusedElement is TextBox { AcceptsReturn: true })
+                return;
+
+            if (Keyboard.FocusedElement is ComboBox)
+                return;
+
+            if (Keyboard.FocusedElement is System.Windows.Controls.DatePicker)
+                return;
+
+            if (SavePersonCommand?.CanExecute(null) == true)
+            {
+                e.Handled = true;
+                SavePersonCommand.Execute(null);
+            }
+        }
+
         private void CityCombo_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (SelectedProvinceId <= 0)
