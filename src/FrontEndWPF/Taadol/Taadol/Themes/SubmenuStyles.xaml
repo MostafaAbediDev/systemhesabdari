@@ -21,7 +21,6 @@
                 Value="8,0,8,0" />
     </Style>
 
-    <!-- ★ خط چین بین دو دایره — با Padding 18 از هر طرف فاصله داره -->
     <Style x:Key="SubmenuDivider"
            TargetType="Border">
         <Setter Property="Height"

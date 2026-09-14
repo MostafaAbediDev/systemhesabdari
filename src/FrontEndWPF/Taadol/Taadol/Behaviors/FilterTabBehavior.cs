@@ -1,11 +1,8 @@
-using System.Windows;
+﻿using System.Windows;
 
 namespace Taadol.Controls
 {
-    /// <summary>
-    /// کنترل آیکون ضربدر (✕) روی تب‌های فیلتر (FilterTabStyle2).
-    /// تب «همه» در هر لیست نباید ضربدر داشته باشد → ShowClose="False".
-    /// </summary>
+
     public static class FilterTabBehavior
     {
         public static readonly DependencyProperty ShowCloseProperty =

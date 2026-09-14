@@ -12,7 +12,7 @@
              HorizontalAlignment="Stretch" VerticalAlignment="Top">
 
     <UserControl.Resources>
-        <!-- استایل تکست‌باکس‌ها -->
+
         <Style x:Key="DatePickerTextBoxStyle" TargetType="TextBox">
             <Setter Property="Background" Value="White"/>
             <Setter Property="BorderBrush" Value="#B0B0B0"/>
@@ -53,7 +53,6 @@
             </Setter>
         </Style>
 
-        <!-- دکمه‌های ناوبری ماه -->
         <Style x:Key="CalendarNavButtonStyle" TargetType="Button">
             <Setter Property="Width" Value="28"/>
             <Setter Property="Height" Value="28"/>
@@ -79,7 +78,6 @@
             </Setter>
         </Style>
 
-        <!-- دکمه‌های روزهای ماه -->
         <Style x:Key="CalendarDayButtonStyle" TargetType="Button">
             <Setter Property="FontFamily" Value="{StaticResource IRANSans}"/>
             <Setter Property="FontSize" Value="13"/>
@@ -113,7 +111,6 @@
             </Setter>
         </Style>
 
-        <!-- روزهای هفته -->
         <Style x:Key="CalendarWeekdayStyle" TargetType="TextBlock">
             <Setter Property="FontFamily" Value="{StaticResource IRANSans}"/>
             <Setter Property="FontSize" Value="11"/>
@@ -122,7 +119,6 @@
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
 
-        <!-- دکمه امروز -->
         <Style x:Key="CalendarTodayButtonStyle" TargetType="Button">
             <Setter Property="FontFamily" Value="{StaticResource IRANSans}"/>
             <Setter Property="FontSize" Value="12"/>
@@ -156,12 +152,11 @@
     <Grid Margin="0,0,0,0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <!-- باکس‌های تاریخ -->
+
             <RowDefinition Height="Auto"/>
-            <!-- پیغام خطا -->
+
         </Grid.RowDefinitions>
 
-        <!-- باکس‌های تاریخ -->
         <Grid Grid.Row="0" HorizontalAlignment="Stretch">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1.4*" MinWidth="110"/>
@@ -171,7 +166,6 @@
                 <ColumnDefinition Width="*" MinWidth="70"/>
             </Grid.ColumnDefinitions>
 
-            <!-- سال همراه با آیکون تقویم -->
             <Border Grid.Column="0"
                     BorderBrush="#E5E7EB"
                     BorderThickness="1"
@@ -185,7 +179,7 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <Border Grid.Column="0" 
+                    <Border Grid.Column="0"
                             x:Name="CalendarIconBorder"
                             Width="28" Height="28"
                             CornerRadius="4"
@@ -217,7 +211,6 @@
                 </Grid>
             </Border>
 
-            <!-- ماه -->
             <Border Grid.Column="2"
                     BorderBrush="#E5E7EB"
                     BorderThickness="1"
@@ -237,7 +230,6 @@
                          PreviewTextInput="NumberValidationTextBox"/>
             </Border>
 
-            <!-- روز -->
             <Border Grid.Column="4"
                     BorderBrush="#E5E7EB"
                     BorderThickness="1"
@@ -258,8 +250,7 @@
             </Border>
         </Grid>
 
-        <!-- پیغام خطا -->
-        <TextBlock Grid.Row="1" 
+        <TextBlock Grid.Row="1"
                    x:Name="ErrorMessage"
                    Foreground="#DC3545"
                    FontSize="11"
@@ -269,7 +260,6 @@
                    Margin="0,4,0,0"
                    FlowDirection="RightToLeft"/>
 
-        <!-- پاپ‌آپ تقویم شمسی -->
         <Popup x:Name="CalendarPopup"
                Placement="Bottom"
                AllowsTransparency="True"

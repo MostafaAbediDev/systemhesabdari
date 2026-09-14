@@ -32,7 +32,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <!-- ★ FlowDirection و TextBlock.TextAlignment مستقیم روی Border -->
+
                         <Border x:Name="Bd"
                                 Background="{TemplateBinding Background}"
                                 CornerRadius="4"
@@ -84,7 +84,7 @@
     </UserControl.Resources>
 
     <Grid>
-        <!-- ★ سلکتور اصلی (هدر) — دیگه BorderBrush/BorderThickness نداره، خط از IconLineWrapper میاد -->
+
         <Border x:Name="SelectorBorder"
                 Background="Transparent"
                 Padding="0,8"
@@ -139,7 +139,6 @@
             </Grid>
         </Border>
 
-        <!-- ★ پاپ‌آپ لیست سال‌ها -->
         <Popup x:Name="YearsPopup"
                PlacementTarget="{Binding ElementName=SelectorBorder}"
                Placement="Bottom"

@@ -1,4 +1,4 @@
-<UserControl x:Class="Taadol.Views.BranchArchiveListView"
+﻿<UserControl x:Class="Taadol.Views.BranchArchiveListView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:svg="http://sharpvectors.codeplex.com/svgc/"
@@ -35,7 +35,6 @@
             <Setter Property="Panel.ZIndex" Value="-1" />
         </Style>
 
-        <!-- ظاهر ردیف‌ها شبیه جدول حساب‌های بانکی: خط افقی خاکستری زیر هر ردیف -->
         <Style x:Key="BankTableCellStyle"
                TargetType="DataGridCell"
                BasedOn="{StaticResource UnifiedGridCellStyle}">
@@ -58,7 +57,6 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <!-- ═══ هدر ═══ -->
             <Border Grid.Row="0"
                     BorderBrush="#E5E7EB"
                     BorderThickness="0,0,0,1"
@@ -94,7 +92,6 @@
                 </Grid>
             </Border>
 
-            <!-- ═══ محتویات اصلی ═══ -->
             <Grid Grid.Row="1" Margin="0,8,0,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -104,7 +101,6 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <!-- ═══ نوار فیلتر + آپلود ═══ -->
                 <Border Grid.Row="0"
                         Background="#ffffff"
                         CornerRadius="8"
@@ -119,14 +115,12 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        <!-- فیلترها -->
                         <Grid Grid.Column="0">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
-                            <!-- ردیف اول: نام شرکت + نام شعبه -->
                             <Grid Grid.Row="0">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
@@ -157,7 +151,6 @@
                                 </StackPanel>
                             </Grid>
 
-                            <!-- ردیف دوم: عنوان فایل + توضیحات -->
                             <Grid Grid.Row="1" Margin="0,5,0,0">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
@@ -181,7 +174,6 @@
                             </Grid>
                         </Grid>
 
-                        <!-- آپلود فایل سمت راست -->
                         <controls:FilePickerControl Grid.Column="2"
                                                     Margin="0,0,12,0"
                                                     FlowDirection="LeftToRight"
@@ -190,7 +182,6 @@
                     </Grid>
                 </Border>
 
-                <!-- ═══ خط جداکننده ═══ -->
                 <Grid Grid.Row="1" Margin="0,5,0,5">
                     <Border Height="3">
                         <Border.Background>
@@ -218,7 +209,6 @@
                              HorizontalAlignment="Right" VerticalAlignment="Center" Panel.ZIndex="2" />
                 </Grid>
 
-                <!-- ═══ نوار ابزار: سرچ + دکمه‌ها ═══ -->
                 <Border Grid.Row="2"
                         Background="#ffffff"
                         BorderBrush="#E5E7EB"
@@ -231,7 +221,6 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        <!-- سرچ -->
                         <Border Grid.Column="0"
                                 Background="#FFFFFF"
                                 BorderBrush="#E5E7EB"
@@ -361,7 +350,6 @@
                     </Grid>
                 </Border>
 
-                <!-- ═══ DataGrid ═══ -->
                 <controls:UnifiedListView x:Name="ArchivesGrid"
                                            Grid.Row="3"
                                            Padding="0,0,10,0"
@@ -373,7 +361,6 @@
                                           LoadErrorText="{Binding LoadErrorText}">
                     <controls:UnifiedListView.Columns>
 
-                            <!-- تاریخ بارگذاری -->
                             <DataGridTextColumn Header="تاریخ بارگذاری" Width="200" MinWidth="160"
                                                 Binding="{Binding CreationDate}"
                                                 ElementStyle="{StaticResource BaseTextColumnStyle}">
@@ -388,7 +375,6 @@
                                 </DataGridTextColumn.HeaderStyle>
                             </DataGridTextColumn>
 
-                            <!-- شرکت -->
                             <DataGridTextColumn Header="شرکت" Width="180" MinWidth="140"
                                                 Binding="{Binding CompanyName}"
                                                 ElementStyle="{StaticResource BaseTextColumnStyle}">
@@ -403,7 +389,6 @@
                                 </DataGridTextColumn.HeaderStyle>
                             </DataGridTextColumn>
 
-                            <!-- شعبه -->
                             <DataGridTextColumn Header="شعبه" Width="180" MinWidth="140"
                                                 Binding="{Binding BranchTitle}"
                                                 ElementStyle="{StaticResource FullNameColumnStyle}">
@@ -418,7 +403,6 @@
                                 </DataGridTextColumn.HeaderStyle>
                             </DataGridTextColumn>
 
-                            <!-- عنوان فایل -->
                             <DataGridTextColumn Header="عنوان فایل" Width="200" MinWidth="160"
                                                 Binding="{Binding Title}"
                                                 ElementStyle="{StaticResource FullNameColumnStyle}">
@@ -433,7 +417,6 @@
                                 </DataGridTextColumn.HeaderStyle>
                             </DataGridTextColumn>
 
-                            <!-- ایکون فایل -->
                             <DataGridTemplateColumn Header="فایل" Width="80" MinWidth="60">
                                 <DataGridTemplateColumn.CellStyle>
                                     <Style TargetType="DataGridCell" BasedOn="{StaticResource BankTableCellStyle}" />
@@ -454,7 +437,6 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-                            <!-- توضیحات -->
                             <DataGridTextColumn Header="توضیحات" Width="2.5*" MinWidth="200"
                                                 Binding="{Binding Description}"
                                                 ElementStyle="{StaticResource BaseTextColumnStyle}">
@@ -470,7 +452,6 @@
                         </controls:UnifiedListView.Columns>
                 </controls:UnifiedListView>
 
-                <!-- ═══ نوار خلاصه زیر گرید ═══ -->
                 <Border Grid.Row="4"
                         Background="#ffffff"
                         BorderBrush="#E5E7EB"
@@ -487,7 +468,6 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <!-- تعداد انتخاب شده -->
                         <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
                             <TextBlock x:Name="SelectedSummaryText"
                                        Text="آرشیو انتخاب شده (۰)"
@@ -497,7 +477,6 @@
                             <Border Width="1" Height="14" Background="#E5E7EB" Margin="8,0" VerticalAlignment="Center" />
                         </StackPanel>
 
-                        <!-- تعداد کل -->
                         <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                             <TextBlock Text="تعداد کل"
                                        FontSize="14" FontWeight="SemiBold"
@@ -515,7 +494,6 @@
 
             </Grid>
 
-            <!-- ═══ فوتر (دکمه‌ها) ═══ -->
             <Border Grid.Row="2"
                     Margin="0,10,0,0"
                     BorderBrush="#E5E7EB"
@@ -524,8 +502,7 @@
                     Background="White"
                     SnapsToDevicePixels="True"
                     UseLayoutRounding="True">
-                <!-- آرشیوها هنگام انتخاب فایل ذخیره می‌شوند؛ پس دکمه‌های ذخیره/ذخیره موقت
-                     (که هیچ عملی انجام نمی‌دادند) حذف شده‌اند و فقط «انصراف» (پاک‌کردن فیلترها) مانده است. -->
+
                 <Grid Margin="16,10" FlowDirection="RightToLeft">
                     <StackPanel Orientation="Horizontal"
                                 Margin="0,0,20,0"
@@ -546,9 +523,6 @@
                 </Grid>
             </Border>
 
-
-
-            <!-- ═══ Decorative Ellipses ═══ -->
             <Ellipse Style="{StaticResource EllipseLeft}" Grid.Row="1" Grid.ColumnSpan="3" Margin="-18,0,0,0" />
             <Ellipse Style="{StaticResource EllipseRight}" Grid.Row="1" Grid.ColumnSpan="3" Margin="0,0,-18,0" />
         </Grid>

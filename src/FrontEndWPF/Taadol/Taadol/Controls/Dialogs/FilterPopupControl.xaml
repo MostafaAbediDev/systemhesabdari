@@ -6,28 +6,8 @@
              FlowDirection="RightToLeft"
              Background="Transparent">
 
-    <!-- ============================================================
-         FilterPopupControl
-
-         ⚠️  برای پیش‌نمایش در Designer:
-         این UserControl خودش کارت پاپ‌آپ رو نشون می‌ده.
-         در زمان اجرا، با متد ShowAt() این کارت داخل یک Popup واقعی
-         قرار می‌گیره و نسبت به anchor باز می‌شه.
-
-         Property ها (از code-behind ست می‌شن):
-           - Title            : عنوان پاپ‌آپ
-           - Options          : لیست همه‌ی گزینه‌ها
-           - SelectedOptions  : گزینه‌های انتخاب‌شده (HashSet<string>)
-           - ShowSearch       : آیا TextBox سرچ نشون داده بشه
-           - ImmediateApply   : آیا فیلتر با هر کلیک اعمال بشه (بدون دکمه اعمال)
-
-         Event:
-           - SelectionChanged : وقتی انتخاب‌ها عوض می‌شن
-    ============================================================ -->
-
-    <!-- ===== Style های دکمه‌های Footer ===== -->
     <UserControl.Resources>
-        <!-- Style دکمه‌های ثانویه (همه / پاک) -->
+
         <Style x:Key="SecondaryFooterButtonStyle"
                TargetType="Button">
             <Setter Property="FontFamily"
@@ -76,7 +56,6 @@
             </Setter>
         </Style>
 
-        <!-- Style دکمه‌ی اصلی (اعمال) -->
         <Style x:Key="PrimaryFooterButtonStyle"
                TargetType="Button">
             <Setter Property="FontFamily"
@@ -122,7 +101,6 @@
             </Setter>
         </Style>
 
-        <!-- Style ردیف چک‌باکس (ToggleButton) -->
         <Style x:Key="FilterCheckBoxStyle"
                TargetType="ToggleButton">
             <Setter Property="Cursor"
@@ -149,7 +127,6 @@
                             <StackPanel Orientation="Horizontal"
                                         VerticalAlignment="Center">
 
-                                <!-- ★ ۱. چک‌باکس — اول (سمت راست در RTL) -->
                                 <Border x:Name="CheckBoxBorder"
                                         Width="20"
                                         Height="20"
@@ -168,7 +145,6 @@
                                                     Visibility="Collapsed" />
                                 </Border>
 
-                                <!-- ★ ۲. متن — بعد از چک‌باکس (سمت چپ در RTL) -->
                                 <ContentPresenter Content="{TemplateBinding Content}"
                                                   VerticalAlignment="Center"
                                                   Margin="8,0,0,0">
@@ -231,8 +207,6 @@
         </Style>
     </UserControl.Resources>
 
-    <!-- ===== ریشه: کارت پاپ‌آپ ===== -->
-    <!-- این Border در Designer هم دیده می‌شه -->
     <Border Background="White"
             BorderBrush="#D4E1FF"
             BorderThickness="1"
@@ -250,7 +224,7 @@
         </Border.Effect>
 
         <StackPanel>
-            <!-- ===== Header ===== -->
+
             <Border Background="#F8FAFF"
                     CornerRadius="6,6,0,0"
                     Padding="12,8,12,8"
@@ -265,9 +239,6 @@
                            Foreground="#2667FF" />
             </Border>
 
-            <!-- ===== Search Box ===== -->
-            <!-- از TextBox ساده استفاده می‌کنیم چون ModernPersianTextBox ارتفاع ثابت 45 داره.
-                 کاربر می‌تونه Style و ارتفاع رو از همینجا ویرایش کنه. -->
             <Border x:Name="SearchBoxBorder"
                     Background="White"
                     BorderBrush="#E8E8E8"
@@ -314,7 +285,6 @@
                           Unchecked="SelectAllToggle_Unchecked"
                           Margin="2,1,2,1" />
 
-            <!-- ===== لیست چک‌باکس‌ها ===== -->
             <ScrollViewer MaxHeight="240"
                           VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Hidden"
@@ -322,9 +292,6 @@
                 <StackPanel x:Name="ItemsHost" />
             </ScrollViewer>
 
-            <!-- ===== Footer (دکمه‌ها) ===== -->
-            <!-- برای دیدن دکمه‌ها در Designer، Visibility رو روی Visible می‌ذاریم.
-                 در زمان اجرا اگر ImmediateApply=true باشه، مخفی می‌شه. -->
             <Border x:Name="FooterBorder"
                     Background="#F8FAFF"
                     CornerRadius="0,0,6,6"
@@ -332,7 +299,7 @@
                     BorderBrush="#E2E8F0"
                     BorderThickness="0,1,0,0"
                     Margin="-6,6,-6,-6">
-                <!-- Footer — ستون همه حذف شد -->
+
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1*" />

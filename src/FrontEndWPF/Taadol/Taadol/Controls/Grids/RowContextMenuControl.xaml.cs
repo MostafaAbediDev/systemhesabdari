@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -7,13 +7,7 @@ using System.Windows.Media;
 
 namespace Taadol.Controls
 {
-    /// <summary>
-    /// منوی راست‌کلیک ردیف گرید (ویرایش / حذف).
-    /// به‌جای Popup از overlay داخل همان پنجره استفاده می‌کند (مثل LoadingOverlay):
-    /// هیچ پنجره/فوکوس/capture جداگانه‌ای ندارد، پس هنگام باز شدن در دل رویداد
-    /// ماوس نمی‌تواند قفل شود. با کلیک بیرون از منو، Escape یا از دست رفتن
-    /// فوکوس پنجره بسته می‌شود.
-    /// </summary>
+
     public partial class RowContextMenuControl : UserControl
     {
         public event EventHandler EditRequested;
@@ -25,8 +19,6 @@ namespace Taadol.Controls
         {
             InitializeComponent();
 
-            // کارت در XAML Visible است تا در دیزاینر دیده شود؛ در زمان اجرا فقط با
-            // راست‌کلیک نمایان می‌شود و بقیه‌ی اوقات Collapsed و غیرقابل‌کلیک است.
             if (!DesignerProperties.GetIsInDesignMode(this))
             {
                 MenuCard.Visibility = Visibility.Collapsed;
@@ -34,10 +26,6 @@ namespace Taadol.Controls
             }
         }
 
-        /// <summary>
-        /// منو را نزدیک نقطه‌ی داده‌شده (نسبت به خود کنترل) باز می‌کند.
-        /// هر آیتمی که فرمش هندلر نداشته باشد مخفی می‌شود.
-        /// </summary>
         public void ShowMenu(bool showEdit, bool showDelete, Point position)
         {
             if (!showEdit && !showDelete)
@@ -47,7 +35,6 @@ namespace Taadol.Controls
             DeleteButton.Visibility = showDelete ? Visibility.Visible : Visibility.Collapsed;
             DividerBorder.Visibility = showEdit && showDelete ? Visibility.Visible : Visibility.Collapsed;
 
-            // کمی پایین‌تر/راست‌تر از نشانگر تا زیر دست نرود و از لبه‌ی پنجره بیرون نزند
             double menuWidth = 105;
             double menuHeight = 100;
             double maxX = ActualWidth - menuWidth - 4;
@@ -59,9 +46,6 @@ namespace Taadol.Controls
             PositionTransform.X = Math.Min(x, Math.Max(0, maxX));
             PositionTransform.Y = Math.Min(y, Math.Max(0, maxY));
 
-            // overlay را فعال کن: کلیک‌های بیرون از منو به گرید نرسند و منو بسته شود.
-            // (خود UserControl پس‌زمینه ندارد؛ فقط وقتی منو باز است RootGrid hit-testable می‌شود
-            // تا بقیه‌ی زمان کلیک‌ها به گرید برسند.)
             RootGrid.IsHitTestVisible = true;
             RootGrid.Background = Brushes.Transparent;
             MenuCard.Visibility = Visibility.Visible;
@@ -104,7 +88,7 @@ namespace Taadol.Controls
 
         private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            // کلیک روی خود منو (دکمه‌ها) نباید آن را ببندد
+
             if (IsClickInsideMenu(e.OriginalSource as DependencyObject))
                 return;
 

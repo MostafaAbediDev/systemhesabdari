@@ -34,8 +34,6 @@ namespace Taadol.Views
         {
             InitializeComponent();
 
-            // نوار خلاصه به شکاف زیر گرید منتقل می‌شود تا همیشه زیر گرید بچسبد
-            // (اول از والد فعلی جدا می‌شود تا خطای «Must disconnect child» رخ ندهد)
             if (SummaryBorder.Parent is Panel parent)
                 parent.Children.Remove(SummaryBorder);
             PersonsGrid.Footer = SummaryBorder;
@@ -46,7 +44,6 @@ namespace Taadol.Views
             DataContext = ViewModel;
             UpdateEmptyStateMessage();
 
-            // جستجو با Debounce داخلی SearchBoxControl (پیش‌فرض ۳۰۰ms)
             SearchBox.SearchTextChanged += (s, text) =>
             {
                 ViewModel.HandleSearchTextChanged(text);
@@ -63,8 +60,7 @@ namespace Taadol.Views
 
             PersonsGrid.GridDoubleClicked += (s, e) =>
             {
-                // دسترسی به ویرایش شخص فقط از طریق دکمه داخل پنل جزئیات رخ می‌دهد،
-                // نه با دابل‌کلیک روی ردیف گرید.
+
             };
 
             PersonsGrid.CheckedItemsChanged += (s, e) =>
@@ -73,7 +69,6 @@ namespace Taadol.Views
                 ViewModel.UpdateSummaryBar();
             };
 
-            // انتخاب همه = فقط همین صفحه؛ خاموش‌کردن هدر = پاک کردن انتخاب کل لیست
             PersonsGrid.SelectAllToggled += (s, select) =>
             {
                 if (select || ViewModel.AllPersons == null) return;
@@ -81,7 +76,6 @@ namespace Taadol.Views
                     item.IsSelected = false;
             };
 
-            // منوی راست‌کلیک ردیف: ویرایش و حذف (حذف تک‌مورد مثل پنل جزئیات)
             PersonsGrid.RowEditRequested += (s, item) =>
             {
                 if (item is PersonItem p && Window.GetWindow(this) is MainWindow mw)
@@ -162,14 +156,9 @@ namespace Taadol.Views
                 tabPersonnel.Tag = ViewModel.TabPersonnelCount;
             }
 
-            // پیام Empty State را با وضعیت فیلتر/جستجو هماهنگ کن
             UpdateEmptyStateMessage();
         }
 
-        /// <summary>
-        /// وقتی هیچ شخصی نمایش داده نمی‌شود، پیام وسط گرید بر اساس وضعیت فیلتر انتخاب می‌شود:
-        /// «هنوز شخصی ثبت نشده» برای حالت بدون داده، «موردی مطابق فیلتر پیدا نشد» برای فیلتر فعال.
-        /// </summary>
         private void UpdateEmptyStateMessage()
         {
             if (PersonsGrid == null) return;
@@ -210,9 +199,6 @@ namespace Taadol.Views
             }
         }
 
-        // ======================================================
-        //  Tab Filter Handlers
-        // ======================================================
         private void FilterTab_Click(object sender, RoutedEventArgs e)
         {
             if (sender is not ToggleButton tb) return;
@@ -237,9 +223,6 @@ namespace Taadol.Views
             return "all";
         }
 
-        // ======================================================
-        //  CRUD Handlers
-        // ======================================================
         private async void BtnDelete_Click(object sender, RoutedEventArgs e)
         {
             var selectedItems = ViewModel.GetSelectedItems();
@@ -273,7 +256,6 @@ namespace Taadol.Views
                 var (deletedCount, errors) = await ViewModel.DeleteSelectedAsync();
                 _isLoadedOnce = false;
 
-                // پنل‌های حذف‌شده‌ها حذف و بقیه‌ی انتخاب‌ها/جمع‌ها با لیست همگام شوند
                 PersonsGrid.RefreshVisualState();
                 UpdateDetailPanels();
                 ViewModel.UpdateSummaryBar();
@@ -314,7 +296,7 @@ namespace Taadol.Views
 
         private void BtnNew_Click(object sender, MouseButtonEventArgs e)
         {
-            // فرم «شخص جدید» به‌صورت مودال روی همین گرید باز می‌شود (گرید بسته نمی‌شود)
+
             var mainWindow = Window.GetWindow(this) as MainWindow;
             mainWindow?.OpenNewPerson();
         }
@@ -324,16 +306,13 @@ namespace Taadol.Views
             (Window.GetWindow(this) as MainWindow)?.CloseCurrentForm();
         }
 
-        /// <summary>
-        /// رفرش داده‌های گرید از بیرون (مثلاً بعد از بسته‌شدن فرم «شخص جدید» در مودال).
-        /// </summary>
         public async Task RefreshGridAsync()
         {
             _isLoadedOnce = false;
             try
             {
                 await ViewModel.RefreshAsync();
-                // پنل‌های موجود حذف شوند تا با داده‌ی جدید دوباره ساخته شوند
+
                 ClearDetailPanels();
                 UpdateDetailPanels();
             }
@@ -360,9 +339,6 @@ namespace Taadol.Views
             }
         }
 
-        // ======================================================
-        //  Panel Toggle Animation
-        // ======================================================
         private void TogglePanelBtn_Click(object sender, MouseButtonEventArgs e)
         {
             TogglePanel();
@@ -437,7 +413,6 @@ namespace Taadol.Views
                 SelectedCountBadge.Visibility = Visibility.Collapsed;
                 PanelHeaderText.Visibility = Visibility.Collapsed;
 
-                // پنل و عنوان مثل قبل همزمان با ستون محو می‌شوند...
                 var fadeOut = new System.Windows.Media.Animation.DoubleAnimation(0, TimeSpan.FromMilliseconds(250));
                 fadeOut.EasingFunction = ease;
                 fadeOut.Completed += (s, ev) =>
@@ -445,8 +420,6 @@ namespace Taadol.Views
                     DetailPanelContainer.Visibility = Visibility.Collapsed;
                 };
 
-                // ...ولی متن دکمه «شخص جدید» سریع‌تر محو می‌شود تا وقتی دکمه همراه با
-                // ستون جمع می‌شود، متن هیچ‌وقت بریده دیده نشود.
                 var fadeOutBtnText = new System.Windows.Media.Animation.DoubleAnimation(0, TimeSpan.FromMilliseconds(160));
                 fadeOutBtnText.EasingFunction = ease;
                 fadeOutBtnText.Completed += (s, ev) =>
@@ -467,9 +440,6 @@ namespace Taadol.Views
                     DetailPanelColumn.Width = new GridLength(64);
                     BtnToggleSidebar.Margin = new Thickness(56, 40, 0, 0);
 
-                    // بعد از کامل‌شدن جمع‌شدن (متن دیگر نیست)، دکمه به حالت مربعی
-                    // متمرکز فقط-آیکون می‌رود — بدون هیچ پرشی چون عرضش در این لحظه
-                    // دقیقاً 44px است (64 منهای حاشیه‌ها).
                     BtnNewBorder.Width = 44;
                     BtnNewBorder.HorizontalAlignment = HorizontalAlignment.Center;
                     BtnNewBorder.Margin = new Thickness(6, 8, 6, 8);
@@ -479,12 +449,6 @@ namespace Taadol.Views
             }
         }
 
-        // ======================================================
-        //  Detail Panel Management
-        // ======================================================
-        /// <summary>
-        /// تمام پنل‌های جزئیات باز را حذف می‌کند (با cleanup handlerها).
-        /// </summary>
         private void ClearDetailPanels()
         {
             var panels = DetailPanelsStack.Children
@@ -505,7 +469,7 @@ namespace Taadol.Views
             _isUpdatingPanels = true;
             try
             {
-                // پنل‌هایی که دیگر انتخاب نیستند حذف شوند
+
                 var currentIds = ViewModel.GetSelectedItems().Select(p => p.Id).ToHashSet();
                 var toRemove = DetailPanelsStack.Children
                     .OfType<Taadol.Controls.PersonDetailPanel>()
@@ -514,8 +478,7 @@ namespace Taadol.Views
 
                 foreach (var panel in toRemove)
                 {
-                    // ✅ Event handler cleanup: قبل از حذف پنل، handler ها را جدا کن
-                    // تا اگر reference به پنل باقی ماند، handler اجرا نشود
+
                     panel.CloseRequested -= DetailPanel_CloseRequested;
                     panel.EditRequested -= DetailPanel_EditRequested;
                     panel.DeleteRequested -= DetailPanel_DeleteRequested;
@@ -523,10 +486,6 @@ namespace Taadol.Views
                     DetailPanelsStack.Children.Remove(panel);
                 }
 
-                // ساخت تدریجی پنل‌ها: بین هر پنل به Dispatcher فرصت render می‌دهیم
-                // تا ساخت هم‌زمان پنل‌های زیاد (مثلاً «انتخاب همه») برنامه را فریز نکند.
-                // در هر تکرار، انتخاب‌ها دوباره خوانده می‌شوند تا اگر در این بین رویداد جدیدی
-                // آمد (کلیک روی چند ردیف)، پنل‌ها دوباره/دوبار ساخته نشوند.
                 while (true)
                 {
                     var selectedItems = ViewModel.GetSelectedItems();
@@ -541,8 +500,6 @@ namespace Taadol.Views
 
                     var panel = new Taadol.Controls.PersonDetailPanel();
 
-                    // PersonType نام نوع انتخاب‌شده (مثلاً «مشتری و تامین کننده») است؛
-                    // IsLegal فقط حقیقی/حقوقی را نشان می‌دهد و نباید در ردیف دسته‌بندی نمایش داده شود.
                     var personType = string.IsNullOrWhiteSpace(item.PersonType)
                         ? "—"
                         : item.PersonType;
@@ -579,7 +536,6 @@ namespace Taadol.Views
                         balanceStatus,
                         item.Status == "فعال");
 
-                    // حساب‌های بانکی از کش (پر شده در LoadDataAsync) — بدون کوئری دیتابیس
                     var bankItems = ViewModel.GetBankAccounts(item.Id)
                         .Select(b => new Taadol.Models.BankAccountItem
                         {
@@ -599,12 +555,9 @@ namespace Taadol.Views
 
                     DetailPanelsStack.Children.Insert(0, panel);
 
-                    // پنل جدید بالای لیست اضافه شد — اسکرول را نرم به ابتدا ببر
-                    // تا نفر تازه‌انتخاب‌شده دقیقاً دیده شود.
                     if (DetailPanelScroll != null)
                         DetailPanelScroll.SmoothScrollToTop();
 
-                    // به UI فرصت render بده
                     await Dispatcher.Yield(DispatcherPriority.Background);
                 }
             }
@@ -663,7 +616,6 @@ namespace Taadol.Views
 
                 _isLoadedOnce = false;
 
-                // انتخاب‌های باقی‌مانده حفظ شده‌اند؛ وضعیت چک‌باکس‌ها، پنل‌ها و جمع‌ها را همگام کن
                 PersonsGrid.RefreshVisualState();
                 UpdateDetailPanels();
                 ViewModel.UpdateSummaryBar();
@@ -677,9 +629,6 @@ namespace Taadol.Views
             }
         }
 
-        // ======================================================
-        //  Scroll & Layout
-        // ======================================================
         private void DetailPanelContainer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
             if (DetailPanelScroll == null) return;
@@ -700,8 +649,6 @@ namespace Taadol.Views
             }), DispatcherPriority.Background);
         }
 
-        // فرم لیست باید همیشه کل فضای محتوا رو پر کنه حتی اگه ردیف جدول کم باشه
-        // یا پنل جزئیات بسته باشه (چون MainContent با Top/Left فقط اندازه محتوا رو می‌گیره).
         private void FillAvailableSpace()
         {
             if (Window.GetWindow(this) is not Window window) return;
@@ -721,9 +668,6 @@ namespace Taadol.Views
             Height = h > 0 ? h : 0;
         }
 
-        // ======================================================
-        //  Popup Filter Handlers
-        // ======================================================
         private void StatusFilter_Click(object sender, RoutedEventArgs e)
         {
             ShowFilterPopup(
@@ -827,9 +771,6 @@ namespace Taadol.Views
             popup.ShowAt(anchor);
         }
 
-        // ======================================================
-        //  Helpers
-        // ======================================================
         private static string BuildFullExceptionMessage(Exception ex)
         {
             if (ex == null) return "خطای ناشناخته.";
@@ -848,7 +789,6 @@ namespace Taadol.Views
             return sb.ToString();
         }
 
-
         private void BtnPrint_Click(object sender, RoutedEventArgs e)
         {
         }
@@ -864,9 +804,6 @@ namespace Taadol.Views
 
     }
 
-    // ======================================================
-    //  PersonItem (مدل ردیف DataGrid)
-    // ======================================================
     public class PersonItem : INotifyPropertyChanged, IListRowItem
     {
         private int _rowNumber;
@@ -961,10 +898,6 @@ namespace Taadol.Views
         public bool IsCurrent { get; set; }
     }
 
-    /// <summary>
-    /// اسکرول نرم برای ScrollViewer. چون VerticalOffset قابل انیمیشن مستقیم نیست،
-    /// از طریق یک attached property واسطه انیمیت می‌شود.
-    /// </summary>
     public static class SmoothScrollHelper
     {
         private static readonly DependencyProperty AnimatedOffsetProperty =

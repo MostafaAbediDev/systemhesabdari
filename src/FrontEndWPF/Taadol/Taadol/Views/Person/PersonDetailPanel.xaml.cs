@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -20,7 +20,6 @@ namespace Taadol.Controls
         private static readonly SolidColorBrush BlueBrush = new(Color.FromRgb(0x25, 0x63, 0xEB));
         private static readonly SolidColorBrush ActiveGrayBrush = new(Color.FromRgb(0x4B, 0x52, 0x63));
 
-        // پیش‌فرض: پنل به‌صورت بسته لود می‌شه (شبیه تصویر). اگه لازمه بازش بمونه، این رو true بذار.
         public bool StartExpanded { get; set; } = true;
 
         public long PersonId
@@ -55,9 +54,6 @@ namespace Taadol.Controls
             e.Handled = true;
         }
 
-        /// <summary>
-        /// کوتاه‌سازی نوع دسته‌بندی برای نمایش در پنل — «مشتری و تامین کننده» → «هردو»
-        /// </summary>
         private static string ShortPersonType(string personType)
         {
             if (string.IsNullOrWhiteSpace(personType)) return personType;
@@ -139,7 +135,6 @@ namespace Taadol.Controls
             CardNumberText.Text = defaultAccount.CardNumber ?? "—";
             ShebaNumberText.Text = defaultAccount.ShebaNumber ?? "—";
 
-            // «حساب دیگر دارد» فقط وقتی مجموع حساب‌ها بیشتر از ۱ باشد
             OtherAccountText.Text = accounts.Count > 1 ? "دارد" : "ندارد";
         }
 
@@ -155,11 +150,6 @@ namespace Taadol.Controls
             ApplyExpandState(_isExpanded, animate: true);
         }
 
-        /// <summary>
-        /// حالت باز/بسته رو اعمال می‌کنه. اگه animate=false باشه (مثلاً موقع لود اولیه)
-        /// مقادیر مستقیم و بدون انیمیشن ست می‌شن تا هیچ پرش/فلیکری دیده نشه
-        /// و پنل دقیقاً همون شکلِ نهاییِ بسته/باز رو از همون لحظه اول داشته باشه.
-        /// </summary>
         private void ApplyExpandState(bool expanded, bool animate)
         {
             double heightTarget = expanded ? 800 : 0;

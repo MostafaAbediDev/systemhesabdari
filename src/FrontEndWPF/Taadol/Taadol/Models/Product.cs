@@ -1,4 +1,4 @@
-﻿// Models/Product.cs
+﻿
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -17,7 +17,6 @@ namespace TaadolAccounting.Models
         private string _brand;
         private string _description;
         private string _imagePath;
-
 
         private decimal _purchasePrice;
         private decimal _salePrice;

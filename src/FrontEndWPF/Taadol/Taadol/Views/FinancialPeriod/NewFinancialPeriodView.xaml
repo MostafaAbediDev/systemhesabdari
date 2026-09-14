@@ -22,7 +22,6 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <!-- ═══ ردیف 0: هدر ═══ -->
             <Grid Grid.Row="0"
                   Margin="10,15,10,10">
                 <StackPanel Orientation="Horizontal"
@@ -45,7 +44,6 @@
                 </StackPanel>
             </Grid>
 
-            <!-- خط جداکننده دش‌دار -->
             <Border Grid.Row="0"
                     Height="1"
                     Margin="7,0,7,2"
@@ -73,7 +71,6 @@
                 </Border.Background>
             </Border>
 
-            <!-- ═══ ردیف 1: بدنه (اسکرول‌شونده) ═══ -->
             <ScrollViewer Grid.Row="1"
                           Style="{StaticResource MinimalScrollViewer}"
                           VerticalScrollBarVisibility="Auto"
@@ -138,7 +135,6 @@
                 </Border>
             </ScrollViewer>
 
-            <!-- ═══ ردیف 2: جداکننده دکمه‌ای ═══ -->
             <Grid Grid.Row="2"
                   Margin="0,0,0,2">
                 <Border Height="3">
@@ -180,7 +176,6 @@
                          Panel.ZIndex="2" />
             </Grid>
 
-            <!-- ═══ ردیف 3: فوتر (دکمه‌ها) ═══ -->
             <Border Grid.Row="3"
                     Margin="0,10,0,0"
                     BorderBrush="#E5E7EB"

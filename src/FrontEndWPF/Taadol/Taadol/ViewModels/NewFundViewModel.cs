@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
@@ -148,8 +148,6 @@ namespace Taadol.ViewModels
                 if (SelectedBranchId <= 0 && Branches.Count > 0)
                     SelectedBranchId = Branches[0].Id;
 
-                // TODO: پس از ارائه Contract دریافت حساب‌های قابل انتخاب توسط بک‌اند،
-                // این placeholder حذف و با حساب‌های فعال، حذف‌نشده و مجاز جایگزین شود.
                 Accounts.Clear();
                 Accounts.Add(new AccountOption
                 {
@@ -216,8 +214,6 @@ namespace Taadol.ViewModels
                     return;
                 }
 
-                // TODO: Contract فعلی CreateFunds فیلدهای بانک، کارت، شبا، شماره حساب و تاریخ ثبت حساب را ندارد؛
-                // این مقادیر فعلاً فقط در فرم نگه‌داری می‌شوند و پس از تکمیل Contract باید ارسال شوند.
                 ToastManager.Success(result.Message ?? "صندوق با موفقیت ثبت شد.");
                 Saved?.Invoke();
                 ClearForm();

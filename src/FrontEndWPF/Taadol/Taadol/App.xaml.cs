@@ -30,13 +30,12 @@ namespace Taadol
         public static IServiceProvider ServiceProvider { get; private set; }
         public static string ConnectionString { get; private set; }
 
-        // مسیر فایل لاگ — در پوشه‌ی Temp ویندوز
         public static string LogFilePath { get; } =
             Path.Combine(Path.GetTempPath(), "taadol-startup.log");
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            // ابتدا فایل لاگ رو ریست کن
+
             try
             {
                 File.WriteAllText(LogFilePath,
@@ -44,11 +43,9 @@ namespace Taadol
             }
             catch
             {
-                // اگه نتونست فایل بسازه، حداقل ادامه بده
+
             }
 
-            // ===== ثبت هندلرهای خطای سراسری =====
-            // این هندلرها هر خطایی که در UI Thread رخ بده رو می‌گیرن
             DispatcherUnhandledException += App_DispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
@@ -62,7 +59,7 @@ namespace Taadol
 
                 string connectionString = GetConnectionString();
                 ConnectionString = connectionString;
-                // از نوشتن رمز عبور در لاگ جلوگیری می‌کنیم.
+
                 LogStep("Connection string loaded successfully");
 
                 LogStep("Registering ICodeGeneratorService...");
@@ -104,9 +101,6 @@ namespace Taadol
                 base.OnStartup(e);
                 LogStep("base.OnStartup completed");
 
-                // ===== ایجاد دستی MainWindow با try-catch =====
-                // چون StartupUri رو از App.xaml حذف کردیم، خودمون MainWindow می‌سازیم
-                // تا اگه خطایی موقع لود MainWindow رخ داد، ببینیم
                 LogStep("Creating MainWindow...");
                 try
                 {
@@ -149,7 +143,7 @@ namespace Taadol
                 }
                 catch
                 {
-                    // اگر MessageBox هم کار نکرد
+
                 }
 
                 Environment.FailFast(fullMessage);
@@ -173,7 +167,6 @@ namespace Taadol
                     ? "appsettings.json has ConnectionStrings:TaadolDb"
                     : "appsettings.json does NOT contain ConnectionStrings:TaadolDb");
 
-                // بدون fallback سخت‌کد: اگر تنظیم دیتابیس نبود، خطای واضح بده
                 if (string.IsNullOrWhiteSpace(cs))
                     throw new InvalidOperationException(
                         "رشته اتصال 'TaadolDb' در appsettings.json تعریف نشده است.");
@@ -187,7 +180,6 @@ namespace Taadol
             }
         }
 
-        // ===== هندلر خطای UI Thread =====
         private void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
             var msg = "🔴 خطای پردازش‌نشده در UI Thread:" + Environment.NewLine + Environment.NewLine +
@@ -201,11 +193,9 @@ namespace Taadol
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
 
-            // جلوگیری از بسته شدن برنامه
             e.Handled = true;
         }
 
-        // ===== هندلر خطای سراسری CLR =====
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             var ex = e.ExceptionObject as Exception;
@@ -224,18 +214,15 @@ namespace Taadol
             }
             catch
             {
-                // اگر نتونست MessageBox نشون بده
+
             }
 
             Environment.FailFast(msg);
         }
 
-        // ===== هندلر خطای Task های غیرمشاهده =====
         private void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
         {
-            // لغو شدن عملیات (Cancellation) رفتار عادی برنامه است — نه خطا.
-            // وقتی فرم بسته می‌شود و CTS لغو می‌شود، Task های در حال اجرا
-            // OperationCanceledException پرتاب می‌کنند؛ این را نباید خطا نمایش داد.
+
             var isCancellation =
                 e.Exception is OperationCanceledException ||
                 (e.Exception is AggregateException agg &&
@@ -254,14 +241,8 @@ namespace Taadol
             e.SetObserved();
         }
 
-        /// <summary>
-        /// ثبت پیام برای عیب‌یابی بخش‌های مختلف برنامه.
-        /// </summary>
         internal static void Log(string message) => LogStep(message);
 
-        /// <summary>
-        /// نوشتن یک خط در فایل لاگ با timestamp
-        /// </summary>
         private static void LogStep(string message)
         {
             try
@@ -269,19 +250,15 @@ namespace Taadol
                 var line = $"[{DateTime.Now:HH:mm:ss.fff}] {message}{Environment.NewLine}";
                 File.AppendAllText(LogFilePath, line);
 
-                // همزمان در Debug Output ویندوز هم بنویس
                 Debug.WriteLine(line);
                 Trace.WriteLine(line);
             }
             catch
             {
-                // اگر نتونست در فایل بنویسه
+
             }
         }
 
-        /// <summary>
-        /// ساخت پیام خطای کامل شامل Inner Exception ها و Stack Trace
-        /// </summary>
         private static string BuildExceptionMessage(Exception ex)
         {
             if (ex == null) return "خطای ناشناخته.";

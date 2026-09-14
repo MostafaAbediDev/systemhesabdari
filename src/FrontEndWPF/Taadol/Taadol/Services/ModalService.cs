@@ -1,14 +1,11 @@
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
 
 namespace Taadol.Services
 {
-    /// <summary>
-    /// Manages the modal overlay layer in MainWindow.
-    /// Extracted from MainWindow to reduce duplication (open block was repeated 7 times).
-    /// </summary>
+
     public class ModalService : IModalService
     {
         private readonly ContentControl _modalContent;
@@ -38,12 +35,9 @@ namespace Taadol.Services
         {
             if (_modalOverlay == null) return;
 
-            // Detach the content immediately so its Unloaded handlers cancel work
-            // before the fade animation completes.
             var contentBeingClosed = _modalContent.Content;
             _modalContent.Content = null;
 
-            // بستن نرم با فید-اوت تا فرم «یهویی» ناپدید نشود
             var fade = new DoubleAnimation(
                 0, TimeSpan.FromMilliseconds(220));
             fade.EasingFunction = new QuadraticEase

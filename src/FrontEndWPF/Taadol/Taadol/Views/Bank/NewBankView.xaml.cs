@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -32,8 +32,6 @@ namespace Taadol.Views.Bank
         private async void Cancel_Click(object sender, RoutedEventArgs e)
             => await HandleCancelAsync();
 
-        // کلید Escape مسیر لغو/بستن و کلید Enter مسیر ذخیره را اجرا میکند؛
-        // Enter در فیلدهای چندخطی به خط بعدی میگذارد.
         private void View_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
@@ -47,7 +45,7 @@ namespace Taadol.Views.Bank
                 return;
 
             if (Keyboard.FocusedElement is TextBox { AcceptsReturn: true })
-                return; // فیلد چندخطی: Enter باید خط جدید ایجاد کند
+                return;
 
             if (ViewModel?.IsFormInteractive == true && ViewModel.SaveCommand.CanExecute(null))
             {

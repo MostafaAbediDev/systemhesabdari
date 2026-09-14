@@ -1,4 +1,4 @@
-using GeneralInfoManagement.Application.Contract.City;
+﻿using GeneralInfoManagement.Application.Contract.City;
 using GeneralInfoManagement.Application.Contract.Province;
 using Microsoft.Extensions.DependencyInjection;
 using BankManagement.Application.Contracts.BankBranch;
@@ -16,17 +16,10 @@ using System.Windows;
 
 namespace Taadol.Helpers
 {
-    /// <summary>
-    /// Shared helpers for Person form views (NewPersonView, EditPersonView).
-    /// Extracted to eliminate duplicated LoadProvincesAsync and LoadCitiesAsync code.
-    /// </summary>
+
     public static class PersonFormHelper
     {
-        /// <summary>
-        /// استان‌ها را از طریق لایه Application بارگذاری می‌کند.
-        /// </summary>
-        /// <param name="provinces">Target collection to populate (will be cleared first).</param>
-        /// <param name="onError">Error handler — each view uses a different reporter (ToastManager vs Debug).</param>
+
         public static async Task LoadProvincesAsync(
             ObservableCollection<ProvinceViewModel> provinces,
             Action<Exception> onError,
@@ -79,18 +72,6 @@ namespace Taadol.Helpers
             }
         }
 
-        /// <summary>
-        /// شهرهای یک استان را از طریق لایه Application بارگذاری می‌کند و نتیجه‌های قدیمی را نادیده می‌گیرد.
-        /// </summary>
-        /// <param name="cities">Target collection to populate (will be cleared first).</param>
-        /// <param name="provinceId">Province to load cities for.</param>
-        /// <param name="token">Optional cancellation token.</param>
-        /// <param name="getCurrentProvinceId">Returns the view's current SelectedProvinceId (for staleness check).</param>
-        /// <param name="getCurrentCityId">Returns the view's current SelectedCityId (for reset check).</param>
-        /// <param name="setSelectedCityId">Sets the view's SelectedCityId (to reset if no longer valid).</param>
-        /// <param name="formName">View name for Debug.WriteLine messages (e.g. "NewPersonView").</param>
-        /// <param name="onError">Error handler for non-cancellation exceptions.</param>
-        /// <param name="onCancelled">Handler called when OperationCanceledException is caught (usually just Debug.WriteLine).</param>
         public static async Task LoadCitiesAsync(
             ObservableCollection<CityViewModel> cities,
             long provinceId,
@@ -124,14 +105,13 @@ namespace Taadol.Helpers
                 }, ct).ConfigureAwait(false);
 
                 ct.ThrowIfCancellationRequested();
-                // ✅ Staleness check: اگر کاربر استان را عوض کرده، نتایج قدیمی را نادیده بگیر
+
                 if (getCurrentProvinceId() != provinceId)
                     return;
 
                 await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
                 {
-                    // The selection may change after the background query completes but
-                    // before this UI callback runs, so check again on the UI thread.
+
                     if (getCurrentProvinceId() != provinceId)
                         return;
 
@@ -139,7 +119,6 @@ namespace Taadol.Helpers
                     foreach (var c in items)
                         cities.Add(c);
 
-                    // اگر شهر انتخاب‌شده دیگر متعلق به این استان نیست، ریستش کن
                     if (cities.All(c => c.Id != getCurrentCityId()))
                         setSelectedCityId(0);
                 });
@@ -156,10 +135,6 @@ namespace Taadol.Helpers
             }
         }
 
-        /// <summary>
-        /// Fetches active contact types, populates the given list and dictionary.
-        /// No Dispatcher needed — dictionary operations are not UI-bound.
-        /// </summary>
         public static async Task LoadContactTypesAsync(
             List<ContactTypeViewModel> contactTypes,
             Dictionary<string, long> contactTypeByName,
@@ -202,10 +177,6 @@ namespace Taadol.Helpers
             }
         }
 
-        /// <summary>
-        /// Fetches person types. Optionally populates the given collection (with Dispatcher).
-        /// Returns the items list so the caller can do view-specific post-processing.
-        /// </summary>
         public static async Task<List<PersonTypeViewModel>> LoadPersonTypesAsync(
             ObservableCollection<PersonTypeViewModel> personTypes,
             Action<Exception> onError,
@@ -261,11 +232,6 @@ namespace Taadol.Helpers
             }
         }
 
-        /// <summary>
-        /// Fetches branches and populates the collection (with Dispatcher).
-        /// Returns items so the caller can do view-specific post-processing (e.g. SelectedBranchId).
-        /// Note: branches must be BulkObservableCollection to support ReplaceAll.
-        /// </summary>
         public static async Task<List<BranchComboItem>> LoadBranchesAsync(
             Action<List<BranchComboItem>> replaceAll,
             Action<Exception> onError,
@@ -314,9 +280,6 @@ namespace Taadol.Helpers
             }
         }
 
-        /// <summary>
-        /// Fetches bank branches and populates the collection (with Dispatcher).
-        /// </summary>
         public static async Task LoadBankBranchesAsync(
             ObservableCollection<BankBranchViewModel> bankBranches,
             bool hasBankBranchApp,
@@ -366,7 +329,7 @@ namespace Taadol.Helpers
             }
             catch (OperationCanceledException)
             {
-                // لغو شده — بدون خطا
+
                 return;
             }
             catch (Exception ex)
@@ -375,11 +338,6 @@ namespace Taadol.Helpers
             }
         }
 
-        /// <summary>
-        /// Loads the category tree for a given person type via IPersonCategoryApplication.
-        /// Returns the tree DTO so the caller can populate its own CategorySearch controls.
-        /// No UI dependencies — each view sets PersonTypeId and calls LoadFromTreeDto itself.
-        /// </summary>
         public static async Task<List<PersonCategoryTreeViewModel>> LoadCategoryTreeAsync(
             long personTypeId,
             CancellationToken? token,
@@ -422,10 +380,6 @@ namespace Taadol.Helpers
             }
         }
 
-        /// <summary>
-        /// لود لیست دپارتمان‌ها از بک‌اند Payroll و تبدیل به فرمت درختی برای CategorySearchControl.
-        /// خروجی: یک درخت تک‌ریشه با عنوان "دپارتمان" و تمام دپارتمان‌ها به‌عنوان فرزند.
-        /// </summary>
         public static async Task<List<PersonCategoryTreeViewModel>> LoadDepartmentsTreeAsync(
             CancellationToken cancellationToken,
             Action<Exception> onError)
@@ -474,10 +428,6 @@ namespace Taadol.Helpers
             }
         }
 
-        /// <summary>
-        /// لود لیست عناوین شغلی از بک‌اند Payroll و تبدیل به فرمت درختی برای CategorySearchControl.
-        /// خروجی: یک درخت تک‌ریشه با عنوان "عنوان شغلی" و تمام عناوین به‌عنوان فرزند.
-        /// </summary>
         public static async Task<List<PersonCategoryTreeViewModel>> LoadJobTitlesTreeAsync(
             CancellationToken cancellationToken,
             Action<Exception> onError,
@@ -530,10 +480,6 @@ namespace Taadol.Helpers
             }
         }
 
-        /// <summary>
-        /// تبدیل مستقیم لیست دپارتمان‌ها به فرمت درختی (همگام).
-        /// برای رفرش کنترل‌های SearchOnDemand بعد از افزودن/ویرایش.
-        /// </summary>
         public static List<PersonCategoryTreeViewModel> BuildDepartmentTree(
             List<PayrollSystemManagement.Application.Contracts.Department.DepartmentViewModel> items)
         {
@@ -552,10 +498,6 @@ namespace Taadol.Helpers
             return new List<PersonCategoryTreeViewModel> { root };
         }
 
-        /// <summary>
-        /// تبدیل مستقیم لیست عناوین شغلی به فرمت درختی (همگام).
-        /// برای رفرش کنترل‌های SearchOnDemand بعد از افزودن/ویرایش.
-        /// </summary>
         public static List<PersonCategoryTreeViewModel> BuildJobTitleTree(
             List<PayrollSystemManagement.Application.Contracts.JobTitle.JobTitleViewModel> items)
         {

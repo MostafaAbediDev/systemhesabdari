@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using BankManagement.Application.Contracts.Bank;
@@ -7,10 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Taadol.ViewModels
 {
-    /// <summary>
-    /// ViewModel فرم ویرایش بانک. فقط منطق ویژهٔ «ویرایش» (بارگذاری بانک، وضعیت بارگذاری،
-    /// رویداد ویرایش) را نگه می‌دارد؛ وضعیت و خط لولهٔ مشترک از BankFormViewModelBase ارث برده می‌شود.
-    /// </summary>
+
     public sealed class EditBankViewModel : BankFormViewModelBase<BankEditFormSnapshot>
     {
         private readonly IServiceProvider _serviceProvider;
@@ -28,8 +25,6 @@ namespace Taadol.ViewModels
             _serviceProvider = serviceProvider;
             BankId = bankId;
 
-            // بارگذاری از همان ابتدای ساخت ViewModel شروع می‌شود؛ فراخوانی مجدد LoadAsync
-            // در رویداد Loaded همان Task را استفاده می‌کند و بارگذاری تکراری انجام نمی‌شود.
             _ = LoadAsync(_loadCts!.Token);
         }
 
@@ -38,7 +33,6 @@ namespace Taadol.ViewModels
         public event Action? BankUpdated;
         public event Action? LoadFailed;
 
-        // قرارداد فعلی بک‌اند این مقدار را برنمی‌گرداند؛ فقط برای نمایش خواندنی فرم نگه داشته می‌شود.
         public string UniqueCode
         {
             get => _uniqueCode;
@@ -86,7 +80,7 @@ namespace Taadol.ViewModels
 
             if (_loadTask != null)
             {
-                // اگر خطا قبل از اتصال View رخ داده باشد، در فراخوانی Loaded دوباره رویداد را اعلام می‌کنیم.
+
                 if (_loadFailed)
                     LoadFailed?.Invoke();
 
@@ -133,7 +127,7 @@ namespace Taadol.ViewModels
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
-                // لغو بارگذاری هنگام خروج از فرم رفتار عادی است.
+
             }
             catch (Exception exception)
             {

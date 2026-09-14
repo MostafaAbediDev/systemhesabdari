@@ -1,4 +1,4 @@
-<UserControl x:Class="Taadol.Controls.RowContextMenuControl"
+﻿<UserControl x:Class="Taadol.Controls.RowContextMenuControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -9,12 +9,6 @@
              FlowDirection="RightToLeft"
              FontFamily="{StaticResource IRANSans}">
 
-    <!-- ═══ منوی راست‌کلیک ردیف (ویرایش / حذف) ═══
-         به‌جای Popup از overlay داخل همان پنجره استفاده می‌شود (مثل LoadingOverlay)
-         تا هیچ ددلاک/مشکل فوکوس WPF نداشته باشد. با کلیک بیرون، Escape یا
-         از دست رفتن فوکوس پنجره بسته می‌شود. -->
-    <!-- نکته: کارت عمداً در XAML Collapsed نیست تا در حالت دیزاینر (VS) دیده شود؛
-         مخفی‌شدنش در کد-بیهند (فقط در زمان اجرا) انجام می‌شود. -->
     <Grid x:Name="RootGrid">
         <Border x:Name="MenuCard"
                 HorizontalAlignment="Left"

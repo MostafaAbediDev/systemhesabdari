@@ -1,4 +1,4 @@
-<UserControl x:Class="Taadol.Controls.PaginationBar"
+﻿<UserControl x:Class="Taadol.Controls.PaginationBar"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:svg="http://sharpvectors.codeplex.com/svgc/"
@@ -127,8 +127,7 @@
                                                 <Setter TargetName="bd"
                                                         Property="Background"
                                                         Value="Transparent" />
-                                                <!-- نقطه‌چین همیشه ثابت/بی‌حرکت است: بدون مکان‌نمای دست، بدون هاور
-                                                     و بدون کلیک — فقط یک «...» خنثی بین شماره‌ها، در هر دو طرف -->
+
                                                 <Setter Property="Cursor"
                                                         Value="Arrow" />
                                                 <Setter Property="IsHitTestVisible"
@@ -160,6 +159,7 @@
 
                 <Button Width="26"
                         Height="26"
+                        Margin="0,0,8 ,0"
                         Cursor="Hand"
                         Click="BtnNextPage_Click">
                     <Button.Template>

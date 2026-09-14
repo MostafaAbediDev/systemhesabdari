@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Specialized;
 using System.Windows;
@@ -8,17 +8,13 @@ using Taadol.Views;
 
 namespace Taadol.Controls
 {
-    /// <summary>
-    /// جدول حساب‌های بانکی مشترک بین NewPersonView و EditPersonView.
-    /// با عرض کم، به‌جای Clip شدن، اسکرول افقی نشان می‌دهد.
-    /// </summary>
+
     public partial class BankAccountsTableControl : UserControl
     {
         public static readonly DependencyProperty ItemsSourceProperty =
             DependencyProperty.Register(nameof(ItemsSource), typeof(IEnumerable), typeof(BankAccountsTableControl),
                 new PropertyMetadata(null, OnItemsSourceChanged));
 
-        /// <summary>اگر true باشد، حذف ردیف نیاز به تأیید کاربر دارد (رفتار فرم ویرایش).</summary>
         public static readonly DependencyProperty RemoveConfirmationProperty =
             DependencyProperty.Register(nameof(RemoveConfirmation), typeof(bool), typeof(BankAccountsTableControl),
                 new PropertyMetadata(false));
@@ -56,7 +52,6 @@ namespace Taadol.Controls
         private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
             => UpdateVisibility();
 
-        /// <summary>جدول وقتی خالی است Collapsed می‌شود (مثل Visibility قبلی با CountToVisibilityConverter).</summary>
         private void UpdateVisibility()
         {
             int count = 0;
@@ -96,7 +91,7 @@ namespace Taadol.Controls
         private void TableContainerBorder_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             var border = (Border)sender;
-            double radius = border.CornerRadius.TopLeft; // چون همه گوشه‌ها 4 هستند
+            double radius = border.CornerRadius.TopLeft;
             border.Clip = new RectangleGeometry(
                 new Rect(0, 0, border.ActualWidth, border.ActualHeight),
                 radius,

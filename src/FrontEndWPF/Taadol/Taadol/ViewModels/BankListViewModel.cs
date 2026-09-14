@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -195,7 +195,7 @@ namespace Taadol.ViewModels
             }
             catch (OperationCanceledException) when (token.IsCancellationRequested)
             {
-                // لغو بارگذاری هنگام رفرش یا خروج از صفحه، رفتار عادی است.
+
             }
             catch (Exception exception)
             {
@@ -399,7 +399,7 @@ namespace Taadol.ViewModels
             }
             catch (OperationCanceledException)
             {
-                // لغو عملیات هنگام خروج طبیعی است.
+
             }
             catch (Exception exception)
             {

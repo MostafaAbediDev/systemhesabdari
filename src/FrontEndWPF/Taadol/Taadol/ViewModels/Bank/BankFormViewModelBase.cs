@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -14,11 +14,7 @@ using Taadol.Helpers;
 
 namespace Taadol.ViewModels
 {
-    /// <summary>
-    /// کلاس پایهٔ مشترک فرم‌های بانک (ثبت/ویرایش).
-    /// وضعیت مشترک، اعتبارسنجی، کامندها، توست‌ها و خط لولهٔ ذخیره‌سازی را نگه می‌دارد؛
-    /// کلاس‌های مشتق فقط فرم‌خاص‌ها (اعتبارسنجی، ذخیره در دیتابیس، رویداد موفقیت) را پیاده می‌کنند.
-    /// </summary>
+
     public abstract class BankFormViewModelBase<TSnapshot> : ObservableObject, IDisposable, IUnsavedChangesAware
         where TSnapshot : FormSnapshotBase
     {
@@ -33,10 +29,8 @@ namespace Taadol.ViewModels
         private CancellationTokenSource? _saveCts;
         private TSnapshot? _initialSnapshot;
 
-        /// <summary>هنگام مقداردهی برنامه‌ای میدان‌ها true می‌شود تا dirty-check اعلام نشود.</summary>
         protected bool _isInitializing;
 
-        /// <summary>0 = زنده، 1 = آزاد شده (Dispose شده).</summary>
         protected int _disposeState;
 
         protected BankFormViewModelBase()
@@ -47,7 +41,6 @@ namespace Taadol.ViewModels
             SelectBankType(BankTypes[0]);
         }
 
-        // انواع بانک ثابت هستند و شناسه آن‌ها با داده‌های Seed بک‌اند هماهنگ است.
         public ObservableCollection<BankTypeOption> BankTypes { get; } = new()
         {
             new BankTypeOption(1, "دولتی"),
@@ -149,8 +142,6 @@ namespace Taadol.ViewModels
             }
         }
 
-        // چرا public؟ این عضو مستقیماً به XAML (ButtonText) بایند می‌شود و بایندینگ WPF فقط
-        // اعضای public را می‌بیند؛ override نمی‌تواند دسترسی را گسترده‌تر کند (CS0507).
         public abstract string SaveButtonText { get; }
         protected abstract string SuccessMessage { get; }
         protected virtual string DefaultSaveErrorMessage => "خطا در ذخیره اطلاعات";
@@ -168,7 +159,6 @@ namespace Taadol.ViewModels
             SelectedBankTypeId = option.Id;
         }
 
-        /// <summary>ورودی عمومی ذخیره برای Code-behind؛ نتیجهٔ موفقیت را برمی‌گرداند.</summary>
         public virtual async Task<bool> SaveAsync()
         {
             if (!CanSave())
@@ -220,10 +210,8 @@ namespace Taadol.ViewModels
             }
         }
 
-        // اجرای نرم (بدون نتیجه) برای SafeAsyncCommand؛ خطاها داخل SaveAsync مهار می‌شوند.
         private async Task SaveBankSafeAsync() => await SaveAsync();
 
-        /// <summary>اعتبارسنجی میدان‌های مشترک. کلاس مشتق می‌تواند گسترش دهد.</summary>
         protected virtual bool ValidateForm(out string errorMessage)
         {
             errorMessage = string.Empty;
@@ -267,14 +255,12 @@ namespace Taadol.ViewModels
             return true;
         }
 
-        /// <summary>حالت اولیه را پس از بارگذاری/پاک‌سازی دوباره می‌نشاند.</summary>
         public void ResetInitialSnapshot()
         {
             _initialSnapshot = BuildSnapshot();
             OnPropertyChanged(nameof(HasUnsavedChanges));
         }
 
-        /// <summary>اگر تغییر واقعی رخ داد، رویداد تغییر وضعیت را اعلام می‌کند.</summary>
         protected void MarkChanged()
         {
             if (_isInitializing || IsDisposed)
@@ -282,8 +268,6 @@ namespace Taadol.ViewModels
 
             OnPropertyChanged(nameof(HasUnsavedChanges));
         }
-
-        // === اعتبارسنجی لوگو — منطق یکسان در هر دو فرم ثبت/ویرایش ===
 
         protected static bool TryValidateLogo(string? path, out string errorMessage)
         {
@@ -332,7 +316,6 @@ namespace Taadol.ViewModels
             }
         }
 
-        /// <summary>نگاشت خطاهای دیتابیس به پیام فارسی کاربرپسند.</summary>
         protected static string GetFriendlyErrorMessage(Exception exception, string fallbackMessage)
         {
             var messages = new System.Text.StringBuilder();
@@ -374,8 +357,6 @@ namespace Taadol.ViewModels
             return fallbackMessage;
         }
 
-        // === توست‌ها — امن از نظر Dispatcher ===
-
         protected static void ShowWarningToast(string message) => ShowToast(() => ToastManager.Warning(message));
         protected static void ShowSuccessToast(string message) => ShowToast(() => ToastManager.Success(message));
         protected static void ShowErrorToast(string message) => ShowToast(() => ToastManager.Error(message));
@@ -394,20 +375,15 @@ namespace Taadol.ViewModels
 
         protected void RaiseCanExecuteChanged() => (SaveCommand as SafeAsyncCommand)?.RaiseCanExecuteChanged();
 
-        /// <summary>بعد از ذخیرهٔ موفق، کلاس مشتق رویداد خود (BankSaved/BankUpdated) را صدا می‌زند.</summary>
         protected abstract void OnSaved();
 
-        /// <summary>ثبت واقعی در دیتابیس؛ false یعنی عملیات انجام نشد (توست خطا توسط مشتق نمایش داده شده).</summary>
         protected abstract Task<bool> ExecuteSaveCoreAsync(CancellationToken token);
 
-        /// <summary>فرم ثبت برای ورود بعدی پاک می‌شود؛ در فرم ویرایش پیش‌فرض هیچ‌کاری نیست.</summary>
         protected virtual void ResetFormIfNew()
         {
         }
 
         protected abstract TSnapshot BuildSnapshot();
-
-        // === الگوی Dispose ===
 
         public void Dispose()
         {
@@ -420,7 +396,6 @@ namespace Taadol.ViewModels
             DisposeCore();
         }
 
-        /// <summary>کلاس‌های مشتق برای آزادسازی منابع اضافی (مثل CTS بارگذاری) بازنویسی می‌کنند.</summary>
         protected virtual void DisposeCore()
         {
         }

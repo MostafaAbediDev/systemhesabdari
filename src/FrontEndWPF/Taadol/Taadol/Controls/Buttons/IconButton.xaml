@@ -61,8 +61,8 @@
         </Button.Template>
 
         <StackPanel Orientation="Horizontal">
-            <svg:SvgViewbox Width="{Binding IconSize, ElementName=Root}"
-                            Height="{Binding IconSize, ElementName=Root}"
+            <svg:SvgViewbox Width="12"
+                            Height="12"
                             Source="{Binding IconSource, ElementName=Root}"
                             VerticalAlignment="Center"
                             Margin="0,0,10,0" />

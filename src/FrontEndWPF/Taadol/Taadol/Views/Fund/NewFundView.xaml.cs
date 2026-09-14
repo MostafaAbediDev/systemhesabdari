@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Taadol.Helpers;
@@ -30,7 +30,7 @@ namespace Taadol.Views.Fund
 
         private void OnSaved()
         {
-            // پس از ثبت موفق، با بازسازی لیست، رکورد جدید فوراً نمایش داده می‌شود.
+
             (Window.GetWindow(this) as MainWindow)?.NavigateTo(NavKeys.FundList);
         }
 

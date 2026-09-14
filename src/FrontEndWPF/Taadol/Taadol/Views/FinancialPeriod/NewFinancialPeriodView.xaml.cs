@@ -231,14 +231,13 @@ namespace Taadol.Views
 
             try
             {
-                // عملیات دیتابیس از طریق سرویس Application روی ترد پس‌زمینه اجرا می‌شود تا UI فریز نشود
+
                 var saveToken = _saveCts.Token;
                 var dbMessage = await Task.Run(() =>
                 {
                     using var scope = App.ServiceProvider.CreateScope();
                     var app = scope.ServiceProvider.GetRequiredService<IFinancialPeriodApplication>();
 
-                    // اول ثبت، بعد وضعیت «دوره جاری» — تا اگر Create خطا داد، دوره‌های قبلی دست‌نخورده بمانند
                     var result = app.Create(new CreateFinancialPeriod
                     {
                         Title = PeriodTitle.Trim(),
@@ -252,14 +251,13 @@ namespace Taadol.Views
 
                     if (IsCurrentPeriod)
                     {
-                        // دوره‌های فعال قبلی همان شعبه غیرفعال شوند
+
                         var existing = app.GetFinancialPeriods()
                             .Where(p => p.BranchId == SelectedBranchId && p.IsActive && !p.IsDeleted)
                             .ToList();
                         foreach (var p in existing)
                             app.Deactivate(p.Id);
 
-                        // Create فیلد IsActive را ست نمی‌کند؛ دوره جدید را فعال کن
                         var created = app.GetFinancialPeriods()
                             .FirstOrDefault(p => p.Title == PeriodTitle.Trim() && p.BranchId == SelectedBranchId && !p.IsDeleted);
                         if (created != null)
@@ -277,13 +275,12 @@ namespace Taadol.Views
 
                 ToastManager.Success("دوره مالی با موفقیت ثبت شد.");
 
-                // کش سال‌های مالی سایدبار را بی‌اعتبار کن تا دوره جدید فوراً دیده شود
                 Taadol.Controls.YearSelectorControl.InvalidateCache();
                 if ((Window.GetWindow(this) as MainWindow)?.Sidebar?.YearSelector is { } yearSelector)
                     _ = RefreshYearSelectorSafeAsync(yearSelector);
 
                 ClearForm();
-                // Focus first focusable element (PeriodTitle field)
+
                 MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
             }
             catch (OperationCanceledException) when (_saveCts?.IsCancellationRequested == true)
@@ -360,7 +357,6 @@ namespace Taadol.Views
             var picker = sender as PersianDatePickerControl;
             if (picker == null) return;
 
-            // اگر فیلدهای تاریخ پاک شوند مقدار null می‌شود تا ذخیره با تاریخ قبلی رخ ندهد
             if (picker == StartDatePicker)
                 StartDate = picker.SelectedDate;
 
@@ -376,7 +372,6 @@ namespace Taadol.Views
         {
         }
 
-        /// <summary>Safe wrapper for yearSelector.RefreshAsync with error handling at call site.</summary>
         private async Task RefreshYearSelectorSafeAsync(Taadol.Controls.YearSelectorControl yearSelector)
         {
             try
@@ -385,7 +380,7 @@ namespace Taadol.Views
             }
             catch (OperationCanceledException)
             {
-                // Cancellation is expected when the view is closed or superseded.
+
             }
             catch (Exception ex)
             {

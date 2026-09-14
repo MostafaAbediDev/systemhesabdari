@@ -1,15 +1,11 @@
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
 
 namespace Taadol.Controls
 {
-    /// <summary>
-    /// جستجوی مشترک همه فرم‌های لیست: placeholder + دکمه پاک‌کردن (X) +
-    /// Debounce داخلی. فرم فقط به رویداد <see cref="SearchTextChanged"/> گوش می‌دهد
-    /// و دیگر نیازی به تایمر یا منطق تکرارشده در هر فرم ندارد.
-    /// </summary>
+
     public partial class SearchBoxControl : UserControl
     {
         public static readonly DependencyProperty PlaceholderProperty =
@@ -24,7 +20,6 @@ namespace Taadol.Controls
             DependencyProperty.Register(nameof(DebounceMs), typeof(int), typeof(SearchBoxControl),
                 new PropertyMetadata(300));
 
-        /// <summary>بعد از توقف تایپ (Debounce) با متن جاری صدا زده می‌شود.</summary>
         public event EventHandler<string> SearchTextChanged;
 
         private readonly DispatcherTimer _debounceTimer;
@@ -43,7 +38,7 @@ namespace Taadol.Controls
 
         private void SearchInput_TextChanged(object sender, TextChangedEventArgs e)
         {
-            // دکمه پاک‌کردن فقط وقتی متنی هست دیده شود
+
             ClearButton.Visibility = string.IsNullOrEmpty(Text) ? Visibility.Collapsed : Visibility.Visible;
 
             _debounceTimer.Stop();

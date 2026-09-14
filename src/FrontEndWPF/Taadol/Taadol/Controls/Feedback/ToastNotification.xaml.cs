@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -31,23 +31,23 @@ namespace Taadol.Controls
             switch (type)
             {
                 case ToastType.Success:
-                    IconCircle.Background = new SolidColorBrush(Color.FromRgb(220, 252, 231)); // green-50
-                    IconInner.Background = new SolidColorBrush(Color.FromRgb(34, 197, 94));     // green-500
+                    IconCircle.Background = new SolidColorBrush(Color.FromRgb(220, 252, 231));
+                    IconInner.Background = new SolidColorBrush(Color.FromRgb(34, 197, 94));
                     SetCheckIcon();
                     break;
                 case ToastType.Error:
-                    IconCircle.Background = new SolidColorBrush(Color.FromRgb(254, 226, 226)); // red-50
-                    IconInner.Background = new SolidColorBrush(Color.FromRgb(239, 68, 68));     // red-500
+                    IconCircle.Background = new SolidColorBrush(Color.FromRgb(254, 226, 226));
+                    IconInner.Background = new SolidColorBrush(Color.FromRgb(239, 68, 68));
                     SetCloseIcon();
                     break;
                 case ToastType.Warning:
-                    IconCircle.Background = new SolidColorBrush(Color.FromRgb(255, 247, 205)); // amber-50
-                    IconInner.Background = new SolidColorBrush(Color.FromRgb(245, 158, 11));     // amber-500
+                    IconCircle.Background = new SolidColorBrush(Color.FromRgb(255, 247, 205));
+                    IconInner.Background = new SolidColorBrush(Color.FromRgb(245, 158, 11));
                     SetWarningIcon();
                     break;
                 case ToastType.Info:
-                    IconCircle.Background = new SolidColorBrush(Color.FromRgb(219, 234, 254)); // blue-50
-                    IconInner.Background = new SolidColorBrush(Color.FromRgb(59, 130, 246));     // blue-500
+                    IconCircle.Background = new SolidColorBrush(Color.FromRgb(219, 234, 254));
+                    IconInner.Background = new SolidColorBrush(Color.FromRgb(59, 130, 246));
                     SetInfoIcon();
                     break;
             }

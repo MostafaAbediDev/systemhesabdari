@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Windows.Controls;
 using Taadol.Helpers;
 using Taadol.Views;
@@ -6,17 +6,10 @@ using Taadol.Views.Fund;
 
 namespace Taadol.Services
 {
-    /// <summary>
-    /// Centralized registration of all navigable views into the ViewFactory.
-    /// Keeps MainWindow constructor lean and provides one place to add new views.
-    /// </summary>
+
     public static class ViewFactoryRegistrations
     {
-        /// <summary>
-        /// Registers all standard navigable views.
-        /// Some registrations that require MainWindow-scoped state (e.g., event wiring)
-        /// are passed as delegates from MainWindow.
-        /// </summary>
+
         public static void RegisterDefaults(
             ViewFactory factory,
             Func<UserControl> bankListFactory,

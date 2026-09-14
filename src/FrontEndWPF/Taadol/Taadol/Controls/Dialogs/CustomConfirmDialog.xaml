@@ -9,7 +9,7 @@
         WindowStartupLocation="CenterScreen"
         Width="420"
         Height="260"
-        
+
         Topmost="True">
 
     <Border Background="White"
@@ -24,7 +24,6 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <!-- ICON -->
             <Border Width="40"
                     Height="40"
                     Background="#E9FFF1"
@@ -37,7 +36,6 @@
                                 VerticalAlignment="Center" />
             </Border>
 
-            <!-- TEXT -->
             <StackPanel Grid.Row="1"
                         Margin="0,15,0,0"
                         HorizontalAlignment="Center">
@@ -58,7 +56,6 @@
                            TextWrapping="Wrap" />
             </StackPanel>
 
-            <!-- BUTTONS -->
             <StackPanel Grid.Row="2"
                         Orientation="Horizontal"
                         HorizontalAlignment="Center"
@@ -144,7 +141,6 @@
                                FontWeight="Medium" />
                 </Button>
 
-              
             </StackPanel>
 
         </Grid>

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -14,11 +14,7 @@ using Taadol.Helpers;
 
 namespace Taadol.Views
 {
-    /// <summary>
-    /// فرم ویرایش شرکت — الگوی EditPersonView:
-    /// لود اطلاعات از GetDetails، ذخیره با EditCompanies،
-    /// ردیابی تغییرات ذخیره‌نشده (IUnsavedChangesAware) و رفرش لیست پشت مودال.
-    /// </summary>
+
     public partial class EditCompanyView : UserControl, INotifyPropertyChanged, IUnsavedChangesAware
     {
         private readonly ICompanyApplication _companyApplication;
@@ -29,9 +25,6 @@ namespace Taadol.Views
         private DateTime? _foundingDate;
         private bool _isActive = true;
 
-        // ردیابی تغییرات واقعی کاربر:
-        // تا پایان لود (IsLoading) تغییرات برنامه‌نویسی نادیده گرفته می‌شوند؛
-        // بعد از آن هر تغییر = تغییر کاربر → انصراف فقط در این صورت سؤال می‌پرسد.
         private bool _isLoading = true;
         private bool _userMadeChanges;
         private bool _isSaving;
@@ -95,7 +88,7 @@ namespace Taadol.Views
         {
             try
             {
-                // جزئیات شرکت و وضعیت فعال به‌صورت موازی لود می‌شوند
+
                 var detailsTask = Task.Run(() =>
                 {
                     using var scope = App.ServiceProvider.CreateScope();
@@ -120,13 +113,12 @@ namespace Taadol.Views
                 CompanyName = details.Title ?? "";
                 OfficialName = details.LegalName ?? "";
 
-                // GetDetails وضعیت فعال را برنمی‌گرداند؛ از لیست شرکت‌ها می‌خوانیم
                 var companyVm = (await companiesTask).FirstOrDefault(c => c.Id == _companyId);
                 IsActive = companyVm?.IsActive ?? true;
 
                 if (details.EstablishedDate != default)
                 {
-                    // هم مقدار property (برای ولیدیشن/ذخیره) هم فیلدهای نمایشی تاریخ
+
                     FoundingDate = details.EstablishedDate;
                     if (FoundingDatePicker != null)
                         FoundingDatePicker.SelectedDate = details.EstablishedDate;
@@ -139,7 +131,6 @@ namespace Taadol.Views
                         CompanyImagePicker.ImagePath = fullPath;
                 }
 
-                // لود کامل شد — از این به بعد هر تغییری = تغییر کاربر
                 _isLoading = false;
             }
             catch (Exception ex)
@@ -161,7 +152,6 @@ namespace Taadol.Views
             var picker = sender as PersianDatePickerControl;
             if (picker == null) return;
 
-            // اگر فیلدهای تاریخ پاک شوند مقدار null می‌شود تا ذخیره با تاریخ قبلی رخ ندهد
             FoundingDate = picker.SelectedDate;
         }
 
@@ -179,7 +169,6 @@ namespace Taadol.Views
         {
             if (_isSaving) return;
 
-            // اعتبارسنجی اول — دکمه فقط وقتی وارد حالت «در حال ذخیره» می‌شود که فرم معتبر باشد
             if (string.IsNullOrWhiteSpace(CompanyName))
             {
                 ToastManager.Warning("نام شرکت / کسب‌وکار را وارد کنید.");
@@ -231,7 +220,6 @@ namespace Taadol.Views
                     return;
                 }
 
-                // هماهنگ‌سازی وضعیت فعال/غیرفعال با لیست
                 if (IsActive)
                     await Task.Run(() => _companyApplication.Activate(_companyId));
                 else
@@ -242,7 +230,6 @@ namespace Taadol.Views
                 var mainWindow = Window.GetWindow(this) as MainWindow;
                 mainWindow?.CloseModal();
 
-                // اگر پشت مودال لیست شرکت‌ها بود همان لیست درجا رفرش می‌شود (بدون از دست رفتن State)
                 if (mainWindow?.MainContent.Content is CompanyListView listView)
                     _ = RefreshListViewSafeAsync(listView);
                 else
@@ -264,10 +251,6 @@ namespace Taadol.Views
             }
         }
 
-        /// <summary>
-        /// اگر تغییرات ذخیره‌نشده وجود داشته باشد، از کاربر می‌پرسد (ذخیره/انصراف/بستن).
-        /// خروجی false یعنی بستن ادامه پیدا نکند (کاربر Cancel زده یا انتخاب کرده ذخیره کند).
-        /// </summary>
         private bool ConfirmCloseWithUnsavedWarning()
         {
             if (!_userMadeChanges)
@@ -282,7 +265,7 @@ namespace Taadol.Views
             if (result == MessageBoxResult.Yes)
             {
                 _ = SaveCompanyAsync();
-                return false; // ذخیره خودش فرم را می‌بندد
+                return false;
             }
 
             return result == MessageBoxResult.No;
@@ -304,7 +287,6 @@ namespace Taadol.Views
             (Window.GetWindow(this) as MainWindow)?.CloseModal();
         }
 
-        /// <summary>Safe wrapper for RefreshGridAsync with error handling at call site.</summary>
         private async Task RefreshListViewSafeAsync(CompanyListView listView)
         {
             try
@@ -313,7 +295,7 @@ namespace Taadol.Views
             }
             catch (OperationCanceledException)
             {
-                // Cancellation is expected when the view is closed or superseded.
+
             }
             catch (Exception ex)
             {

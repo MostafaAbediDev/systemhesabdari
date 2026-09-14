@@ -24,8 +24,7 @@ namespace Taadol.Controls
         private DispatcherTimer _submenuAnimationTimer;
         private DispatcherTimer _cornerAnimationTimer;
         private const double SIDEBAR_OPEN = 240;
-        // ★ عرض حالت بسته از 62 به 76 افزایش یافت
-        // چون آیکون‌ها از 20 به 24 بزرگ‌تر شدن، در عرض 62 ناقص دیده می‌شدن
+
         private const double SIDEBAR_CLOSED = 63;
         private Dictionary<string, StackPanel> _subMenus;
         private Button _activeMenuButton = null;
@@ -59,7 +58,6 @@ namespace Taadol.Controls
             var clickedBtn = sender as Button;
             if (clickedBtn == null) return;
 
-
                         if (_activeSubMenuItem != null)
                 SetSubMenuInactive(_activeSubMenuItem);
 
@@ -87,7 +85,6 @@ namespace Taadol.Controls
             {
                 border.SetResourceReference(Border.BackgroundProperty, "ActiveMenuBrush");
 
-
                 if (_subMenus.ContainsKey(menuTag))
                 {
                     var subMenu = _subMenus[menuTag];
@@ -107,7 +104,6 @@ namespace Taadol.Controls
                 }
             }
 
-            // ★ متن منو: حالت فعال → ExtraBold 14
             var textBlock = FindChild<TextBlock>(button, null);
             if (textBlock != null)
             {
@@ -132,7 +128,6 @@ namespace Taadol.Controls
                 border.CornerRadius = new CornerRadius(8);
             }
 
-            // ★ متن منو: حالت غیرفعال → Regular 14
             var textBlock = FindChild<TextBlock>(button, null);
             if (textBlock != null)
             {
@@ -221,7 +216,7 @@ namespace Taadol.Controls
             if (arrow != null) arrow.Source = new Uri("/Assets/Icons/chevron-left.svg", UriKind.Relative);
 
             SetAllTextsVisibility(Visibility.Visible);
-            YearSelector.Expand(); // ★ اضافه شد
+            YearSelector.Expand();
 
             AnimateWidth(SIDEBAR_CLOSED, SIDEBAR_OPEN, 180, () =>
             {
@@ -239,7 +234,7 @@ namespace Taadol.Controls
             };
             timer.Start();
             SetAllTextsVisibility(Visibility.Visible);
-            YearSelector.Expand(); // ★
+            YearSelector.Expand();
         }
 
         private void AnimateClose()
@@ -254,7 +249,7 @@ namespace Taadol.Controls
             if (arrow != null) arrow.Source = new Uri("/Assets/Icons/chevron-right.svg", UriKind.Relative);
 
             FadeOutAllTexts();
-            YearSelector.Collapse(); // ★ اضافه شد
+            YearSelector.Collapse();
 
             foreach (var sub in _subMenus.Values)
                 sub.Visibility = Visibility.Collapsed;
@@ -270,7 +265,6 @@ namespace Taadol.Controls
             timer.Tick += (s, e2) =>
             {
                 timer.Stop();
-                // Visibility.Collapsed حذف شد - فقط فید آوت می‌شود تا جایش ثابت بماند
 
                 AnimateWidth(SIDEBAR_OPEN, SIDEBAR_CLOSED, 180, () =>
                 {
@@ -278,8 +272,8 @@ namespace Taadol.Controls
                 });
             };
             FadeOutAllTexts();
-            FadeOutLogoText(); // لاگو تکست هم فید آوت شود
-            YearSelector.Collapse(); // ★
+            FadeOutLogoText();
+            YearSelector.Collapse();
             timer.Start();
         }
         private void AnimateWidth(double from, double to, int durationMs, Action onComplete)
@@ -324,7 +318,7 @@ namespace Taadol.Controls
         private void HideElements()
         {
             FadeOutAllTexts();
-            // Visibility.Collapsed حذف شد - فقط فید آوت می‌شود تا جایش ثابت بماند
+
         }
 
         private void FadeIn(UIElement el, int ms = 250)
@@ -368,7 +362,6 @@ namespace Taadol.Controls
             FadeInChild<SvgViewbox>(BtnReports, "chevReports");
             FadeInLogoText();
         }
-
 
         private void FadeOutAllTexts()
         {
@@ -691,8 +684,6 @@ namespace Taadol.Controls
             return t * t * (3 - 2 * t);
         }
 
-        // ★ فیلدهای سال مالی به YearSelectorControl منتقل شدن
-
         private void AnimateCornerRadius(Border border, CornerRadius targetRadius, int durationMs = 90, Action onComplete = null)
         {
             var startRadius = border.CornerRadius;
@@ -752,10 +743,6 @@ namespace Taadol.Controls
             if (openMenu != null) SmoothClose(openMenu);
         }
 
-        /// <summary>
-        /// زیرمنوی فعال سایدبار را از حالت انتخاب خارج می‌کند (وقتی فرم با دکمه بستن بسته می‌شود).
-        /// هم حالت بصری دکمه و هم انتخاب ViewModel پاک می‌شود.
-        /// </summary>
         public void DeselectActiveSubMenu()
         {
             if (_activeSubMenuButton != null)
@@ -787,7 +774,7 @@ namespace Taadol.Controls
 
         private void AnimateSizeWithBounce(Ellipse ellipse, double from, double to, int durationMs)
         {
-            // ✅ توقف تایمر bounce قبلی — جلوگیری از تجمع انیمیشن
+
             if (_activeBounceTimer != null)
             {
                 _activeBounceTimer.Stop();
@@ -797,7 +784,7 @@ namespace Taadol.Controls
             int totalSteps = 20;
             int currentStep = 0;
             double stepDuration = (double)durationMs / totalSteps;
-            double overshoot = to + (to - from) * 0.3; 
+            double overshoot = to + (to - from) * 0.3;
             var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(stepDuration) };
             _activeBounceTimer = timer;
             timer.Tick += (s, e) =>
@@ -858,7 +845,6 @@ namespace Taadol.Controls
 
                 newBrush.BeginAnimation(SolidColorBrush.ColorProperty, anim);
 
-                // ★ زیرمنو غیرفعال: سایز ۱۴ ثابت، وزن Regular
                 AnimateFontSize(textBlock, 14, 14, 200);
                 textBlock.FontWeight = FontWeights.Regular;
             }
@@ -887,10 +873,6 @@ namespace Taadol.Controls
             }
         }
 
-
-        // ★ تمام منطق سال مالی (YearSelector_Click, BuildYearList, OpenYearPopup,
-        //    CloseYearPopup, RotateYearChevron, ToPersianDigits) به YearSelectorControl منتقل شد.
-
         private void SetSubMenuActive(Button btn)
         {
             btn.ApplyTemplate();
@@ -912,7 +894,6 @@ namespace Taadol.Controls
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                     });
 
-                // ★ زیرمنو فعال: سایز ۱۴ ثابت، وزن ExtraBold
                 AnimateFontSize(textBlock, 14, 14, 200);
                 textBlock.FontWeight = FontWeights.ExtraBold;
             }
@@ -954,14 +935,13 @@ namespace Taadol.Controls
             return 1 - (1 - t) * (1 - t);
         }
 
-        // ✅ تایمرهای فعال برای جلوگیری از تجمع انیمیشن
         private DispatcherTimer _activeSizeTimer;
         private DispatcherTimer _activeBounceTimer;
         private DispatcherTimer _activeFontSizeTimer;
 
         private void AnimateSize(Ellipse ellipse, double from, double to, int durationMs)
         {
-            // توقف تایمر قبلی — اگر انیمیشن قبلی تمام نشده، آن را لغو کن
+
             if (_activeSizeTimer != null)
             {
                 _activeSizeTimer.Stop();
@@ -996,7 +976,7 @@ namespace Taadol.Controls
 
         private void AnimateFontSize(TextBlock textBlock, double from, double to, int durationMs)
         {
-            // توقف تایمر قبلی
+
             if (_activeFontSizeTimer != null)
             {
                 _activeFontSizeTimer.Stop();

@@ -1,4 +1,4 @@
-<UserControl x:Class="Taadol.Views.PersonListView"
+﻿<UserControl x:Class="Taadol.Views.PersonListView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:svg="http://sharpvectors.codeplex.com/svgc/"
@@ -202,16 +202,15 @@
                                                TextColor="#2563EB"
                                                IconPath="/Assets/Icons/arrow-reload-horizontal-2.svg"
                                                Margin="6,0,0,0"
-                                               
+
                                                Click="BtnRefresh_Click" />
 
-                        <!-- X بستن -->
                         <Border Cursor="Hand"
                                 Background="Transparent"
                                 Padding="6"
                                 VerticalAlignment="Center"
                                 Margin="6,0,0,0">
-                           
+
                         </Border>
                     </StackPanel>
                 </Grid>
@@ -223,19 +222,17 @@
                                       Width="340"
                                       MinWidth="64"
                                       MaxWidth="340" />
-                    <!-- خط جداکننده‌ی ۱ پیکسلی بین پنل و گرید با مارجین ۵ از هر طرف (مطابق فیگما) -->
+
                     <ColumnDefinition Width="11" />
                     <ColumnDefinition Width="*"
                                       MinWidth="500" />
                 </Grid.ColumnDefinitions>
 
-                <!-- خط عمودی ۱ پیکسلی بین پنل و گرید (مارجین افقی ۵) -->
                 <Border Grid.Column="1"
                         Background="#E5E7EB"
                         Margin="5,0,5,0"
                         SnapsToDevicePixels="True" />
 
-                <!-- ═══ پنل سمت راست — اطلاعات اشخاص انتخاب شده ═══ -->
                 <Grid Grid.Column="0"
                       MinWidth="64"
                       HorizontalAlignment="Stretch">
@@ -245,7 +242,6 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <!-- عنوان پنل -->
                     <Border Grid.Row="0"
                             x:Name="PanelHeaderBorder"
                             Background="#ffffff"
@@ -306,7 +302,6 @@
                         </Grid>
                     </Border>
 
-                    <!-- پنل اطلاعات -->
                     <Border x:Name="DetailPanelContainer"
                             Grid.Row="1"
                             Width="340"
@@ -321,7 +316,6 @@
                         </ScrollViewer>
                     </Border>
 
-                    <!-- دکمه + شخص جدید -->
                     <Border Grid.Row="2"
                             x:Name="BtnNewBorder"
                             Margin="10,8,10,8"
@@ -353,10 +347,6 @@
                     </Border>
                 </Grid>
 
-                <!-- دکمه باز/بسته پنل -->
-              
-
-            <!-- ═══ DataGrid Container ═══ -->
             <Border Grid.Column="2"
                     Background="Transparent"
                         VerticalAlignment="Stretch"
@@ -372,7 +362,6 @@
                          <RowDefinition Height="Auto" />
                      </Grid.RowDefinitions>
 
-                    <!-- ═══ Filter Tabs + Search ═══ -->
                          <Border Grid.Row="0"
                                  x:Name="FilterBarBorder"
                                  BorderBrush="#E5E7EB"
@@ -394,14 +383,12 @@
                                                       MinWidth="70" />
                                 </Grid.ColumnDefinitions>
 
-                                <!-- جستجو -->
                                 <controls:SearchBoxControl x:Name="SearchBox"
                                     AutomationProperties.AutomationId="SearchBox"
                                                            Grid.Column="0"
                                                            Margin="0,0,4,0"
                                                            Placeholder="جستجو در نام ، شماره موبایل" />
 
-                                <!-- تب‌ها -->
                                 <ToggleButton x:Name="tabAll"
                                  AutomationProperties.AutomationId="tabAll"
                                               Grid.Column="1"
@@ -441,7 +428,7 @@
                                               Margin="4,0,0,0" />
                             </Grid>
                         </Border>
-                         <!-- ═══ DataGrid (کنترل مشترک) ═══ -->
+
                          <controls:UnifiedListView x:Name="PersonsGrid"
                                                    AutomationProperties.AutomationId="PersonsGrid"
                                                    Grid.Row="1"
@@ -454,9 +441,6 @@
 
                              <controls:UnifiedListView.Columns>
 
-
-
-                                 <!-- 3️⃣ کد یکتا -->
                                  <DataGridTextColumn Header="کد یکتا"
                                                      Width="90"
                                                      MinWidth="70"
@@ -469,7 +453,6 @@
                                     </DataGridTextColumn.HeaderStyle>
                                 </DataGridTextColumn>
 
-                                 <!-- 4️⃣ نام کامل / شرکت -->
                                  <DataGridTextColumn Header="نام کامل / شرکت"
                                                      Width="160"
                                                      MinWidth="125"
@@ -482,7 +465,6 @@
                                     </DataGridTextColumn.HeaderStyle>
                                 </DataGridTextColumn>
 
-                                 <!-- 5️⃣ وضعیت (با فیلتر) -->
                                  <DataGridTemplateColumn Width="90"
                                                          MinWidth="65">
                                     <DataGridTemplateColumn.HeaderStyle>
@@ -548,7 +530,7 @@
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding Status}"
                                                                          Value="فعال">
-                                                                <!-- سبز لایت مطابق فیگما (قبلاً شفاف/کم‌رنگ بود) -->
+
                                                                 <Setter Property="Background"
                                                                         Value="#E0FBEC" />
                                                             </DataTrigger>
@@ -581,7 +563,6 @@
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
-                                 <!-- 6️⃣ نوع (حقیقی/حقوقی) با فیلتر -->
                                  <DataGridTemplateColumn Width="80"
                                                          MinWidth="60">
                                     <DataGridTemplateColumn.HeaderStyle>
@@ -639,7 +620,6 @@
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
-                                 <!-- 7️⃣ موبایل -->
                                  <DataGridTextColumn Header="موبایل"
                                                      Width="115"
                                                      MinWidth="90"
@@ -652,7 +632,6 @@
                                     </DataGridTextColumn.HeaderStyle>
                                 </DataGridTextColumn>
 
-                                 <!-- 8️⃣ شهر (با فیلتر) -->
                                  <DataGridTemplateColumn Width="105"
                                                          MinWidth="85">
                                     <DataGridTemplateColumn.HeaderStyle>
@@ -710,7 +689,6 @@
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
-                                 <!-- 9️⃣ آخرین تراکنش -->
                                  <DataGridTemplateColumn Header="آخرین تراکنش"
                                                          Width="115"
                                                          MinWidth="95">
@@ -743,7 +721,6 @@
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
-                                <!-- 🔟 وضعیت حساب با فیلتر -->
                                 <DataGridTemplateColumn Width="*"
                                                         MinWidth="175">
                                     <DataGridTemplateColumn.HeaderStyle>
@@ -795,8 +772,7 @@
                                     </DataGridTemplateColumn.HeaderTemplate>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <!-- مبلغ و برچسب همیشه در یک ردیف افقی کنار هم و با فاصله‌ی ۶ پیکسل؛
-                                                 TextWrapping=NoWrap روی هر دو، بنابراین هرگز به خط دوم نمی‌روند -->
+
                                             <StackPanel Orientation="Horizontal"
                                                         HorizontalAlignment="Center"
                                                         VerticalAlignment="Center"
@@ -807,7 +783,7 @@
                                                            FontWeight="Bold"
                                                            FontFamily="{StaticResource Vazir}"
                                                            VerticalAlignment="Center"
-                                                           
+
                                                            Margin="0,0,8,0"
                                                            TextWrapping="NoWrap">
                                                     <TextBlock.Style>
@@ -854,7 +830,6 @@
                                 </DataGridTemplateColumn>                             </controls:UnifiedListView.Columns>
                         </controls:UnifiedListView>
 
-                <!-- ═══ نوار خلاصه زیر گرید (در سازنده به Footer گرید منتقل می‌شود) ═══ -->
                 <Border Grid.Row="2"
                         Background="#ffffff"
                         BorderBrush="#E5E7EB"
@@ -871,13 +846,12 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <!-- جمع بدهکار -->
                         <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                             <TextBlock Text="جمع بدهکار"
                                        FontSize="14" FontWeight="SemiBold"
                                        Foreground="#1F2937"
                                        VerticalAlignment="Center" />
-                           
+
                             <TextBlock x:Name="TotalDebitText"
                                                FontSize="14" FontWeight="Medium"
                                        Foreground="#22C55E"
@@ -886,7 +860,6 @@
                                                FontFamily="{StaticResource Vazir}" />
                         </StackPanel>
 
-                        <!-- جمع بستانکار -->
                         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center"
                                     Margin="30,0">
                             <TextBlock Text="جمع بستانکار"
@@ -907,13 +880,12 @@
 
                                 </StackPanel>
 
-                        <!-- جمع اشخاص انتخاب شده -->
                         <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
                             <TextBlock x:Name="SelectedSummaryText"
                                                FontSize="14" FontWeight="SemiBold"
                                        Foreground="#1F2937"
                                        VerticalAlignment="Center" />
-                                  
+
                             <TextBlock x:Name="SelectedTotalText"
                                                FontSize="14" FontWeight="Medium"
                                        Foreground="#2563EB"
@@ -931,14 +903,10 @@
 
                     </Grid>
             </Border>
-              
 
-
-                <!-- ═══ Decorative Ellipses ═══ -->
             <Ellipse Style="{StaticResource EllipseLeft}" Grid.Row="1" Grid.ColumnSpan="3" Margin="-18,0,0,0" />
             <Ellipse Style="{StaticResource EllipseRight}" Grid.Row="1" Grid.ColumnSpan="3" Margin="0,0,-18,0" />
 
-            <!-- ═══ Toggle Button — direct grid child, last = on top ═══ -->
             <Button x:Name="BtnToggleSidebar"
                     AutomationProperties.AutomationId="BtnToggleSidebar"
                     Grid.Row="1" Grid.ColumnSpan="3"

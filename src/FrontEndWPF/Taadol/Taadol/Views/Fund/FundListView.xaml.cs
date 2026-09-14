@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
@@ -42,7 +42,6 @@ namespace Taadol.Views.Fund
         {
             InitializeComponent();
 
-            // نوار جمع‌بندی به شکاف زیر گرید منتقل می‌شود تا همیشه زیر گرید بچسبد
             if (FundSummaryBar.Parent is Panel parent)
                 parent.Children.Remove(FundSummaryBar);
             FundsGrid.Footer = FundSummaryBar;
@@ -57,7 +56,6 @@ namespace Taadol.Views.Fund
             FundsGrid.PageSizeRequested += (s, size) => ChangePageSize(size);
             FundsGrid.CheckedItemsChanged += (s, e) => UpdateSummary();
 
-            // منوی راست‌کلیک ردیف: ویرایش (فعلاً در دسترس نیست) و حذف
             FundsGrid.RowEditRequested += (s, item) =>
             {
                 if (item is FundItem)
@@ -74,7 +72,6 @@ namespace Taadol.Views.Fund
                 BtnDelete_Click(this, new RoutedEventArgs());
             };
 
-            // انتخاب همه = فقط همین صفحه؛ خاموش‌کردن هدر = پاک کردن انتخاب کل لیست
             FundsGrid.SelectAllToggled += (s, select) =>
             {
                 if (select || AllFunds == null) return;
@@ -82,7 +79,6 @@ namespace Taadol.Views.Fund
                     item.IsSelected = false;
             };
 
-            // جستجو با Debounce داخلی SearchBoxControl (پیش‌فرض ۳۰۰ms)
             FundSearchBox.SearchTextChanged += (s, text) =>
             {
                 _searchText = text.Trim();
@@ -143,7 +139,6 @@ namespace Taadol.Views.Fund
             }
         }
 
-        // فرم لیست باید همیشه کل فضای محتوا رو پر کنه حتی اگه ردیف جدول کم باشه
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             Dispatcher.BeginInvoke(new Action(() =>
@@ -171,9 +166,6 @@ namespace Taadol.Views.Fund
             Height = h > 0 ? h : 0;
         }
 
-        /// <summary>
-        /// رفرش داده‌های گرید از بیرون (مثلاً بعد از بسته‌شدن فرم «صندوق جدید»).
-        /// </summary>
         public async Task RefreshGridAsync()
         {
             var current = Interlocked.Exchange(ref _loadCts, null);
@@ -415,7 +407,6 @@ namespace Taadol.Views.Fund
         {
             var pages = new ObservableCollection<PageItem>();
 
-            // آستانه ۵ صفحه: با ۵ صفحه یا کمتر همه‌ی شماره‌ها بدون نقطه‌چین
             if (_totalPages <= 5)
             {
                 for (int i = 1; i <= _totalPages; i++)
@@ -441,7 +432,6 @@ namespace Taadol.Views.Fund
                 IsCurrent = _currentPage == 1
             });
 
-            // نقطه‌چین اول — همیشه ثابت در هر دو طرف (مطابق لیست اشخاص)
             pages.Add(new PageItem
             {
                 PageNumber = 0,
@@ -476,7 +466,6 @@ namespace Taadol.Views.Fund
                 }
             }
 
-            // نقطه‌چین دوم — همیشه ثابت
             pages.Add(new PageItem
             {
                 PageNumber = 0,

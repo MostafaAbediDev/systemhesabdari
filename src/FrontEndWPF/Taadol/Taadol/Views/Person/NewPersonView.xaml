@@ -9,7 +9,7 @@
               FlowDirection="RightToLeft"
               Background="Transparent">
 
-    <UserControl.Resources> 
+    <UserControl.Resources>
         <local:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
 
         <Style x:Key="FormLabel"
@@ -26,7 +26,7 @@
                     Padding="10,15,10,15"
                     Margin="0,5,0,5">
                 <StackPanel>
-                    <!-- ردیف اول هر آیتم: نام بانک + شعبه + دکمه‌ها -->
+
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -65,7 +65,6 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
 
-                            <!-- حساب پیش‌فرض: می‌چسبه راست -->
                             <ToggleButton Grid.Column="0"
                                           Content="حساب پیش فرض"
                                           FlowDirection="LeftToRight"
@@ -74,7 +73,6 @@
                                           Checked="RowDefaultToggle_Checked"
                                           HorizontalAlignment="Left" />
 
-                            <!-- دکمه‌ها: می‌چسبن چپ -->
                             <StackPanel Grid.Column="1"
                                         Orientation="Horizontal"
                                         HorizontalAlignment="Left">
@@ -117,7 +115,6 @@
                         </Grid>
                     </Grid>
 
-                    <!-- ردیف دوم هر آیتم: شماره کارت + شبا + حساب -->
                     <Grid Margin="0,10,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -171,7 +168,6 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <!-- ═══ ردیف 0: هدر ═══ -->
             <Grid Grid.Row="0"
                   Margin="10,15,10,10">
                 <StackPanel Orientation="Horizontal"
@@ -194,7 +190,6 @@
                 </StackPanel>
             </Grid>
 
-            <!-- خط جداکننده دش‌دار -->
             <Border Grid.Row="0"
                     Height="1"
                     Margin="7,0,7,2"
@@ -222,7 +217,6 @@
                 </Border.Background>
             </Border>
 
-            <!-- ═══ ردیف 1: CardPanel اصلی (اطلاعات شخص) ═══ -->
             <Border Grid.Row="1"
                     Style="{StaticResource CardPanel}">
                 <Grid>
@@ -407,8 +401,6 @@
                             </StackPanel>
                         </Grid>
 
-                        <!-- ردیف دوم: نام و نام خانوادگی فرد رابط (فقط برای شخص حقوقی)
-                             این فرد از طرف شرکت با ما در ارتباط خواهد بود. -->
                         <Grid x:Name="ContactPersonPanel"
                               Margin="0,2,0,2"
                               Visibility="Collapsed">
@@ -510,7 +502,6 @@
 
                     </StackPanel>
 
-                    <!-- تصویر -->
                     <StackPanel Grid.Column="1"
                                 Margin="0,0,10,0"
                                 HorizontalAlignment="Center"
@@ -529,7 +520,6 @@
                 </Grid>
             </Border>
 
-            <!-- ═══ ردیف 2: جداکننده دکمه‌ای ═══ -->
             <Grid Grid.Row="2"
                   Margin="0,0,0,2">
                 <Border Height="3"
@@ -556,8 +546,7 @@
                         </VisualBrush>
                     </Border.Background>
                 </Border>
-                <!-- رنگ این دو در کد-بیهند بر اساس حالت میزبانی ست می‌شود:
-                     مودال (از لیست اشخاص) → #66000000، ناوبری عادی (سایدبار) → #FFF8ED -->
+
                 <Ellipse x:Name="DividerEllipseLeft"
                          Width="17"
                          Margin="-9,0,0,0"
@@ -613,7 +602,6 @@
                 </Border>
             </StackPanel>
 
-            <!-- ═══ ردیف 4: محتوای تب‌ها — فقط اینجا اسکرول می‌شه ═══ -->
             <ScrollViewer Grid.Row="4"
                           Style="{StaticResource MinimalScrollViewer}"
                           VerticalScrollBarVisibility="Auto"
@@ -621,11 +609,9 @@
                 <Border Style="{StaticResource CardPanel}">
                     <Grid Margin="12,0,12,0">
 
-                        <!-- تب: تماس و آدرس -->
                         <StackPanel x:Name="PricingContent"
                                     Visibility="Visible">
 
-                            <!-- ردیف اول: کد پستی - ایمیل - موبایل - شماره تلفن (از راست به چپ) -->
                             <Grid Margin="0,0,0,16">
 <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
@@ -638,7 +624,6 @@
                                 <ColumnDefinition Width="16" />
                             </Grid.ColumnDefinitions>
 
-                                <!-- شماره تلفن (چپ‌ترین) -->
                                 <StackPanel Grid.Column="0"
                                             HorizontalAlignment="Left">
                                     <TextBlock Style="{StaticResource FormLabel}">
@@ -655,7 +640,6 @@
                                                                    Placeholder="071" />
                                 </StackPanel>
 
-                                <!-- موبایل -->
                                 <StackPanel Grid.Column="2"
                                             HorizontalAlignment="Left">
                                     <TextBlock Style="{StaticResource FormLabel}">
@@ -672,7 +656,6 @@
                                                                    Placeholder="091" />
                                 </StackPanel>
 
-<!-- ایمیل -->
                                 <StackPanel Grid.Column="4"
                                             HorizontalAlignment="Left">
                                     <TextBlock Text="ایمیل"
@@ -686,7 +669,6 @@
                                                                       Placeholder="@gmail.com" />
                                 </StackPanel>
 
-                                <!-- کد پستی -->
                                 <StackPanel Grid.Column="6"
                                             HorizontalAlignment="Left">
                                     <TextBlock Text="کد پستی"
@@ -700,7 +682,6 @@
                                 </StackPanel>
                             </Grid>
 
-                            <!-- ردیف دوم: استان - شهرستان - آدرس (کشیده) (از راست به چپ) -->
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
@@ -711,7 +692,6 @@
                                     <ColumnDefinition Width="16" />
                                 </Grid.ColumnDefinitions>
 
-                                <!-- آدرس (کشیده، راست‌ترین) -->
                                 <StackPanel Grid.Column="4"
                                             HorizontalAlignment="Stretch">
                                     <TextBlock Text="آدرس"
@@ -722,7 +702,6 @@
                                                                    Placeholder="" />
                                 </StackPanel>
 
-                                <!-- استان -->
                                 <StackPanel Grid.Column="0"
                                             HorizontalAlignment="Left">
                                     <TextBlock Style="{StaticResource FormLabel}">
@@ -741,7 +720,6 @@
                                               ItemContainerStyle="{StaticResource SearchableComboBoxItem}" />
                                 </StackPanel>
 
-                                <!-- شهرستان (تا انتخاب استان فعال نمی‌شود) -->
                                 <StackPanel Grid.Column="2"
                                             HorizontalAlignment="Left">
                                     <TextBlock Style="{StaticResource FormLabel}">
@@ -776,13 +754,9 @@
                             </Grid>
                         </StackPanel>
 
-
-
-                        <!-- ═══ تب: حساب های بانکی — متد جدید ═══ -->
                         <StackPanel x:Name="InventoryContent"
                                     Visibility="Collapsed">
 
-                            <!-- فرم ورود اطلاعات حساب -->
                             <Grid Margin="0,8,0,8">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
@@ -798,7 +772,6 @@
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
 
-                                <!-- ردیف اول: نام بانک + نام شعبه + شماره کارت + حساب پیش‌فرض -->
                                 <StackPanel Grid.Row="0"
                                             Margin="0,0,0,10"
                                             Grid.Column="0">
@@ -844,7 +817,6 @@
                                                   IsChecked="True" />
                                 </StackPanel>
 
-                                <!-- ردیف دوم: شماره حساب + شماره شبا + دکمه افزودن -->
                                 <StackPanel Grid.Row="1"
                                             Margin="0,0,0,0"
                                             Grid.Column="0">
@@ -868,7 +840,6 @@
                                                                    Placeholder="IR" />
                                 </StackPanel>
 
-                                <!-- دکمه افزودن، داخل خود گرید، چسبیده به چپ -->
                                 <Border Grid.Row="1"
                                         Margin="0,0,0,5"
                                         Grid.Column="0"
@@ -903,14 +874,10 @@
                                 </Border>
                             </Grid>
 
-
-
-                            <!-- جدول حساب‌های بانکی -->
                             <controls:BankAccountsTableControl x:Name="BankAccountsTable"
                                                                ItemsSource="{Binding BankAccounts}" />
                         </StackPanel>
 
-                        <!-- تب: مالیات -->
                         <StackPanel x:Name="TaxContent"
                                     Visibility="Collapsed">
                             <Grid Margin="0,0,0,10"
@@ -1041,10 +1008,9 @@
                 </Border>
             </ScrollViewer>
 
-            <!-- ═══ ردیف 5: فوتر (دکمه‌ها) ═══ -->
             <Border Grid.Row="5"
                     Margin="0,10,0,0"
-                    BorderBrush="#E5E7EB"       
+                    BorderBrush="#E5E7EB"
                     BorderThickness="0,1,0,0"
                     CornerRadius="0,0,4,4"
                     Background="White">
@@ -1056,7 +1022,6 @@
                         <ColumnDefinition Width=".30*" />
                     </Grid.ColumnDefinitions>
 
-                    <!-- سمت راست: ذخیره شخص -->
                     <controls:IconButton Grid.Column="0"
                                          x:Name="SaveButton"
                                          ButtonText="ذخیره شخص"
@@ -1064,8 +1029,6 @@
                                          ButtonCommand="{Binding SavePersonCommand}"
                                          ButtonBackground="#2667FF"
                                          CornerRadius="4" />
-
-                  
 
                     <Button Grid.Column="1"
                             Background="Transparent"
@@ -1088,8 +1051,7 @@
                                        VerticalAlignment="Center" />
                         </StackPanel>
                     </Button>
-                    <!-- سمت چپ: ذخیره موقت — طبق تصمیم فاز ۱ فقط نمایشی است و هیچ عملی انجام نمی‌دهد
-                         (در فازهای آینده پیاده‌سازی می‌شود) -->
+
                     <controls:CustomOutlinedButton Grid.Column="2"
                                                    Text="ذخیره موقت"
                                                    HorizontalAlignment="Stretch"

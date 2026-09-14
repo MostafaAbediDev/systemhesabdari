@@ -1,4 +1,4 @@
-<UserControl x:Class="Taadol.Controls.BankAccountsTableControl"
+﻿<UserControl x:Class="Taadol.Controls.BankAccountsTableControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:svg="http://sharpvectors.codeplex.com/svgc/"
@@ -6,7 +6,7 @@
              Background="Transparent">
 
     <UserControl.Resources>
-        <!-- دکمه‌های آیکونی ستون عملیات: هاور با یک سطح خیلی ملایم به رنگ خود آیکون -->
+
         <Style x:Key="BankRowIconButtonStyle"
                TargetType="Button">
             <Setter Property="Background"
@@ -37,8 +37,7 @@
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver"
                                      Value="True">
-                                <!-- رنگ پایه با DataTrigger روی Tag تعیین می‌شود؛
-                                     فقط یک سایه ملایم زیر آیکون -->
+
                                 <Setter TargetName="HoverSurface"
                                         Property="Background"
                                         Value="#EFF3FF" />
@@ -50,26 +49,24 @@
         </Style>
     </UserControl.Resources>
 
-    <!-- جدول حساب‌های بانکی مشترک بین NewPersonView و EditPersonView -->
     <Border x:Name="TableContainerBorder"
             BorderBrush="#E5E7EB"
             BorderThickness="1"
             CornerRadius="4"
             Margin="0,0,0,8"
             SizeChanged="TableContainerBorder_SizeChanged">
-        <!-- اسکرول افقی: وقتی عرض پنجره کم است، جدول به‌جای Clip شدن اسکرول می‌شود -->
+
         <ScrollViewer x:Name="Scroller"
                       HorizontalScrollBarVisibility="Auto"
                       VerticalScrollBarVisibility="Disabled">
-            <!-- اسکرول‌بار مینیمال مثل گرید UnifiedListView -->
+
             <ScrollViewer.Resources>
                 <Style TargetType="ScrollBar"
                        BasedOn="{StaticResource MinimalScrollBar}">
                     <Style.Triggers>
                         <Trigger Property="Orientation"
                                  Value="Horizontal">
-                            <!-- اسکرول‌بار افقی باید دیده شود تا کاربر بفهمد
-                                 در پنجره کوچک می‌تواند به ستون‌های آخر برسد -->
+
                             <Setter Property="Height"
                                     Value="10" />
                         </Trigger>
@@ -85,37 +82,35 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <!-- ============ هدر جدول ============ -->
                 <Grid Grid.Row="0"
                       Background="Transparent"
                       Height="44">
                     <Grid.ColumnDefinitions>
-                        <!-- # -->
+
                         <ColumnDefinition Width="35" />
                         <ColumnDefinition Width="1" />
-                        <!-- نام بانک -->
+
                         <ColumnDefinition Width="*" MinWidth="130" />
                         <ColumnDefinition Width="1" />
-                        <!-- نام شعبه -->
+
                         <ColumnDefinition Width="1.5*" MinWidth="190" />
                         <ColumnDefinition Width="1" />
-                        <!-- شماره کارت -->
+
                         <ColumnDefinition Width="150" />
                         <ColumnDefinition Width="1" />
-                        <!-- شماره شبا -->
+
                         <ColumnDefinition Width="200" />
                         <ColumnDefinition Width="1" />
-                        <!-- شماره حساب -->
+
                         <ColumnDefinition Width="150" />
                         <ColumnDefinition Width="1" />
-                        <!-- پیش فرض -->
+
                         <ColumnDefinition Width="70" />
                         <ColumnDefinition Width="1" />
-                        <!-- عملیات -->
+
                         <ColumnDefinition Width="60" />
                     </Grid.ColumnDefinitions>
 
-                    <!-- عناوین -->
                     <TextBlock Grid.Column="0"
                                Text="#"
                                FontFamily="{StaticResource IRANSans}"
@@ -181,7 +176,6 @@
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center" />
 
-                    <!-- خطوط عمودی جداکننده -->
                     <Border Grid.Column="1" Background="#E5E7EB" />
                     <Border Grid.Column="3" Background="#E5E7EB" />
                     <Border Grid.Column="5" Background="#E5E7EB" />
@@ -190,14 +184,12 @@
                     <Border Grid.Column="11" Background="#E5E7EB" />
                     <Border Grid.Column="13" Background="#E5E7EB" />
 
-                    <!-- خط افقی زیر هدر -->
                     <Border Grid.ColumnSpan="15"
                             BorderBrush="#E5E7EB"
                             BorderThickness="0,0,0,1"
                             VerticalAlignment="Bottom" />
                 </Grid>
 
-                <!-- ============ ردیف‌های داده ============ -->
                 <ItemsControl Grid.Row="1"
                               ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource AncestorType=UserControl}}">
                     <ItemsControl.ItemTemplate>
@@ -219,32 +211,31 @@
                                         </Style>
                                     </Grid.Style>
                                     <Grid.ColumnDefinitions>
-                                        <!-- # -->
+
                                         <ColumnDefinition Width="35" />
                                         <ColumnDefinition Width="1" />
-                                        <!-- نام بانک -->
+
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="1" />
-                                        <!-- نام شعبه -->
+
                                         <ColumnDefinition Width="1.5*" />
                                         <ColumnDefinition Width="1" />
-                                        <!-- شماره کارت -->
+
                                         <ColumnDefinition Width="150" />
                                         <ColumnDefinition Width="1" />
-                                        <!-- شماره شبا -->
+
                                         <ColumnDefinition Width="200" />
                                         <ColumnDefinition Width="1" />
-                                        <!-- شماره حساب -->
+
                                         <ColumnDefinition Width="150" />
                                         <ColumnDefinition Width="1" />
-                                        <!-- پیش فرض -->
+
                                         <ColumnDefinition Width="70" />
                                         <ColumnDefinition Width="1" />
-                                        <!-- عملیات -->
+
                                         <ColumnDefinition Width="60" />
                                     </Grid.ColumnDefinitions>
 
-                                    <!-- # -->
                                     <TextBlock Grid.Column="0"
                                                Text="{Binding Index}"
                                                FontFamily="{StaticResource IRANSans}"
@@ -256,7 +247,6 @@
 
                                     <Border Grid.Column="1" Background="#E5E7EB" />
 
-                                    <!-- نام بانک -->
                                     <TextBlock Grid.Column="2"
                                                Text="{Binding BankName}"
                                                FontFamily="{StaticResource IRANSans}"
@@ -268,7 +258,6 @@
 
                                     <Border Grid.Column="3" Background="#E5E7EB" />
 
-                                    <!-- نام شعبه -->
                                     <TextBlock Grid.Column="4"
                                                Text="{Binding BranchName}"
                                                FontFamily="{StaticResource IRANSans}"
@@ -280,7 +269,6 @@
 
                                     <Border Grid.Column="5" Background="#E5E7EB" />
 
-                                    <!-- شماره کارت -->
                                     <TextBlock Grid.Column="6"
                                                Text="{Binding CardNumber}"
                                                FontFamily="{StaticResource IRANSans}"
@@ -293,7 +281,6 @@
 
                                     <Border Grid.Column="7" Background="#E5E7EB" />
 
-                                    <!-- شماره شبا -->
                                     <TextBlock Grid.Column="8"
                                                Text="{Binding Shaba}"
                                                FontFamily="{StaticResource IRANSans}"
@@ -306,7 +293,6 @@
 
                                     <Border Grid.Column="9" Background="#E5E7EB" />
 
-                                    <!-- شماره حساب -->
                                     <TextBlock Grid.Column="10"
                                                Text="{Binding AccountNumber}"
                                                FontFamily="{StaticResource IRANSans}"
@@ -319,7 +305,6 @@
 
                                     <Border Grid.Column="11" Background="#E5E7EB" />
 
-                                    <!-- پیش فرض (فقط خواندنی) -->
                                     <Border Grid.Column="12"
                                             Width="20"
                                             Height="20"
@@ -360,7 +345,6 @@
 
                                     <Border Grid.Column="13" Background="#E5E7EB" />
 
-                                    <!-- عملیات -->
                                     <StackPanel Grid.Column="14"
                                                 Orientation="Horizontal"
                                                 HorizontalAlignment="Center"

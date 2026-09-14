@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
@@ -19,12 +19,7 @@ using Taadol.Helpers;
 
 namespace Taadol.Views
 {
-    /// <summary>
-    /// فرم ویرایش شعبه — الگوی EditCompanyView:
-    /// لود اطلاعات از GetDetails (+ کد و وضعیت فعال از لیست)، ذخیره با EditBranch،
-    /// ردیابی تغییرات ذخیره‌نشده (IUnsavedChangesAware) و رفرش لیست پشت مودال.
-    /// بدون تغییر بک‌اند — متد Edit بک‌اند سالم است (چک‌ها Id خود رکورد را مستثنی می‌کنند).
-    /// </summary>
+
     public partial class EditBranchView : UserControl, INotifyPropertyChanged, IUnsavedChangesAware
     {
         private CancellationTokenSource _loadCts = new();
@@ -53,11 +48,8 @@ namespace Taadol.Views
 
         private long _selectedProvinceId;
         private long _selectedCityId;
-        private long _preferredCityId; // هنگام لود اولیه، شهر واقعی شعبه انتخاب شود نه اولین شهر
+        private long _preferredCityId;
 
-        // ردیابی تغییرات واقعی کاربر:
-        // تا پایان لود (IsLoading) تغییرات برنامه‌نویسی نادیده گرفته می‌شوند؛
-        // بعد از آن هر تغییر = تغییر کاربر → انصراف فقط در این صورت سؤال می‌پرسد.
         private bool _isLoading = true;
         private bool _userMadeChanges;
         private bool _isSaving;
@@ -232,7 +224,7 @@ namespace Taadol.Views
         {
             try
             {
-                // جزئیات شعبه، وضعیت فعال، شرکت‌ها و استان‌ها به‌صورت موازی لود می‌شوند
+
                 var detailsTask = Task.Run(() =>
                 {
                     using var scope = App.ServiceProvider.CreateScope();
@@ -280,7 +272,6 @@ namespace Taadol.Views
                 foreach (var p in provinces)
                     Provinces.Add(new ProvinceComboItem { Id = p.Id, Title = p.Title });
 
-                // کد فعلی شعبه — وضعیت خودکار/دستی مستقیماً از DTO دریافتی از GetDetails خوانده می‌شود (بدون حدس زدن)
                 var currentCode = details.ManualCode ?? details.CurrentCode ?? "";
                 UniqueCode = currentCode;
                 _isCodeAutomatic = details.IsCodeAutomatic;
@@ -299,7 +290,6 @@ namespace Taadol.Views
                 LatitudeText = details.Latitude.ToString(CultureInfo.InvariantCulture);
                 LongitudeText = details.Longitude.ToString(CultureInfo.InvariantCulture);
 
-                // GetDetails وضعیت فعال را برنمی‌گرداند؛ از لیست شعبه‌ها می‌خوانیم
                 IsActive = branchVm?.IsActive ?? true;
 
                 if (details.CompanyId > 0)
@@ -312,7 +302,6 @@ namespace Taadol.Views
                     await LoadCitiesAsync(details.ProvinceId);
                 }
 
-                // لود کامل شد — از این به بعد هر تغییری = تغییر کاربر
                 _isLoading = false;
             }
             catch (Exception ex)
@@ -376,7 +365,6 @@ namespace Taadol.Views
             }
         }
 
-        /// <summary>Safe wrapper for LoadCitiesAsync with error handling at call site.</summary>
         private async Task LoadCitiesSafeAsync(long provinceId)
         {
             try
@@ -385,7 +373,7 @@ namespace Taadol.Views
             }
             catch (OperationCanceledException)
             {
-                // Cancellation is expected when the province or view changes.
+
             }
             catch (Exception ex)
             {
@@ -394,7 +382,6 @@ namespace Taadol.Views
             }
         }
 
-        /// <summary>Safe wrapper for RefreshGridAsync with error handling at call site.</summary>
         private async Task RefreshListViewSafeAsync(BranchListView listView)
         {
             try
@@ -403,7 +390,7 @@ namespace Taadol.Views
             }
             catch (OperationCanceledException)
             {
-                // Cancellation is expected when the view is closed or superseded.
+
             }
             catch (Exception ex)
             {
@@ -420,7 +407,7 @@ namespace Taadol.Views
 
         private void CodeModeToggle_SelectionChanged(object sender, bool isFirstSelected)
         {
-            // isFirstSelected = true → اتوماتیک (کد جدید تولید می‌شود)، false → دستی (کد فعلی حفظ می‌شود)
+
             _isCodeAutomatic = isFirstSelected;
             IsUniqueCodeManual = !isFirstSelected;
             MarkUserChange();
@@ -437,13 +424,10 @@ namespace Taadol.Views
             _userMadeChanges = true;
         }
 
-        // Validation methods moved to Taadol.Helpers.ValidationHelper
-
         private async Task SaveBranchAsync()
         {
             if (_isSaving) return;
 
-            // اعتبارسنجی اول — دکمه فقط وقتی وارد حالت «در حال ذخیره» می‌شود که فرم معتبر باشد
             if (!_isCodeAutomatic && string.IsNullOrWhiteSpace(UniqueCode))
             {
                 ToastManager.Warning("شناسه یکتا را وارد کنید.");
@@ -526,7 +510,6 @@ namespace Taadol.Views
                     return;
                 }
 
-                // هماهنگ‌سازی وضعیت فعال/غیرفعال با لیست
                 if (IsActive)
                     await Task.Run(() => _branchApplication.Activate(_branchId));
                 else
@@ -537,7 +520,6 @@ namespace Taadol.Views
                 var mainWindow = Window.GetWindow(this) as MainWindow;
                 mainWindow?.CloseModal();
 
-                // اگر پشت مودال لیست شعبه‌ها بود همان لیست درجا رفرش می‌شود (بدون از دست رفتن State)
                 if (mainWindow?.MainContent.Content is BranchListView listView)
                     _ = RefreshListViewSafeAsync(listView);
                 else
@@ -559,10 +541,6 @@ namespace Taadol.Views
             }
         }
 
-        /// <summary>
-        /// اگر تغییرات ذخیره‌نشده وجود داشته باشد، از کاربر می‌پرسد (ذخیره/انصراف/بستن).
-        /// خروجی false یعنی بستن ادامه پیدا نکند (کاربر Cancel زده یا انتخاب کرده ذخیره کند).
-        /// </summary>
         private bool ConfirmCloseWithUnsavedWarning()
         {
             if (!_userMadeChanges)
@@ -577,7 +555,7 @@ namespace Taadol.Views
             if (result == MessageBoxResult.Yes)
             {
                 _ = SaveBranchAsync();
-                return false; // ذخیره خودش فرم را می‌بندد
+                return false;
             }
 
             return result == MessageBoxResult.No;

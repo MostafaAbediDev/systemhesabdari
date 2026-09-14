@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -188,7 +188,7 @@ namespace Taadol.Views.Bank
             }
             catch (OperationCanceledException)
             {
-                // لغو بارگذاری رفتار عادی هنگام خروج از صفحه است.
+
             }
             catch (Exception exception)
             {
@@ -207,7 +207,7 @@ namespace Taadol.Views.Bank
             }
             catch (OperationCanceledException)
             {
-                // لغو رفرش رفتار عادی است.
+
             }
             catch (Exception exception)
             {

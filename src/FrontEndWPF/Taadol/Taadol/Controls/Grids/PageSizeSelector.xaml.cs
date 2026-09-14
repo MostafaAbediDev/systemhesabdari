@@ -19,14 +19,12 @@ namespace Taadol.Controls
         private static readonly SolidColorBrush BlueBgBrush = new(Color.FromRgb(0xEF, 0xF6, 0xFF));
 
         public event EventHandler<int> SelectionChanged;
-        private int _lastCloseTimestamp = -100000; // مقدار اولیه دور از هر Timestamp واقعی
+        private int _lastCloseTimestamp = -100000;
 
         public int SelectedPageSize { get; private set; } = 15;
 
         private readonly List<int> _options = new() { 10, 15, 20, 25, 50, 75 };
 
-        // برای unsubscribe در Unloaded — وگرنه هر PageSizeSelector ساخته‌شده
-        // یک هندلر زنده روی ویندوز باقی می‌گذارد (نشتی حافظه)
         private Window _subscribedWindow;
 
         public PageSizeSelector()
@@ -60,7 +58,6 @@ namespace Taadol.Controls
             var element = e.OriginalSource as DependencyObject;
             if (element == null) return;
 
-            // اگر کلیک روی RootBorder یا داخل DropdownBorder باشد، بسته نمی‌شود
             if (IsDescendantOf(element, RootBorder) || IsDescendantOf(element, DropdownBorder))
                 return;
 
@@ -72,10 +69,6 @@ namespace Taadol.Controls
             {
                 if (child == parent) return true;
 
-                // کلیک روی متن داخل گزینه‌ها، OriginalSource را یک Run (ContentElement)
-                // می‌کند که Visual نیست؛ VisualTreeHelper.GetParent روی آن
-                // InvalidOperationException می‌اندازد (باگ Runtime تأییدشده).
-                // برای عناصر غیر-Visual از LogicalTree پدر را بالا می‌رویم.
                 child = child is Visual || child is System.Windows.Media.Media3D.Visual3D
                     ? VisualTreeHelper.GetParent(child)
                     : LogicalTreeHelper.GetParent(child);
@@ -160,8 +153,7 @@ namespace Taadol.Controls
 
         private void Item_Click(object sender, MouseButtonEventArgs e)
         {
-            // هر انتخاب باید فقط یک‌بار به PaginationBar برسد؛ مخصوصاً وقتی کاربر
-            // روی مقدار فعلی کلیک می‌کند یا رویداد ورودی در حال انتشار مجدد است.
+
             if (_isSelecting || sender is not Border b || b.Tag is not int val)
             {
                 e.Handled = _isSelecting;
@@ -170,7 +162,6 @@ namespace Taadol.Controls
 
             e.Handled = true;
 
-            // انتخاب مقدار فعلی هیچ تغییری ایجاد نمی‌کند و نباید گرید را دوباره فیلتر کند.
             if (val == SelectedPageSize)
             {
                 DropdownPopup.IsOpen = false;
@@ -183,8 +174,6 @@ namespace Taadol.Controls
             BuildItems();
             DropdownPopup.IsOpen = false;
 
-            // ابتدا کنترل را غیرفعال می‌کنیم و اجرای رویداد را به نوبت بعدی Dispatcher
-            // می‌سپاریم تا کاربر حالت در حال پردازش را ببیند و کلیک تکراری ثبت نشود.
             IsEnabled = false;
             var requestVersion = ++_selectionRequestVersion;
             Dispatcher.BeginInvoke(new Action(() =>
@@ -195,7 +184,7 @@ namespace Taadol.Controls
                 }
                 finally
                 {
-                    // بعد از پایان ApplyFilters و Layout مربوط به آن، کنترل دوباره فعال شود.
+
                     Dispatcher.BeginInvoke(new Action(() =>
                     {
                         if (requestVersion == _selectionRequestVersion)

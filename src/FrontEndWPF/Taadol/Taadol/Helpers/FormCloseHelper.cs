@@ -1,19 +1,11 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using System.Windows;
 using Taadol.Controls;
 
 namespace Taadol.Helpers
 {
-    /// <summary>
-    /// راهنمای بستن فرم‌های دارای تغییرات ذخیره‌نشده (پرسش Yes/No/Cancel).
-    /// رفتار با HandleCancelAsync قبلی دو فرم بانک یکسان است:
-    /// - بدون تغییر ذخیره‌نشده → بستن مستقیم
-    /// - Cancel → فرم باز می‌ماند
-    /// - Yes → ذخیره انجام می‌شود ولی فرم باز می‌ماند؛ بستن پس از ذخیرهٔ موفق توسط
-    ///   رویدادهای موفقیت (BankSaved/BankUpdated در MainWindow) انجام می‌شود.
-    /// - No → بدون ذخیره بسته می‌شود
-    /// </summary>
+
     public static class FormCloseHelper
     {
         public static async Task ConfirmAndCloseAsync(
@@ -52,7 +44,6 @@ namespace Taadol.Helpers
                 return;
             }
 
-            // No → بدون ذخیره ببند.
             closeAction();
         }
     }

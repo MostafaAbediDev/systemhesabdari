@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -16,11 +16,7 @@ using Taadol.Helpers;
 
 namespace Taadol.Views
 {
-    /// <summary>
-    /// فرم ویرایش دوره مالی — الگوی EditCompanyView:
-    /// لود اطلاعات از GetDetails، ذخیره با EditFinancialPeriod،
-    /// ردیابی تغییرات ذخیره‌نشده (IUnsavedChangesAware) و رفرش لیست پشت مودال.
-    /// </summary>
+
     public partial class EditFinancialPeriodView : UserControl, INotifyPropertyChanged, IUnsavedChangesAware
     {
         private CancellationTokenSource _loadCts = new();
@@ -34,9 +30,6 @@ namespace Taadol.Views
         private DateTime? _endDate;
         private bool _isCurrentPeriod = true;
 
-        // ردیابی تغییرات واقعی کاربر:
-        // تا پایان لود (IsLoading) تغییرات برنامه‌نویسی نادیده گرفته می‌شوند؛
-        // بعد از آن هر تغییر = تغییر کاربر → انصراف فقط در این صورت سؤال می‌پرسد.
         private bool _isLoading = true;
         private bool _userMadeChanges;
         private bool _isSaving;
@@ -115,7 +108,6 @@ namespace Taadol.Views
             {
                 var token = _loadCts.Token;
 
-                // جزئیات دوره و وضعیت فعال به‌صورت موازی لود می‌شوند
                 var detailsTask = Task.Run(() =>
                 {
                     token.ThrowIfCancellationRequested();
@@ -150,7 +142,6 @@ namespace Taadol.Views
 
                 PeriodTitle = details.Title ?? "";
 
-                // GetDetails وضعیت فعال را برنمی‌گرداند؛ از لیست دوره‌ها می‌خوانیم
                 var periodVm = (await periodsTask).FirstOrDefault(p => p.Id == _periodId);
                 IsCurrentPeriod = periodVm?.IsActive ?? true;
 
@@ -178,14 +169,12 @@ namespace Taadol.Views
                 foreach (var b in branches)
                     Branches.Add(b);
 
-                // اگر شعبه‌ای که دوره به آن تعلق دارد غیرفعال شده، همچنان در لیست باشد
                 token.ThrowIfCancellationRequested();
                 if (SelectedBranchId > 0 && Branches.All(b => b.Id != SelectedBranchId))
                 {
                     Branches.Insert(0, new BranchComboItem { Id = details.BranchId, Title = "—" });
                 }
 
-                // لود کامل شد — از این به بعد هر تغییری = تغییر کاربر
                 _isLoading = false;
             }
             catch (OperationCanceledException)
@@ -215,7 +204,6 @@ namespace Taadol.Views
             var picker = sender as PersianDatePickerControl;
             if (picker == null) return;
 
-            // اگر فیلدهای تاریخ پاک شوند مقدار null می‌شود تا ذخیره با تاریخ قبلی رخ ندهد
             StartDate = picker.SelectedDate;
         }
 
@@ -224,7 +212,6 @@ namespace Taadol.Views
             var picker = sender as PersianDatePickerControl;
             if (picker == null) return;
 
-            // اگر فیلدهای تاریخ پاک شوند مقدار null می‌شود تا ذخیره با تاریخ قبلی رخ ندهد
             EndDate = picker.SelectedDate;
         }
 
@@ -233,7 +220,6 @@ namespace Taadol.Views
             if (_isSaving) return;
             if (_saveCts == null || _saveCts.IsCancellationRequested) return;
 
-            // اعتبارسنجی اول — دکمه فقط وقتی وارد حالت «در حال ذخیره» می‌شود که فرم معتبر باشد
             if (string.IsNullOrWhiteSpace(PeriodTitle))
             {
                 ToastManager.Warning("عنوان دوره مالی را وارد کنید.");
@@ -273,9 +259,7 @@ namespace Taadol.Views
 
             try
             {
-                // ذخیره از طریق سرویس Application روی ترد پس‌زمینه اجرا می‌شود تا UI فریز نشود.
-                // سرویس بک‌اند خودش چک همپوشانی و عنوان تکراری را انجام می‌دهد.
-                // خروجی null یعنی موفق؛ غیر null پیام هشدار است.
+
                 var saveToken = _saveCts.Token;
                 var dbMessage = await Task.Run(() =>
                 {
@@ -294,10 +278,9 @@ namespace Taadol.Views
                     if (!result.IsSucceeded)
                         return result.Message;
 
-                    // Edit فیلد IsActive را تغییر نمی‌دهد؛ وضعیت «دوره جاری» را دستی اعمال می‌کنیم
                     if (IsCurrentPeriod)
                     {
-                        // بقیه دوره‌های فعال همان شعبه غیرفعال شوند (به‌جز خودِ این دوره)
+
                         var others = app.GetFinancialPeriods()
                             .Where(p => p.Id != _periodId && p.BranchId == SelectedBranchId && p.IsActive && !p.IsDeleted)
                             .ToList();
@@ -322,7 +305,6 @@ namespace Taadol.Views
 
                 ToastManager.Success("ویرایش دوره مالی با موفقیت انجام شد.");
 
-                // کش سال‌های مالی سایدبار را بی‌اعتبار کن تا تغییرات فوراً دیده شود
                 Taadol.Controls.YearSelectorControl.InvalidateCache();
                 if ((Window.GetWindow(this) as MainWindow)?.Sidebar?.YearSelector is { } yearSelector)
                     _ = RefreshYearSelectorSafeAsync(yearSelector);
@@ -330,7 +312,6 @@ namespace Taadol.Views
                 var mainWindow = Window.GetWindow(this) as MainWindow;
                 mainWindow?.CloseModal();
 
-                // اگر پشت مودال لیست دوره‌های مالی بود همان لیست درجا رفرش می‌شود (بدون از دست رفتن State)
                 if (mainWindow?.MainContent.Content is FinancialPeriodListView listView)
                     _ = RefreshListViewSafeAsync(listView);
                 else
@@ -357,10 +338,6 @@ namespace Taadol.Views
             }
         }
 
-        /// <summary>
-        /// اگر تغییرات ذخیره‌نشده وجود داشته باشد، از کاربر می‌پرسد (ذخیره/انصراف/بستن).
-        /// خروجی false یعنی بستن ادامه پیدا نکند (کاربر Cancel زده یا انتخاب کرده ذخیره کند).
-        /// </summary>
         private bool ConfirmCloseWithUnsavedWarning()
         {
             if (!_userMadeChanges)
@@ -375,7 +352,7 @@ namespace Taadol.Views
             if (result == MessageBoxResult.Yes)
             {
                 _ = SavePeriodAsync();
-                return false; // ذخیره خودش فرم را می‌بندد
+                return false;
             }
 
             return result == MessageBoxResult.No;
@@ -397,7 +374,6 @@ namespace Taadol.Views
             (Window.GetWindow(this) as MainWindow)?.CloseModal();
         }
 
-        /// <summary>Safe wrapper for yearSelector.RefreshAsync with error handling at call site.</summary>
         private async Task RefreshYearSelectorSafeAsync(Taadol.Controls.YearSelectorControl yearSelector)
         {
             try
@@ -406,7 +382,7 @@ namespace Taadol.Views
             }
             catch (OperationCanceledException)
             {
-                // Cancellation is expected when the view is closed or superseded.
+
             }
             catch (Exception ex)
             {
@@ -415,7 +391,6 @@ namespace Taadol.Views
             }
         }
 
-        /// <summary>Safe wrapper for RefreshGridAsync with error handling at call site.</summary>
         private async Task RefreshListViewSafeAsync(FinancialPeriodListView listView)
         {
             try
@@ -424,7 +399,7 @@ namespace Taadol.Views
             }
             catch (OperationCanceledException)
             {
-                // Cancellation is expected when the view is closed or superseded.
+
             }
             catch (Exception ex)
             {

@@ -32,27 +32,15 @@ using System.Windows.Media;
 using Taadol.Controls;
 namespace Taadol.Views
 {
-    /// <summary>
-    /// فرم ثبت شخص جدید.
-    /// همه‌ی فیلدها به Property هایی با INotifyPropertyChanged بایند می‌شوند
-    /// و در زمان ذخیره، تمام اطلاعات شخص + تماس‌ها + آدرس + حساب‌های بانکی
-    /// از طریق Application های مربوطه ذخیره می‌شود.
-    ///
-    /// ★ محدودیت‌های بک‌اند (نسخه فعلی):
-    ///   - CreatePerson فیلد IsActive نداره.
-    ///     → برای تنظیم IsActive از IPersonApplication.Activate(id) / Deactivate(id) استفاده می‌کنیم.
-    ///   - OperationResult.Id برنمی‌گرده.
-    ///     → بعد از Create، با Search(NationalCode/EconomicCode) شخص جدید رو پیدا می‌کنیم.
-    /// </summary>
+
     public partial class NewPersonView : UserControl, INotifyPropertyChanged, IUnsavedChangesAware
     {
-        // ===== CancellationToken =====
+
         private CancellationTokenSource _loadCts = new();
         private CancellationTokenSource _saveCts = new();
         private CancellationTokenSource _cityLoadCts = new();
         private CancellationTokenSource _jobTitleLoadCts = new();
 
-        // ===== Services (از DI رزولو می‌شوند) =====
         private readonly IPersonApplication _personApplication;
         private readonly IBranchApplication _branchApplication;
         private readonly IPersonTypeApplication _personTypeApplication;
@@ -60,17 +48,16 @@ namespace Taadol.Views
         private readonly IPersonContactApplication _personContactApplication;
         private readonly IPersonAddressApplication _personAddressApplication;
         private readonly IPersonBankApplication _personBankApplication;
-        // این سرویس اختیاری است (ممکن است در App.xaml.cs ثبت نشده باشد)
+
         private readonly IBankBranchApplication? _bankBranchApplication;
         private readonly ICodeGeneratorService _codeGeneratorService;
         private readonly IPersonCategoryApplication _personCategoryApplication;
         private long? _selectedPersonCategoryId;
         private readonly IPictureApplication _pictureApplication;
         private string? _selectedImagePath;
-        // ===== Command =====
+
         public ICommand SavePersonCommand { get; }
 
-        // ===== Combo Sources =====
         public BulkObservableCollection<BranchComboItem> Branches { get; } = new();
         public BulkObservableCollection<PersonTypeViewModel> PersonTypes { get; } = new();
         public BulkObservableCollection<ProvinceViewModel> Provinces { get; } = new();
@@ -78,11 +65,9 @@ namespace Taadol.Views
         public BulkObservableCollection<BankBranchViewModel> BankBranches { get; } = new();
         public ObservableCollection<BankAccountRow> BankAccounts { get; } = new();
 
-        // ===== Lookup Cache =====
         private List<ContactTypeViewModel> _contactTypes = new();
         private readonly Dictionary<string, long> _contactTypeByName = new(StringComparer.OrdinalIgnoreCase);
 
-        // ===== Property backing fields =====
         private string _firstName = "";
         private string _lastName = "";
         private string _contactFirstName = "";
@@ -99,18 +84,15 @@ namespace Taadol.Views
         private long _selectedPersonTypeId;
         private decimal _creditLimit;
 
-        // Contact tab
         private string _phone = "";
         private string _mobile = "";
         private string _email = "";
         private string _postalCode = "";
         private string _address = "";
 
-        // Address tab
         private long _selectedProvinceId;
         private long _selectedCityId;
 
-        // Main bank account (موجودیت اول که همیشه در فرم نمایش داده می‌شود)
         private string _mainBankName = "";
         private string _mainBranchName = "";
         private string _mainCardNumber = "";
@@ -119,14 +101,11 @@ namespace Taadol.Views
         private bool _mainBankIsDefault = true;
         private long _selectedBankBranchId;
 
-        // ===== Properties =====
         public string FirstName { get => _firstName; set { _firstName = value; OnPropertyChanged(); MarkUserChange(); } }
         public string LastName { get => _lastName; set { _lastName = value; OnPropertyChanged(); MarkUserChange(); } }
 
-        /// <summary>نام فرد رابط (فقط برای شخص حقوقی) — فردی که از طرف شرکت با ما در ارتباط است</summary>
         public string ContactFirstName { get => _contactFirstName; set { _contactFirstName = value; OnPropertyChanged(); MarkUserChange(); } }
 
-        /// <summary>نام خانوادگی فرد رابط (فقط برای شخص حقوقی)</summary>
         public string ContactLastName { get => _contactLastName; set { _contactLastName = value; OnPropertyChanged(); MarkUserChange(); } }
 
         public string NationalCode { get => _nationalCode; set { _nationalCode = value; OnPropertyChanged(); MarkUserChange(); } }
@@ -141,10 +120,6 @@ namespace Taadol.Views
             set { _isCodeAutomatic = value; OnPropertyChanged(); MarkUserChange(); }
         }
 
-        /// <summary>
-        /// وقتی true باشه، TextBox شناسه یکتا قابل ویرایش است (حالت دستی).
-        /// وقتی false باشه، TextBox غیرفعال و مقدارش از CodeGeneratorService میاد.
-        /// </summary>
         public bool IsUniqueCodeManual { get => !_isCodeAutomatic; }
 
         public bool IsLegal
@@ -177,14 +152,12 @@ namespace Taadol.Views
         {
             if (personTypeId <= 0) return;
 
-            // ★ این خط کلیدیه — بدون این، PersonTypeId کنترل همیشه 0 می‌مونه
             if (CategorySearch != null)
                 CategorySearch.PersonTypeId = personTypeId;
 
             var token = _loadCts?.Token ?? CancellationToken.None;
             CancelAndDispose(ref _jobTitleLoadCts);
 
-            // دسته‌بندی شخص و دپارتمان بارگذاری می‌شوند؛ عنوان شغلی بعد از انتخاب دپارتمان لود می‌شود.
             var categoryTask = PersonFormHelper.LoadCategoryTreeAsync(
                 personTypeId, token,
                 ex => System.Diagnostics.Debug.WriteLine($"Categories load failed: {ex.Message}"),
@@ -215,14 +188,12 @@ namespace Taadol.Views
         }
         public decimal CreditLimit { get => _creditLimit; set { _creditLimit = value; OnPropertyChanged(); MarkUserChange(); } }
 
-        // Contact
         public string Phone { get => _phone; set { _phone = value; OnPropertyChanged(); MarkUserChange(); } }
         public string Mobile { get => _mobile; set { _mobile = value; OnPropertyChanged(); MarkUserChange(); } }
         public string Email { get => _email; set { _email = value; OnPropertyChanged(); MarkUserChange(); } }
         public string PostalCode { get => _postalCode; set { _postalCode = value; OnPropertyChanged(); MarkUserChange(); } }
         public string Address { get => _address; set { _address = value; OnPropertyChanged(); MarkUserChange(); } }
 
-        // Address
         public long SelectedProvinceId
         {
             get => _selectedProvinceId;
@@ -238,7 +209,6 @@ namespace Taadol.Views
             }
         }
 
-        /// <summary>فیلد شهرستان را تا انتخاب استان بلاک می‌کند و در صورت تلاش، خطا نشان می‌دهد.</summary>
         private void UpdateCityState()
         {
             if (CityBlockOverlay == null) return;
@@ -257,8 +227,6 @@ namespace Taadol.Views
             e.Handled = true;
         }
 
-        // کلید Escape مسیر لغو/بستن و کلید Enter مسیر ذخیره را اجرا میکند؛
-        // Enter در فیلدهای چندخطی به خط بعدی میگذارد.
         private void NewPersonView_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
@@ -313,7 +281,6 @@ namespace Taadol.Views
             set { _selectedCityId = value; OnPropertyChanged(); MarkUserChange(); }
         }
 
-        // Main bank
         public string MainBankName { get => _mainBankName; set { _mainBankName = value; OnPropertyChanged(); MarkUserChange(); } }
         public string MainBranchName { get => _mainBranchName; set { _mainBranchName = value; OnPropertyChanged(); MarkUserChange(); } }
         public string MainCardNumber { get => _mainCardNumber; set { _mainCardNumber = value; OnPropertyChanged(); MarkUserChange(); } }
@@ -322,11 +289,6 @@ namespace Taadol.Views
         public bool MainBankIsDefault { get => _mainBankIsDefault; set { _mainBankIsDefault = value; OnPropertyChanged(); MarkUserChange(); } }
         public long SelectedBankBranchId { get => _selectedBankBranchId; set { _selectedBankBranchId = value; OnPropertyChanged(); MarkUserChange(); } }
 
-        /// <summary>
-        /// الپس‌های دو سر جداکننده باید با پس‌زمینه‌ی پشت فرم هم‌رنگ باشند:
-        /// وقتی فرم از لیست اشخاص به‌صورت مودال باز می‌شود → رنگ overlay تیره (#66000000)
-        /// و وقتی از سایدبار به‌صورت عادی باز می‌شود → رنگ پس‌زمینه‌ی صفحه (#FFF8ED).
-        /// </summary>
         private void UpdateDividerEllipseColor()
         {
             bool isModal = Window.GetWindow(this) is MainWindow mw && mw.ModalContent.Content == this;
@@ -336,14 +298,10 @@ namespace Taadol.Views
             DividerEllipseRight.Fill = brush;
         }
 
-        // ======================================================
-        //  Constructor
-        // ======================================================
         public NewPersonView()
         {
             InitializeComponent();
 
-            // نوع منبع برای کنترل‌های دپارتمان و عنوان شغلی
             if (CategorySearch2 != null)
                 CategorySearch2.SourceKind = Controls.CategorySearchControl.SearchSourceKind.Department;
             if (CategorySearch3 != null)
@@ -358,7 +316,6 @@ namespace Taadol.Views
                 CategorySearch2.SelectionCleared += OnDepartmentSelectionCleared;
             }
 
-            // پیش‌فرض نوع قرارداد در تب پرسنل: رسمی
             if (ContractPermanent != null)
             {
                 _suppressContractToggle = true;
@@ -366,21 +323,15 @@ namespace Taadol.Views
                 _suppressContractToggle = false;
             }
 
-            // رویدادهای جدول حساب‌های بانکی (کنترل مشترک) — در کد وصل می‌شوند چون delegate سفارشی دارد
             BankAccountsTable.EditRequested += BankAccountsTable_EditRequested;
             BankAccountsTable.RemoveRequested += BankAccountsTable_RemoveRequested;
 
-            // شهرستان تا انتخاب استان غیرفعال است
             UpdateCityState();
             CityCombo.DropDownOpened += CityCombo_DropDownOpened;
             CityCombo.PreviewKeyDown += CityCombo_PreviewKeyDown;
 
-            // رنگ الپس‌های جداکننده به حالت میزبانی بستگی دارد؛
-            // تا زمانی که فرم در visual tree نیست (و window/مودال مشخص نیست) نمی‌توان تشخیص داد،
-            // پس در Loaded ست می‌شود.
             Loaded += (s, e) => UpdateDividerEllipseColor();
 
-            // سرویس‌های ضروری — اگه نباشن، فرم باز نمی‌شه
             _personApplication = App.ServiceProvider.GetRequiredService<IPersonApplication>();
             _branchApplication = App.ServiceProvider.GetRequiredService<IBranchApplication>();
             _personTypeApplication = App.ServiceProvider.GetRequiredService<IPersonTypeApplication>();
@@ -389,8 +340,7 @@ namespace Taadol.Views
             _personAddressApplication = App.ServiceProvider.GetRequiredService<IPersonAddressApplication>();
             _personBankApplication = App.ServiceProvider.GetRequiredService<IPersonBankApplication>();
             _pictureApplication = App.ServiceProvider.GetRequiredService<IPictureApplication>();
-            // سرویس اختیاری — اگه BankManagementBoostrapper در App.xaml.cs ثبت نشده باشه،
-            // null برمی‌گردانه و فرم باز می‌شه (بدون لیست شعب بانک)
+
             _bankBranchApplication = App.ServiceProvider.GetService<IBankBranchApplication>();
 
             if (_bankBranchApplication == null)
@@ -399,13 +349,11 @@ namespace Taadol.Views
                     "⚠️ IBankBranchApplication ثبت نشده. اطمینان حاصل کن که BankManagementBoostrapper.Configure در App.xaml.cs صدا زده شده.");
             }
 
-            // سرویس تولید کد یکتا (از CodeManagement)
             _codeGeneratorService = App.ServiceProvider.GetRequiredService<ICodeGeneratorService>();
             _personCategoryApplication = App.ServiceProvider.GetRequiredService<IPersonCategoryApplication>();
             SavePersonCommand = new RelayCommand(async () => await SavePersonAsync());
             DataContext = this;
 
-            // مقداردهی اولیه شناسه یکتا در حالت اتوماتیک
             try
             {
                 ManualCode = GenerateNextUniqueCode();
@@ -419,7 +367,6 @@ namespace Taadol.Views
             this.Unloaded += OnViewUnloaded;
             CategorySearch.CategorySelected += OnCategorySelected;
 
-            // تغییر حساب‌های بانکی (افزودن/حذف) هم «تغییر کاربر» محسوب می‌شود
             BankAccounts.CollectionChanged += (_, _) => MarkUserChange();
 
             ShabaInput.Text = "IR";
@@ -500,7 +447,6 @@ namespace Taadol.Views
             current.Dispose();
         }
 
-        /// <summary>لغو عملیات‌های در حال اجرا هنگام بسته شدن فرم</summary>
         private void OnViewUnloaded(object sender, RoutedEventArgs e)
         {
             CancelAndDispose(ref _loadCts);
@@ -520,9 +466,6 @@ namespace Taadol.Views
             this.Unloaded -= OnViewUnloaded;
         }
 
-        // ======================================================
-        //  Async Loaders
-        // ======================================================
         private async void OnLoaded(object sender, RoutedEventArgs e)
         {
             this.Unloaded -= OnViewUnloaded;
@@ -605,11 +548,6 @@ namespace Taadol.Views
                 UpdatePersonTypeToggleSelection();
             }
 
-            // رفع باگ ترتیب ساخت: تاگل «مشتری» در XAML از اول IsChecked="True" دارد،
-            // پس رویداد Checked در حین InitializeComponent قبل از ساخته‌شدن
-            // CategorySearch فایر می‌شود و PersonTypeId روی کنترل اعمال نمی‌شود.
-            // اینجا صریحاً اعمال مجدد می‌کنیم تا «افزودن دسته» بدون جابه‌جایی بین
-            // انواع شخص کار کند.
             if (SelectedPersonTypeId > 0)
                 await LoadCategoriesAsync(SelectedPersonTypeId);
         }
@@ -643,7 +581,6 @@ namespace Taadol.Views
                 formName: "NewPersonView",                    onError: ex => { System.Diagnostics.Debug.WriteLine($"[NewPersonView] Load cities error: {ex}"); ToastManager.Error("خطا در لود شهرها"); });
         }
 
-        /// <summary>Safe wrapper for LoadCategoriesAsync with error handling at call site.</summary>
         private async Task LoadCategoriesSafeAsync(long personTypeId)
         {
             try
@@ -652,7 +589,7 @@ namespace Taadol.Views
             }
             catch (OperationCanceledException)
             {
-                // Cancellation is expected when the person type changes or the view closes.
+
             }
             catch (Exception ex)
             {
@@ -661,7 +598,6 @@ namespace Taadol.Views
             }
         }
 
-        /// <summary>Safe wrapper for LoadCitiesAsync with error handling at call site.</summary>
         private async Task LoadCitiesSafeAsync(long provinceId, CancellationToken cancellationToken)
         {
             try
@@ -670,7 +606,7 @@ namespace Taadol.Views
             }
             catch (OperationCanceledException)
             {
-                // Cancellation is expected when the province or view changes.
+
             }
             catch (Exception ex)
             {
@@ -689,9 +625,6 @@ namespace Taadol.Views
                 onSkipped: msg => System.Diagnostics.Debug.WriteLine("⚠️ " + msg));
         }
 
-        // ======================================================
-        //  Toggle Handlers
-        // ======================================================
         private void CodeModeToggle_SelectionChanged(object sender, bool isFirstSelected)
         {
             IsCodeAutomatic = isFirstSelected;
@@ -726,7 +659,7 @@ namespace Taadol.Views
 
         private void LegalTypeToggle_SelectionChanged(object sender, bool isFirstSelected)
         {
-            // isFirst = حقیقی → IsLegal = false
+
             IsLegal = !isFirstSelected;
         }
 
@@ -762,9 +695,6 @@ namespace Taadol.Views
             }
         }
 
-        // ======================================================
-        //  Person Type Toggle buttons (مشتری/تامین‌کننده/هردو/پرسنل)
-        // ======================================================
         private void PersonTypeToggle_Checked(object sender, RoutedEventArgs e)
         {
             var tb = sender as ToggleButton;
@@ -772,9 +702,7 @@ namespace Taadol.Views
 
             if (tb.IsChecked == true && tb.Tag != null && long.TryParse(tb.Tag.ToString(), out var id))
             {
-                // ✅ ابتدا دسته‌بندی قبلی پاک شود تا با PersonType جدید تداخل نکند
-                // نکته: این event هنگام InitializeComponent (به‌خاطر IsChecked="True" در XAML)
-                // قبل از مقداردهی CategorySearch هم فراخوانی می‌شود، پس باید null-safe باشد.
+
                 if (CategorySearch != null)
                 {
                     CategorySearch.ClearSelection(false);
@@ -793,7 +721,6 @@ namespace Taadol.Views
             var tb = sender as ToggleButton;
             if (tb == null) return;
 
-            // Check if any other toggle is still checked
             var buttons = new[] { PersonTypeCustomer, PersonTypeSupplier, PersonTypeBoth, PersonTypePersonnel };
             bool anyChecked = false;
             foreach (var b in buttons)
@@ -805,7 +732,6 @@ namespace Taadol.Views
                 }
             }
 
-            // ✅ اگر هیچ PersonType انتخاب نشده، CategorySearch غیرفعال و پاک شود
             if (!anyChecked)
             {
                 tb.IsChecked = true;
@@ -834,9 +760,6 @@ namespace Taadol.Views
             }
         }
 
-        // ======================================================
-        //  Personnel (تب پرسنل) — فیلدها و نوع قرارداد
-        // ======================================================
         private bool _suppressContractToggle;
 
         private void ContractToggle_Checked(object sender, RoutedEventArgs e)
@@ -844,7 +767,6 @@ namespace Taadol.Views
             var tb = sender as ToggleButton;
             if (tb == null || tb.IsChecked != true || _suppressContractToggle) return;
 
-            // رفتار رادیویی: با چک شدن یکی، بقیه خاموش می‌شوند
             _suppressContractToggle = true;
             try
             {
@@ -863,7 +785,6 @@ namespace Taadol.Views
 
         private bool IsPersonnelSelected => PersonTypePersonnel?.IsChecked == true;
 
-        /// <summary> نوع قرارداد انتخاب‌شده در تب پرسنل؛ پیش‌فرض رسمی (Permanent)</summary>
         private EmployeeContractTypeDTO GetSelectedContractType()
         {
             if (ContractContractual?.IsChecked == true) return EmployeeContractTypeDTO.Contractual;
@@ -887,7 +808,6 @@ namespace Taadol.Views
             }
         }
 
-        /// <summary> تبدیل ارقام فارسی/عربی به انگلیسی + parse عدد اعشاری</summary>
         private static decimal ParsePersianDecimal(string text)
         {
             if (string.IsNullOrWhiteSpace(text)) return 0m;
@@ -902,7 +822,6 @@ namespace Taadol.Views
             return decimal.TryParse(sb.ToString(), NumberStyles.Number, CultureInfo.InvariantCulture, out var v) ? v : 0m;
         }
 
-        /// <summary> اعتبارسنجی فیلدهای اجباری تب پرسنل (کد پرسنلی، بیمه، حقوق، دپارتمان، عنوان شغلی)</summary>
         private bool ValidatePersonnelFields()
         {
             if (!IsPersonnelSelected) return true;
@@ -931,13 +850,6 @@ namespace Taadol.Views
             }
         }
 
-        // ======================================================
-        //  Save
-        // ======================================================
-        // Note: async void here is safe because:
-        // 1. try/catch wraps the entire body
-        // 2. _isSaving guard prevents reentrancy
-        // 3. SavePersonAsync handles all error paths
         private async void SavePerson_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -951,13 +863,10 @@ namespace Taadol.Views
             }
         }
 
-        /// <summary>بعد از ذخیره‌ی موفق یک شخص صدا زده می‌شود تا گرید پشت مودال رفرش شود.</summary>
         public event Action PersonSaved;
 
         private bool _isSaving;
 
-        // ===== ردیابی تغییرات کاربر (برای انصراف/بستن با اخطار) =====
-        // تا وقتی فرم در حال مقداردهی اولیه/لود است، تغییراتِ برنامه‌ای نادیده گرفته می‌شوند
         private bool _isLoading = true;
         private bool _userMadeChanges;
 
@@ -979,15 +888,12 @@ namespace Taadol.Views
             {
                 if (SaveButton != null) SaveButton.IsEnabled = false;
 
-                // 1) اعتبارسنجی
                 if (!ValidatePerson()) return;
                 _saveCts.Token.ThrowIfCancellationRequested();
 
-                // 2) تأیید کاربر
                 var dialog = new CustomConfirmDialog();
                 if (dialog.ShowDialog() != true) return;
 
-                // 3) ذخیره در دیتابیس
                 var snapshot = CaptureSaveSnapshot();
                 var saveResult = await ExecutePersonSaveAsync(snapshot);
 
@@ -997,7 +903,6 @@ namespace Taadol.Views
                     return;
                 }
 
-                // 4) ذخیره عکس + رفرش UI
                 OnSaveSucceeded(saveResult.PersonId);
             }
             catch (OperationCanceledException)
@@ -1018,7 +923,6 @@ namespace Taadol.Views
             }
         }
 
-        /// <summary> snapping all form field values for cross-thread save</summary>
         private record SaveSnapshot(
             bool IsLegal, string CompanyName, string FirstName, string LastName,
             string ContactFirstName, string ContactLastName, string NationalCode,
@@ -1059,7 +963,6 @@ namespace Taadol.Views
                 GetSelectedContractType());
         }
 
-        /// <summary> persists person + contacts + address + banks in a single scoped Task.Run</summary>
         private Task<(bool Success, string Message, long PersonId)> ExecutePersonSaveAsync(SaveSnapshot s)
         {
             return Task.Run(() =>
@@ -1071,7 +974,6 @@ namespace Taadol.Views
                 var addressApp = sp.GetRequiredService<IPersonAddressApplication>();
                 var bankApp = sp.GetRequiredService<IPersonBankApplication>();
 
-                // --- Create person ---
                 var command = new CreatePerson
                 {
                     FirstName = s.IsLegal ? s.CompanyName : s.FirstName,
@@ -1098,19 +1000,14 @@ namespace Taadol.Views
                 if (personId <= 0)
                     return (false, "شخص ثبت شد ولی پیدا کردن شناسه‌ی او ناموفق بود.", 0L);
 
-                // Activate / Deactivate
                 if (s.IsActive) personApp.Activate(personId); else personApp.Deactivate(personId);
 
-                // --- Save contacts ---
                 SaveContactsScoped(contactApp, personId, s.ContactTypeNames, s.Phone, s.Mobile, s.Email);
 
-                // --- Save address ---
                 SaveAddressScoped(addressApp, personId, s);
 
-                // --- Save bank accounts ---
                 SaveBankAccountsScoped(bankApp, personId, s);
 
-                // --- Save personnel (Employees) ---
                 if (s.IsPersonnel)
                 {
                     var employeeApp = sp.GetRequiredService<IEmployeeApplication>();
@@ -1136,7 +1033,6 @@ namespace Taadol.Views
             });
         }
 
-        /// <summary> resolves person ID after Create (OperationResult lacks Id property)</summary>
         private static long ResolveCreatedPersonId(IPersonApplication personApp, CreatePerson command)
         {
             var list = personApp.Search(new PersonSearchModel
@@ -1147,7 +1043,6 @@ namespace Taadol.Views
             return list?.OrderByDescending(x => x.Id).FirstOrDefault()?.Id ?? 0;
         }
 
-        /// <summary> saves phone / mobile / email contacts</summary>
         private static void SaveContactsScoped(IPersonContactApplication contactApp, long personId,
             Dictionary<string, long> typeNames, string phone, string mobile, string email)
         {
@@ -1159,7 +1054,6 @@ namespace Taadol.Views
                 contactApp.Create(new CreatePersonContact { PersonId = personId, ContactTypeId = emailTypeId, Value = email, Description = "", IsDefault = false });
         }
 
-        /// <summary> saves main address</summary>
         private static void SaveAddressScoped(IPersonAddressApplication addressApp, long personId, SaveSnapshot s)
         {
             if (string.IsNullOrWhiteSpace(s.Address) && s.ProvinceId <= 0 && s.CityId <= 0) return;
@@ -1176,10 +1070,9 @@ namespace Taadol.Views
             });
         }
 
-        /// <summary> saves main + grid bank accounts</summary>
         private static void SaveBankAccountsScoped(IPersonBankApplication bankApp, long personId, SaveSnapshot s)
         {
-            // Main account
+
             if ((!string.IsNullOrWhiteSpace(s.MainShaba) || !string.IsNullOrWhiteSpace(s.MainCardNumber)) && s.MainBankBranchId > 0)
             {
                 bankApp.Create(new CreatePersonBank
@@ -1189,7 +1082,7 @@ namespace Taadol.Views
                     Shaba = s.MainShaba ?? "", IsDefault = s.MainBankIsDefault
                 });
             }
-            // Grid accounts
+
             foreach (var row in s.BankAccountsSnapshot)
             {
                 if (row.Shaba == null && row.CardNumber == null) continue;
@@ -1203,7 +1096,6 @@ namespace Taadol.Views
             }
         }
 
-        /// <summary> post-save: picture + toast + navigate</summary>
         private void OnSaveSucceeded(long personId)
         {
             SavePersonPicture(personId);
@@ -1215,18 +1107,12 @@ namespace Taadol.Views
             {
                 ClearForm();
 
-                // بعد از ذخیره‌ی موفق، فرم باید «بدون تغییر ذخیره‌نشده» باشد.
-                // ClearForm خودش مقادیر را ست می‌کند و setterها فرم را dirty می‌کنند؛
-                // همچنین بایندینگ‌ها در اولویت DataBind مقدار را به کنترل‌ها می‌برند و
-                // گردش برگشتی TwoWay ممکن است دوباره dirty کند. بنابراین ریست باید
-                // بعد از تخلیه‌ی کامل صف Dispatcher (ContextIdle) انجام شود.
                 Dispatcher.BeginInvoke(
                     new Action(() => _userMadeChanges = false),
                     System.Windows.Threading.DispatcherPriority.ContextIdle);
             }
         }
 
-        /// <summary> logs exception to debug + file</summary>
         private void LogSaveException(Exception ex)
         {
             var fullMessage = BuildFullExceptionMessage(ex);
@@ -1237,14 +1123,10 @@ namespace Taadol.Views
             }
             try { System.IO.File.AppendAllText(System.IO.Path.Combine(System.IO.Path.GetTempPath(), "taadol-person-save-error.log"), $"[{DateTime.Now:yyyy/MM/dd HH:mm:ss}]{Environment.NewLine}{fullMessage}{Environment.NewLine}{new string('-', 80)}{Environment.NewLine}"); } catch { }
         }
-        /// <summary>
-        /// ★ ذخیره عکس شخص.
-        /// فایل انتخاب‌شده توسط کاربر در پوشه‌ی Pictures/Persons کنار فایل اجرایی کپی می‌شه
-        /// و مسیر نسبی اون در جدول Pictures با OwnerType=Person ذخیره می‌شه.
-        /// </summary>
+
         private void SavePersonPicture(long personId)
         {
-            // اگه کاربر عکسی انتخاب نکرده، رد شو
+
             if (string.IsNullOrWhiteSpace(_selectedImagePath) || !File.Exists(_selectedImagePath))
             {
                 System.Diagnostics.Debug.WriteLine("📷 SavePersonPicture: No image selected, skipping.");
@@ -1253,25 +1135,20 @@ namespace Taadol.Views
 
             try
             {
-                // ساخت پوشه‌ی مقصد در کنار فایل اجرایی
+
                 var appDir = AppDomain.CurrentDomain.BaseDirectory;
                 var picturesDir = Path.Combine(appDir, "Pictures", "Persons");
                 Directory.CreateDirectory(picturesDir);
 
-                // ساخت نام فایل یکتا با timestamp + personId
-                var ext = Path.GetExtension(_selectedImagePath); // مثلاً ".jpg"
+                var ext = Path.GetExtension(_selectedImagePath);
                 if (string.IsNullOrWhiteSpace(ext)) ext = ".jpg";
                 var fileName = $"person_{personId}_{DateTime.Now:yyyyMMdd_HHmmss}{ext}";
                 var destPath = Path.Combine(picturesDir, fileName);
 
-                // کپی فایل (حتی اگه مبدا و مقصد یکی باشن، با overwrite=true)
                 File.Copy(_selectedImagePath, destPath, overwrite: true);
 
-                // مسیر نسبی برای ذخیره در DB
                 var relativeUrl = $"Pictures/Persons/{fileName}";
 
-                // ثبت در جدول Pictures
-                // ✅ بک‌اند آپدیت شده و Person = 2 به PictureOwnerTypeDTO اضافه شده
                 var result = _pictureApplication.Create(new CreatePicture
                 {
                     OwnerId = personId,
@@ -1288,13 +1165,12 @@ namespace Taadol.Views
                     System.Diagnostics.Debug.WriteLine($"📷 SavePersonPicture: Picture saved successfully — Url={relativeUrl}");
                 }
 
-                // پاک کردن مسیر بعد از ثبت
                 _selectedImagePath = null;
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"📷 SavePersonPicture ERROR: {ex.Message}");
-                // عکس optional هست، نباید کل عملیات ثبت رو لغو کنه
+
             }
         }
         private static string BuildFullExceptionMessage(Exception ex)
@@ -1341,7 +1217,6 @@ namespace Taadol.Views
             return true;
         }
 
-        /// <summary> validates BranchId and PersonTypeId are selected</summary>
         private bool ValidateRequiredSelections()
         {
             if (SelectedBranchId <= 0) { ToastManager.Warning("لطفاً شعبه را انتخاب کنید."); return false; }
@@ -1349,7 +1224,6 @@ namespace Taadol.Views
             return true;
         }
 
-        /// <summary> validates mobile format and updates UI indicator</summary>
         private bool ValidateMobileField()
         {
             if (string.IsNullOrWhiteSpace(Mobile)) { MobileInput.ValidationState = Controls.ValidationState.None; MobileInput.ValidationMessage = ""; return true; }
@@ -1357,7 +1231,6 @@ namespace Taadol.Views
             MobileInput.ValidationState = Controls.ValidationState.Valid; MobileInput.ValidationMessage = ""; return true;
         }
 
-        /// <summary> validates phone format and updates UI indicator</summary>
         private bool ValidatePhoneField()
         {
             if (string.IsNullOrWhiteSpace(Phone)) { PhoneInput.ValidationState = Controls.ValidationState.None; PhoneInput.ValidationMessage = ""; return true; }
@@ -1365,7 +1238,6 @@ namespace Taadol.Views
             PhoneInput.ValidationState = Controls.ValidationState.Valid; PhoneInput.ValidationMessage = ""; return true;
         }
 
-        /// <summary> validates legal person required fields: CompanyName, EconomicCode, ContactFirstName/LastName</summary>
         private bool ValidateLegalFields()
         {
             if (string.IsNullOrWhiteSpace(CompanyName)) { ToastManager.Warning("نام شرکت را وارد کنید."); return false; }
@@ -1375,13 +1247,12 @@ namespace Taadol.Views
             return true;
         }
 
-        /// <summary> validates natural person required fields: FirstName, LastName, NationalCode</summary>
         private bool ValidateNaturalPersonFields()
         {
             bool hasError = false;
             SetFieldValidation(FirstNameInput, string.IsNullOrWhiteSpace(FirstName), "نام را وارد کنید.", ref hasError);
             SetFieldValidation(LastNameInput, string.IsNullOrWhiteSpace(LastName), "نام خانوادگی را وارد کنید.", ref hasError);
-            // NationalCode: empty → error; wrong length → error; invalid checksum → error; else valid
+
             if (string.IsNullOrWhiteSpace(NationalCode))
                 SetNationalCodeValidation(Controls.ValidationState.Invalid, "کد ملی را وارد کنید.", ref hasError);
             else if (NationalCode.Count(char.IsDigit) != 10)
@@ -1405,7 +1276,6 @@ namespace Taadol.Views
             if (state == Controls.ValidationState.Invalid) hasError = true;
         }
 
-        /// <summary> validates unique code (auto-generated or manual)</summary>
         private bool ValidateUniqueCode()
         {
             if (!IsCodeAutomatic && string.IsNullOrWhiteSpace(ManualCode))
@@ -1419,7 +1289,6 @@ namespace Taadol.Views
             return true;
         }
 
-        /// <summary> validates email and shaba formats</summary>
         private bool ValidateContactFormats()
         {
             if (!string.IsNullOrWhiteSpace(Email) && !ValidationHelper.IsValidEmail(Email))
@@ -1431,14 +1300,9 @@ namespace Taadol.Views
             return true;
         }
 
-        // Validation methods moved to Taadol.Helpers.ValidationHelper
-
-        // ======================================================
-        //  Save Sub-Entities
-        // ======================================================
         private void SaveContacts(long personId)
         {
-            // تلفن ثابت
+
             if (!string.IsNullOrWhiteSpace(Phone) && _contactTypeByName.TryGetValue("تلفن ثابت", out var phoneTypeId))
             {
                 _personContactApplication.Create(new CreatePersonContact
@@ -1446,12 +1310,11 @@ namespace Taadol.Views
                     PersonId = personId,
                     ContactTypeId = phoneTypeId,
                     Value = Phone.Trim(),
-                    Description = "",  // ← ستون Description در DB NOT NULL است
+                    Description = "",
                     IsDefault = false
                 });
             }
 
-            // موبایل
             if (!string.IsNullOrWhiteSpace(Mobile) && _contactTypeByName.TryGetValue("موبایل", out var mobileTypeId))
             {
                 _personContactApplication.Create(new CreatePersonContact
@@ -1464,7 +1327,6 @@ namespace Taadol.Views
                 });
             }
 
-            // ایمیل
             if (!string.IsNullOrWhiteSpace(Email) && _contactTypeByName.TryGetValue("ایمیل", out var emailTypeId))
             {
                 _personContactApplication.Create(new CreatePersonContact
@@ -1486,7 +1348,6 @@ namespace Taadol.Views
                 SelectedCityId <= 0)
                 return;
 
-            // چک کردن FK: ProvinceId و CityId در DB با Restrict هستن
             if (SelectedProvinceId <= 0 || SelectedCityId <= 0)
             {
                 System.Diagnostics.Debug.WriteLine(
@@ -1517,7 +1378,6 @@ namespace Taadol.Views
         {
             System.Diagnostics.Debug.WriteLine($"🏦 SaveBanks: personId={personId}, MainShaba='{MainShaba}', MainCardNumber='{MainCardNumber}', SelectedBankBranchId={SelectedBankBranchId}, BankAccounts.Count={BankAccounts.Count}");
 
-            // حساب بانکی اصلی (اگر شماره شبا یا شماره کارت دارد)
             if (!string.IsNullOrWhiteSpace(MainShaba) || !string.IsNullOrWhiteSpace(MainCardNumber))
             {
                 System.Diagnostics.Debug.WriteLine($"🏦 SaveBanks: Saving main account — BankBranchId={SelectedBankBranchId}");
@@ -1528,7 +1388,6 @@ namespace Taadol.Views
                 System.Diagnostics.Debug.WriteLine($"🏦 SaveBanks: Main account skipped — MainShaba and MainCardNumber both empty");
             }
 
-            // حساب‌های اضافه‌شده — هر ردیف BankBranchId خودش رو داره
             int idx = 0;
             foreach (var row in BankAccounts)
             {
@@ -1543,12 +1402,9 @@ namespace Taadol.Views
             }
         }
 
-        /// <summary>
-        /// ★ پارامتر bankBranchId اضافه شد — حالا per-row کار می‌کنه (به‌جای global SelectedBankBranchId).
-        /// </summary>
         private void TryCreateBankAccount(long personId, long bankBranchId, string bankName, string accountNumber, string cardNumber, string shaba, bool isDefault)
         {
-            // نکته: BankBranchId در DB با Restrict هست و اگر 0 باشه، FK خطا می‌ده.
+
             if (bankBranchId <= 0)
             {
                 System.Diagnostics.Debug.WriteLine(
@@ -1588,9 +1444,6 @@ namespace Taadol.Views
             }
         }
 
-        // ======================================================
-        //  Helpers
-        // ======================================================
         private void ClearForm()
         {
             FirstName = "";
@@ -1631,7 +1484,6 @@ namespace Taadol.Views
 
             UpdatePersonTypeToggleSelection();
 
-            // تولید شناسه یکتای جدید برای شخص بعدی
             try
             {
                 ManualCode = GenerateNextUniqueCode();
@@ -1644,10 +1496,6 @@ namespace Taadol.Views
             }
         }
 
-        /// <summary>
-        /// بستن فرم: اگر در مودال است (از لیست اشخاص) فقط مودال بسته می‌شود؛
-        /// اگر از سایدبار به‌صورت عادی باز شده، فرم بسته و زیرمنوی سایدبار پاک می‌شود.
-        /// </summary>
         private void CloseFormOrModal()
         {
             var mainWindow = Window.GetWindow(this) as MainWindow;
@@ -1673,11 +1521,11 @@ namespace Taadol.Views
 
                     if (result == MessageBoxResult.Yes)
                     {
-                        // ✅ غیرفعال کردن دکمه‌ها برای جلوگیری از کلیک مجدد
+
                         if (SaveButton != null) SaveButton.IsEnabled = false;
 
                         await SavePersonAsync();
-                        // SavePersonAsync بعد از موفقیت خودش فرم را می‌بندد
+
                         return;
                     }
                     if (result == MessageBoxResult.Cancel)
@@ -1693,9 +1541,6 @@ namespace Taadol.Views
             }
         }
 
-        // ======================================================
-        //  Bank Accounts (Add/Remove)
-        // ======================================================
         private static bool IsBankAccountRowEmpty(BankAccountRow row)
         {
             return row.BankBranchId <= 0
@@ -2017,9 +1862,6 @@ namespace Taadol.Views
             _isUpdatingDefault = false;
         }
 
-        // ======================================================
-        //  Tab Switching (تماس/بانک/پرسنل)
-        // ======================================================
         private void TabPricing_Checked(object sender, RoutedEventArgs e)
         {
             if (TabPricing == null || TabInventory == null || TabTax == null) return;
@@ -2056,9 +1898,6 @@ namespace Taadol.Views
             TaxContent.Visibility = Visibility.Visible;
         }
 
-        // ======================================================
-        //  Misc UI Handlers
-        // ======================================================
         private void OnImageSelected(object sender, RoutedEventArgs e)
         {
             _selectedImagePath = PersonImagePicker?.ImagePath;
@@ -2071,9 +1910,6 @@ namespace Taadol.Views
             MarkUserChange();
         }
 
-        // ======================================================
-        //  Close & Clear
-        // ======================================================
         private void CloseButton_Click(object sender, MouseButtonEventArgs e)
         {
             CloseFormOrModal();
@@ -2116,9 +1952,6 @@ namespace Taadol.Views
             MainBankIsDefault = false;
         }
 
-        // ======================================================
-        //  INotifyPropertyChanged
-        // ======================================================
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -2134,7 +1967,7 @@ namespace Taadol.Views
                 {
                     if (string.IsNullOrWhiteSpace(text) || text.Length < 10)
                     {
-                        // هنوز کامل نشده — آیکونی نشان نده
+
                         textBox.ValidationState = Controls.ValidationState.None;
                         textBox.ValidationMessage = "";
                     }
@@ -2220,11 +2053,6 @@ namespace Taadol.Views
         }
     }
 
-    // ======================================================
-    //  Helper Models
-    // ======================================================
-
-    /// <summary>آیتم حساب بانکی اضافه‌شده توسط کاربر در فرم شخص</summary>
     public class BankAccountRow : INotifyPropertyChanged
     {
         private long _bankBranchId;
@@ -2238,7 +2066,6 @@ namespace Taadol.Views
 
         public int Index { get => _index; set { _index = value; OnPC(); } }
 
-        /// <summary>شناسه‌ی شعبه بانک انتخاب‌شده برای این ردیف (per-row)</summary>
         public long BankBranchId
         {
             get => _bankBranchId;
@@ -2266,5 +2093,4 @@ namespace Taadol.Views
             => throw new NotImplementedException();
     }
 
-    // نکته: BranchComboItem قبلاً در NewFinancialPeriodView.xaml.cs تعریف شده و در اینجا reuse می‌شود.
 }

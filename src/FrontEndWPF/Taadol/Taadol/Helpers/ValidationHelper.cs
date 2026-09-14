@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -53,9 +53,6 @@ namespace Taadol.Helpers
             }
         }
 
-        /// <summary>
-        /// اعتبارسنجی شماره موبایل (دقیقاً 11 رقم، شروع با 09)
-        /// </summary>
         public static bool IsValidMobile(string mobile)
         {
             if (string.IsNullOrWhiteSpace(mobile)) return false;
@@ -65,9 +62,6 @@ namespace Taadol.Helpers
                    && digits.All(char.IsDigit);
         }
 
-        /// <summary>
-        /// اعتبارسنجی شماره تلفن ثابت (8 تا 11 رقم)
-        /// </summary>
         public static bool IsValidPhone(string phone)
         {
             if (string.IsNullOrWhiteSpace(phone)) return false;
@@ -77,9 +71,6 @@ namespace Taadol.Helpers
                    && digits.All(char.IsDigit);
         }
 
-        /// <summary>
-        /// اعتبارسنجی کد پستی (دقیقاً ۱۰ رقم عددی)
-        /// </summary>
         public static bool IsValidPostalCode(string postalCode)
         {
             if (string.IsNullOrWhiteSpace(postalCode)) return false;

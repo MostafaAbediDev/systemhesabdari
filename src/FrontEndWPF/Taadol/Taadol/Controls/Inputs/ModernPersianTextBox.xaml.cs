@@ -105,17 +105,12 @@ namespace Taadol.Controls
             Loaded += (s, e) =>
             {
                 UpdateIconAndTextDirection();
-                // Loaded پدینگ را ریست می‌کند؛ اگر آیکون فعال بود دوباره جایش را باز کن
+
                 UpdatePaddingForIcon(ValidationState != ValidationState.None);
             };
             UpdateIconAndTextDirection();
         }
 
-        /// <summary>
-        /// فیلد نباید با محتوای زیاد کش بیاید و چیدمان بقیه‌ی فرم را تحت تاثیر قرار دهد.
-        /// عرض دلخواه همیشه به فضای موجود محدود می‌شود (و در بافتِ بدون محدودیت، سقف معقول ۳۶۰).
-        /// محتوای اضافه با اسکرول افقی داخل خود فیلد قابل مشاهده است.
-        /// </summary>
         protected override Size MeasureOverride(Size availableSize)
         {
             var desired = base.MeasureOverride(availableSize);
@@ -224,9 +219,6 @@ namespace Taadol.Controls
             UpdatePlaceholderVisibility();
             TextChanged?.Invoke(this, new RoutedEventArgs());
 
-            // After all handlers run, enforce border = ValidationState.
-            // External handlers or focus cascades may have overridden the border;
-            // this guarantees the visual matches the validation state at all times.
             System.Diagnostics.Debug.WriteLine($"[GUARD] TextBox_TextChanged fired | ValidationState={ValidationState} | Text=\"{Text}\"");
             if (ValidationState == ValidationState.Invalid)
             {
@@ -248,13 +240,12 @@ namespace Taadol.Controls
 
         private void PART_TextBox_GotFocus(object sender, RoutedEventArgs e)
         {
-            // وقتی Invalid هست، border قرمز حفظ می‌شود (حتی روی فوکوس)
+
             if (ValidationState == ValidationState.None)
             {
                 border.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2667FF"));
                 border.BorderThickness = new Thickness(1.5);
             }
-            // Valid: border خاکی باقی می‌ماند (آیکون سبز نشان داده می‌شود)
 
             var tb = sender as TextBox;
             if (tb != null && string.IsNullOrEmpty(tb.Text))
@@ -265,7 +256,7 @@ namespace Taadol.Controls
 
         private void PART_TextBox_LostFocus(object sender, RoutedEventArgs e)
         {
-            // فقط وقتی None هست border رو ریست کن — Invalid و Valid دست‌نخورده باقی می‌مانند
+
             if (ValidationState == ValidationState.None)
             {
                 border.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E8E8E8"));
@@ -291,18 +282,13 @@ namespace Taadol.Controls
 
             bool isRtl = this.FlowDirection == FlowDirection.RightToLeft;
 
-            // در هر دو جهت، متن و کرسر از یک لبه شروع می‌شوند و پلیس‌هولدر دقیقاً
-            // هم‌تراز با همان لبه قرار می‌گیرد تا کرسر تکست‌باکس خالی دقیقاً از
-            // محل شروع هینت شروع شود. آیکون ولیدیشن همیشه سمت مخالف شروع متن است.
             if (isRtl)
             {
                 ValidationText.HorizontalAlignment = HorizontalAlignment.Left;
 
-                // آیکون سمت مخالف شروع متن (سمت چپ) — در RTL با HA=Right چپ می‌نشیند
                 ValidationIconBorder.HorizontalAlignment = HorizontalAlignment.Right;
                 ValidationIconBorder.Margin = new Thickness(0, 0, 10, 0);
-                // ⚠️ در RTL، HorizontalAlignment/ContentAlignment سمنتیک برعکس دارد:
-                // HA=Right عنصر را چپ می‌گذارد و HA=Left راست.
+
                 PART_TextBox.HorizontalContentAlignment = HorizontalAlignment.Left;
                 PART_TextBox.Padding = new Thickness(16, 0, 12, 0);
                 PlaceholderText.HorizontalAlignment = HorizontalAlignment.Left;
@@ -310,13 +296,9 @@ namespace Taadol.Controls
             }
             else
             {
-                // پیام خطا همیشه سمت راست (مثل فیلدهای RTL/نام)
+
                 ValidationText.HorizontalAlignment = HorizontalAlignment.Right;
 
-                // برای یکسان بودن جایگاه آیکون در همه‌ی فیلدها (مثل فیلدهای RTL)،
-                // آیکون در فیلدهای LTR هم سمت چپ می‌نشیند. چون متن این فیلدها سمت
-                // چپ است، هنگام نمایش آیکون پدینگ چپ اضافه می‌شود تا تداخل نشود
-                // (UpdatePaddingForIcon).
                 ValidationIconBorder.HorizontalAlignment = HorizontalAlignment.Left;
                 ValidationIconBorder.Margin = new Thickness(10, 0, 0, 0);
                 PART_TextBox.HorizontalContentAlignment = HorizontalAlignment.Left;
@@ -370,11 +352,6 @@ namespace Taadol.Controls
             }
         }
 
-        /// <summary>
-        /// فقط در فیلدهای LTR: آیکون سمت چپ است و متن هم سمت چپ شروع می‌شود، پس وقتی
-        /// آیکون ظاهر می‌شود باید پدینگ چپ اضافه شود تا متن زیر آیکون نرود.
-        /// (در فیلدهای RTL متن سمت راست است و آیکون سمت چپ — تداخلی نیست.)
-        /// </summary>
         private void UpdatePaddingForIcon(bool iconVisible)
         {
             if (this.FlowDirection == FlowDirection.LeftToRight)
@@ -395,8 +372,7 @@ namespace Taadol.Controls
 
             if (iconVisible)
             {
-                // Icon: Width=22, Margin=5,0,10,0. Reserve the right-side
-                // margin and icon width, plus the existing right padding.
+
                 PART_TextBox.Padding = new Thickness(16, 0, 37, 0);
                 PlaceholderText.Margin = new Thickness(16, 0, 37, 0);
             }

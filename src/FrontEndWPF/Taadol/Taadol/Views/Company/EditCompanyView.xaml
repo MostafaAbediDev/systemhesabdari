@@ -1,4 +1,4 @@
-<UserControl x:Class="Taadol.Views.EditCompanyView"
+﻿<UserControl x:Class="Taadol.Views.EditCompanyView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:Taadol.Controls"
@@ -6,14 +6,6 @@
              FlowDirection="RightToLeft"
              Background="Transparent">
 
-    <!-- ═══════════════════════════════════════════════════
-         ساختار اصلی: Grid با 5 ردیف (مثل EditPersonView)
-         ردیف 0: هدر (ثابت)
-         ردیف 1: CardPanel اصلی (فیلدها)
-         ردیف 2: جداکننده دکمه‌ای (ثابت)
-         ردیف 3: فضای محتوا (اسکرول‌پذیر)
-         ردیف 4: فوتر (دکمه‌ها)
-    ════════════════════════════════════════════════════ -->
     <Border x:Name="RootBorder"
             CornerRadius="4"
             ClipToBounds="True"
@@ -31,7 +23,6 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <!-- ═══ ردیف 0: هدر ═══ -->
             <Grid Grid.Row="0"
                   Margin="10,15,10,10">
                 <StackPanel Orientation="Horizontal"
@@ -81,7 +72,6 @@
                 </Border.Background>
             </Border>
 
-            <!-- ═══ ردیف 1: CardPanel اصلی ═══ -->
             <Border Grid.Row="1"
                     Style="{StaticResource CardPanel}">
                 <Grid>
@@ -93,7 +83,6 @@
                     <StackPanel Grid.Column="0"
                                 Margin="0,0,24,0">
 
-                        <!-- ردیف اول: نام شرکت + وضعیت فعال -->
                         <Grid Margin="0,0,0,16">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
@@ -121,7 +110,6 @@
                             </StackPanel>
                         </Grid>
 
-                        <!-- ردیف دوم: نام رسمی ثبتی + تاریخ تاسیس -->
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
@@ -164,7 +152,6 @@
                 </Grid>
             </Border>
 
-            <!-- ═══ ردیف 2: جداکننده دکمه‌ای ═══ -->
             <Grid Grid.Row="2"
                   Margin="0,0,0,2">
                 <Border Height="3"
@@ -207,10 +194,8 @@
                          Panel.ZIndex="2" />
             </Grid>
 
-            <!-- ═══ ردیف 3: فضای محتوا ═══ -->
             <Grid Grid.Row="3" />
 
-            <!-- ═══ ردیف 4: فوتر (دکمه‌ها) ═══ -->
             <Border Grid.Row="4"
                     Margin="0,10,0,0"
                     BorderBrush="#E5E7EB"
@@ -224,7 +209,6 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <!-- سمت راست: ویرایش شرکت -->
                     <controls:CustomOutlinedButton Grid.Column="0"
                                                    x:Name="SaveButton"
                                                    Text="ویرایش"
@@ -242,7 +226,6 @@
                         </controls:CustomOutlinedButton.Icon>
                     </controls:CustomOutlinedButton>
 
-                    <!-- سمت چپ: انصراف -->
                     <StackPanel Grid.Column="1"
                                 Orientation="Horizontal"
                                 Background="Transparent"

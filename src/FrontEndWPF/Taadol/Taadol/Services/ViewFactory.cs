@@ -11,7 +11,6 @@ namespace Taadol.Services
         private readonly Dictionary<string, Func<UserControl>> _registry = new Dictionary<string, Func<UserControl>>();
         private readonly IServiceProvider _serviceProvider;
 
-        // Constructor رو به این شکل تغییر دادم تا همServiceProvider بگیره هم ارور نده
         public ViewFactory(IServiceProvider serviceProvider = null)
         {
             _serviceProvider = serviceProvider;

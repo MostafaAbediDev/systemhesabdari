@@ -34,7 +34,6 @@ namespace Taadol.Controls
         private CancellationTokenSource _operationCts = new();
         private int _operationVersion;
 
-        // Events
         public event Action<CategoryItem> CategorySelected;
         public event Action SelectionCleared;
         public event Action<CategoryItem> ItemAdded;
@@ -42,16 +41,8 @@ namespace Taadol.Controls
         public event Action<CategoryItem> ItemDeleted;
         public event Action DataChanged;
 
-        /// <summary>
-        /// شناسه نوع شخصی که دسته‌بندی‌ها به آن تعلق دارند.
-        /// این مقدار باید قبل از عملیات Add/Edit/Delete توسط View والد ست شود.
-        /// </summary>
         public long PersonTypeId { get; set; }
 
-        /// <summary>
-        /// نوع منبع داده کنترل در حالت SearchOnDemand (دپارتمان یا عنوان شغلی).
-        /// فقط برای کنترل‌های SearchOnDemand معنا دارد.
-        /// </summary>
         public enum SearchSourceKind { None, Department, JobTitle }
 
         public static readonly DependencyProperty SourceKindProperty =
@@ -61,21 +52,14 @@ namespace Taadol.Controls
                 typeof(CategorySearchControl),
                 new PropertyMetadata(SearchSourceKind.None));
 
-        /// <summary>نوع منبع داده کنترل در حالت SearchOnDemand.</summary>
         public SearchSourceKind SourceKind
         {
             get => (SearchSourceKind)GetValue(SourceKindProperty);
             set => SetValue(SourceKindProperty, value);
         }
 
-        /// <summary>
-        /// نام دپارتمان انتخاب‌شده برای فیلتر عنوان‌های شغلی در سمت Frontend.
-        /// </summary>
         public string DepartmentFilterName { get; set; }
 
-        /// <summary>
-        /// شناسه دپارتمان انتخاب‌شده برای ایجاد عنوان شغلی.
-        /// </summary>
         public long DepartmentId { get; set; }
         private static readonly Color[] DotColors = new[]
         {
@@ -137,16 +121,10 @@ namespace Taadol.Controls
             try { current.Cancel(); } catch (ObjectDisposedException) { }
             current.Dispose();
         }
-        // این متد رو حذف کن:
-        // private void LoadSampleData() { ... }
 
-        // به جاش این متد رو اضافه کن:
-        /// <summary>
-        /// بارگذاری درخت دسته‌بندی از بک‌اند (PersonCategoryTreeViewModel)
-        /// </summary>
         public void LoadFromTreeDto(List<PersonCategoryTreeViewModel> tree, int level = 0)
         {
-            // ★ جلوگیری از NullReferenceException اگه tree برابر null باشه
+
             if (tree == null)
             {
                 System.Diagnostics.Debug.WriteLine("⚠️ LoadFromTreeDto: tree is null");
@@ -182,15 +160,9 @@ namespace Taadol.Controls
 
             System.Diagnostics.Debug.WriteLine($"✅ LoadFromTreeDto: built {_allCategories.Count} root(s), total children in tree = {totalChildren}, _allCategories first root children = {(_allCategories.Count > 0 && _allCategories[0].HasChildren ? _allCategories[0].Children.Count : 0)}");
 
-            // در حالت SearchOnDemand درخت کامل ساخته نمی‌شود؛ فقط پیش‌نمایش محدود + جستجو.
             ResetLazyItems(SearchOnDemand ? BuildSearchOnDemandSource() : _allCategories);
         }
 
-        /// <summary>
-        /// پیش‌نمایش سبک برای حالت SearchOnDemand:
-        /// فرزندانِ ریشه (دپارتمان‌ها/عناوین شغلی) به‌صورت سطح‌اول و با سقف MaxSearchResults
-        /// نمایش داده می‌شوند تا UI فریز نشود ولی لیست خالی به نظر نرسد.
-        /// </summary>
         private List<CategoryItem> BuildSearchOnDemandSource()
         {
             var result = new List<CategoryItem>();
@@ -232,7 +204,6 @@ namespace Taadol.Controls
             var endIndex = Math.Min(_visibleItemCount + LazyPageSize, _visibleSourceItems.Count);
             _visibleItemCount = endIndex;
 
-            // صفحه‌ی جدید در batchهای کوچک اضافه می‌شود تا Render فرصت اجرای Shimmer داشته باشد.
             Dispatcher.BeginInvoke(new Action(() =>
             {
                 AppendLazyItemsInBatches(startIndex, endIndex, renderVersion);
@@ -253,7 +224,6 @@ namespace Taadol.Controls
                     .Select(item => CloneCategoryTree(item, 0, true))
                     .ToList();
 
-                // فقط آیتم‌های جدید اضافه می‌شوند؛ آیتم‌های قبلی دوباره ساخته نمی‌شوند.
                 BuildTree(batch, null, clearRoot: false);
 
                 if (batchEnd < endIndex)
@@ -346,7 +316,7 @@ namespace Taadol.Controls
 
         private void BuildTree(List<CategoryItem> items, TreeViewItem parent = null, bool clearRoot = true)
         {
-            // ★ جلوگیری از NullReferenceException
+
             if (items == null) return;
             if (CategoryTree == null) return;
 
@@ -381,30 +351,23 @@ namespace Taadol.Controls
                 else
                     parent.Items.Add(treeItem);
 
-                // اتچ کردن hover ایونت‌ها بعد از لود شدن آیتم
                 treeItem.Loaded += TreeItem_Loaded;
             }
         }
-
-        // ==================== Hover Isolation (راه‌حل اصلی) ====================
-        // مشکل: IsMouseOver در WPF به parent ها bubble میکنه
-        // راه‌حل: MouseEnter/Leave روی Border داخلی "Bd" که فقط ناحیه خودش رو cover میکنه
 
         private void TreeItem_Loaded(object sender, RoutedEventArgs e)
         {
             var treeItem = sender as TreeViewItem;
             if (treeItem == null) return;
 
-            // پیدا کردن Border داخلی "Bd" - این border فقط همون row خودشه، نه فرزندها
             var bd = FindChild<Border>(treeItem, "Bd");
             if (bd != null)
             {
-                // MouseEnter/Leave روی Border مستقیم - bubble نمیکنه به parent TreeViewItem
+
                 bd.MouseEnter += TreeItemBorder_MouseEnter;
                 bd.MouseLeave += TreeItemBorder_MouseLeave;
             }
 
-            // اعمال رنگ dot
             if (treeItem.Tag is CategoryItem catItem)
                 ApplyDotColor(treeItem, catItem.Level);
         }
@@ -414,11 +377,9 @@ namespace Taadol.Controls
             var bd = sender as Border;
             if (bd == null) return;
 
-            // پیدا کردن ActionButtons درون همین border
             var actionButtons = FindChild<StackPanel>(bd, "ActionButtons");
             var bdBrush = FindChild<SolidColorBrush>(bd, "BdBrush");
 
-            // اگر SolidColorBrush مستقیم پیدا نشد، از Background بگیریم
             var brush = bd.Background as SolidColorBrush;
 
             AnimateHoverIn(bd, actionButtons);
@@ -437,7 +398,6 @@ namespace Taadol.Controls
         {
             if (bd == null) return;
 
-            // انیمیشن نرم برای background
             var colorAnim = new ColorAnimation
             {
                 To = Color.FromRgb(0xF0, 0xF5, 0xFF),
@@ -447,7 +407,7 @@ namespace Taadol.Controls
 
             if (bd.Background is SolidColorBrush brush)
             {
-                // اگر brush freeze شده باشه، یه نمونه جدید بساز
+
                 if (brush.IsFrozen)
                 {
                     brush = new SolidColorBrush(brush.Color);
@@ -462,7 +422,6 @@ namespace Taadol.Controls
                 newBrush.BeginAnimation(SolidColorBrush.ColorProperty, colorAnim);
             }
 
-            // انیمیشن نرم برای دکمه‌ها
             if (actionButtons != null)
             {
                 var fadeAnim = new DoubleAnimation
@@ -523,8 +482,6 @@ namespace Taadol.Controls
             dot.Background = new SolidColorBrush(DotColors[colorIndex]);
         }
 
-        // ==================== Popup Animations ====================
-
         private void MainBorder_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             if (_isAnimating) return;
@@ -549,7 +506,6 @@ namespace Taadol.Controls
             SearchBox.Focus();
             SearchBox.Text = "";
 
-            // در حالت SearchOnDemand فقط پیش‌نمایش محدود رندر می‌شود تا ۵۰۰+ آیتم یکجا ساخته نشوند.
             ResetLazyItems(SearchOnDemand ? BuildSearchOnDemandSource() : _allCategories);
         }
 
@@ -576,7 +532,6 @@ namespace Taadol.Controls
             var slide = (TranslateTransform)container.RenderTransform;
             slide.Y = -18;
 
-            // fade in آرام‌تر
             var fadeIn = new DoubleAnimation
             {
                 From = 0,
@@ -613,7 +568,7 @@ namespace Taadol.Controls
 
         private async void AddRootButton_Click(object sender, RoutedEventArgs e)
         {
-            // حالت دپارتمان/عنوان شغلی: مستقیم از سرویس Payroll اضافه می‌شود
+
             if (SearchOnDemand)
             {
                 await AddPayrollItemAsync();
@@ -677,9 +632,7 @@ namespace Taadol.Controls
                 ToastManager.Error("خطا در عملیات دسته‌بندی");
             }
         }
-        /// <summary>
-        /// افزودن مستقیم دپارتمان/عنوان شغلی از سرویس‌های Payroll (حالت SearchOnDemand).
-        /// </summary>
+
         private async Task AddPayrollItemAsync()
         {
             var title = ModernDialog.ShowInput(
@@ -695,7 +648,7 @@ namespace Taadol.Controls
 
             if (string.IsNullOrWhiteSpace(title)) return;
             title = title.Trim();            var token = BeginOperation(out var version);
-            // DependencyProperty به UI thread وابسته است؛ قبل از Task.Run کپی می‌کنیم.
+
             var sourceKind = SourceKind;
             var departmentId = DepartmentId;
             try
@@ -741,12 +694,9 @@ namespace Taadol.Controls
             }
         }
 
-        /// <summary>
-        /// رفرش درخت در حالت SearchOnDemand از سرویس Payroll مربوطه.
-        /// </summary>
         public async Task RefreshPayrollTreeAsync()
         {            var token = BeginOperation(out var version);
-            // DependencyProperty به UI thread وابسته است؛ قبل از Task.Run کپی می‌کنیم.
+
             var sourceKind = SourceKind;
             var departmentFilterName = DepartmentFilterName;
             List<PersonCategoryTreeViewModel> tree;
@@ -852,12 +802,6 @@ namespace Taadol.Controls
             set => SetValue(IsRequiredProperty, value);
         }
 
-        /// <summary>
-        /// وقتی true باشد، درخت خالی/سبک باز می‌شود و آیتم‌ها فقط بر اساس جستجو ساخته می‌شوند
-        /// (با سقف <see cref="MaxSearchResults"/>). برای لیست‌های بزرگ مثل دپارتمان/عنوان شغلی
-        /// (صدها رکورد) استفاده می‌شود تا از فریز UI روی کلیک جلوگیری شود.
-        /// وقتی false باشد (پیش‌فرض)، رفتار فعلی یعنی نمایش کامل درخت حفظ می‌شود.
-        /// </summary>
         public static readonly DependencyProperty SearchOnDemandProperty =
             DependencyProperty.Register(
                 nameof(SearchOnDemand),
@@ -871,7 +815,6 @@ namespace Taadol.Controls
             set => SetValue(SearchOnDemandProperty, value);
         }
 
-        /// <summary>سقف تعداد نتایج در حالت SearchOnDemand.</summary>
         public const int MaxSearchResults = 60;
         private const int LazyPageSize = 20;
         private const int LazyBatchSize = 4;
@@ -883,7 +826,6 @@ namespace Taadol.Controls
 
             var slide = (TranslateTransform)container.RenderTransform;
 
-            // fade out آرام‌تر
             var fadeOut = new DoubleAnimation
             {
                 From = 1,
@@ -892,7 +834,6 @@ namespace Taadol.Controls
                 EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
             };
 
-            // slide out آرام‌تر
             var slideOut = new DoubleAnimation
             {
                 From = 0,
@@ -917,8 +858,6 @@ namespace Taadol.Controls
         private void RotateArrow(double angle)
         {
         }
-
-        // ==================== Search ====================
 
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -995,11 +934,6 @@ namespace Taadol.Controls
             return result;
         }
 
-        /// <summary>
-        /// نسخه‌ای از فیلتر که برای حالت SearchOnDemand استفاده می‌شود:
-        /// فقط آیتم‌های تکی (برگ‌های درخت) که عنوانشان شامل عبارت باشد را برمی‌گرداند
-        /// و حداکثر <paramref name="maxResults"/> نتیجه را برمی‌گرداند تا درخت سنگین نشود.
-        /// </summary>
         private List<CategoryItem> FilterCategoriesCapped(List<CategoryItem> items, string searchText, int maxResults)
         {
             var result = new List<CategoryItem>();
@@ -1062,8 +996,6 @@ namespace Taadol.Controls
             }
         }
 
-        // ==================== Item Operations ====================
-
         private async void EditButton_Click(object sender, MouseButtonEventArgs e)
         {
             e.Handled = true;
@@ -1086,7 +1018,7 @@ namespace Taadol.Controls
             if (newTitle == category.Title) return;
 
             var token = BeginOperation(out var version);
-            // DependencyProperty به UI thread وابسته است؛ قبل از Task.Run کپی می‌کنیم.
+
             var sourceKind = SourceKind;
             var departmentId = DepartmentId;
             try
@@ -1164,7 +1096,7 @@ namespace Taadol.Controls
             if (!confirm) return;
 
             var token = BeginOperation(out var version);
-            // DependencyProperty به UI thread وابسته است؛ قبل از Task.Run کپی می‌کنیم.
+
             var sourceKind = SourceKind;
             var departmentId = DepartmentId;
             try
@@ -1237,7 +1169,7 @@ namespace Taadol.Controls
             title = title.Trim();
 
             var token = BeginOperation(out var version);
-            // DependencyProperty به UI thread وابسته است؛ قبل از Task.Run کپی می‌کنیم.
+
             var sourceKind = SourceKind;
             var departmentId = DepartmentId;
             try
@@ -1329,8 +1261,6 @@ namespace Taadol.Controls
             return false;
         }
 
-        // ==================== Selection ====================
-
         private void CategoryTree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (e.NewValue is TreeViewItem selectedItem && selectedItem.Tag is CategoryItem category)
@@ -1340,7 +1270,6 @@ namespace Taadol.Controls
                     (Color)ColorConverter.ConvertFromString("#0D2159"));
                 ClosePopup();
 
-                // ★ نگه داشتن Id دسته انتخاب‌شده
                 _selectedCategoryId = category.Id;
 
                 CategorySelected?.Invoke(category);
@@ -1370,8 +1299,6 @@ namespace Taadol.Controls
             e.Handled = true;
         }
 
-        // ==================== Public API ====================
-
         public void SetSelectedCategory(string title)
         {
             SelectedText.Text = title;
@@ -1379,11 +1306,6 @@ namespace Taadol.Controls
                 (Color)ColorConverter.ConvertFromString("#0D2159"));
         }
 
-        /// <summary>
-        /// ★ انتخاب دسته‌بندی با Id — برای لود دسته‌بندی شخص در فرم ویرایش
-        /// این متد درخت دسته‌بندی‌ها رو می‌گرده و اگه دسته با Id مورد نظر پیدا کنه،
-        /// اون رو به‌عنوان دسته انتخاب‌شده تنظیم می‌کنه.
-        /// </summary>
         public void SelectCategoryById(long categoryId)
         {
             if (categoryId <= 0 || _allCategories == null || _allCategories.Count == 0)
@@ -1400,7 +1322,6 @@ namespace Taadol.Controls
                 System.Diagnostics.Debug.WriteLine($"✅ SelectCategoryById: found '{found.Title}'");
                 SetSelectedCategory(found.Title);
 
-                // یادآوری: در event دسته‌بندی هم اطلاع بدیم
                 _selectedCategoryId = found.Id;
             }
             else
@@ -1409,9 +1330,6 @@ namespace Taadol.Controls
             }
         }
 
-        /// <summary>
-        /// جستجوی دسته‌بندی با Id در درخت (به‌صورت بازگشتی)
-        /// </summary>
         private CategoryItem FindCategoryById(List<CategoryItem> items, long categoryId)
         {
             if (items == null) return null;
@@ -1434,12 +1352,8 @@ namespace Taadol.Controls
             return null;
         }
 
-        // ★ فیلد برای نگه داشتن Id دسته انتخاب‌شده
         private long? _selectedCategoryId;
 
-        /// <summary>
-        /// Id دسته‌بندی انتخاب‌شده (null اگه هیچی انتخاب نشده)
-        /// </summary>
         public long? SelectedCategoryId => _selectedCategoryId;
 
         public void SetCategories(List<CategoryItem> categories)
@@ -1462,8 +1376,6 @@ namespace Taadol.Controls
             ? SelectedText.Text
             : null;
 
-        // ==================== Helper Methods ====================
-
         private TreeViewItem FindParentTreeViewItem(DependencyObject child)
         {
             while (child != null)
@@ -1471,9 +1383,6 @@ namespace Taadol.Controls
                 if (child is TreeViewItem item)
                     return item;
 
-                // کلیک روی متن گره، OriginalSource را یک Run (ContentElement) می‌کند که
-                // Visual نیست؛ VisualTreeHelper.GetParent روی آن InvalidOperationException
-                // می‌اندازد. برای عناصر غیر-Visual از LogicalTree بالا می‌رویم.
                 child = child is Visual || child is System.Windows.Media.Media3D.Visual3D
                     ? VisualTreeHelper.GetParent(child)
                     : LogicalTreeHelper.GetParent(child);
@@ -1532,11 +1441,9 @@ namespace Taadol.Controls
                 UnsubscribeTreeItemEvents(child);
         }
 
-        // ==================== Nested Classes ====================
-
         public class CategoryItem
         {
-            public long Id { get; set; }              // ← اضافه بشه
+            public long Id { get; set; }
             public string Title { get; set; }
             public string IconPath { get; set; }
             public ObservableCollection<CategoryItem> Children { get; set; }
@@ -1549,7 +1456,6 @@ namespace Taadol.Controls
                 Children = new ObservableCollection<CategoryItem>();
             }
         }
-
 
     }
 }

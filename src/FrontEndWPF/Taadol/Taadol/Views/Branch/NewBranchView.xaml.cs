@@ -117,7 +117,6 @@ namespace Taadol.Views
 
         public ObservableCollection<ProvinceComboItem> Provinces { get; set; } = new();
 
-
         public long SelectedCityId
         {
             get => _selectedCityId;
@@ -129,7 +128,6 @@ namespace Taadol.Views
             }
         }
 
-        /// <summary>فیلد شهرستان را تا انتخاب استان بلاک می‌کند و در صورت تلاش، خطا نشان می‌دهد.</summary>
         private void UpdateCityState()
         {
             if (CityBlockOverlay == null) return;
@@ -313,7 +311,6 @@ namespace Taadol.Views
             ShowCompanyComboLoading(true);
             var loadToken = _loadCts?.Token ?? CancellationToken.None;
 
-            // این خط باعث می‌شود اول UI و انیمیشن فرصت نمایش پیدا کند
             await Dispatcher.Yield(DispatcherPriority.Background);
 
             try
@@ -516,7 +513,6 @@ namespace Taadol.Views
             return 0;
         }
 
-
         public string LongitudeText
         {
             get => _longitudeText;
@@ -570,8 +566,6 @@ namespace Taadol.Views
                 MarkUserChange();
             }
         }
-
-
 
         public string TelePhone
         {
@@ -647,13 +641,12 @@ namespace Taadol.Views
             this.Unloaded -= OnViewUnloaded;
         }
 
-        // Validation methods moved to Taadol.Helpers.ValidationHelper
         private void ShowCompanyComboLoading(bool show)
         {
             CompanyComboLoading.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
             CompanyComboBox.IsEnabled = !show;
         }
-       
+
         private string _nationalId;
         public string NationalId
         {
@@ -665,7 +658,7 @@ namespace Taadol.Views
                 MarkUserChange();
             }
         }
-        // Phone validation moved to Taadol.Helpers.ValidationHelper
+
         private async Task SaveBranchAsync()
         {
             if (_isSaving) return;
@@ -688,8 +681,7 @@ namespace Taadol.Views
                 ToastManager.Warning("شماره تلفن وارد شده معتبر نیست.");
                 return;
             }
-            // بررسی محدوده معتبر مختصات
-          
+
             if (SelectedCompanyId <= 0)
             {
                 ToastManager.Warning("لطفاً شرکت را انتخاب کنید.");
@@ -792,7 +784,7 @@ namespace Taadol.Views
                 ToastManager.Success("شعبه با موفقیت ثبت شد.");
 
                 ClearForm();
-                // Focus first focusable element (BranchName field)
+
                 MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
             }
             catch (Exception ex)
@@ -896,7 +888,7 @@ namespace Taadol.Views
         {
             IsMainBranch = isFirstSelected;
         }
-        private bool _isMainBranch = true; // true = اصلی، false = فرعی
+        private bool _isMainBranch = true;
         public bool IsMainBranch
         {
             get => _isMainBranch;
@@ -965,7 +957,6 @@ namespace Taadol.Views
             if (TabPricing == null ) return;
 
             TabPricing.IsChecked = false;
-        
 
             PricingContent.Visibility = Visibility.Collapsed;
             InventoryContent.Visibility = Visibility.Visible;

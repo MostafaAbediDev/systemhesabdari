@@ -47,8 +47,6 @@ namespace Taadol.Views
         {
             InitializeComponent();
 
-            // نوار جمع‌بندی به شکاف زیر گرید منتقل می‌شود تا همیشه زیر گرید بچسبد
-            // (اول از والد فعلی جدا می‌شود تا خطای «Must disconnect child» رخ ندهد)
             if (BranchSummaryBar.Parent is Panel parent)
                 parent.Children.Remove(BranchSummaryBar);
             BranchesGrid.Footer = BranchSummaryBar;
@@ -65,7 +63,6 @@ namespace Taadol.Views
             BranchesGrid.PageSizeRequested += (s, size) => ChangePageSize(size);
             BranchesGrid.CheckedItemsChanged += (s, e) => UpdateSummary();
 
-            // انتخاب همه = فقط همین صفحه؛ خاموش‌کردن هدر = پاک کردن انتخاب کل لیست
             BranchesGrid.SelectAllToggled += (s, select) =>
             {
                 if (select || AllBranches == null) return;
@@ -73,7 +70,6 @@ namespace Taadol.Views
                     item.IsSelected = false;
             };
 
-            // منوی راست‌کلیک ردیف: ویرایش و حذف
             BranchesGrid.RowEditRequested += (s, item) =>
             {
                 if (item is BranchItem b && Window.GetWindow(this) is MainWindow mw)
@@ -90,7 +86,6 @@ namespace Taadol.Views
                 BtnDelete_Click(this, new RoutedEventArgs());
             };
 
-            // جستجو با Debounce داخلی SearchBoxControl (پیش‌فرض ۳۰۰ms)
             BranchSearchBox.SearchTextChanged += (s, text) =>
             {
                 _searchText = text.Trim();
@@ -112,8 +107,6 @@ namespace Taadol.Views
             };
         }
 
-        // ─── هدر ستون‌های داخلی (چک‌باکس و شماره ردیف) را خاکستری می‌کند ───
-        // تا با بقیه ستون‌ها و بردرهای فرم (E5E7EB) هماهنگ باشد، مثل جدول حساب‌های بانکی.
         private void ApplyGrayHeaders()
         {
             var gray = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E5E7EB"));
@@ -164,9 +157,6 @@ namespace Taadol.Views
             }
         }
 
-        /// <summary>
-        /// رفرش داده‌های گرید از بیرون (مثلاً بعد از بسته‌شدن فرم «ویرایش شعبه» در مودال).
-        /// </summary>
         public async Task RefreshGridAsync()
         {
             var current = Interlocked.Exchange(ref _loadCts, null);
@@ -190,7 +180,6 @@ namespace Taadol.Views
                 ToastManager.Error("خطا در بروزرسانی");
             }
         }
-
 
         private async void BranchListView_Loaded(object sender, RoutedEventArgs e)
         {
@@ -487,7 +476,6 @@ namespace Taadol.Views
         {
             var pages = new ObservableCollection<PageItem>();
 
-            // آستانه ۵ صفحه: با ۵ صفحه یا کمتر همه‌ی شماره‌ها بدون نقطه‌چین
             if (_totalPages <= 5)
             {
                 for (int i = 1; i <= _totalPages; i++)
@@ -513,7 +501,6 @@ namespace Taadol.Views
                 IsCurrent = _currentPage == 1
             });
 
-            // نقطه‌چین اول — همیشه ثابت در هر دو طرف (مطابق لیست اشخاص)
             pages.Add(new PageItem
             {
                 PageNumber = 0,
@@ -548,7 +535,6 @@ namespace Taadol.Views
                 }
             }
 
-            // نقطه‌چین دوم — همیشه ثابت
             pages.Add(new PageItem
             {
                 PageNumber = 0,
@@ -789,10 +775,6 @@ namespace Taadol.Views
             ToastManager.Success("شعبه‌های انتخاب‌شده حذف شدند.");
         }
 
-
-
-        // فرم لیست باید همیشه کل فضای محتوا رو پر کنه حتی اگه ردیف جدول کم باشه
-        // (چون MainContent با Top/Left فقط اندازه محتوا رو می‌گیره) — مثل PersonListView
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             Dispatcher.BeginInvoke(new Action(() =>

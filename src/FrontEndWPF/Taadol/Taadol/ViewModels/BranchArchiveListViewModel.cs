@@ -1,4 +1,4 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GeneralInfoManagement.Application.Contract.BranchArchice;
 using GeneralInfoManagement.Application.Contract.Branches;
@@ -59,7 +59,6 @@ namespace Taadol.ViewModels
 
         private List<long> _companyBranchIds = new();
 
-        // تبدیل تاریخ میلادی دریافتی از سرویس به تاریخ شمسی (همان الگوی لیست‌های دیگر)
         private string ToPersianDate(object dateValue)
         {
             if (dateValue == null)
@@ -152,9 +151,7 @@ namespace Taadol.ViewModels
             LoadErrorText = null;
             try
             {
-                // Resolve a fresh scope for each background database operation.
-                // This prevents multiple synchronous application calls from sharing
-                // a scoped DbContext/connection during rapid navigation.
+
                 var archives = await Task.Run(() =>
                 {
                     using var operationScope = _serviceProvider.CreateScope();
@@ -277,7 +274,6 @@ namespace Taadol.ViewModels
                     .WaitAsync(cancellationToken)
                     ?? new List<BranchViewModel>();
 
-                // اگر کاربر شرکت دیگری را انتخاب کرده، نتیجه‌ی درخواست قبلی نباید اعمال شود.
                 if (requestVersion != Volatile.Read(ref _branchFilterRequestVersion) ||
                     SelectedCompany?.Id != companyId)
                     return;
@@ -482,7 +478,6 @@ namespace Taadol.ViewModels
         private static string ToPersianNumber(int number) => ToPersianNumber((long)number);
     }
 
-    // ─── Models ───
     public class BranchArchiveItem : INotifyPropertyChanged, IListRowItem
     {
         private int _rowNumber;

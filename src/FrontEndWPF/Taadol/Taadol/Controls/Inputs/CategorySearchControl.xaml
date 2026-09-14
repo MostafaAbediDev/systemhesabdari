@@ -7,7 +7,6 @@
 
     <UserControl.Resources>
 
-        <!-- ==================== استایل سطح اول ==================== -->
         <Style x:Key="RootTreeViewItemStyle"
                TargetType="TreeViewItem">
             <Setter Property="BorderThickness"
@@ -45,7 +44,6 @@
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
 
-                                    <!-- آیکون باز/بسته -->
                                     <ToggleButton x:Name="Expander"
                                                   Grid.Column="0"
                                                   IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
@@ -104,7 +102,6 @@
                                         </ToggleButton.Template>
                                     </ToggleButton>
 
-                                    <!-- نقطه -->
                                     <Border x:Name="Dot"
                                             Grid.Column="0"
                                             Width="8"
@@ -118,7 +115,6 @@
                                         </Border.Background>
                                     </Border>
 
-                                    <!-- محتوا -->
                                     <StackPanel Grid.Column="1"
                                                 Orientation="Horizontal">
                                         <svg:SvgViewbox x:Name="ItemIcon"
@@ -131,7 +127,6 @@
                                                           VerticalAlignment="Center" />
                                     </StackPanel>
 
-                                    <!-- دکمه‌های عملیاتی - hover توسط code-behind کنترل میشه -->
                                     <StackPanel x:Name="ActionButtons"
                                                 Grid.Column="2"
                                                 Orientation="Horizontal"
@@ -264,7 +259,6 @@
                                         Value="Visible" />
                             </Trigger>
 
-
                             <Trigger Property="IsExpanded"
                                      Value="True">
                                 <Trigger.EnterActions>
@@ -317,7 +311,6 @@
                                 </Trigger.ExitActions>
                             </Trigger>
 
-                            <!-- انتخاب‌شده -->
                             <Trigger Property="IsSelected"
                                      Value="True">
                                 <Setter TargetName="Bd"
@@ -332,7 +325,6 @@
             </Setter>
         </Style>
 
-        <!-- ==================== استایل سطح دوم ==================== -->
         <Style x:Key="ChildTreeViewItemStyle"
                TargetType="TreeViewItem">
             <Setter Property="BorderThickness"
@@ -644,7 +636,6 @@
             </Setter>
         </Style>
 
-        <!-- ==================== استایل سطح سوم ==================== -->
         <Style x:Key="GrandChildTreeViewItemStyle"
                TargetType="TreeViewItem">
             <Setter Property="BorderThickness"
@@ -890,7 +881,7 @@
                         Width="1"
                         Height="27"
                         Background="#E5E7EB"
-                        VerticalAlignment="Center"           
+                        VerticalAlignment="Center"
                         Margin="8,0,7,0" />
 
 <Border Grid.Column="3"
@@ -906,7 +897,7 @@
          Cursor="Hand">
                     <svg:SvgViewbox Width="8"
                                     Height="8"
-                                    Source="/Assets/Icons/Plus_thin.svg"   
+                                    Source="/Assets/Icons/Plus_thin.svg"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Center" />
                 </Border>

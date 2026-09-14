@@ -171,9 +171,8 @@ namespace Taadol.Views
                 ToastManager.Success(
                     string.IsNullOrWhiteSpace(message) ? "شرکت با موفقیت ثبت شد." : message);
 
-                // بعد از ثبت، فرم باز می‌ماند و فقط فیلدها پاک می‌شوند (بدون رفتن به لیست شرکت‌ها)
                 ClearForm();
-                // Focus first focusable element (CompanyName field)
+
                 MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
             }
             catch (Exception ex)
@@ -194,7 +193,7 @@ namespace Taadol.Views
 
         private void Cancel_Click(object sender, MouseButtonEventArgs e)
         {
-            // اگر فیلدها خالی نباشند، ولیدیشن ذخیره/انصراف
+
             if (HasContent())
             {
                 var result = MessageBox.Show(
@@ -235,7 +234,7 @@ namespace Taadol.Views
 
         private void HeaderClose_Click(object sender, MouseButtonEventArgs e)
         {
-            // دکمه X بدون سؤال مستقیم می‌بندد (مثل ویرایش شخص)
+
             CloseForm();
         }
 
@@ -248,7 +247,6 @@ namespace Taadol.Views
             ProductImage = "";
             IsBranchActive = true;
 
-            // پاک کردن بصری فیلد تاریخ (خود کنترل فیلدها را خالی می‌کند)
             FoundingDatePicker?.Clear();
         }
 
@@ -297,7 +295,6 @@ namespace Taadol.Views
             var picker = sender as PersianDatePickerControl;
             if (picker == null) return;
 
-            // اگر فیلدهای تاریخ پاک شوند مقدار null می‌شود تا ذخیره با تاریخ قبلی رخ ندهد
             FoundingDate = picker.SelectedDate;
         }
 
@@ -322,5 +319,4 @@ namespace Taadol.Views
         }
     }
 
-   
 }

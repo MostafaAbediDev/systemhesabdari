@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using BankManagement.Application.Contracts.Bank;
@@ -7,10 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Taadol.ViewModels
 {
-    /// <summary>
-    /// ViewModel فرم ثبت بانک. فقط اعضای ویژهٔ «ثبت» (شناسهٔ یکتا، وضعیت فعال، رویداد ذخیره)
-    /// را نگه می‌دارد؛ وضعیت و منطق مشترک از BankFormViewModelBase ارث برده می‌شود.
-    /// </summary>
+
     public sealed class NewBankViewModel : BankFormViewModelBase<BankNewFormSnapshot>
     {
         private readonly IServiceProvider _serviceProvider;
@@ -28,7 +25,6 @@ namespace Taadol.ViewModels
 
         public event Action? BankSaved;
 
-        // این فیلد فعلاً فقط برای تکمیل ظاهر فرم است و تا آماده‌شدن قرارداد بک‌اند ارسال نمی‌شود.
         public string UniqueCode
         {
             get => _uniqueCode;

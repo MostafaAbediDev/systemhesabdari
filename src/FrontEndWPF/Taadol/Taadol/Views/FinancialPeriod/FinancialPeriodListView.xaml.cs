@@ -45,8 +45,6 @@ namespace Taadol.Views
         {
             InitializeComponent();
 
-            // نوار جمع‌بندی به شکاف زیر گرید منتقل می‌شود تا همیشه زیر گرید بچسبد
-            // (اول از والد فعلی جدا می‌شود تا خطای «Must disconnect child» رخ ندهد)
             if (PeriodSummaryBar.Parent is Panel parent)
                 parent.Children.Remove(PeriodSummaryBar);
             PeriodsGrid.Footer = PeriodSummaryBar;
@@ -61,14 +59,12 @@ namespace Taadol.Views
             PeriodsGrid.PageSizeRequested += (s, size) => ChangePageSize(size);
             PeriodsGrid.CheckedItemsChanged += (s, e) => UpdateSummary();
 
-            // منوی راست‌کلیک ردیف: ویرایش
             PeriodsGrid.RowEditRequested += (s, item) =>
             {
                 if (item is FinancialPeriodItem p && Window.GetWindow(this) is MainWindow mw)
                     mw.NavigateToEditFinancialPeriod(long.Parse(p.UniqueId));
             };
 
-            // انتخاب همه = فقط همین صفحه؛ خاموش‌کردن هدر = پاک کردن انتخاب کل لیست
             PeriodsGrid.SelectAllToggled += (s, select) =>
             {
                 if (select || AllPeriods == null) return;
@@ -76,7 +72,6 @@ namespace Taadol.Views
                     item.IsSelected = false;
             };
 
-            // جستجو با Debounce داخلی SearchBoxControl (پیش‌فرض ۳۰۰ms)
             PeriodSearchBox.SearchTextChanged += (s, text) =>
             {
                 _searchText = text.Trim();
@@ -119,8 +114,6 @@ namespace Taadol.Views
             }
         }
 
-        // فرم لیست باید همیشه کل فضای محتوا رو پر کنه حتی اگه ردیف جدول کم باشه
-        // (چون MainContent با Top/Left فقط اندازه محتوا رو می‌گیره) — مثل PersonListView
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             Dispatcher.BeginInvoke(new Action(() =>
@@ -148,9 +141,6 @@ namespace Taadol.Views
             Height = h > 0 ? h : 0;
         }
 
-        /// <summary>
-        /// رفرش داده‌های گرید از بیرون (مثلاً بعد از بسته‌شدن فرم «ویرایش دوره مالی» در مودال).
-        /// </summary>
         public async Task RefreshGridAsync()
         {
             _loadCts?.Cancel();
@@ -169,7 +159,6 @@ namespace Taadol.Views
                 ToastManager.Error("خطا در بروزرسانی");
             }
         }
-
 
         private async void FinancialPeriodListView_Loaded(object sender, RoutedEventArgs e)
         {
@@ -434,7 +423,6 @@ namespace Taadol.Views
         {
             var pages = new ObservableCollection<PageItem>();
 
-            // آستانه ۵ صفحه: با ۵ صفحه یا کمتر همه‌ی شماره‌ها بدون نقطه‌چین
             if (_totalPages <= 5)
             {
                 for (int i = 1; i <= _totalPages; i++)
@@ -460,7 +448,6 @@ namespace Taadol.Views
                 IsCurrent = _currentPage == 1
             });
 
-            // نقطه‌چین اول — همیشه ثابت در هر دو طرف (مطابق لیست اشخاص)
             pages.Add(new PageItem
             {
                 PageNumber = 0,
@@ -495,7 +482,6 @@ namespace Taadol.Views
                 }
             }
 
-            // نقطه‌چین دوم — همیشه ثابت
             pages.Add(new PageItem
             {
                 PageNumber = 0,
@@ -613,8 +599,6 @@ namespace Taadol.Views
 
             popup.ShowAt(anchor);
         }
-
-
 
         private void GoToNextPage()
         {

@@ -1,4 +1,4 @@
-<UserControl x:Class="Taadol.Views.Bank.NewBankView"
+﻿<UserControl x:Class="Taadol.Views.Bank.NewBankView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:Taadol.Controls"
@@ -79,7 +79,7 @@
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Grid.Column="0">
-                            <!-- شناسه یکتا؛ فعلاً نمایشی است و در قرارداد ثبت بانک ارسال نمی‌شود. -->
+
                             <Grid Margin="0,0,0,0">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="230" />
@@ -109,7 +109,6 @@
 
                             </Grid>
 
-                            <!-- نام بانک -->
                             <TextBlock Style="{StaticResource FormLabel}"
                                        Margin="0,16,0,0"><Run Text="نام بانک" /><Run Text=" *" Foreground="#DC2626" /></TextBlock>
                             <controls:ModernPersianTextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"
@@ -117,7 +116,6 @@
                                                            MaxLength="200"
                                                            Placeholder="بنویسید" />
 
-                            <!-- نوع بانک -->
                             <TextBlock Style="{StaticResource FormLabel}"
                                        Margin="0,16,0,0"><Run Text="نوع بانک" /><Run Text=" *" Foreground="#DC2626" /></TextBlock>
                             <Grid Margin="0,8,0,0">
@@ -154,7 +152,6 @@
                                                               VerticalAlignment="Center" />
                             </Grid>
 
-                            <!-- کشور -->
                             <TextBlock Style="{StaticResource FormLabel}"
                                        Margin="0,16,0,0"><Run Text="کشور" /><Run Text=" *" Foreground="#DC2626" /></TextBlock>
                             <ComboBox Style="{StaticResource SearchableComboBox}"
@@ -164,7 +161,6 @@
                                       ItemContainerStyle="{StaticResource SearchableComboBoxItem}"
                                       Margin="0,8,0,0" />
 
-                            <!-- توضیحات -->
                             <TextBlock Text="توضیحات"
                                        Style="{StaticResource FormLabel}"
                                        Margin="0,16,0,0" />
@@ -175,7 +171,6 @@
                                                            Placeholder="بنویسید" />
                         </StackPanel>
 
-                        <!-- تصویر بانک در کنار فرم -->
                         <StackPanel Grid.Column="2"
                                     Margin="0,0,10,0"
                                     VerticalAlignment="Top"
@@ -245,7 +240,6 @@
                 </Grid>
             </Border>
 
-            <!-- پوشش زمان ذخیره برای جلوگیری از کلیک و نمایش وضعیت عملیات -->
             <Border Grid.Row="0"
                     Grid.RowSpan="4"
                     Panel.ZIndex="20"

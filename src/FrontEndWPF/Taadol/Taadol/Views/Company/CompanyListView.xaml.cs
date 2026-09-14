@@ -45,8 +45,6 @@ namespace Taadol.Views
         {
             InitializeComponent();
 
-            // نوار جمع‌بندی به شکاف زیر گرید منتقل می‌شود تا همیشه زیر گرید بچسبد
-            // (اول از والد فعلی جدا می‌شود تا خطای «Must disconnect child» رخ ندهد)
             if (CompanySummaryBar.Parent is Panel parent)
                 parent.Children.Remove(CompanySummaryBar);
             CompaniesGrid.Footer = CompanySummaryBar;
@@ -61,7 +59,6 @@ namespace Taadol.Views
             CompaniesGrid.PageSizeRequested += (s, size) => ChangePageSize(size);
             CompaniesGrid.CheckedItemsChanged += (s, e) => UpdateSummary();
 
-            // انتخاب همه = فقط همین صفحه؛ خاموش‌کردن هدر = پاک کردن انتخاب کل لیست
             CompaniesGrid.SelectAllToggled += (s, select) =>
             {
                 if (select || AllCompanies == null) return;
@@ -69,7 +66,6 @@ namespace Taadol.Views
                     item.IsSelected = false;
             };
 
-            // منوی راست‌کلیک ردیف: ویرایش و حذف
             CompaniesGrid.RowEditRequested += (s, item) =>
             {
                 if (item is CompanyItem c && Window.GetWindow(this) is MainWindow mw)
@@ -86,7 +82,6 @@ namespace Taadol.Views
                 BtnDelete_Click(this, new RoutedEventArgs());
             };
 
-            // جستجو با Debounce داخلی SearchBoxControl (پیش‌فرض ۳۰۰ms)
             CompanySearchBox.SearchTextChanged += (s, text) =>
             {
                 _searchText = text.Trim();
@@ -142,8 +137,6 @@ namespace Taadol.Views
             }
         }
 
-        // فرم لیست باید همیشه کل فضای محتوا رو پر کنه حتی اگه ردیف جدول کم باشه
-        // (چون MainContent با Top/Left فقط اندازه محتوا رو می‌گیره) — مثل PersonListView
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             Dispatcher.BeginInvoke(new Action(() =>
@@ -171,9 +164,6 @@ namespace Taadol.Views
             Height = h > 0 ? h : 0;
         }
 
-        /// <summary>
-        /// رفرش داده‌های گرید از بیرون (مثلاً بعد از بسته‌شدن فرم «ویرایش شرکت» در مودال).
-        /// </summary>
         public async Task RefreshGridAsync()
         {
             var current = Interlocked.Exchange(ref _loadCts, null);
@@ -197,7 +187,6 @@ namespace Taadol.Views
                 ToastManager.Error("خطا در بروزرسانی");
             }
         }
-
 
         private async void CompanyListView_Loaded(object sender, RoutedEventArgs e)
         {
@@ -456,7 +445,6 @@ namespace Taadol.Views
         {
             var pages = new ObservableCollection<PageItem>();
 
-            // آستانه ۵ صفحه: با ۵ صفحه یا کمتر همه‌ی شماره‌ها بدون نقطه‌چین
             if (_totalPages <= 5)
             {
                 for (int i = 1; i <= _totalPages; i++)
@@ -482,7 +470,6 @@ namespace Taadol.Views
                 IsCurrent = _currentPage == 1
             });
 
-            // نقطه‌چین اول — همیشه ثابت در هر دو طرف (مطابق لیست اشخاص)
             pages.Add(new PageItem
             {
                 PageNumber = 0,
@@ -517,7 +504,6 @@ namespace Taadol.Views
                 }
             }
 
-            // نقطه‌چین دوم — همیشه ثابت
             pages.Add(new PageItem
             {
                 PageNumber = 0,
@@ -684,8 +670,6 @@ namespace Taadol.Views
 
             ToastManager.Success("عملیات حذف انجام شد.");
         }
-
-
 
         private void GoToNextPage()
         {

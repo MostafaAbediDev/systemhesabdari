@@ -5,38 +5,47 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using Taadol.Controls;
+using Taadol.ViewModels;
 
 namespace Taadol.Views
 {
     public partial class NewProductView : UserControl
     {
+        public NewProductViewModel ViewModel { get; }
+
         public NewProductView()
         {
             InitializeComponent();
+            ViewModel = new NewProductViewModel();
+            DataContext = ViewModel;
 
-            TabPricing.Checked += (s, e) =>
-            {
-                TabInventory.IsChecked = false;
-                TabTax.IsChecked = false;
-                SwitchTab(0);
-            };
-
-            TabInventory.Checked += (s, e) =>
-            {
-                TabPricing.IsChecked = false;
-                TabTax.IsChecked = false;
-                SwitchTab(1);
-            };
-
-            TabTax.Checked += (s, e) =>
-            {
-                TabPricing.IsChecked = false;
-                TabInventory.IsChecked = false;
-                SwitchTab(2);
-            };
+            Loaded += (s, e) => UpdateDividerEllipseColor();
         }
 
-        private void HeaderClose_Click(object sender, MouseButtonEventArgs e)
+        private void UpdateDividerEllipseColor()
+        {
+            bool isModal = Window.GetWindow(this) is MainWindow mw && mw.ModalContent.Content == this;
+            var colorHex = isModal ? "#66000000" : "#FFF8ED";
+            var brush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(colorHex));
+            DividerEllipseLeft.Fill = brush;
+            DividerEllipseRight.Fill = brush;
+        }
+        private void RootBorder_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            RootBorder.Clip = new RectangleGeometry(
+                new Rect(0, 0, e.NewSize.Width, e.NewSize.Height), 4, 4);
+        }
+        private void CloseButton_Click(object sender, MouseButtonEventArgs e)
+        {
+            var mainWindow = Window.GetWindow(this) as MainWindow;
+            if (mainWindow == null) return;
+            if (mainWindow.ModalContent.Content == this)
+                mainWindow.CloseModal();
+            else
+                mainWindow.CloseCurrentForm();
+        }
+
+        private void Cancel_Click(object sender, RoutedEventArgs e)
         {
             var mainWindow = Window.GetWindow(this) as MainWindow;
             if (mainWindow == null) return;
@@ -52,94 +61,44 @@ namespace Taadol.Views
             if (imagePicker != null)
             {
                 string imagePath = imagePicker.ImagePath;
-                            }
+            }
         }
 
         private void OnImageRemoved(object sender, RoutedEventArgs e)
         {
         }
-        private void SwitchTab(int index)
-        {
-            PricingContent.Visibility = index == 0 ? Visibility.Visible : Visibility.Collapsed;
-            InventoryContent.Visibility = index == 1 ? Visibility.Visible : Visibility.Collapsed;
-            TaxContent.Visibility = index == 2 ? Visibility.Visible : Visibility.Collapsed;
-        }
-        private void TabTax_Checked(object sender, RoutedEventArgs e)
-        {
-            if (TabPricing == null || TabInventory == null) return;
 
-            TabPricing.IsChecked = false;
-            TabInventory.IsChecked = false;
-
-            PricingContent.Visibility = Visibility.Collapsed;
-            InventoryContent.Visibility = Visibility.Collapsed;
-            TaxContent.Visibility = Visibility.Visible;
+        private void TabInfo_Checked(object sender, RoutedEventArgs e)
+        {
+            if (InfoContent != null) InfoContent.Visibility = Visibility.Visible;
+            if (VariantsContent != null) VariantsContent.Visibility = Visibility.Collapsed;
+            if (PricingContent != null) PricingContent.Visibility = Visibility.Collapsed;
         }
 
-
-
-
-
-        private void TabInventory_Checked(object sender, RoutedEventArgs e)
+        private void TabVariants_Checked(object sender, RoutedEventArgs e)
         {
-            if (TabPricing == null || TabTax == null) return;
-
-            TabPricing.IsChecked = false;
-            TabTax.IsChecked = false;
-
-            PricingContent.Visibility = Visibility.Collapsed;
-            InventoryContent.Visibility = Visibility.Visible;
-            TaxContent.Visibility = Visibility.Collapsed;
+            if (InfoContent != null) InfoContent.Visibility = Visibility.Collapsed;
+            if (VariantsContent != null) VariantsContent.Visibility = Visibility.Visible;
+            if (PricingContent != null) PricingContent.Visibility = Visibility.Collapsed;
         }
+
         private void TabPricing_Checked(object sender, RoutedEventArgs e)
         {
-            if (TabInventory == null || TabTax == null) return;
-
-                        TabInventory.IsChecked = false;
-            TabTax.IsChecked = false;
-
-                        PricingContent.Visibility = Visibility.Visible;
-            InventoryContent.Visibility = Visibility.Collapsed;
-            TaxContent.Visibility = Visibility.Collapsed;
-        }
-        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
+            if (InfoContent != null) InfoContent.Visibility = Visibility.Collapsed;
+            if (VariantsContent != null) VariantsContent.Visibility = Visibility.Collapsed;
+            if (PricingContent != null) PricingContent.Visibility = Visibility.Visible;
         }
 
-        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void CodeModeToggle_SelectionChanged(object sender, bool e)
         {
-
         }
 
-        private void TextBox_TextChanged_1(object sender, TextChangedEventArgs e)
+        private void View_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-
         }
 
-        private void TextBox_TextChanged_2(object sender, TextChangedEventArgs e)
+        private void View_Unloaded(object sender, RoutedEventArgs e)
         {
-
-        }
-
-        private void TabInventory_Checked_1(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void TabInventory_Checked_2(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void TextBox_TextChanged_3(object sender, TextChangedEventArgs e)
-        {
-
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-
         }
     }
 }

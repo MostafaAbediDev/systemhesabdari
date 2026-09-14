@@ -1,4 +1,4 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using PersonManagement.Application.Contract.PersonAddress;
@@ -19,8 +19,7 @@ namespace Taadol.ViewModels
 {
     public partial class PersonListViewModel : ObservableObject
     {
-        // فرهنگ ثابت fa-IR برای فرمت مبلغ: رقم فارسی + جداکننده هزارگان «٬»
-        // (به فرهنگ سیستم وابسته نیست تا روی ویندوز انگلیسی «،» لاتین نمایش ندهد)
+
         private static readonly CultureInfo AmountCulture = CultureInfo.GetCultureInfo("fa-IR");
 
         private readonly IServiceProvider _serviceProvider;
@@ -35,10 +34,8 @@ namespace Taadol.ViewModels
         private int _summaryDataVersion;
         private string _lastSummaryKey;
 
-        // کش حساب‌های بانکی هر شخص — در LoadDataAsync همراه تماس‌ها و آدرس‌ها پر می‌شود
         private Dictionary<long, List<PersonBankViewModel>> _bankAccountsByPerson = new();
 
-        // کش تماس‌ها و آدرس‌ها — برای پنل جزئیات (ایمیل، آدرس کامل)
         private Dictionary<long, List<PersonContactViewModel>> _contactsByPerson = new();
         private Dictionary<long, PersonAddressViewModel> _addressesByPerson = new();
 
@@ -133,9 +130,6 @@ namespace Taadol.ViewModels
             return AllPersons?.Where(p => !p.IsEmpty).ToList() ?? new List<PersonItem>();
         }
 
-        /// <summary>
-        /// حساب‌های بانکی کش‌شده در LoadDataAsync — بدون کوئری دیتابیس.
-        /// </summary>
         public List<PersonBankViewModel> GetBankAccounts(long personId)
         {
             return _bankAccountsByPerson.TryGetValue(personId, out var list)
@@ -143,9 +137,6 @@ namespace Taadol.ViewModels
                 : new List<PersonBankViewModel>();
         }
 
-        /// <summary>
-        /// ایمیل شخص از تماس‌های کش‌شده (نوع تماس شامل «ایمیل») — null اگر موجود نباشد.
-        /// </summary>
         public string GetEmail(long personId)
         {
             if (!_contactsByPerson.TryGetValue(personId, out var contacts))
@@ -159,9 +150,6 @@ namespace Taadol.ViewModels
             return email?.Value;
         }
 
-        /// <summary>
-        /// آدرس از آدرس‌های کش‌شده — null اگر موجود نباشد.
-        /// </summary>
         public string GetAddress(long personId)
         {
             if (!_addressesByPerson.TryGetValue(personId, out var address) || address == null)
@@ -170,9 +158,6 @@ namespace Taadol.ViewModels
             return string.IsNullOrWhiteSpace(address.Address) ? null : address.Address.Trim();
         }
 
-        /// <summary>
-        /// کد پستی از آدرس‌های کش‌شده — null اگر موجود نباشد.
-        /// </summary>
         public string GetPostalCode(long personId)
         {
             if (!_addressesByPerson.TryGetValue(personId, out var address) || address == null)
@@ -199,8 +184,6 @@ namespace Taadol.ViewModels
             IsLoading = true;
             LoadErrorText = null;
 
-            // انتخاب‌های فعلی را حفظ کن تا بعد از بازسازی لیست (مثلاً بعد از حذف یک شخص)
-            // بقیه‌ی آیتم‌های انتخابی از حالت انتخاب خارج نشوند.
             var selectedIds = AllPersons?
                 .Where(p => p.IsSelected && !p.IsEmpty)
                 .Select(p => p.Id)
@@ -360,8 +343,7 @@ namespace Taadol.ViewModels
             }
             catch (Exception ex)
             {
-                // خطا را بی‌صدا نبلع: اگر رفرش بعد از ثبت شکست بخورد،
-                // لیست قبلی حفظ می‌شود و کاربر پیام می‌گیرد (به‌جای «۰ از ۰» گمراه‌کننده).
+
                 System.Diagnostics.Debug.WriteLine($"[ERROR] PersonListViewModel.LoadDataAsync: {ex}");
                 if (requestVersion != Volatile.Read(ref _loadRequestVersion))
                     return;
@@ -663,11 +645,6 @@ namespace Taadol.ViewModels
             SelectedCountText = $"({selectedItems.Count})";
         }
 
-        /// <summary>
-        /// حذف گروهی اشخاص انتخاب‌شده.
-        /// نتیجه هر حذف جمع‌آوری می‌شود تا کاربر نتیجه واقعی (موفق/ناموفق) را ببیند،
-        /// نه اینکه خطاها فقط در Debug نوشته شوند.
-        /// </summary>
         public async Task<(int DeletedCount, List<string> Errors)> DeleteSelectedAsync()
         {
             var selectedItems = GetSelectedItems();
@@ -851,7 +828,6 @@ namespace Taadol.ViewModels
             return result;
         }
 
-        /// <summary>رقم‌های انگلیسی داخل رشته را به فارسی تبدیل می‌کند؛ بقیه دست‌نخورده می‌ماند.</summary>
         private static string ToPersianDigits(string input)
         {
             if (string.IsNullOrEmpty(input)) return input;
@@ -864,18 +840,9 @@ namespace Taadol.ViewModels
             return new string(result);
         }
 
-        /// <summary>
-        /// فرمت ثابت مبلغ: رقم فارسی + جداکننده هزارگان «٬» (مستقل از فرهنگ سیستم).
-        /// مثال: 1234567 → «۱٬۲۳۴٬۵۶۷»
-        /// رقم‌ها همین‌جا فارسی می‌شوند (نه فقط در لایه رندر) تا سلول‌هایی که رفتار
-        /// NumberFontBehavior را ندارند (Run صریح) هم رقم فارسی نشان بدهند.
-        /// </summary>
         private static string FormatAmount(decimal value)
             => ToPersianDigits(value.ToString("N0", AmountCulture));
 
-        /// <summary>
-        /// پارس مبلغ نمایش‌داده‌شده (رقم فارسی/لاتین و جداکننده «٬» یا «،» لاتین را می‌پذیرد).
-        /// </summary>
         private static bool TryParseAmount(string text, out long value)
         {
             value = 0;
@@ -884,7 +851,6 @@ namespace Taadol.ViewModels
             return long.TryParse(normalized, out value);
         }
 
-        /// <summary>رقم‌های فارسی داخل رشته را به انگلیسی برمی‌گرداند (برای Parse عددی).</summary>
         private static string ToAsciiDigits(string input)
         {
             if (string.IsNullOrEmpty(input)) return input;

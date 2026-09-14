@@ -17,21 +17,14 @@ using System.Windows.Threading;
 
 namespace Taadol.Controls
 {
-    /// <summary>
-    /// سلکتور سال مالی در سایدبار.
-    /// دوره‌های مالی رو از دیتابیس (IFinancialPeriodApplication) لود می‌کنه.
-    /// سال مالی انتخاب‌شده رو از طریق Event به مصرف‌کننده گزارش می‌ده.
-    /// </summary>
+
     public partial class YearSelectorControl : UserControl
     {
         private DispatcherTimer _collapseTimer;
 
-        // ===== Event =====
-        /// <summary>وقتی سال مالی عوض می‌شه صدا زده می‌شه (شناسه + عنوان)</summary>
         public event Action<long, string> SelectionChanged;
         private static readonly PersianCalendar _persianCalendar = new PersianCalendar();
 
-        // ===== State =====
         private bool _isPopupOpen = false;
         private long _selectedPeriodId = 0;
         private string _selectedYearTitle = "";
@@ -41,28 +34,18 @@ namespace Taadol.Controls
         private int _loadVersion;
         private static List<FinancialPeriodViewModel> _cachedPeriods = null;
         private static readonly SemaphoreSlim _cacheLock = new(1, 1);
-        // ===== Constructor =====
+
         public YearSelectorControl()
         {
             InitializeComponent();
 
-            // لود دوره‌های مالی از دیتابیس
             Loaded += OnLoaded;
             Unloaded += OnUnloaded;
         }
 
-        // ======================================================
-        //  Collapse / Expand (هنگام بسته/باز شدن سایدبار)
-        // ======================================================
-
-        /// <summary>
-        /// هنگام بسته شدن سایدبار صدا زده می‌شه.
-        /// متن و فلش رو FadeOut می‌کنه و بعد مخفی می‌کنه.
-        /// خطوط بالا/پایین رو حذف و margin رو صفر می‌کنه تا آیکون وسط قرار بگیره.
-        /// </summary>
         public void Collapse()
         {
-            // ★ اگه تایمر قبلی هنوز در حال اجراست، متوقفش کن
+
             _collapseTimer?.Stop();
 
             FadeOut(YearText, 100);
@@ -78,14 +61,9 @@ namespace Taadol.Controls
             _collapseTimer.Start();
         }
 
-        /// <summary>
-        /// هنگام باز شدن سایدبار صدا زده می‌شه.
-        /// متن و فلش رو نشون می‌ده و FadeIn می‌کنه.
-        /// خطوط و margin رو برمی‌گردونه.
-        /// </summary>
         public void Expand()
         {
-            // تایمر Collapse نباید پس از بازشدن سایدبار دوباره Visibility را تغییر دهد.
+
             _collapseTimer?.Stop();
 
             YearText.Visibility = Visibility.Visible;
@@ -117,19 +95,11 @@ namespace Taadol.Controls
             });
         }
 
-        /// <summary>
-        /// کش سراسری دوره‌های مالی را بی‌اعتبار می‌کند تا بار بعدی از دیتابیس خوانده شود.
-        /// بعد از ثبت یک دوره مالی جدید صدا زده شود.
-        /// </summary>
         public static void InvalidateCache()
         {
             _cachedPeriods = null;
         }
 
-        /// <summary>
-        /// دوره‌های مالی را از نو از دیتابیس می‌خواند (بعد از ثبت دوره جدید)
-        /// تا دوره تازه‌ثبت‌شده بدون ری‌استارت برنامه در انتخابگر دیده شود.
-        /// </summary>
         public async Task RefreshAsync()
         {
             _isLoaded = true;
@@ -153,9 +123,6 @@ namespace Taadol.Controls
             Unloaded -= OnUnloaded;
         }
 
-        // ======================================================
-        //  Load
-        // ======================================================
         private async void OnLoaded(object sender, RoutedEventArgs e)
         {
             if (_isLoaded) return;
@@ -164,17 +131,11 @@ namespace Taadol.Controls
             await LoadPeriodsAsync();
         }
 
-        /// <summary>
-        /// لود دوره‌های مالی از دیتابیس به‌صورت async.
-        /// فقط ۱۰ سال آخر رو لود می‌کنه.
-        /// موقع لود، spinner نشون داده می‌شه.
-        /// </summary>
         private async Task LoadPeriodsAsync()
         {
             var version = Volatile.Read(ref _loadVersion);
             var token = _loadCts.Token;
 
-            // ★ اگه قبلاً کش شده، بدون هیچ اسپینر و تأخیری فوراً نمایش بده
             if (_cachedPeriods != null)
             {
                 if (token.IsCancellationRequested || version != Volatile.Read(ref _loadVersion)) return;
@@ -191,7 +152,7 @@ namespace Taadol.Controls
                 await _cacheLock.WaitAsync(token);
                 try
                 {
-                    // ★ دابل-چک: شاید در همین حین یه اینستنس دیگه کش کرده باشه
+
                     if (_cachedPeriods == null)
                     {
                         var items = await Task.Run(() =>
@@ -251,11 +212,6 @@ namespace Taadol.Controls
             }
         }
 
-        /// <summary>
-        /// فرمت‌بندی عنوان دوره مالی:
-        /// «شعبه [عنوان شعبه] | سال [سال]»
-        /// مثال: «شعبه ۱۰۰ | سال ۱۴۰۵»
-        /// </summary>
         private string FormatPeriodTitle(FinancialPeriodViewModel period)
         {
             var branch = string.IsNullOrWhiteSpace(period.BranchTitle) ? "-" : period.BranchTitle;
@@ -271,21 +227,16 @@ namespace Taadol.Controls
                 persianYear = 0;
             }
 
-            // ★ استفاده از RLM (Right-to-Left Mark = \u200F) بعد از هر عدد
-            // تا موتور Bidi مجبور بشه ترتیب رو دقیقاً همون‌طور که نوشتیم نگه ذاره
             const string RLM = "\u200F";
             return $"شعبه {branch}{RLM} | سال {persianYear}{RLM}";
         }
-        /// <summary>نمایش/مخفی‌کردن spinner لود</summary>
+
         private void ShowLoading(bool show)
         {
             LoadingOverlay.Visibility = show ? Visibility.Visible : Visibility.Hidden;
             YearsList.Visibility = show ? Visibility.Hidden : Visibility.Visible;
         }
 
-        // ======================================================
-        //  Popup Open/Close
-        // ======================================================
         private void Selector_Click(object sender, MouseButtonEventArgs e)
         {
             if (_isPopupOpen)
@@ -315,13 +266,11 @@ namespace Taadol.Controls
         }
         private void YearsPopup_Closed(object sender, EventArgs e)
         {
-            // ★ همگام‌سازی state با وضعیت واقعی پاپ‌آپ
+
             _isPopupOpen = false;
             RotateChevron(0);
         }
-        // ======================================================
-        //  Build Years List
-        // ======================================================
+
         private void BuildYearsList()
         {
             YearsList.Children.Clear();
@@ -331,14 +280,11 @@ namespace Taadol.Controls
                 var period = _periods[i];
                 bool isSelected = period.Id == _selectedPeriodId;
 
-                // ★ Content رو به‌عنوان string قرار می‌دیم (نه TextBlock).
-                // این کار باعث می‌شه Style دکمه (شامل FontWeight و Foreground) درست اعمال بشه.
-                // Style دکمه در XAML طوری تنظیم شده که TextBlock داخلی رو راست‌چین کنه.
                 var btn = new Button
                 {
                     Content = FormatPeriodTitle(period),
                     Tag = period.Id,
-                    // ★ FlowDirection اصلاً اینجا نباشه — از Border تو Template میاد
+
                     Style = (Style)Resources[isSelected ? "YearButtonSelectedStyle" : "YearButtonStyle"]
                 };
 
@@ -351,7 +297,6 @@ namespace Taadol.Controls
                     _selectedPeriodId = id;
                     _selectedYearTitle = title;
                     YearText.Text = title;
-
 
                     SelectionChanged?.Invoke(id, title);
                     ClosePopup();
@@ -367,9 +312,6 @@ namespace Taadol.Controls
             }
         }
 
-        // ======================================================
-        //  Helpers
-        // ======================================================
         private string ToPersianDigits(int number)
         {
             return number.ToString()

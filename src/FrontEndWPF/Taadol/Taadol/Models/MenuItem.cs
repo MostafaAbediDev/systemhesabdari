@@ -1,4 +1,4 @@
-﻿// Models/MenuItem.cs
+﻿
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -11,7 +11,7 @@ namespace TaadolAccounting.Models
         private bool _isSelected;
 
         public string Title { get; set; }
-        public string IconPath { get; set; }  
+        public string IconPath { get; set; }
         public ObservableCollection<SubMenuItem> SubItems { get; set; } = new ObservableCollection<SubMenuItem>();
 
         public bool HasSubItems => SubItems?.Count > 0;

@@ -24,8 +24,6 @@ namespace Taadol.Services
                 if (view == null)
                     return;
 
-                // Replace the old view before creating additional layout work. Its
-                // Unloaded handler can cancel pending database loads immediately.
                 _content.Content = view;
             }
             catch (Exception ex)

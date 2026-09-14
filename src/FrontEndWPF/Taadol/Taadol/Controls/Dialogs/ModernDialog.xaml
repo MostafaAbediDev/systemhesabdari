@@ -44,7 +44,6 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <!-- ====== آیکون بزرگ در دایره رنگی ====== -->
             <Border x:Name="IconCircle"
                     Grid.Row="0"
                     Width="76"
@@ -67,7 +66,6 @@
                 </Border>
             </Border>
 
-            <!-- ====== عنوان ====== -->
             <TextBlock x:Name="DialogTitle"
                        Grid.Row="1"
                        Text="عنوان"
@@ -77,7 +75,6 @@
                        HorizontalAlignment="Center"
                        Margin="0,0,0,10" />
 
-            <!-- ====== توضیح ====== -->
             <TextBlock x:Name="DialogMessage"
                        Grid.Row="2"
                        Text="پیام توضیحی در اینجا قرار می‌گیرد."
@@ -88,7 +85,6 @@
                        Margin="10,0,10,18"
                        LineHeight="22" />
 
-            <!-- ====== TextBox (فقط در حالت Input نمایش داده می‌شود) ====== -->
             <Border x:Name="InputWrapper"
                     Grid.Row="3"
                     Visibility="Collapsed"
@@ -109,14 +105,12 @@
                          KeyDown="InputBox_KeyDown" />
             </Border>
 
-            <!-- ====== دکمه‌ها ====== -->
             <StackPanel Grid.Row="4"
                         x:Name="ButtonsPanel"
                         Orientation="Horizontal"
                         HorizontalAlignment="Center"
                         Margin="0,4,0,0">
 
-                <!-- دکمه تأیید -->
                 <Button x:Name="ConfirmButton"
                         Width="130"
                         Height="42"
@@ -159,7 +153,6 @@
                                FontWeight="Medium" />
                 </Button>
 
-                <!-- دکمه انصراف -->
                 <Button x:Name="CancelButton"
                         Width="130"
                         Height="42"

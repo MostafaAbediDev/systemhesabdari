@@ -16,7 +16,6 @@
                 Background="#ffffff">
             <StackPanel>
 
-                
                 <Grid Margin="10,15,10,10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -63,7 +62,6 @@
                     </StackPanel>
                 </Grid>
 
-                
                 <Border Height="1"
                         Margin="7,0,7,2">
                     <Border.Background>
@@ -89,7 +87,6 @@
                     </Border.Background>
                 </Border>
 
-                
                 <Border Style="{StaticResource CardPanel}">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -100,7 +97,6 @@
                         <StackPanel Grid.Column="0"
                                     Margin="0,0,24,0">
 
-                            
                             <TextBlock Text="کد حسابداری"
                                        Style="{StaticResource FormLabel}" />
                             <Grid Margin="0,0,0,8">
@@ -181,8 +177,6 @@
                                 </StackPanel>
                             </Grid>
 
-
-                            
                             <Grid Margin="0,0,0,8"
                                   HorizontalAlignment="Left">
                                 <Grid.ColumnDefinitions>
@@ -191,7 +185,7 @@
                                     <ColumnDefinition Width="16" />
                                     <ColumnDefinition Width="440*" />
                                 </Grid.ColumnDefinitions>
-                              
+
                                 <StackPanel Grid.Column="0"
                                             Grid.ColumnSpan="2">
                                     <StackPanel Orientation="Horizontal">
@@ -205,7 +199,6 @@
                                                 Background="#E9F0FF"
                                                 BorderBrush="Transparent"
                                                 Height="30">
-
 
                                             <StackPanel Orientation="Horizontal">
                                                 <svg:SvgViewbox Width="13"
@@ -228,52 +221,22 @@
                                                   Margin="0,0,0,0"
                                                   Width="315"
                                                   ItemContainerStyle="{StaticResource SearchableComboBoxItem}"
-                                                 
+
                                                   Grid.ColumnSpan="2">
                                             <ComboBoxItem Content="گزینه ۱" />
                                             <ComboBoxItem Content="گزینه ۲" />
                                             <ComboBoxItem Content="گزینه ۳" />
                                         </ComboBox>
 
-                                        <!--<Button Grid.Column="1"
-                       Style="{StaticResource LightAddButton}"
-                       Width="115"
-                       Margin="10,0,0,0"
-                       Background="#E9F0FF"
-                       BorderBrush="Transparent"
-                       Height="42">
-
-
-                   <StackPanel Orientation="Horizontal">
-                       <svg:SvgViewbox Width="13"
-                                       Height="13"
-                                       Source="/Assets/Icons/add-square.svg"
-                                       VerticalAlignment="Center"
-                                       Margin="0,0,5,0" />
-                       <TextBlock Text="دسته جدید"
-                                  FontWeight="Medium"
-                                  FontSize="14"
-                                  Foreground="#5185FF"
-                                  FontFamily="{StaticResource IRANSans}"
-                                  VerticalAlignment="Center" />
-                   </StackPanel>
-               </Button>-->
                                     </Grid>
                                     <StackPanel Orientation="Horizontal"
                                                 Margin="0,4,0,0">
 
-
-
                                     </StackPanel>
                                 </StackPanel>
 
-                              
-
-
-
                             </Grid>
 
-                            
                             <TextBlock Text="توضیحات"
                                        Style="{StaticResource FormLabel}" />
                             <controls:ModernPersianTextBox Grid.Column="0"
@@ -281,7 +244,6 @@
                                                            Placeholder="1234" />
                         </StackPanel>
 
-                        
                         <StackPanel Grid.Column="1"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Top"
@@ -297,7 +259,6 @@
                     </Grid>
                 </Border>
 
-                
                 <Grid Margin="0,2,0,5">
                     <Border Height="3">
                         <Border.Background>
@@ -340,11 +301,9 @@
                              Panel.ZIndex="2" />
                 </Grid>
 
-                
                 <Border Style="{StaticResource CardPanel}">
                     <StackPanel>
 
-                        
                         <Border CornerRadius="12"
                                 BorderThickness="1.5"
                                 BorderBrush="#BED1FF"
@@ -367,11 +326,9 @@
                             </StackPanel>
                         </Border>
 
-                        
                         <StackPanel x:Name="PricingContent"
                                     Visibility="Visible">
 
-                            
                             <Grid Margin="0,0,0,16">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
@@ -395,7 +352,6 @@
                                               Margin="10,25,18,0" />
                             </Grid>
 
-                            
                             <Grid Margin="0,0,0,8">
                                 <Grid.Style>
                                     <Style TargetType="Grid">
@@ -441,11 +397,9 @@
                             </Grid>
                         </StackPanel>
 
-                        
                         <StackPanel x:Name="TaxContent"
                                     Visibility="Collapsed"     >
 
-                            
                             <StackPanel Orientation="Horizontal"
                                         Margin="0,0,0,20"
                                         HorizontalAlignment="Left"
@@ -457,7 +411,6 @@
                                               Margin="10,0,18,0" />
                             </StackPanel>
 
-                            
                             <Grid>
                                 <Grid.Style>
                                     <Style TargetType="Grid">

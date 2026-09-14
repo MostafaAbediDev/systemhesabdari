@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -22,13 +22,11 @@ namespace Taadol.Views
         {
             InitializeComponent();
 
-            // ظاهر گرید آرشیو را دقیقاً شبیه جدول حساب‌های بانکی (BankAccountsTableControl) کن
             ApplyBankTableStyle();
 
             ViewModel = new BranchArchiveListViewModel(App.ServiceProvider);
             DataContext = ViewModel;
 
-            // جستجو با Debounce: هر ضربه کلید مستقیم فیلتر سنگین را روی UI Thread اجرا نکند
             _searchDebounceTimer = new DispatcherTimer
             {
                 Interval = TimeSpan.FromMilliseconds(300)
@@ -53,7 +51,6 @@ namespace Taadol.Views
             ArchivesGrid.CheckedItemsChanged += (s, e) =>
                 ViewModel.UpdateSelectedCount();
 
-            // انتخاب همه = فقط همین صفحه؛ خاموش‌کردن هدر = پاک کردن انتخاب کل لیست
             ArchivesGrid.SelectAllToggled += (s, select) =>
             {
                 if (select || ViewModel.AllArchives == null) return;
@@ -61,7 +58,6 @@ namespace Taadol.Views
                     item.IsSelected = false;
             };
 
-            // منوی راست‌کلیک ردیف: فقط حذف (ویرایش در این فرم وجود ندارد)
             ArchivesGrid.RowDeleteRequested += (s, item) =>
             {
                 if (item is not BranchArchiveItem a) return;
@@ -88,15 +84,11 @@ namespace Taadol.Views
             this.Unloaded -= OnViewUnloaded;
         }
 
-        // ─── ظاهر گرید شبیه جدول حساب‌های بانکی ───
-        // ردیف‌ها همه‌سفید (بدون یک‌درمیان) و هدر ستون‌های داخلی (چک‌باکس و شماره ردیف)
-        // هم خط زیرین نازک خاکستری بگیرند مثل بقیه ستون‌ها.
         private void ApplyBankTableStyle()
         {
-            // ردیف‌های یک‌درمیان خاکستری (#F8F8F8) خاموش می‌شود → همه ردیف‌ها سفید
+
             ArchivesGrid.Grid.AlternationCount = 1;
 
-            // هدر ستون‌های داخلی: خط آبی ۲px → خاکستری ۱px (مثل جدول حساب‌های بانکی)
             var gray = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E5E7EB"));
             var builtInThicknesses = new[] { new Thickness(0, 0, 1, 1), new Thickness(0, 0, 1, 1) };
             var cellStyle = (Style)FindResource("BankTableCellStyle");
@@ -109,11 +101,9 @@ namespace Taadol.Views
                 s.Setters.Add(new Setter(Control.BorderThicknessProperty, builtInThicknesses[i]));
                 ArchivesGrid.Grid.Columns[i].HeaderStyle = s;
 
-                // سلول‌های ستون‌های داخلی هم خط افقی خاکستری زیر ردیف بگیرند
                 ArchivesGrid.Grid.Columns[i].CellStyle = cellStyle;
             }
 
-            // ستون شماره ردیف مثل بقیه فرم‌های گرید (۵۰px)
             if (ArchivesGrid.Grid.Columns.Count > 1)
             {
                 var rowNumberCol = ArchivesGrid.Grid.Columns[1];
@@ -121,7 +111,6 @@ namespace Taadol.Views
                 rowNumberCol.MinWidth = 45;
             }
         }
-
 
         private void HeaderClose_Click(object sender, MouseButtonEventArgs e)
         {
@@ -132,7 +121,6 @@ namespace Taadol.Views
         {
             ToastManager.Warning("چاپ این بخش به‌زودی اضافه می‌شود.");
         }
-
 
         private async Task AddPickedFileAsync()
         {
@@ -196,7 +184,6 @@ namespace Taadol.Views
             }
         }
 
-        // ─── CRUD ───
         private async void BtnDelete_Click(object sender, RoutedEventArgs e)
         {
             var selectedItems = ViewModel.GetSelectedItems();
@@ -238,7 +225,7 @@ namespace Taadol.Views
 
         private void CancelButton_Click(object sender, MouseButtonEventArgs e)
         {
-            // Cancel action - clear filters
+
             HeaderSearchBox.Text = "";
             SearchBox.Text = "";
             DescriptionSearchBox.Text = "";
@@ -247,7 +234,6 @@ namespace Taadol.Views
             ViewModel.HandleSearchTextChanged("");
         }
 
-        // ─── Filter ───
         private void CompanyComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (ViewModel == null) return;

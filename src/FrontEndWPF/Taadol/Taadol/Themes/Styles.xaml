@@ -5,11 +5,6 @@
                     xmlns:svg="http://sharpvectors.codeplex.com/svgc/"
                     xmlns:controls="clr-namespace:Taadol.Controls">
 
-    
-    
-    
-
-    
     <SolidColorBrush x:Key="PrimaryBrush"
                      Color="#0D2159" />
     <SolidColorBrush x:Key="PrimaryDarkBrush"
@@ -17,7 +12,6 @@
     <SolidColorBrush x:Key="PrimaryLightBrush"
                      Color="#E9F0FF" />
 
-    
     <SolidColorBrush x:Key="AccentBrush"
                      Color="#2667FF" />
     <SolidColorBrush x:Key="AccentDarkBrush"
@@ -32,7 +26,7 @@
                      Color="#2667FF" />
     <SolidColorBrush x:Key="MenuInactiveBrush"
                      Color="#AFAFAF" />
-    
+
     <SolidColorBrush x:Key="GreenBrush"
                      Color="#02CF54" />
     <SolidColorBrush x:Key="GreenDarkBrush"
@@ -40,20 +34,16 @@
     <SolidColorBrush x:Key="GreenLightBrush"
                      Color="#E0FBEC" />
 
-
-    
     <SolidColorBrush x:Key="DangerBrush"
                      Color="#C1121F" />
     <SolidColorBrush x:Key="DangerLightBrush"
                      Color="#FCE8EA" />
 
-    
     <SolidColorBrush x:Key="GoldBrush"
                      Color="#F5A623" />
     <SolidColorBrush x:Key="GoldLightBrush"
                      Color="#FFF8E7" />
 
-    
     <SolidColorBrush x:Key="Gray05Brush"
                      Color="#E9F0FF" />
     <SolidColorBrush x:Key="Gray1Brush"
@@ -72,7 +62,7 @@
                      Color="#173E99" />
     <SolidColorBrush x:Key="Gray055Brush"
                      Color="#F8FAFC" />
-    
+
     <SolidColorBrush x:Key="BackgroundBrush"
                      Color="#F2F5FA" />
     <SolidColorBrush x:Key="CardBackgroundBrush"
@@ -80,7 +70,6 @@
     <SolidColorBrush x:Key="SidebarBgBrush"
                      Color="#F8FAFF" />
 
-    
     <SolidColorBrush x:Key="ActiveMenuBrush"
                      Color="#E9F0FF" />
 
@@ -91,17 +80,13 @@
     <SolidColorBrush x:Key="TextMutedBrush"
                      Color="#A8C2FF" />
 
-    
     <SolidColorBrush x:Key="BorderBrush"
                      Color="#D4E1FF" />
 
-    
     <FontFamily x:Key="IRANSans">
         pack://application:,,,/Fonts/IRANSans/#IRANSansXFaNum
     </FontFamily>
 
-    <!-- ═══ فونت وزیر (Vazir) — کل خانواده اضافه شد: Fonts/Vazir ═══
-         Vazir: ارقام لاتین | Vazir FD: ارقام فارسی پیش‌فرض | WOL: بدون حروف لاتین -->
     <FontFamily x:Key="Vazir">
         pack://application:,,,/Fonts/Vazir/#Vazir
     </FontFamily>
@@ -134,7 +119,6 @@
                         <StackPanel Orientation="Horizontal"
                                     HorizontalAlignment="Center">
 
-                            
                             <Border x:Name="checkIcon"
                                     Width="18"
                                     Height="18"
@@ -153,14 +137,12 @@
                                                 Visibility="Collapsed" />
                             </Border>
 
-                            
                             <TextBlock x:Name="txt"
                                        Text="{TemplateBinding Content}"
                                        VerticalAlignment="Center"
                                        FontWeight="Medium"
                                        FontFamily="{StaticResource IRANSans}" />
 
-                            
                             <Border x:Name="countBorder"
                                     Background="#F1F5F9"
                                     CornerRadius="8"
@@ -174,12 +156,11 @@
                                            FontFamily="{StaticResource IRANSans}" />
                             </Border>
 
-
                         </StackPanel>
                     </Border>
 
                     <ControlTemplate.Triggers>
-                        
+
                         <Trigger Property="IsChecked"
                                  Value="True">
                             <Setter TargetName="txt"
@@ -205,7 +186,6 @@
                                     Value="Visible" />
                         </Trigger>
 
-                        
                         <Trigger Property="IsMouseOver"
                                  Value="True">
                             <Setter TargetName="bd"
@@ -213,7 +193,6 @@
                                     Value="#F8FAFC" />
                         </Trigger>
 
-                        
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsChecked"
@@ -230,9 +209,7 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
-    
-    
+
     <Style x:Key="MainWindowStyle"
            TargetType="Window">
         <Setter Property="FontFamily"
@@ -267,13 +244,11 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        
                         <ContentPresenter Grid.Column="0"
                                           VerticalAlignment="Center"
                                           Margin="0,0,12,0"
                                           RecognizesAccessKey="True" />
 
-                        
                         <Border x:Name="CheckBoxBorder"
                                 Grid.Column="1"
                                 Width="22"
@@ -284,7 +259,6 @@
                                 CornerRadius="6"
                                 HorizontalAlignment="Right">
 
-                            
                             <Path x:Name="CheckMark"
                                   Data="M 2 6 L 6 10 L 14 2"
                                   Stroke="#2667FF"
@@ -306,7 +280,7 @@
                     </Grid>
 
                     <ControlTemplate.Triggers>
-                        
+
                         <Trigger Property="IsChecked"
                                  Value="True">
                             <Setter TargetName="CheckBoxBorder"
@@ -358,7 +332,6 @@
                             </Trigger.ExitActions>
                         </Trigger>
 
-                        
                         <Trigger Property="IsMouseOver"
                                  Value="True">
                             <Setter TargetName="CheckBoxBorder"
@@ -366,7 +339,6 @@
                                     Value="#2667FF" />
                         </Trigger>
 
-                        
                         <Trigger Property="IsEnabled"
                                  Value="False">
                             <Setter Property="Opacity"
@@ -377,7 +349,6 @@
             </Setter.Value>
         </Setter>
     </Style>
-
 
     <Style x:Key="FilterTabStyle2"
            TargetType="ToggleButton">
@@ -431,7 +402,7 @@
                                         <Setter Property="Visibility"
                                                 Value="Collapsed" />
                                         <Style.Triggers>
-                                            <!-- ضربدر فقط وقتی مجاز باشد (ShowClose=True) و تب انتخاب شده باشد دیده می‌شود -->
+
                                             <MultiDataTrigger>
                                                 <MultiDataTrigger.Conditions>
                                                     <Condition Binding="{Binding Path=(controls:FilterTabBehavior.ShowClose), RelativeSource={RelativeSource AncestorType=ToggleButton}}"
@@ -530,11 +501,6 @@
         </Setter>
     </Style>
 
-
-
-
-
-
     <Style x:Key="CardPanel"
            TargetType="Border">
         <Setter Property="Background"
@@ -628,7 +594,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="TextBox">
                     <Grid>
-                        
+
                         <Border x:Name="border"
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
@@ -641,7 +607,6 @@
                                               VerticalScrollBarVisibility="Hidden"
                                               Margin="{TemplateBinding Padding}" />
 
-                                
                                 <TextBlock x:Name="PlaceholderText"
                                            Text="{TemplateBinding Tag}"
                                            Foreground="#BFBFBF"
@@ -656,7 +621,7 @@
                     </Grid>
 
                     <ControlTemplate.Triggers>
-                        
+
                         <Trigger Property="Text"
                                  Value="">
                             <Setter TargetName="PlaceholderText"
@@ -664,7 +629,6 @@
                                     Value="Visible" />
                         </Trigger>
 
-                        
                         <Trigger Property="IsFocused"
                                  Value="True">
                             <Setter TargetName="border"
@@ -675,7 +639,6 @@
                                     Value="1.5" />
                         </Trigger>
 
-                        
                         <Trigger Property="IsEnabled"
                                  Value="False">
                             <Setter Property="Background"
@@ -689,9 +652,6 @@
         </Setter>
     </Style>
 
-    <!-- ═══════════════════════════════════════════════════
-         اسکرول بار مینیمال — رنگ تم برنامه (#2667FF)
-    ════════════════════════════════════════════════════ -->
     <Style x:Key="MinimalScrollBar"
            TargetType="ScrollBar">
         <Setter Property="Background"
@@ -838,7 +798,6 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
 
-                                
                                 <TextBox x:Name="PART_EditableTextBox"
                                          Grid.Column="0"
                                          Margin="{TemplateBinding Padding}"
@@ -867,7 +826,6 @@
                                     </TextBox.Style>
                                 </TextBox>
 
-                                
                                 <TextBlock x:Name="PlaceholderText"
                                            Grid.Column="0"
                                            Text="{TemplateBinding Tag}"
@@ -879,7 +837,6 @@
                                            IsHitTestVisible="False"
                                            Visibility="Collapsed" />
 
-                                
                                 <ToggleButton x:Name="ToggleButton"
                                               Grid.Column="1"
                                               Background="Transparent"
@@ -953,7 +910,6 @@
                                     </ToggleButton.Template>
                                 </ToggleButton>
 
-                                
                                 <Popup x:Name="PART_Popup"
                                        AllowsTransparency="True"
                                        Placement="Bottom"
@@ -987,7 +943,7 @@
                     </Grid>
 
                     <ControlTemplate.Triggers>
-                        
+
                         <Trigger Property="Text"
                                  Value="">
                             <Setter TargetName="PlaceholderText"
@@ -1001,7 +957,6 @@
                                     Value="Visible" />
                         </Trigger>
 
-                        
                         <Trigger Property="IsMouseOver"
                                  Value="True">
                             <Setter TargetName="border"
@@ -1009,7 +964,6 @@
                                     Value="#c0c0c0" />
                         </Trigger>
 
-                        
                         <Trigger Property="IsKeyboardFocusWithin"
                                  Value="True">
                             <Setter TargetName="border"
@@ -1020,7 +974,6 @@
                                     Value="1.5" />
                         </Trigger>
 
-                        
                         <Trigger Property="IsEnabled"
                                  Value="False">
                             <Setter Property="Background"
@@ -1037,9 +990,6 @@
         </Setter>
     </Style>
 
-
-
-    
     <Style x:Key="SearchableComboBoxItem"
            TargetType="ComboBoxItem">
         <Setter Property="Height"
@@ -1083,7 +1033,6 @@
             </Setter.Value>
         </Setter>
     </Style>
-
 
     <Style x:Key="LightAddButton"
            TargetType="Button">
@@ -1146,7 +1095,7 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+
     <Style x:Key="twoway"
            TargetType="Border">
         <Setter Property="Background">
@@ -1206,7 +1155,7 @@
                                           VerticalAlignment="Center" />
                     </Border>
                     <ControlTemplate.Triggers>
-                        
+
                         <Trigger Property="IsChecked"
                                  Value="True">
                             <Setter TargetName="border"
@@ -1222,11 +1171,9 @@
                             <Setter Property="Foreground"
                                     Value="#2667FF" />
 
-
                         </Trigger>
                         <Trigger Property="IsChecked"
                                  Value="False">
-
 
                             <Setter TargetName="border"
                                     Property="BorderBrush"
@@ -1234,9 +1181,7 @@
                             <Setter Property="Foreground"
                                     Value="#555555" />
 
-
                         </Trigger>
-
 
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -1273,9 +1218,6 @@
         </Setter>
     </Style>
 
-    
-    
-    
     <Style x:Key="FieldLabel"
            TargetType="TextBlock">
         <Setter Property="FontFamily"
@@ -1290,9 +1232,6 @@
                 Value="0,0,0,6" />
     </Style>
 
-    
-    
-    
     <Style x:Key="ChipButton"
            TargetType="RadioButton">
         <Setter Property="Height"
@@ -1340,9 +1279,6 @@
         </Setter>
     </Style>
 
-    
-    
-    
     <Style x:Key="StatusToggleButton"
            TargetType="ToggleButton">
         <Setter Property="Cursor"
@@ -1369,7 +1305,6 @@
                                 </Style>
                             </ContentPresenter.Resources>
                         </ContentPresenter>
-
 
                         <Border x:Name="CheckBoxBorder"
                                 Width="20"
@@ -1408,7 +1343,6 @@
                                     Value="Visible" />
                         </Trigger>
 
-
                         <Trigger Property="IsChecked"
                                  Value="False">
                             <Setter TargetName="CheckBoxBorder"
@@ -1425,7 +1359,6 @@
                                     Property="Visibility"
                                     Value="Collapsed" />
                         </Trigger>
-
 
                         <Trigger Property="IsMouseOver"
                                  Value="True">
@@ -1524,7 +1457,6 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        
                         <Ellipse x:Name="OuterCircle"
                                  Width="20"
                                  Height="20"
@@ -1533,7 +1465,6 @@
                                  Fill="Transparent"
                                  Grid.Column="0" />
 
-                        
                         <Ellipse x:Name="InnerCircle"
                                  Width="10"
                                  Height="10"
@@ -1541,7 +1472,6 @@
                                  Grid.Column="0"
                                  Visibility="Collapsed" />
 
-                        
                         <ContentPresenter Grid.Column="1"
                                           Margin="8,0,0,0"
                                           VerticalAlignment="Center" />
@@ -1549,7 +1479,6 @@
 
                     <ControlTemplate.Triggers>
 
-                        
                         <Trigger Property="IsChecked"
                                  Value="True">
                             <Setter TargetName="InnerCircle"
@@ -1563,7 +1492,6 @@
                                     Value="#27AE60" />
                         </Trigger>
 
-                        
                         <Trigger Property="IsMouseOver"
                                  Value="True">
                             <Setter TargetName="OuterCircle"
@@ -1574,7 +1502,6 @@
                                     Value="#E8F8F0" />
                         </Trigger>
 
-                        
                         <Trigger Property="IsEnabled"
                                  Value="False">
                             <Setter TargetName="OuterCircle"
@@ -1601,7 +1528,7 @@
                 <ControlTemplate TargetType="RadioButton">
                     <StackPanel Orientation="Horizontal"
                                 VerticalAlignment="Center">
-                        
+
                         <ContentPresenter Content="{TemplateBinding Content}"
                                           VerticalAlignment="Center"
                                           Margin="0,0,8,0">
@@ -1619,7 +1546,6 @@
                             </ContentPresenter.Resources>
                         </ContentPresenter>
 
-                        
                         <Border x:Name="RadioBorder"
                                 Width="20"
                                 Height="20"
@@ -1627,7 +1553,7 @@
                                 BorderBrush="#CBD5E1"
                                 CornerRadius="4"
                                 Background="#FFFFFF">
-                            
+
                             <svg:SvgViewbox x:Name="CheckMark"
                                             Width="8"
                                             Height="8"
@@ -1640,7 +1566,7 @@
                     </StackPanel>
 
                     <ControlTemplate.Triggers>
-                        
+
                         <Trigger Property="IsChecked"
                                  Value="True">
                             <Setter TargetName="RadioBorder"
@@ -1657,7 +1583,6 @@
                                     Value="Visible" />
                         </Trigger>
 
-                        
                         <Trigger Property="IsChecked"
                                  Value="False">
                             <Setter TargetName="RadioBorder"
@@ -1674,7 +1599,6 @@
                                     Value="Collapsed" />
                         </Trigger>
 
-                        
                         <Trigger Property="IsMouseOver"
                                  Value="True">
                             <Setter TargetName="RadioBorder"
@@ -1686,9 +1610,7 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
-    
-    
+
     <Style x:Key="TabToggleButton"
            TargetType="ToggleButton">
         <Setter Property="Height"
@@ -1736,9 +1658,6 @@
         </Setter>
     </Style>
 
-    
-    
-    
     <Style x:Key="SubMenuItemButton"
            TargetType="Button">
         <Setter Property="Height"

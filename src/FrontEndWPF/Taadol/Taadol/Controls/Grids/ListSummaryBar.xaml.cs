@@ -1,12 +1,9 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 
 namespace Taadol.Controls
 {
-    /// <summary>
-    /// نوار خلاصه/شمارنده زیر گرید: تعداد موارد انتخاب شده + تعداد کل مربوط به همان صفحه.
-    /// مقدار دهی از طریق خاصیت‌های متنی انجام می‌شود.
-    /// </summary>
+
     public partial class ListSummaryBar : UserControl
     {
         public ListSummaryBar()

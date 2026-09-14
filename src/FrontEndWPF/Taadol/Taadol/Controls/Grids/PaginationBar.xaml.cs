@@ -1,22 +1,17 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Windows;
 using System.Windows.Controls;
 
 namespace Taadol.Controls
 {
-    /// <summary>
-    /// نوار صفحه‌بندی مشترک: دکمه قبلی/بعدی، شماره صفحات، انتخاب تعداد صفحه و متن شمارنده.
-    /// فرم‌ها از طریق شبکه رویدادها مقادیر را دریافت/ایجاد می‌کنند.
-    /// </summary>
+
     public partial class PaginationBar : UserControl
     {
         public PaginationBar()
         {
             InitializeComponent();
         }
-
-        // ────────────────────── Dependency Properties ──────────────────────
 
         public static readonly DependencyProperty PagesSourceProperty =
             DependencyProperty.Register(nameof(PagesSource), typeof(IEnumerable), typeof(PaginationBar),
@@ -48,14 +43,10 @@ namespace Taadol.Controls
             set => SetValue(PageInfoContentProperty, value);
         }
 
-        // ────────────────────── Events ──────────────────────
-
         public event EventHandler NextPageRequested;
         public event EventHandler PreviousPageRequested;
         public event EventHandler<int> PageRequested;
         public event EventHandler<int> PageSizeRequested;
-
-        // ────────────────────── Handlers ──────────────────────
 
         private void BtnNextPage_Click(object sender, RoutedEventArgs e)
         {
@@ -119,8 +110,7 @@ namespace Taadol.Controls
 
         private void PageSizeSelector_SelectionChanged(object sender, int newSize)
         {
-            // گارد دوم در لایه‌ی واسط: حتی اگر کنترل داخلی به‌دلیل رویداد ورودی
-            // چند بار پیام بدهد، فرم فقط یک بار برای همان مقدار Refresh می‌شود.
+
             if (_lastRequestedPageSize == newSize)
                 return;
 

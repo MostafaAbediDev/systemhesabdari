@@ -19,7 +19,6 @@ namespace Taadol.Controls
         private enum CalendarView { Days, Months, Years }
         private CalendarView _currentView = CalendarView.Days;
 
-        // اسامی ماه‌های شمسی
         private static readonly string[] MonthNames = {
             "فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور",
             "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"
@@ -27,7 +26,6 @@ namespace Taadol.Controls
 
         #region Dependency Properties (پراپرتی‌های بایندینگ)
 
-        // ۱. پراپرتی تاریخ میلادی (برای ذخیره در دیتابیس)
         public static readonly DependencyProperty SelectedDateProperty =
             DependencyProperty.Register(nameof(SelectedDate), typeof(DateTime?), typeof(PersianDatePickerControl),
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnSelectedDateChanged));
@@ -45,7 +43,6 @@ namespace Taadol.Controls
             DateChanged?.Invoke(this, new RoutedEventArgs());
         }
 
-        // ۲. پراپرتی رشته تاریخ شمسی (مانند ۱۴۰۳/۰۷/۲۵ برای نمایش یا فیلتر)
         public static readonly DependencyProperty PersianDateStringProperty =
             DependencyProperty.Register(nameof(PersianDateString), typeof(string), typeof(PersianDatePickerControl),
                 new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnPersianDateStringChanged));
@@ -63,12 +60,10 @@ namespace Taadol.Controls
             InitializeComponent();
             InitializeCurrentDate();
 
-            // رجیستر کردن رویدادهای کیبورد برای ناوبری سریع‌تر
             YearTextBox.PreviewKeyDown += DateTextBox_PreviewKeyDown;
             MonthTextBox.PreviewKeyDown += DateTextBox_PreviewKeyDown;
             DayTextBox.PreviewKeyDown += DateTextBox_PreviewKeyDown;
 
-            // هندل کردن بازنشانی فیلدها هنگام خروج فوکوس (Padding با صفر)
             MonthTextBox.LostFocus += MonthTextBox_LostFocus;
             DayTextBox.LostFocus += DayTextBox_LostFocus;
             YearTextBox.LostFocus += YearTextBox_LostFocus;
@@ -81,9 +76,6 @@ namespace Taadol.Controls
             _displayedMonth = _persianCalendar.GetMonth(now);
         }
 
-        /// <summary>
-        /// متد عمومی برای پاک کردن و بازنشانی کامل دیت‌پیکر از بیرون (رفع خطای کامپایل)
-        /// </summary>
         public void Clear()
         {
             _isInternalChange = true;
@@ -304,7 +296,6 @@ namespace Taadol.Controls
             textBox.Text = normalized;
             textBox.CaretIndex = Math.Min(caretIndex, normalized.Length);
         }
-
 
         private void YearTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
@@ -585,7 +576,7 @@ namespace Taadol.Controls
             switch (_currentView)
             {
                 case CalendarView.Days:
-                    // نمایش لیست ماه‌ها
+
                     _currentView = CalendarView.Months;
                     CalendarDaysGrid.Visibility = Visibility.Collapsed;
                     CalendarWeekdayRow.Visibility = Visibility.Collapsed;
@@ -595,7 +586,7 @@ namespace Taadol.Controls
                     RenderMonths();
                     break;
                 case CalendarView.Months:
-                    // نمایش لیست سال‌ها
+
                     _currentView = CalendarView.Years;
                     CalendarDaysGrid.Visibility = Visibility.Collapsed;
                     CalendarWeekdayRow.Visibility = Visibility.Collapsed;
@@ -605,7 +596,7 @@ namespace Taadol.Controls
                     RenderYears();
                     break;
                 case CalendarView.Years:
-                    // برگشت به نمایش روزها
+
                     ShowDaysView();
                     break;
             }
@@ -644,7 +635,7 @@ namespace Taadol.Controls
                         ? new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#2667FF"))
                         : System.Windows.Media.Brushes.Transparent,
                     BorderThickness = new Thickness(0),
-                    // ✅ Concentric radius: دکمه‌های داخل popup با radius 6 هماهنگ با popup radius 8
+
                     Template = CreateMonthYearButtonTemplate()
                 };
 
@@ -667,7 +658,7 @@ namespace Taadol.Controls
         private void RenderYears()
         {
             CalendarYearsGrid.Children.Clear();
-            // 12 سال نمایش داده می‌شود (3×4) تا ردیف آخر کامل باشد
+
             for (int y = _displayedYear - 5; y <= _displayedYear + 6; y++)
             {
                 bool isSelected = y == _displayedYear;
@@ -712,15 +703,11 @@ namespace Taadol.Controls
             }
         }
 
-        // ===== Hover Effects =====
         private readonly System.Windows.Media.Color _hoverColor =
             (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#F0F4FF");
         private readonly System.Windows.Media.Color _selectedColor =
             (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#2667FF");
 
-        /// <summary>
-        /// ✅ Template یکسان برای دکمه‌های ماه و سال با CornerRadius=6
-        /// </summary>
         private ControlTemplate CreateMonthYearButtonTemplate()
         {
             string xaml = @"

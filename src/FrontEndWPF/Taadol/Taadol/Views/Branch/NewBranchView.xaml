@@ -23,7 +23,6 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <!-- ═══ ردیف 0: هدر ═══ -->
             <Grid Grid.Row="0"
                   Margin="10,15,10,10">
                 <StackPanel Orientation="Horizontal"
@@ -46,7 +45,6 @@
                 </StackPanel>
             </Grid>
 
-            <!-- خط جداکننده دش‌دار -->
             <Border Grid.Row="0"
                     Height="1"
                     Margin="7,0,7,2"
@@ -74,14 +72,12 @@
                 </Border.Background>
             </Border>
 
-            <!-- ═══ ردیف 1: بدنه (اسکرول‌شونده) ═══ -->
             <ScrollViewer Grid.Row="1"
                           Style="{StaticResource MinimalScrollViewer}"
                           VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Disabled">
                 <StackPanel>
 
-                    <!-- ═══ کارت اطلاعات اصلی شعبه ═══ -->
                     <Border Style="{StaticResource CardPanel}">
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -116,7 +112,7 @@
                                                                    Placeholder="1234"
                                                                    IsEnabled="{Binding IsUniqueCodeManual}"
                                                                    Grid.ColumnSpan="2" />
-                                  
+
                                 </Grid>
 
                                 <TextBlock Text="نام شرکت"
@@ -254,7 +250,7 @@
                             </StackPanel>
                         </Grid>
                     </Border>
-                    <Grid 
+                    <Grid
                           Margin="0,0,0,2">
                         <Border Height="3">
                             <Border.Background>
@@ -295,7 +291,6 @@
                                  Panel.ZIndex="2" />
                     </Grid>
 
-                    <!-- ═══ تب‌ها ═══ -->
                     <StackPanel Margin="20,0,0,0"
                                 HorizontalAlignment="Left">
                         <Border CornerRadius="0"
@@ -317,7 +312,7 @@
                                              Margin="0,0,0,0"
                                              x:Name="TabInventory"
                                              Checked="TabInventory_Checked" />
-                              
+
                             </StackPanel>
                         </Border>
                     </StackPanel>
@@ -496,9 +491,6 @@
                 </StackPanel>
             </ScrollViewer>
 
-            <!-- ═══ ردیف 3: جداکننده دکمه‌ای ═══ -->
-
-            <!-- ═══ ردیف 4: فوتر (دکمه‌ها) ═══ -->
             <Border Grid.Row="4"
                     Margin="0,5,0,0"
                     BorderBrush="#E5E7EB"

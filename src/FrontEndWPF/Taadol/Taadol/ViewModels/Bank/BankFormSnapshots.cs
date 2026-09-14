@@ -1,18 +1,12 @@
-using System;
+﻿using System;
 
 namespace Taadol.ViewModels
 {
-    /// <summary>
-    /// ریشهٔ مشترک اسنپ‌شات‌های فرم بانک. هر اسنپ‌شات یک کپی فقط‌خواندنی از وضعیت
-    /// میدان‌های فرم است که برای تشخیص تغییرات ذخیره‌نشده (dirty-check) با حالت اولیه مقایسه می‌شود.
-    /// </summary>
+
     public abstract class FormSnapshotBase
     {
     }
 
-    /// <summary>
-    /// اسنپ‌شات فرم ثبت بانک — دقیقاً مطابق FormSnapshot قبلی داخل NewBankViewModel.
-    /// </summary>
     public sealed class BankNewFormSnapshot : FormSnapshotBase
     {
         public BankNewFormSnapshot(
@@ -73,10 +67,6 @@ namespace Taadol.ViewModels
         }
     }
 
-    /// <summary>
-    /// اسنپ‌شات فرم ویرایش بانک — دقیقاً مطابق EditBankFormSnapshot قبلی داخل EditBankViewModel.
-    /// (فرم ویرایش فیلد IsActive ندارد.)
-    /// </summary>
     public sealed class BankEditFormSnapshot : FormSnapshotBase
     {
         public BankEditFormSnapshot(

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,21 +13,16 @@ using Taadol.Models;
 
 namespace Taadol.Controls
 {
-    /// <summary>
-    /// گرید لیست مشترک: استایل‌های یکسان هدر/سلول/ردیف، ستون چک‌باکس، شماره ردیف،
-    /// صفحه‌بندی و لودینگ. ستون‌های هر فرم از طریق خاصیت Columns اضافه می‌شوند.
-    /// </summary>
+
     public partial class UnifiedListView : UserControl
     {
         private bool _scrollWired = false;
         private bool _rowBordersUpdatePending = false;
         private bool _builtColumnsHandled = false;
-        // فقط بعد از اولین ست شدن ItemsSource پیام خالی نمایش داده می‌شود؛
-        // وگرنه قبل از شروع لود، فلش خالی وسط گرید دیده می‌شود.
+
         private bool _itemsSourceEverSet = false;
         private ScrollViewer _innerScrollViewer;
 
-        // شعاع گرد گوشه‌ی داخلی قاب (CornerRadius بیرونی ۴ منهای ضخامت بردر ۱)
         private const double GridCornerRadius = 3;
 
         public UnifiedListView()
@@ -35,9 +30,6 @@ namespace Taadol.Controls
             InitializeComponent();
             Loaded += UnifiedListView_Loaded;
 
-            // چرخ ماوس روی گرید به اسکرول بیرونی منتقل می‌شود (DataGrid رویداد را می‌بلعد)
-            // گوشه‌های محتوای گرید را گرد نگه می‌دارد تا هدر/ردیف‌ها از CornerRadius قاب بیرون نزنند
-            // (فقط خود DataGrid کلیپ می‌شود تا خط بردر قاب بیرونی بریده نشود)
             DataGridView.SizeChanged += DataGridView_SizeChanged;
 
             DataGridView.PreviewMouseLeftButtonDown += DataGridRow_PreviewMouseLeftButtonDown;
@@ -66,10 +58,6 @@ namespace Taadol.Controls
             };
         }
 
-        // ══════════════════════════════════════════════════════
-        //  Dependency Properties
-        // ══════════════════════════════════════════════════════
-
         public static readonly DependencyProperty ItemsSourceProperty =
             DependencyProperty.Register(nameof(ItemsSource), typeof(IEnumerable), typeof(UnifiedListView),
                 new PropertyMetadata(null, (d, _) =>
@@ -77,22 +65,14 @@ namespace Taadol.Controls
                     var control = (UnifiedListView)d;
                     if (control.DataGridView != null)
                     {
-                        // ابتدا ItemsSource را null کن تا کانتینرهای قدیمی (ردیف‌های صفحه قبلی)
-                        // کاملاً تخریب شوند؛ وگرنه با reuse شدن کانتینرها و اشتراک آیتم‌ها،
-                        // شماره ردیف قدیمی/تکراری نمایش داده می‌شود.
+
                         if (!ReferenceEquals(control.DataGridView.ItemsSource, control.ItemsSource))
                         {
                             control.DataGridView.ItemsSource = null;
                             control.DataGridView.ItemsSource = control.ItemsSource;
 
-                            // بعد از تغییر صفحه/فیلتر، وضعیت چک‌باکس سرستون باید دوباره محاسبه شود
-                        // (چک‌باکس هدر فقط وقتی روشن است که همه‌ی ردیف‌های همین صفحه انتخاب باشند).
-                        // تغییر ItemsSource ممکن است چندین LoadingRow پشت‌سرهم ایجاد کند؛
-                        // به‌جای صف‌کردن Refresh برای هر ردیف، فقط یک بروزرسانی تجمیعی ثبت می‌کنیم.
                         control.ScheduleRowBordersUpdate();
 
-                        // با تغییر صفحه/فیلتر، اسکرول عمودی باید به بالای لیست برگردد؛
-                        // وگرنه کاربر در وسط/انتهای صفحه‌ی قبلی می‌ماند و ردیف‌های خالی/بی‌ساختار را می‌بیند.
                             control.Dispatcher.BeginInvoke(new Action(control.ScrollGridToTop),
                                 DispatcherPriority.Background);
                         }
@@ -108,10 +88,6 @@ namespace Taadol.Controls
             set => SetValue(ItemsSourceProperty, value);
         }
 
-        /// <summary>
-        /// محتوای شکاف پایین گرید (نوار جمع‌بندی). هر فرم نوار خودش را اینجا قرار می‌دهد؛
-        /// همیشه زیر گرید و خارج از ناحیه‌ی اسکرول است.
-        /// </summary>
         public static readonly DependencyProperty FooterProperty =
             DependencyProperty.Register(nameof(Footer), typeof(object), typeof(UnifiedListView),
                 new PropertyMetadata(null, (d, _) =>
@@ -176,10 +152,6 @@ namespace Taadol.Controls
             set => SetValue(IsLoadingProperty, value);
         }
 
-        /// <summary>
-        /// پیام خطای آخرین بارگذاری. وقتی مقدار داشته باشد، خطا جای Empty State را می‌گیرد.
-        /// این فقط وضعیت نمایشی FrontEnd است و به قراردادهای Backend وابسته نیست.
-        /// </summary>
         public static readonly DependencyProperty LoadErrorTextProperty =
             DependencyProperty.Register(nameof(LoadErrorText), typeof(string), typeof(UnifiedListView),
                 new PropertyMetadata(string.Empty, (d, _) =>
@@ -197,14 +169,6 @@ namespace Taadol.Controls
 
         private bool HasLoadError => !string.IsNullOrWhiteSpace(LoadErrorText);
 
-        // ══════════════════════════════════════════════════════
-        //  Empty State (وقتی هیچ رکورد واقعی‌ای وجود ندارد)
-        // ══════════════════════════════════════════════════════
-
-        /// <summary>
-        /// وقتی true باشد، اگر ItemsSource هیچ رکورد واقعی (غیر از ردیف‌های خالی پرکننده) نداشته باشد،
-        /// پیام خالی وسط گرید نمایش داده می‌شود. به‌طور پیش‌فرض true است تا همه لیست‌ها یکسان رفتار کنند.
-        /// </summary>
         public static readonly DependencyProperty ShowEmptyStateProperty =
             DependencyProperty.Register(nameof(ShowEmptyState), typeof(bool), typeof(UnifiedListView),
                 new PropertyMetadata(true, (d, _) => ((UnifiedListView)d).UpdateEmptyState()));
@@ -215,7 +179,6 @@ namespace Taadol.Controls
             set => SetValue(ShowEmptyStateProperty, value);
         }
 
-        /// <summary>متن اصلی پیام خالی (فرم می‌تواند آن را سفارشی کند).</summary>
         public static readonly DependencyProperty EmptyStateTextProperty =
             DependencyProperty.Register(nameof(EmptyStateText), typeof(string), typeof(UnifiedListView),
                 new PropertyMetadata("موردی یافت نشد", (d, _) => ((UnifiedListView)d).ApplyEmptyStateTexts()));
@@ -226,7 +189,6 @@ namespace Taadol.Controls
             set => SetValue(EmptyStateTextProperty, value);
         }
 
-        /// <summary>زیرنویس کوچک پیام خالی (فرم می‌تواند آن را سفارشی کند).</summary>
         public static readonly DependencyProperty EmptyStateHintTextProperty =
             DependencyProperty.Register(nameof(EmptyStateHintText), typeof(string), typeof(UnifiedListView),
                 new PropertyMetadata("برای افزودن، از دکمه «جدید» استفاده کنید", (d, _) => ((UnifiedListView)d).ApplyEmptyStateTexts()));
@@ -262,11 +224,9 @@ namespace Taadol.Controls
                 }
             }
 
-            // لودینگ و خطا اولویت دارند؛ Empty فقط بعد از بارگذاری موفق نمایش داده می‌شود.
             var show = ShowEmptyState && _itemsSourceEverSet && !hasRealItems && !IsLoading && !HasLoadError;
             EmptyStateOverlay.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
 
-            // در حالت خالی، گرید حداقل ارتفاع می‌گیرد تا پیام وسط جدول جا داشته باشد
             UpdateGridMinHeight();
         }
 
@@ -290,27 +250,18 @@ namespace Taadol.Controls
             set => SetValue(ShowCheckBoxProperty, value);
         }
 
-        // ══════════════════════════════════════════════════════
-        //  Public Surface
-        // ══════════════════════════════════════════════════════
-
-        /// <summary>ستون‌های دامنه هر فرم (بعد از چک‌باکس و شماره ردیف اضافه می‌شوند).</summary>
         public ObservableCollection<DataGridColumn> Columns { get; } = new ObservableCollection<DataGridColumn>();
 
-        /// <summary>دسترسی مستقیم به DataGrid داخلی.</summary>
         public DataGrid Grid => DataGridView;
 
-        /// <summary>ردیفی که دوبار کلیک شده است (قبل از رویداد GridDoubleClicked مقدار می‌گیرد).</summary>
         public object DoubleClickedItem { get; private set; }
 
-        /// <summary>رسم مجدد خطوط ردیف‌ها و وضعیت چک‌باکس سرستون (بعد از تغییر داده‌ها).</summary>
         public void RefreshVisualState()
         {
             UpdateRowBorders();
             UpdateHeaderSelectAllState();
         }
 
-        // رویدادها — فرم‌ها برای اتصال به ViewModel خود subscribe می‌کنند
         public event EventHandler NextPageRequested;
         public event EventHandler PreviousPageRequested;
         public event EventHandler<int> PageRequested;
@@ -318,22 +269,11 @@ namespace Taadol.Controls
         public event EventHandler GridDoubleClicked;
         public event EventHandler CheckedItemsChanged;
 
-        /// <summary>
-        /// چک‌باکس سرستون فقط همین صفحه را انتخاب می‌کند؛ ولی وقتی خاموش می‌شود،
-        /// فرم باید انتخابِ صفحات دیگر را هم پاک کند تا چیزی انتخاب‌شده باقی نماند.
-        /// مقدار bool = حالت جدید (true = روشن/انتخاب همین صفحه، false = خاموش/پاک کردن همه).
-        /// </summary>
         public event EventHandler<bool> SelectAllToggled;
 
-        /// <summary>راست‌کلیک روی ردیف → «ویرایش» انتخاب شد.</summary>
         public event EventHandler<IListRowItem> RowEditRequested;
 
-        /// <summary>راست‌کلیک روی ردیف → «حذف» انتخاب شد.</summary>
         public event EventHandler<IListRowItem> RowDeleteRequested;
-
-        // ══════════════════════════════════════════════════════
-        //  Lifecycle
-        // ══════════════════════════════════════════════════════
 
         private void UnifiedListView_Loaded(object sender, RoutedEventArgs e)
         {
@@ -349,10 +289,6 @@ namespace Taadol.Controls
             }), DispatcherPriority.Background);
         }
 
-        /// <summary>
-        /// وقتی لیست خالی است یا در حال بارگذاری، گرید حداقل ارتفاع می‌گیرد تا پیام خالی/لودر
-        /// جایی برای نمایش داشته باشد؛ با داده‌ی واقعی صفر می‌شود تا گرید دقیقاً به‌اندازه‌ی محتوا جمع شود.
-        /// </summary>
         private void UpdateGridMinHeight()
         {
             if (GridArea == null) return;
@@ -391,10 +327,6 @@ namespace Taadol.Controls
                 DataGridView.Columns.Add(column);
         }
 
-        // ══════════════════════════════════════════════════════
-        //  Loading / Error State
-        // ══════════════════════════════════════════════════════
-
         private void ShowLoading(bool show)
         {
             if (PaginationBar != null)
@@ -405,7 +337,6 @@ namespace Taadol.Controls
             if (DataGridView != null)
                 DataGridView.IsHitTestVisible = !show;
 
-            // در حالت لودینگ، گرید حداقل ارتفاع می‌گیرد تا کارت لودر جا داشته باشد
             UpdateGridMinHeight();
         }
 
@@ -418,15 +349,10 @@ namespace Taadol.Controls
                     ? "خطا در بارگذاری اطلاعات"
                     : LoadErrorText;
 
-            // هنگام بارگذاری، کارت لودینگ باید روی خطا اولویت داشته باشد.
             LoadErrorOverlay.Visibility = HasLoadError && !IsLoading
                 ? Visibility.Visible
                 : Visibility.Collapsed;
         }
-
-        // ══════════════════════════════════════════════════════
-        //  DataGrid Visual Handlers
-        // ══════════════════════════════════════════════════════
 
         private void DataGridView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -460,8 +386,7 @@ namespace Taadol.Controls
 
         private void DataGridRow_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            // فقط کلیک‌های داخل ردیف مصرف شوند؛ کلیک روی هدر، اسکرول‌بار یا فضای خالی
-            // نباید بلوک شود وگرنه کشیدن thumb اسکرول افقی/عمودی کار نمی‌کند.
+
             if (GetRowFromMouse(e.OriginalSource as DependencyObject) == null)
                 return;
 
@@ -489,10 +414,6 @@ namespace Taadol.Controls
             {
                 if (element is T match) return match;
 
-                // راست‌کلیک/کلیک روی متن سلول، OriginalSource را یک Run (ContentElement)
-                // می‌کند که Visual نیست؛ VisualTreeHelper.GetParent روی آن
-                // InvalidOperationException می‌اندازد (باگ Runtime تأییدشده).
-                // برای عناصر غیر-Visual از LogicalTree پدر را بالا می‌رویم.
                 element = element is Visual || element is System.Windows.Media.Media3D.Visual3D
                     ? VisualTreeHelper.GetParent(element)
                     : LogicalTreeHelper.GetParent(element);
@@ -529,10 +450,6 @@ namespace Taadol.Controls
             return false;
         }
 
-        // ══════════════════════════════════════════════════════
-        //  CheckBox / Select-All
-        // ══════════════════════════════════════════════════════
-
         private void CheckBoxBorder_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             if (sender is FrameworkElement fe && fe.DataContext is IListRowItem item && !item.IsEmpty)
@@ -549,9 +466,7 @@ namespace Taadol.Controls
         {
             if (sender is FrameworkElement fe && fe.DataContext is IListRowItem item && !item.IsEmpty)
             {
-                // صریح ست می‌کنیم چون رویداد Checked قبل از نوشتن بایندینگ TwoWay
-                // روی item.IsSelected فایر می‌شود؛ بدون این خط، مصرف‌کنندگانِ رویداد
-                // (پنل جزئیات، جمع‌ها) هنوز مقدار قدیمی را می‌بینند.
+
                 item.IsSelected = true;
                 UpdateRowBorders();
                 UpdateHeaderSelectAllState();
@@ -563,7 +478,7 @@ namespace Taadol.Controls
         {
             if (sender is FrameworkElement fe && fe.DataContext is IListRowItem item && !item.IsEmpty)
             {
-                // همان توضیح بالا — بایندینگ هنوز IsSelected را false نکرده است.
+
                 item.IsSelected = false;
                 UpdateRowBorders();
                 UpdateHeaderSelectAllState();
@@ -573,8 +488,7 @@ namespace Taadol.Controls
 
         private void DataGridView_LoadingRow(object sender, DataGridRowEventArgs e)
         {
-            // ساخت چند ردیف پشت‌سرهم نباید برای هر ردیف کل گرید را دوباره پردازش کند؛
-            // بروزرسانی را به یک کار تجمیعی در پایان نوبت Dispatcher تبدیل می‌کنیم.
+
             ScheduleRowBordersUpdate();
         }
 
@@ -603,7 +517,6 @@ namespace Taadol.Controls
                 foreach (var item in realItems)
                     item.IsSelected = newState;
 
-                // وقتی هدر خاموش می‌شود، فرم باید انتخابِ بقیه صفحات را هم پاک کند
                 SelectAllToggled?.Invoke(this, newState);
 
                 UpdateRowBorders();
@@ -626,8 +539,6 @@ namespace Taadol.Controls
         {
             if (DataGridView == null) return;
 
-            // چک‌باکس سرستون همان تمپلیت ردیف‌ها (GridCheckBoxTemplate) را دارد؛
-            // فقط IsChecked را ست می‌کنیم تا تریگرهای تمپلیت ظاهر یکسان را بسازند.
             var toggle = FindDescendantByName(DataGridView, "SelectAllBorder") as ToggleButton;
             if (toggle == null) return;
 
@@ -688,7 +599,6 @@ namespace Taadol.Controls
                 var row = DataGridView.ItemContainerGenerator.ContainerFromIndex(i) as DataGridRow;
                 if (row == null) continue;
 
-                // ردیف‌های خالیِ پرکننده نباید خط آبی یا خاکستری اضافی داشته باشند.
                 if (items[i] is not IListRowItem item || item.IsEmpty)
                 {
                     row.BorderBrush = transparent;
@@ -705,15 +615,13 @@ namespace Taadol.Controls
 
                 if (item.IsSelected)
                 {
-                    // ردیف انتخاب‌شده: خط بالا و پایین آبی؛ در انتخاب چند ردیف پشت‌سرهم،
-                    // خط بالای ردیف‌های میانی حذف می‌شود تا مرز داخلی ضخیم دیده نشود.
+
                     row.BorderBrush = blue;
                     row.BorderThickness = new Thickness(0, previousRowSelected ? 0 : 1, 0, 1);
                 }
                 else if (isLastRealRow)
                 {
-                    // بردر پایین قاب بیرونی خط پایانی را رسم می‌کند؛ برای جلوگیری از دوپیکسلی شدن
-                    // لبه‌ی پایین، روی آخرین ردیف خط جداگانه رسم نمی‌کنیم.
+
                     row.BorderBrush = transparent;
                     row.BorderThickness = new Thickness(0);
                 }
@@ -726,8 +634,6 @@ namespace Taadol.Controls
                 NormalizeOuterCellBorder(row);
             }
 
-            // هدرها هم مانند سلول‌ها یک خط داخلی در لبه‌ی راست دارند؛ قاب بیرونی همان خط را
-            // تأمین می‌کند، بنابراین فقط خط راست آخرین هدر حذف می‌شود تا ضخامت دوبرابر نشود.
             NormalizeOuterHeaderBorders();
         }
 
@@ -738,7 +644,7 @@ namespace Taadol.Controls
 
             foreach (var cell in FindVisualChildren<DataGridCell>(row))
             {
-                // بردر بیرونی قاب مسئول لبه‌های چپ و راست است؛ سلول‌ها فقط خطوط داخلی را رسم می‌کنند.
+
                 var thickness = cell.BorderThickness;
                 if (cell.TransformToAncestor(DataGridView).Transform(new Point(0, 0)).X <= 0)
                     cell.BorderThickness = new Thickness(0, thickness.Top, thickness.Right, thickness.Bottom);
@@ -788,18 +694,10 @@ namespace Taadol.Controls
             }
         }
 
-        // ══════════════════════════════════════════════════════
-        //  Scroll & Layout
-        // ══════════════════════════════════════════════════════
-
         private void WireScrollChanged()
         {
             if (DataGridView == null || _scrollWired) return;
 
-            // اسکرول توسط OuterScrollViewer انجام می‌شود؛ هدر خارج از آن ثابت است. Padding/Margin
-            // اسکرول‌ویور داخلی صفر می‌شود. اسکرول‌بار عمودی داخلی غیرفعال است تا فقط بدنه حرکت کند.
-            // فقط وقتی ردیف‌ها از ظرفیت کادر بلندتر شوند ظاهر می‌شود (استایل مینیمال ۸px) تا
-            // کاربر بداند لیست اسکرول دارد؛ با ردیف کم هیچ اسکرول‌باری دیده نمی‌شود.
             if (FindDescendantByName(DataGridView, "DG_ScrollViewer") is ScrollViewer sv)
             {
                 _innerScrollViewer = sv;
@@ -812,10 +710,6 @@ namespace Taadol.Controls
             }
         }
 
-        /// <summary>
-        /// محتوای DataGrid (هدر و ردیف‌ها) را با گوشه‌های گرد می‌بُرد تا گوشه‌های تیز سفید
-        /// از داخل CornerRadius قاب بیرونی دیده نشوند؛ خود قاب (بردر بیرونی) کلیپ نمی‌شود.
-        /// </summary>
         private void DataGridView_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             if (DataGridView == null || DataGridView.ActualWidth <= 0 || DataGridView.ActualHeight <= 0) return;
@@ -824,7 +718,6 @@ namespace Taadol.Controls
                 GridCornerRadius, GridCornerRadius);
         }
 
-        /// <summary>اسکرول داخلی DataGrid را به بالای لیست برمی‌گرداند.</summary>
         private void ScrollGridToTop()
         {
             _innerScrollViewer?.ScrollToTop();

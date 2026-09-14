@@ -6,18 +6,15 @@ using System.Windows.Media.Effects;
 
 namespace Taadol.Controls
 {
-    /// <summary>
-    /// دیالوگ مدرن با انیمیشن، آیکون رنگی و دکمه‌های زیبا.
-    /// از متدهای استاتیک ShowConfirm / ShowInput استفاده کنید.
-    /// </summary>
+
     public partial class ModernDialog : Window
     {
         public enum DialogType
         {
-            Danger,    // قرمز - حذف
-            Primary,   // آبی - افزودن
-            Success,   // سبز - ویرایش / ثبت موفق
-            Warning    // نارنجی - هشدار
+            Danger,
+            Primary,
+            Success,
+            Warning
         }
 
         public string InputText { get; private set; }
@@ -25,23 +22,22 @@ namespace Taadol.Controls
 
         private bool _isClosing = false;
 
-        /// <summary>پالت رنگ بر اساس نوع دیالوگ</summary>
         private class Palette
         {
-            public string IconBg;        // رنگ پس‌زمینه دایره بیرونی
-            public string IconInnerBg;   // رنگ پس‌زمینه دایره درونی
-            public string TitleFg;       // رنگ عنوان
-            public string ConfirmBg;     // رنگ دکمه تأیید
-            public string ConfirmHover;  // رنگ hover دکمه تأیید
-            public string IconPath;      // مسیر آیکون SVG
+            public string IconBg;
+            public string IconInnerBg;
+            public string TitleFg;
+            public string ConfirmBg;
+            public string ConfirmHover;
+            public string IconPath;
         }
 
         private static Palette GetPalette(DialogType type) => type switch
         {
             DialogType.Danger => new Palette
             {
-                IconBg = "#FEE2E2",        // قرمز خیلی کم‌رنگ (حلقه بیرونی)
-                IconInnerBg = "#FFFFFF",   // سفید (دایره داخلی برای وضوح آیکون)
+                IconBg = "#FEE2E2",
+                IconInnerBg = "#FFFFFF",
                 TitleFg = "#DC2626",
                 ConfirmBg = "#E63946",
                 ConfirmHover = "#C81E2D",
@@ -49,7 +45,7 @@ namespace Taadol.Controls
             },
             DialogType.Primary => new Palette
             {
-                IconBg = "#DBEAFE",        // آبی کم‌رنگ
+                IconBg = "#DBEAFE",
                 IconInnerBg = "#FFFFFF",
                 TitleFg = "#2563EB",
                 ConfirmBg = "#2563EB",
@@ -58,7 +54,7 @@ namespace Taadol.Controls
             },
             DialogType.Success => new Palette
             {
-                IconBg = "#DCFCE7",        // سبز کم‌رنگ
+                IconBg = "#DCFCE7",
                 IconInnerBg = "#FFFFFF",
                 TitleFg = "#16A34A",
                 ConfirmBg = "#16A34A",
@@ -67,7 +63,7 @@ namespace Taadol.Controls
             },
             DialogType.Warning => new Palette
             {
-                IconBg = "#FEF3C7",        // زرد کم‌رنگ
+                IconBg = "#FEF3C7",
                 IconInnerBg = "#FFFFFF",
                 TitleFg = "#D97706",
                 ConfirmBg = "#D97706",
@@ -92,11 +88,6 @@ namespace Taadol.Controls
             KeyDown += ModernDialog_KeyDown;
         }
 
-        // ==================== Static API ====================
-
-        /// <summary>
-        /// نمایش دیالوگ تأیید (بدون TextBox).
-        /// </summary>
         public static bool ShowConfirm(
             string title,
             string message,
@@ -112,10 +103,6 @@ namespace Taadol.Controls
             return dlg.IsConfirmed;
         }
 
-        /// <summary>
-        /// نمایش دیالوگ ورودی (با TextBox). مقدار وارد شده را برمی‌گرداند.
-        /// اگر کاربر انصراف دهد، null برمی‌گردد.
-        /// </summary>
         public static string ShowInput(
             string title,
             string message,
@@ -132,9 +119,6 @@ namespace Taadol.Controls
             return dlg.IsConfirmed ? dlg.InputText : null;
         }
 
-        /// <summary>
-        /// نمایش پیام ساده با یک دکمه تأیید.
-        /// </summary>
         public static void ShowMessage(
             string title,
             string message,
@@ -148,8 +132,6 @@ namespace Taadol.Controls
             if (owner != null) dlg.Owner = owner;
             dlg.ShowDialog();
         }
-
-        // ==================== Configuration ====================
 
         private void Configure(
             string title,
@@ -167,18 +149,15 @@ namespace Taadol.Controls
 
             DialogMessage.Text = message;
 
-            // آیکون و رنگ‌ها
             DialogIcon.Source = new System.Uri(p.IconPath, System.UriKind.Relative);
             IconCircle.Background = (SolidColorBrush)new BrushConverter().ConvertFrom(p.IconBg);
             IconInner.Background = (SolidColorBrush)new BrushConverter().ConvertFrom(p.IconInnerBg);
 
-            // رنگ دکمه تأیید (از طریق Background دکمه، که در ControlTemplate به ConfirmBdInner bind شده)
             ConfirmButton.Background = (SolidColorBrush)new BrushConverter().ConvertFrom(p.ConfirmBg);
 
             ConfirmText.Text = confirmText;
             CancelText.Text = cancelText;
 
-            // نمایش / عدم نمایش TextBox
             if (showInput)
             {
                 InputWrapper.Visibility = Visibility.Visible;
@@ -191,8 +170,6 @@ namespace Taadol.Controls
                 InputWrapper.Visibility = Visibility.Collapsed;
             }
         }
-
-        // ==================== Events ====================
 
         private void ModernDialog_Loaded(object sender, RoutedEventArgs e)
         {
@@ -236,7 +213,7 @@ namespace Taadol.Controls
                 InputText = InputBox.Text;
                 if (string.IsNullOrWhiteSpace(InputText))
                 {
-                    // کمی لرزش روی TextBox برای هشدار
+
                     var shake = new DoubleAnimationUsingKeyFrames { Duration = System.TimeSpan.FromMilliseconds(400) };
                     shake.KeyFrames.Add(new LinearDoubleKeyFrame(0, System.TimeSpan.FromMilliseconds(0)));
                     shake.KeyFrames.Add(new LinearDoubleKeyFrame(-6, System.TimeSpan.FromMilliseconds(80)));
@@ -248,7 +225,6 @@ namespace Taadol.Controls
                     InputWrapper.RenderTransform = rt;
                     rt.BeginAnimation(TranslateTransform.XProperty, shake);
 
-                    // فلش قرمز کردن Border
                     InputWrapper.BorderBrush = new SolidColorBrush(Color.FromRgb(0xE6, 0x39, 0x46));
                     return;
                 }
@@ -271,11 +247,9 @@ namespace Taadol.Controls
             });
         }
 
-        // ==================== Animations ====================
-
         private void PlayOpenAnimation()
         {
-            // انیمیشن Scale از 0.85 به 1.0
+
             var scaleAnim = new DoubleAnimation
             {
                 From = 0.85,
@@ -286,7 +260,6 @@ namespace Taadol.Controls
             RootScale.BeginAnimation(ScaleTransform.ScaleXProperty, scaleAnim);
             RootScale.BeginAnimation(ScaleTransform.ScaleYProperty, scaleAnim);
 
-            // انیمیشن Opacity از 0 به 1
             var fade = new DoubleAnimation
             {
                 From = 0,
@@ -296,7 +269,6 @@ namespace Taadol.Controls
             };
             RootBorder.BeginAnimation(OpacityProperty, fade);
 
-            // انیمیشن بالارفتن DropShadow
             var shadowAnim = new DoubleAnimation
             {
                 From = 0,
@@ -310,7 +282,6 @@ namespace Taadol.Controls
         {
             _isClosing = true;
 
-            // یک timeout محافظتی: اگر انیمیشن به هر دلیلی کامل نشد، بعد از 500ms بسته شود
             var safetyTimer = new System.Windows.Threading.DispatcherTimer
             {
                 Interval = System.TimeSpan.FromMilliseconds(500)

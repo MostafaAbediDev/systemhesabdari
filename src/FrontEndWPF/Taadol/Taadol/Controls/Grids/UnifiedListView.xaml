@@ -1,4 +1,4 @@
-<UserControl x:Class="Taadol.Controls.UnifiedListView"
+﻿<UserControl x:Class="Taadol.Controls.UnifiedListView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:svg="http://sharpvectors.codeplex.com/svgc/"
@@ -33,8 +33,6 @@
             <Setter Property="Panel.ZIndex" Value="-1" />
         </Style>
 
-        <!-- ═══ تمپلیت مشترک چک‌باکس: هم برای ردیف‌ها هم برای سرستون ═══
-             تا ظاهر هر دو یکسان باشد (بردر خاکستری → آبی + تیک سفید + هاور). -->
         <ControlTemplate x:Key="GridCheckBoxTemplate" TargetType="ToggleButton">
             <Border x:Name="CheckBoxBorder"
                     Width="20"
@@ -73,9 +71,6 @@
         </ControlTemplate>
     </UserControl.Resources>
 
-    <!-- چیدمان: [ناحیه‌ی گرید با اسکرول بیرونی] + [Footer = نوار جمع‌بندی] + [PaginationBar در پایین].
-         اسکرول‌بار خارج از قاب گرید است؛ قاب همیشه دقیقاً به‌اندازه‌ی محتوا (هدر + ردیف‌ها) جمع می‌شود
-         و هیچ فاصله‌ای بین آخرین ردیف و بردر پایین قاب نیست. چرخ ماوس روی گرید به اسکرول بیرونی منتقل می‌شود. -->
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -94,13 +89,11 @@
                 <Style TargetType="ScrollBar"
                        BasedOn="{StaticResource MinimalScrollBar}" />
             </ScrollViewer.Resources>
-            <!-- GridArea: VerticalAlignment=Top تا دقیقاً به‌اندازه‌ی محتوا جمع شود؛
-                 MinHeight فقط در حالت خالی/لودینگ ۲۰۰ می‌شود تا پیام/لودر جا داشته باشد -->
+
             <Grid x:Name="GridArea"
                   VerticalAlignment="Top"
                   ClipToBounds="True">
-            <!-- MinHeight در کد-behind مدیریت می‌شود: فقط در حالت خالی/لودینگ ۲۰۰ می‌شود
-                 تا پیام/لودر جا داشته باشد؛ با داده‌ی واقعی صفر است تا گرید دقیقاً به‌اندازه‌ی محتوا جمع شود -->
+
             <Border x:Name="DataGridBorder"
                         Background="#FFFFFF"
                         BorderBrush="#E5E7EB"
@@ -150,7 +143,7 @@
                     </DataGrid.Resources>
 
                     <DataGrid.Columns>
-                        <!-- 1️⃣ چک‌باکس -->
+
                         <DataGridTemplateColumn Header=""
                                                 Width="44"
                                                 MinWidth="40">
@@ -178,7 +171,7 @@
                             <DataGridTemplateColumn.CellStyle>
                                 <Style TargetType="DataGridCell"
                                        BasedOn="{StaticResource UnifiedGridCellStyle}">
-                                    <!-- در چیدمان راست‌به‌چپ، لبه‌ی چپ چک‌باکس مرز مشترک با ستون # است. -->
+
                                     <Setter Property="BorderThickness"
                                             Value="1,0,0,0" />
                                     <Setter Property="Padding"
@@ -189,7 +182,7 @@
                             </DataGridTemplateColumn.CellStyle>
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <!-- ردیف‌های خالی (پرکننده صفحه) چک‌باکس ندارند -->
+
                                     <ToggleButton x:Name="RowToggle"
                                                   Cursor="Hand"
                                                   Padding="0"
@@ -215,7 +208,6 @@
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
-                        <!-- 2️⃣ ردیف (#) -->
                         <DataGridTextColumn Header="#"
                                             Width="50"
                                             MinWidth="45"
@@ -224,8 +216,7 @@
                             <DataGridTextColumn.CellStyle>
                                 <Style TargetType="DataGridCell"
                                        BasedOn="{StaticResource UnifiedGridCellStyle}">
-                                    <!-- ستون # باید از هر دو سمت از ستون‌های مجاور جدا باشد. -->
-                                    <!-- ستون # باید از هر دو سمت از ستون‌های مجاور جدا باشد. -->
+
                                     <Setter Property="BorderThickness"
                                             Value="1,0,1,0" />
                                     <Setter Property="BorderBrush"
@@ -235,8 +226,7 @@
                             <DataGridTextColumn.HeaderStyle>
                                 <Style TargetType="DataGridColumnHeader"
                                        BasedOn="{StaticResource UnifiedGridColumnHeaderStyle}">
-                                    <!-- خط‌های چپ و راست هدر # و خط پایینی حفظ می‌شوند. -->
-                                    <!-- خط‌های چپ و راست هدر # و خط پایینی حفظ می‌شوند. -->
+
                                     <Setter Property="BorderThickness"
                                             Value="1,0,1,1" />
                                     <Setter Property="BorderBrush"
@@ -434,7 +424,6 @@
                 </Border>
             </Border>
 
-            <!-- ═══ Error State — خطا در بارگذاری؛ تا زمانی که خطا وجود دارد Empty نشان داده نمی‌شود ═══ -->
             <Border x:Name="LoadErrorOverlay"
                     Background="#FDFDFE"
                     Visibility="Collapsed"
@@ -473,7 +462,6 @@
                 </StackPanel>
             </Border>
 
-            <!-- ═══ Empty State — وقتی هیچ رکورد واقعی‌ای (غیر از ردیف‌های خالی پرکننده) وجود ندارد ═══ -->
             <Border x:Name="EmptyStateOverlay"
                     Background="#FDFDFE"
                     Visibility="Collapsed"
@@ -514,20 +502,15 @@
         </Grid>
         </ScrollViewer>
 
-        <!-- ═══ شکاف نوار جمع‌بندی: هر فرم نوار خودش (ListSummaryBar یا نوار سفارشی) را اینجا می‌گذارد؛
-             همیشه زیر گرید و خارج از ناحیه‌ی اسکرول است ═══ -->
         <ContentControl x:Name="FooterSlot"
                         Grid.Row="1"
                         Margin="0,4,0,0"
                         Focusable="False" />
 
-        <!-- ═══ صفحه‌بندی (زیر نوار جمع‌بندی، خارج از ناحیه‌ی اسکرول) ═══
-             مارجین پایین: با لیست بلند که گرید تا سقف پر می‌شود، نوار هرگز زیر فوتر/لبه بریده نشود -->
         <controls:PaginationBar x:Name="PaginationBar"
                                 Grid.Row="2"
                                 Margin="0,0,0,8" />
 
-        <!-- ═══ منوی راست‌کلیک ردیف (ویرایش / حذف) — کنترل مستقل ═══ -->
         <controls:RowContextMenuControl x:Name="RowContextMenu" />
     </Grid>
 </UserControl>
