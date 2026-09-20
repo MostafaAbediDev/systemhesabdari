@@ -1,6 +1,7 @@
 ﻿using _0_FrameWork.Domain;
 using BankManagement.Domain.Bank.ChequeAgg;
 using BankManagement.Domain.Bank.CompanyBankAccountAgg;
+using GeneralInfoManagement.Domain.BaseInfo.BranchesAgg;
 
 namespace BankManagement.Domain.Bank.ChequeBookAgg
 {
@@ -13,6 +14,12 @@ namespace BankManagement.Domain.Bank.ChequeBookAgg
         public string SerialNumber { get; private set; }
         public DateTime ReceiveDate { get; private set; }
         public long CompanyBankAccountId { get; private set; }
+
+        //New Prop
+        public long BranchId { get; private set; }
+        public Branches Branches { get; private set; }
+        //
+
         public CompanyBankAccounts CompanyBankAccount { get; private set; }
         public List<Cheques> Cheques { get; private set; }
 

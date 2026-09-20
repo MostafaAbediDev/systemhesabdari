@@ -6,7 +6,6 @@ using InventoryManagement.Domain.Inventory.CategoryAgg;
 using InventoryManagement.Domain.Inventory.InventoryTransactionAgg;
 using InventoryManagement.Domain.Inventory.Product.ProductArrributeValueAgg;
 using InventoryManagement.Domain.Inventory.Product.ProductBatcheAgg;
-using InventoryManagement.Domain.Inventory.Product.ProductCreateSerieAgg;
 using InventoryManagement.Domain.Inventory.Product.ProductPriceAgg;
 using InventoryManagement.Domain.Inventory.Product.ProductSerialAgg;
 using InventoryManagement.Domain.Inventory.Storage.StorageProductAgg;
@@ -17,8 +16,14 @@ namespace InventoryManagement.Domain.Inventory.Product.ProductAgg
 {
     public class Products : EntityBase
     {
+        //Use Code From Codes In CodeManagement
         public string Code { get; private set; }
+
+        
         public string Title { get; private set; }
+
+
+
         public string Description { get; private set; }
         public decimal? ConversionFactor { get; private set; }
         public bool IsService { get; private set; }

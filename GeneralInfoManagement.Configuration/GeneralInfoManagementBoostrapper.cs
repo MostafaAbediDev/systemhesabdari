@@ -1,5 +1,4 @@
-﻿using CodeManagement.Infrastructure.EFCore.Repository;
-using GeneralInfoManagement.Application;
+﻿using GeneralInfoManagement.Application;
 using GeneralInfoManagement.Application.Contract.BranchArchice;
 using GeneralInfoManagement.Application.Contract.Branches;
 using GeneralInfoManagement.Application.Contract.City;
@@ -8,12 +7,14 @@ using GeneralInfoManagement.Application.Contract.FinancialPeriod;
 using GeneralInfoManagement.Application.Contract.Picture;
 using GeneralInfoManagement.Application.Contract.Province;
 using GeneralInfoManagement.Domain.BaseInfo.BranchArchiveAgg;
+using GeneralInfoManagement.Domain.BaseInfo.BranchArchiveAgg.FileUpload;
 using GeneralInfoManagement.Domain.BaseInfo.BranchesAgg;
 using GeneralInfoManagement.Domain.BaseInfo.CompaniesAgg;
 using GeneralInfoManagement.Domain.BaseInfo.FinancialPeriodsAgg;
 using GeneralInfoManagement.Domain.BaseInfo.PictureAgg;
 using GeneralInfoManagement.Infrastructure.EFCore;
 using GeneralInfoManagement.Infrastructure.EFCore.Repository;
+using GeneralInfoManagement.Infrastructure.EFCore.Repository.FileUpload;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -40,6 +41,9 @@ namespace GeneralInfoManagement.Configuration
 
             services.AddTransient<ICityApplication, CityApplication>();
             services.AddTransient<IProvinceApplication, ProvinceApplication>();
+
+
+            services.AddTransient<IBranchArchiveFileUploader, BranchArchiveFileUploader>();
 
             //Add DB Context For Real Data
             services.AddDbContext<GeneralInfoSystemContext>(x => x.UseSqlServer(connectionString));

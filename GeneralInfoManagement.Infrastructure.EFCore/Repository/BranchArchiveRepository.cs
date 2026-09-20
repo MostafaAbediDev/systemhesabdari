@@ -36,6 +36,7 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
                 .Any(x => x.BranchId == branchId && !x.IsDeleted);
         }
 
+
         public EditBranchArchive GetDetails(long id)
         {
             return _context.BranchArchives.Where(x => !x.IsDeleted)
@@ -59,6 +60,7 @@ namespace GeneralInfoManagement.Infrastructure.EFCore.Repository
                     Id = x.Id,
                     Title = x.Title,
                     Description = x.Description,
+                    File = x.File,
                     BranchId = x.BranchId,
                     BranchTitle = x.Branch.Title,
                     CreationDate = x.CreationDate.ToString()

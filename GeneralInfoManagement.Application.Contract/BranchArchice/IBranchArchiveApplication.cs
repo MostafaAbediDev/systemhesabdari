@@ -13,5 +13,6 @@ namespace GeneralInfoManagement.Application.Contract.BranchArchice
         EditBranchArchive GetDetails(long id);
         List<BranchArchiveViewModel> Search(BranchArchiveSearchModel searchModel);
         List<BranchArchiveViewModel> GetBranchArchives();
+        string GetFilePath(long id);
     }
 }

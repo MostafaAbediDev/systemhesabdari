@@ -1,5 +1,6 @@
 ﻿using _0_FrameWork.Domain;
 using BankManagement.Domain.Bank.BankAgg;
+using BankManagement.Domain.Bank.BankBrancheAgg;
 using GeneralInfoManagement.Domain.BaseInfo.BranchesAgg;
 
 namespace BankManagement.Domain.Bank.CompanyBankAccountAgg
@@ -12,8 +13,13 @@ namespace BankManagement.Domain.Bank.CompanyBankAccountAgg
         public string Shaba { get; private set; }
         public long BranchId { get; private set; }
         public long BankId { get; private set; }
+
+        //new prop
+        public long BankBranchId { get; private set; }
         public Branches Branches { get; private set; }
+        //
         public Banks Banks { get; private set; }
+        public BankBranches BankBranches { get; private set; }
         
 
         protected CompanyBankAccounts()
